@@ -1,0 +1,37 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Next.js
+.next
+out
+
+# Build
+build
+dist
+
+# Environment
+.env
+.env.local
+.env.production
+
+# Database
+*.db
+prisma/dev.db
+prisma/dev.db-journal
+
+# IDE
+.vscode
+.idea
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Test
+test-content.js
