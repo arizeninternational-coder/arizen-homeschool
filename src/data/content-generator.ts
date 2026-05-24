@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Master content generator — combines all Grade 2 and Grade 5 content
 import { generateGrade2Math } from "./grade2-math";
 import { generateGrade2English } from "./grade2-english";

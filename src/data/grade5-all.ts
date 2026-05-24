@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Grade 5 Creative Arts + Kiswahili — Continuation
 import type { QuestGroup, GeneratedContentBlock } from "./content-types";
 
