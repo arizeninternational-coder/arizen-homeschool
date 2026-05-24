@@ -108,18 +108,7 @@ export async function POST(
 
     const learnerId = token.learnerProfileId as string;
 
-    // Upsert progress
-    const progress = await prisma.progress.upsert({
-      where: {
-        // Use a findFirst + create/update pattern
-      } as any,
-      // Prisma doesn't support upsert with compound keys easily, so:
-      update: {},
-      create: {},
-      // We'll use raw approach
-    });
-
-    // Actually do find + create/update
+    // Upsert progress — find existing or create new
     const existing = await prisma.progress.findFirst({
       where: { learnerId, lessonId: lesson.id },
     });
