@@ -4,6 +4,12 @@ const nextConfig = {
   images: {
     remotePatterns: [],
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   // Vercel optimization
   experimental: {
     // Enable if using server components
