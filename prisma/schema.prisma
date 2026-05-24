@@ -2,16 +2,16 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// datasource db {
-//   provider = "sqlite"
-//   url      = "file:./dev.db"
-// }
-
-// For Vercel/PostgreSQL:
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+// For local SQLite dev, uncomment below and comment out above:
+// datasource db {
+//   provider = "sqlite"
+//   url      = "file:./dev.db"
+// }
 
 // ── Enums ─────────────────────────────────────────────────────
 
@@ -270,6 +270,7 @@ model SideQuest {
   quest           Quest?   @relation(fields: [questId], references: [id])
   theme           Theme    @relation(fields: [themeId], references: [id])
   progress        Progress[]
+  activities      Activity[]
 
   @@unique([themeId, slug])
 }

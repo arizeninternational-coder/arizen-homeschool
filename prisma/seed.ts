@@ -1,9 +1,11 @@
 // Master seed script — creates ALL content for Grade 2 and Grade 5
-// Run with: npx ts-node prisma/seed.ts
-import { prisma } from "@/lib/db/prisma";
-import { generateAllGrade2, getGrade2Stats } from "./grade2-math";
-import { generateAllGrade5, getGrade5Stats } from "./grade5-all";
-import type { QuestGroup } from "./content-types";
+// Run with: npx tsx prisma/seed.ts
+import { PrismaClient } from "@prisma/client";
+import { generateAllGrade2 } from "../src/data/content-generator";
+import { generateAllGrade5 } from "../src/data/grade5-all";
+import type { QuestGroup } from "../src/data/content-types";
+
+const prisma = new PrismaClient();
 
 async function main() {
   console.log("🌱 Seeding Arizen Homeschool database...\n");
@@ -80,23 +82,23 @@ async function main() {
   console.log(`✅ Users: Victor (admin), Ariadne (G5, ${ariadne.totalXp} XP), Ariyana (G2, ${ariyana.totalXp} XP)`);
 
   // ── Generate all quest content ────────────────────────────
-  const grade2Quests = generateAllGrade2();
-  const grade5Quests = generateAllGrade5();
+  const grade2Quests: QuestGroup[] = generateAllGrade2();
+  const grade5Quests: QuestGroup[] = generateAllGrade5();
 
   console.log(`\n📚 Generated content:`);
   console.log(`   Grade 2: ${grade2Quests.length} quests`);
   console.log(`   Grade 5: ${grade5Quests.length} quests`);
 
-  // Seed each grade
-  await seedGrade(guild.id, 2, grade2Quests);
-  await seedGrade(guild.id, 5, grade5Quests);
+  // Seed each grade — returns DB quest maps for progress seeding
+  const g2DbQuests = await seedGrade(guild.id, 2, grade2Quests);
+  const g5DbQuests = await seedGrade(guild.id, 5, grade5Quests);
 
   // ── CBC Reference Data ─────────────────────────────────────
   await seedCbcReferenceData();
 
   // ── Sample progress for demo ──────────────────────────────
-  await seedSampleProgress(ariadne.id, grade5Quests);
-  await seedSampleProgress(ariyana.id, grade2Quests);
+  await seedSampleProgress(ariadne.id, g2DbQuests, g5DbQuests);
+  await seedSampleProgress(ariyana.id, g2DbQuests, g5DbQuests);
 
   // ── Summary ───────────────────────────────────────────────
   const themeCount = await prisma.theme.count();
@@ -109,7 +111,7 @@ async function main() {
   console.log("✅ SEED COMPLETE!");
   console.log("═".repeat(50));
   console.log(`   Guilds: 1`);
-  console.log(`   Users: 1`);
+  console.log(`   Users: 3`);
   console.log(`   Learner Profiles: 2`);
   console.log(`   Themes: ${themeCount}`);
   console.log(`   Quests: ${questCount}`);
@@ -119,6 +121,7 @@ async function main() {
   console.log("═".repeat(50));
 }
 
+// Returns array of { dbId, xpReward } for progress seeding
 async function seedGrade(guildId: string, grade: number, quests: QuestGroup[]) {
   // Group quests by theme
   const themeMap: Record<string, QuestGroup[]> = {};
@@ -127,6 +130,8 @@ async function seedGrade(guildId: string, grade: number, quests: QuestGroup[]) {
     themeMap[q.theme].push(q);
   }
 
+  const dbQuests: { dbId: string; xpReward: any; title: string }[] = [];
+
   for (const [themeSlug, themeQuests] of Object.entries(themeMap)) {
     const first = themeQuests[0];
     const theme = await prisma.theme.create({
@@ -134,7 +139,7 @@ async function seedGrade(guildId: string, grade: number, quests: QuestGroup[]) {
         guildId,
         title: formatThemeTitle(themeSlug),
         slug: `${themeSlug}-${grade}`,
-        description: `${first.description.slice(0, 100)}...`,
+        description: first.description?.slice(0, 100) + "...",
         drivingQuestion: getDrivingQuestion(themeSlug),
         durationWeeks: themeQuests.length,
         grade,
@@ -156,10 +161,12 @@ async function seedGrade(guildId: string, grade: number, quests: QuestGroup[]) {
           orderIndex: questData.orderIndex,
           xpReward: questData.xpReward as any,
           cbcMapping: questData.cbcMapping as any,
-          estimatedDurationMinutes: questData.lessons.reduce((s, l) => s + (l.difficulty ? 30 : 30), 0),
+          estimatedDurationMinutes: questData.lessons.reduce((s, l) => s + 30, 0),
           status: "PUBLISHED",
         },
       });
+
+      dbQuests.push({ dbId: quest.id, xpReward: questData.xpReward, title: questData.title });
 
       for (const lessonData of questData.lessons) {
         await prisma.lesson.create({
@@ -182,6 +189,7 @@ async function seedGrade(guildId: string, grade: number, quests: QuestGroup[]) {
   }
 
   console.log(`   Grade ${grade}: ${Object.keys(themeMap).length} themes, ${quests.length} quests seeded ✅`);
+  return dbQuests;
 }
 
 async function seedCbcReferenceData() {
@@ -268,35 +276,37 @@ async function seedCbcReferenceData() {
   console.log("   CBC Reference Data: ✅");
 }
 
-async function seedSampleProgress(learnerId: string, quests: QuestGroup[]) {
-  // Create progress for first few lessons
-  const publishedQuests = quests.filter(q => q.questType === "MAIN").slice(0, 3);
-  const xpRecords: any[] = [];
+async function seedSampleProgress(
+  learnerId: string,
+  g2DbQuests: { dbId: string; xpReward: any; title: string }[],
+  g5DbQuests: { dbId: string; xpReward: any; title: string }[]
+) {
+  // Pick first 3 quests from the appropriate grade
+  const isGrade2 = (await prisma.learnerProfile.findUnique({ where: { id: learnerId } }))?.grade === 2;
+  const sourceQuests = isGrade2 ? g2DbQuests : g5DbQuests;
+  const selected = sourceQuests.slice(0, 3);
 
-  for (const quest of publishedQuests) {
-    const lessons = quest.lessons.slice(0, 2);
-    for (const lesson of lessons) {
-      await prisma.progress.create({
-        data: {
-          learnerId,
-          questId: quest.id,
-          masteryPercent: 100,
-          completedAt: new Date(),
-          lastAccessed: new Date(),
-        },
-      });
-      xpRecords.push({
+  for (const quest of selected) {
+    await prisma.progress.create({
+      data: {
         learnerId,
-        sourceType: "LESSON" as any,
-        sourceId: lesson.slug,
-        amount: (lesson.xpReward?.base || 40),
-        description: `Completed: ${lesson.title}`,
-      });
-    }
-  }
+        questId: quest.dbId,
+        masteryPercent: 100,
+        completedAt: new Date(),
+        lastAccessed: new Date(),
+      },
+    });
 
-  if (xpRecords.length > 0) {
-    await prisma.xpRecord.createMany({ data: xpRecords });
+    const xpAmount = quest.xpReward?.base || 50;
+    await prisma.xpRecord.create({
+      data: {
+        learnerId,
+        sourceType: "QUEST" as any,
+        sourceId: quest.dbId,
+        amount: xpAmount,
+        description: `Completed: ${quest.title}`,
+      },
+    });
   }
 }
 
