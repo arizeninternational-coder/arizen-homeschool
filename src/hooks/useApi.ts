@@ -47,11 +47,11 @@ export function useThemes(grade?: number) {
 }
 
 export function useTheme(slug: string | null) {
-  return useApi<{ theme: any }>(slug ? `/api/themes/${slug}` : null);
+  return useApi<{ theme: any }>(slug ? `/api/themes?slug=${slug}` : null);
 }
 
 export function useQuest(slug: string | null) {
-  return useApi<{ quest: any }>(slug ? `/api/quests/${slug}` : null);
+  return useApi<{ quest: any }>(slug ? `/api/quests?slug=${slug}` : null);
 }
 
 export function useLesson(slug: string | null) {

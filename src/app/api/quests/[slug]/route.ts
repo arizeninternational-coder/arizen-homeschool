@@ -14,15 +14,15 @@ function respondError(message: string, status = 400) {
   return NextResponse.json({ error: message }, { status });
 }
 
-// GET /api/quests/[slug] — Get quest with all lessons and progress
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ slug: string }> }
-) {
+// GET /api/quests?slug=xxx — Get quest with all lessons and progress
+export async function GET(req: NextRequest) {
   try {
     const token = await getToken({ req, secret });
     if (!token?.guildId) return respondError("Unauthorized", 401);
-    const { slug } = await params;
+
+    const { searchParams } = new URL(req.url);
+    const slug = searchParams.get("slug");
+    if (!slug) return respondError("Slug required", 400);
 
     const quest = await prisma.quest.findFirst({
       where: {
