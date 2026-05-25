@@ -14,9 +14,9 @@
     "vercel-build": "npx prisma generate && npx prisma migrate deploy && next build"
   },
   "dependencies": {
-    "next": "15.0.7",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
+    "next": "15.5.18",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "next-auth": "^4.24.0",
     "@prisma/client": "^5.0.0",
     "bcryptjs": "^2.4.3",
