@@ -46,7 +46,6 @@ export async function POST(req: NextRequest) {
       }
       guildId = guild.id;
     } else {
-      // Default to first guild or create one
       const defaultGuild = await prisma.guild.findFirst();
       if (defaultGuild) {
         guildId = defaultGuild.id;
@@ -109,8 +108,13 @@ export async function POST(req: NextRequest) {
     );
   } catch (error: any) {
     console.error("[AUTH] Registration error:", error);
+    // Return the actual error message in development, generic in production
+    const isDev = process.env.NODE_ENV !== "production";
+    const message = isDev
+      ? `Registration failed: ${error.message || "Unknown error"}`
+      : "Failed to create account. Please try again.";
     return NextResponse.json(
-      { error: "Failed to create account. Please try again." },
+      { error: message },
       { status: 500 }
     );
   }

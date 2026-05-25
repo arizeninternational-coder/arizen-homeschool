@@ -15,7 +15,7 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
           console.log("[AUTH] Missing credentials");
-          throw new Error("Email and password are required");
+          throw new Error("Invalid email or password");
         }
 
         const email = credentials.email.toLowerCase().trim();
@@ -102,6 +102,7 @@ export const authOptions: NextAuthOptions = {
   pages: { signIn: "/auth/login", error: "/auth/login" },
   session: { strategy: "jwt", maxAge: 30 * 24 * 60 * 60 },
   secret: process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-production",
+  debug: process.env.NODE_ENV !== "production",
 };
 
 export default NextAuth(authOptions);
