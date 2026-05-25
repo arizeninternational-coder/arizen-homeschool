@@ -25,11 +25,22 @@ function RegisterForm() {
     if (form.password.length < 8) { setError("Password must be at least 8 characters"); return; }
     setLoading(true);
     try {
-      const res = await fetch("/api/auth/register", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: form.name, email: form.email, password: form.password, displayName: form.displayName || form.name, grade: parseInt(form.grade), role: form.role }) });
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email.toLowerCase().trim(),
+          password: form.password,
+          displayName: form.displayName || form.name,
+          grade: parseInt(form.grade),
+          role: form.role,
+        }),
+      });
       const data = await res.json();
       if (!res.ok) { setError(data.error || "Failed to create account"); return; }
       const { signIn } = await import("next-auth/react");
-      const result = await signIn("credentials", { email: form.email, password: form.password, redirect: false });
+      const result = await signIn("credentials", { email: form.email.toLowerCase().trim(), password: form.password, redirect: false });
       if (result?.error) { router.push("/auth/login"); } else { router.push("/"); router.refresh(); }
     } catch { setError("Something went wrong. Please try again."); }
     finally { setLoading(false); }

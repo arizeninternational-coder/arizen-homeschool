@@ -1,26 +1,40 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Flower2, Mail, Lock, AlertCircle, ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react";
 import { ds, colors } from "@/lib/design-system";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  // Show error from NextAuth redirect
+  useEffect(() => {
+    const err = searchParams.get("error");
+    if (err) {
+      const messages: Record<string, string> = {
+        CredentialsSignin: "Invalid email or password. Please try again.",
+        SessionExpired: "Your session has expired. Please sign in again.",
+        AccessDenied: "Access denied. Please sign in first.",
+      };
+      setError(messages[err] || "Something went wrong. Please try again.");
+    }
+  }, [searchParams]);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setLoading(true);
     try {
-      const result = await signIn("credentials", { email, password, redirect: false });
+      const result = await signIn("credentials", { email: email.toLowerCase().trim(), password, redirect: false });
       if (result?.error) {
         setError("Invalid email or password. Please try again.");
       } else if (result?.ok) {
@@ -112,5 +126,19 @@ export default function LoginPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: colors.bg }}>
+        <div style={{ width: '56px', height: '56px', borderRadius: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', background: colors.primarySoft }}>
+          <Flower2 style={{ width: '28px', height: '28px', color: colors.primary }} />
+        </div>
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }

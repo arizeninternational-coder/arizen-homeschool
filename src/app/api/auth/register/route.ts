@@ -16,6 +16,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const normalizedEmail = email.toLowerCase().trim();
+
     if (password.length < 8) {
       return NextResponse.json(
         { error: "Password must be at least 8 characters" },
@@ -24,7 +26,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if user exists
-    const existing = await prisma.user.findUnique({ where: { email } });
+    const existing = await prisma.user.findUnique({ where: { email: normalizedEmail } });
     if (existing) {
       return NextResponse.json(
         { error: "An account with this email already exists" },
@@ -67,7 +69,7 @@ export async function POST(req: NextRequest) {
     const user = await prisma.user.create({
       data: {
         guildId,
-        email,
+        email: normalizedEmail,
         name,
         passwordHash,
         role: userRole,
@@ -83,6 +85,8 @@ export async function POST(req: NextRequest) {
       },
       include: { learnerProfile: true },
     });
+
+    console.log(`[AUTH] Registered: ${normalizedEmail} (${userRole})`);
 
     return NextResponse.json(
       {
@@ -104,9 +108,9 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (error: any) {
-    console.error("Registration error:", error);
+    console.error("[AUTH] Registration error:", error);
     return NextResponse.json(
-      { error: "Failed to create account" },
+      { error: "Failed to create account. Please try again." },
       { status: 500 }
     );
   }

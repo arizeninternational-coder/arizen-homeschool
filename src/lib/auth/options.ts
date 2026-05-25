@@ -14,30 +14,41 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
+          console.log("[AUTH] Missing credentials");
           throw new Error("Email and password are required");
         }
 
+        const email = credentials.email.toLowerCase().trim();
+        console.log(`[AUTH] Login attempt: ${email}`);
+
         const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
+          where: { email },
           include: { guild: true, learnerProfile: true },
         });
 
-        if (!user || !user.passwordHash) {
+        if (!user) {
+          console.log(`[AUTH] User not found: ${email}`);
           throw new Error("Invalid email or password");
         }
 
-        // Check if it's a real bcrypt hash (starts with $2a$, $2b$, or $2y$)
+        if (!user.passwordHash) {
+          console.log(`[AUTH] No password set: ${email}`);
+          throw new Error("Invalid email or password");
+        }
+
         const isRealHash = /^\$2[aby]\$\d+\$/.test(user.passwordHash);
-        let isValid = false;
-
-        if (isRealHash) {
-          isValid = await bcrypt.compare(credentials.password, user.passwordHash);
-        }
-        // If not a real hash (e.g. placeholder from seed), reject — force password reset
-
-        if (!isValid) {
+        if (!isRealHash) {
+          console.log(`[AUTH] Invalid hash format for: ${email} (hash prefix: ${user.passwordHash.substring(0, 10)}...)`);
           throw new Error("Invalid email or password");
         }
+
+        const isValid = await bcrypt.compare(credentials.password, user.passwordHash);
+        if (!isValid) {
+          console.log(`[AUTH] Wrong password for: ${email}`);
+          throw new Error("Invalid email or password");
+        }
+
+        console.log(`[AUTH] Login success: ${email} (${user.role})`);
 
         return {
           id: user.id,
