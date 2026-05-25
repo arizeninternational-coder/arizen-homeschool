@@ -10,10 +10,6 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  // Vercel optimization
-  experimental: {
-    // Enable if using server components
-  },
   // Ensure Prisma works on Vercel
   webpack: (config, { isServer }) => {
     if (isServer) {

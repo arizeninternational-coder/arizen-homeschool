@@ -264,7 +264,7 @@ function CalmSection() {
               <Star key={i} className="w-5 h-5 fill-accent text-accent" />
             ))}
           </div>
-          <blockquote className="text-body-lg italic mb-6 text-balance" style={{ color: "rgb(var(--color-text) / 0.8)" }}>
+          <blockquote className="text-body-lg italic mb-6 text-balance" style={{ color: "rgba(var(--color-text), 0.8)" }}>
             &ldquo;Learning should feel like a warm hug, not a test. Arizen School understands
             that children grow best when they feel safe, seen, and celebrated.&rdquo;
           </blockquote>
@@ -327,6 +327,8 @@ function Footer() {
 }
 
 /* ─── Page ─── */
+export const dynamic = "force-dynamic";
+
 export default function HomePage() {
   return (
     <div className="min-h-screen">
