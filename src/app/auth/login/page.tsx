@@ -5,6 +5,7 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Flower2, Mail, Lock, AlertCircle, ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react";
+import { ds, colors } from "@/lib/design-system";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -18,14 +19,8 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
-
     try {
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      });
-
+      const result = await signIn("credentials", { email, password, redirect: false });
       if (result?.error) {
         setError("Invalid email or password. Please try again.");
       } else if (result?.ok) {
@@ -42,125 +37,77 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[rgb(var(--color-cream))] via-[rgb(245,243,255)] to-[rgb(240,249,255)]">
-      {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-        <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full blur-3xl" style={{ background: 'rgba(237,233,254,0.3)' }} />
-        <div className="absolute -bottom-32 -left-32 w-96 h-96 rounded-full blur-3xl" style={{ background: 'rgba(224,242,254,0.2)' }} />
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: `linear-gradient(180deg, ${colors.bg} 0%, ${colors.bgSoft} 100%)` }}>
+      {/* BG orbs */}
+      <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }} aria-hidden="true">
+        <div style={{ position: 'absolute', top: '-8rem', right: '-8rem', width: '24rem', height: '24rem', borderRadius: '50%', filter: 'blur(64px)', background: colors.primarySoft }} />
+        <div style={{ position: 'absolute', bottom: '-8rem', left: '-8rem', width: '24rem', height: '24rem', borderRadius: '50%', filter: 'blur(64px)', background: colors.accentSoft }} />
       </div>
 
       {/* Header */}
-      <header className="relative px-4 sm:px-6 pt-5 pb-3">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-sm font-medium hover:opacity-80 transition-opacity"
-          style={{ color: 'rgb(var(--color-text-muted))' }}
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Home
+      <header style={{ position: 'relative', padding: '1.25rem 1rem 0.75rem' }}>
+        <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', fontWeight: 500, color: colors.textMuted, textDecoration: 'none' }}>
+          <ArrowLeft style={{ width: '16px', height: '16px' }} /> Back to Home
         </Link>
       </header>
 
-      {/* Main content */}
-      <main className="relative flex-1 flex items-center justify-center px-4 py-8 sm:py-12">
-        <div className="w-full max-w-[420px]">
-          {/* Logo & Header */}
-          <div className="text-center mb-8">
-            <Link href="/" className="inline-flex items-center gap-3 mb-6 group">
-              <div className="w-11 h-11 rounded-2xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-105" style={{ background: 'linear-gradient(135deg, rgb(var(--color-primary)), #7c3aed)' }}>
-                <Flower2 className="w-6 h-6 text-white" />
+      {/* Main */}
+      <main style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem 1rem' }}>
+        <div style={{ width: '100%', maxWidth: '420px' }}>
+          {/* Logo */}
+          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+            <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none' }}>
+              <div style={{ ...ds.logoMark, width: '44px', height: '44px' }}>
+                <Flower2 style={{ width: '24px', height: '24px' }} />
               </div>
-              <span className="text-xl font-extrabold gradient-text">Arizen School</span>
+              <span style={{ fontSize: '1.25rem', fontWeight: 800, ...ds.textGradient }}>Arizen School</span>
             </Link>
-
-            <h1 className="heading-lg mb-2">Welcome back</h1>
-            <p className="text-body">Sign in to continue your learning journey.</p>
+            <h1 style={{ ...ds.headingLg, marginTop: '1.5rem', marginBottom: '0.5rem' }}>Welcome back</h1>
+            <p style={ds.textBody}>Sign in to continue your learning journey.</p>
           </div>
 
-          {/* Login Card */}
-          <div className="card-glass p-7 sm:p-8">
+          {/* Card */}
+          <div style={ds.cardFlat}>
             {error && (
-              <div className="alert-error">
-                <AlertCircle className="w-5 h-5" />
-                <span>{error}</span>
+              <div style={ds.alertError}>
+                <AlertCircle style={{ width: '20px', height: '20px', color: colors.danger, flexShrink: 0, marginTop: '2px' }} />
+                <span style={{ fontSize: '0.875rem', color: colors.danger }}>{error}</span>
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Email */}
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
               <div>
-                <label className="label" htmlFor="email">
-                  Email
-                </label>
-                <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'rgba(100,116,139,0.5)' }} />
-                  <input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@example.com"
-                    required
-                    autoComplete="email"
-                    className="input-field pl-11"
-                  />
+                <label style={ds.label} htmlFor="email">Email</label>
+                <div style={{ position: 'relative' }}>
+                  <Mail style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: colors.textMuted }} />
+                  <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required autoComplete="email" style={{ ...ds.input, paddingLeft: '2.75rem' }} />
                 </div>
               </div>
 
-              {/* Password */}
               <div>
-                <label className="label" htmlFor="password">
-                  Password
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'rgba(100,116,139,0.5)' }} />
-                  <input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter your password"
-                    required
-                    autoComplete="current-password"
-                    className="input-field pl-11 pr-11"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 hover:opacity-80 transition-opacity"
-                    style={{ color: 'rgba(100,116,139,0.5)' }}
-                    aria-label={showPassword ? "Hide password" : "Show password"}
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                <label style={ds.label} htmlFor="password">Password</label>
+                <div style={{ position: 'relative' }}>
+                  <Lock style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: colors.textMuted }} />
+                  <input id="password" type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter your password" required autoComplete="current-password" style={{ ...ds.input, paddingLeft: '2.75rem', paddingRight: '2.75rem' }} />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: colors.textMuted, padding: 0 }}>
+                    {showPassword ? <EyeOff style={{ width: '16px', height: '16px' }} /> : <Eye style={{ width: '16px', height: '16px' }} />}
                   </button>
                 </div>
               </div>
 
-              {/* Submit */}
-              <button
-                type="submit"
-                disabled={loading}
-                className="btn-primary w-full"
-                style={{ paddingTop: '0.875rem', paddingBottom: '0.875rem' }}
-              >
+              <button type="submit" disabled={loading} style={{ ...ds.btnPrimary, width: '100%', padding: '0.875rem', marginTop: '0.25rem', opacity: loading ? 0.6 : 1 }}>
                 {loading ? (
-                  <span className="flex items-center gap-2">
-                    <Loader2 className="w-4 h-4 spinner" />
-                    Signing in...
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <Loader2 style={{ width: '16px', height: '16px' }} className="spinner" /> Signing in...
                   </span>
-                ) : (
-                  "Sign In"
-                )}
+                ) : "Sign In"}
               </button>
             </form>
           </div>
 
-          {/* Register link */}
-          <p className="text-center mt-6 text-sm" style={{ color: 'rgb(var(--color-text-muted))' }}>
-            Don&apos;t have an account?{" "}
-            <Link href="/auth/register" className="font-bold transition-opacity hover:opacity-80" style={{ color: 'rgb(var(--color-primary))' }}>
-              Create one free
-            </Link>
+          <p style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.875rem', color: colors.textMuted }}>
+            Don't have an account?{" "}
+            <Link href="/auth/register" style={{ fontWeight: 700, color: colors.primary, textDecoration: 'none' }}>Create one free</Link>
           </p>
         </div>
       </main>
