@@ -1,14 +1,10 @@
 "use client";
+
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { GraduationCap, Mail, Lock, AlertCircle } from "lucide-react";
-
-const demoAccounts = [
-  { email: "ariadne@arizen.local", password: "demo123", name: "Ariadne", grade: 5, xp: 2450, streak: 7, color: "from-amber-500 to-red-500" },
-  { email: "ariyana@arizen.local", password: "demo123", name: "Ariyana", grade: 2, xp: 890, streak: 3, color: "from-pink-400 to-purple-500" },
-];
+import { Flower2, Mail, Lock, AlertCircle, ArrowLeft, Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -16,91 +12,152 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setLoading(true);
-    try {
-      const result = await signIn("credentials", { email, password, redirect: false });
-      if (result?.error) setError(result.error);
-      else { router.push("/"); router.refresh(); }
-    } catch { setError("Something went wrong."); }
-    finally { setLoading(false); }
-  }
 
-  async function quickLogin(account: typeof demoAccounts[0]) {
-    setLoading(true);
-    const result = await signIn("credentials", { email: account.email, password: account.password, redirect: false });
-    if (result?.error) setError(result.error);
-    else { router.push("/"); router.refresh(); }
-    setLoading(false);
+    try {
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setError("Invalid email or password. Please try again.");
+      } else {
+        router.push("/");
+        router.refresh();
+      }
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
-    <div className="min-h-screen bg-surface flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-4">
-            <GraduationCap className="w-8 h-8 text-white" />
+    <div className="min-h-screen flex flex-col">
+      {/* Background decoration */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+        <div className="absolute -top-32 -right-32 w-96 h-96 bg-lavender-light/30 rounded-full blur-3xl" />
+        <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-blue-light/20 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-green-light/10 rounded-full blur-3xl" />
+      </div>
+
+      {/* Back to home */}
+      <div className="relative px-4 pt-6">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-sm font-medium text-text-muted hover:text-primary transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Home
+        </Link>
+      </div>
+
+      {/* Main content */}
+      <div className="relative flex-1 flex items-center justify-center px-4 py-12">
+        <div className="w-full max-w-md">
+          {/* Logo & Header */}
+          <div className="text-center mb-8">
+            <Link href="/" className="inline-flex items-center gap-2.5 mb-6">
+              <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center shadow-glow">
+                <Flower2 className="w-6 h-6 text-white" />
+              </div>
+              <span className="text-xl font-extrabold gradient-text">Arizen School</span>
+            </Link>
+
+            <h1 className="heading-lg mb-2">Welcome back</h1>
+            <p className="text-body">Sign in to continue your learning journey.</p>
           </div>
-          <h1 className="text-2xl font-bold text-text">Welcome to Arizen</h1>
-          <p className="text-sm text-text-muted mt-1">Choose a learner account to continue</p>
-        </div>
 
-        {/* Quick login buttons */}
-        <div className="space-y-3 mb-6">
-          {demoAccounts.map(account => (
-            <button
-              key={account.email}
-              onClick={() => quickLogin(account)}
-              disabled={loading}
-              className={`w-full flex items-center gap-4 p-4 rounded-2xl border border-border bg-surface-raised hover:shadow-card-hover hover:border-border-strong transition-all text-left`}
-            >
-              <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${account.color} flex items-center justify-center text-white font-bold text-lg`}>
-                {account.name[0]}
+          {/* Form Card */}
+          <div className="card-glass p-7">
+            {error && (
+              <div className="flex items-start gap-3 bg-danger/8 border border-danger/15 rounded-2xl p-4 mb-5">
+                <AlertCircle className="w-5 h-5 text-danger flex-shrink-0 mt-0.5" />
+                <span className="text-sm text-danger">{error}</span>
               </div>
-              <div className="flex-1">
-                <p className="font-semibold text-text">{account.name}</p>
-                <p className="text-xs text-text-muted">Grade {account.grade} • {account.xp} XP • 🔥 {account.streak} day streak</p>
-              </div>
-              <span className="text-xs font-semibold text-primary">Login →</span>
-            </button>
-          ))}
-        </div>
+            )}
 
-        <div className="relative mb-6">
-          <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border" /></div>
-          <div className="relative flex justify-center"><span className="bg-surface px-3 text-xs text-text-muted">or sign in with email</span></div>
-        </div>
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div>
+                <label className="label" htmlFor="email">
+                  Email
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted/50" />
+                  <input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    required
+                    autoComplete="email"
+                    className="input-field pl-11"
+                  />
+                </div>
+              </div>
 
-        {/* Email/password form */}
-        <div className="bg-surface-raised rounded-2xl border border-border p-6 shadow-card">
-          {error && (
-            <div className="flex items-center gap-2 bg-danger/10 text-danger rounded-xl p-3 mb-4 text-sm">
-              <AlertCircle className="w-4 h-4 flex-shrink-0" /><span>{error}</span>
-            </div>
-          )}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-text mb-1.5">Email</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@arizen.local" required className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border bg-surface text-text text-sm placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors" />
+              <div>
+                <label className="label" htmlFor="password">
+                  Password
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted/50" />
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter your password"
+                    required
+                    autoComplete="current-password"
+                    className="input-field pl-11 pr-11"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted/50 hover:text-text-muted transition-colors"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-text mb-1.5">Password</label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="demo123" required className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border bg-surface text-text text-sm placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors" />
-              </div>
-            </div>
-            <button type="submit" disabled={loading} className="w-full bg-primary text-white rounded-xl py-2.5 font-semibold text-sm hover:bg-primary-dark transition-colors disabled:opacity-50">
-              {loading ? "Signing in..." : "Sign In"}
-            </button>
-          </form>
-          <p className="text-xs text-text-muted text-center mt-3">Password for all demo accounts: <strong>demo123</strong></p>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="btn-primary w-full !py-3.5 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? (
+                  <span className="flex items-center gap-2">
+                    <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    Signing in...
+                  </span>
+                ) : (
+                  "Sign In"
+                )}
+              </button>
+            </form>
+          </div>
+
+          {/* Register link */}
+          <p className="text-center text-sm text-text-muted mt-6">
+            Don&apos;t have an account?{" "}
+            <Link href="/auth/register" className="font-bold text-primary hover:text-primary-dark transition-colors">
+              Create one free
+            </Link>
+          </p>
         </div>
       </div>
     </div>

@@ -10,8 +10,8 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  title: "Arizen Homeschool Hub",
-  description: "A next-generation homeschooling platform — CBC-aligned, gamified, world-class.",
+  title: "Arizen School",
+  description: "A personalized, emotionally intelligent learning system for your child.",
 };
 
 export default function RootLayout({

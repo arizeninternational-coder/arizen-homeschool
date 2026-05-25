@@ -53,7 +53,7 @@ export const authOptions: NextAuthOptions = {
         if (!user || !user.passwordHash) throw new Error("Invalid credentials");
 
         // For demo accounts, allow simple password
-        const isDemo = credentials.password === "demo123";
+        const isDemo = credentials.password === "demo123" && user.passwordHash.includes("$2a$10$jKHICZgTmooKWGzNy73");
         const isValid = isDemo || await bcrypt.compare(credentials.password, user.passwordHash);
         if (!isValid) throw new Error("Invalid credentials");
 

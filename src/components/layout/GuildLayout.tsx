@@ -26,7 +26,7 @@ export function GuildLayout({
   const { sidebarOpen } = useUIStore();
 
   return (
-    <div className="min-h-screen bg-surface">
+    <div className="min-h-screen bg-soft">
       <Sidebar
         guildName={guildName}
         totalXp={totalXp}

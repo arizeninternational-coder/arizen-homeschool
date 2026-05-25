@@ -341,9 +341,9 @@ ON CONFLICT (slug) DO NOTHING;
 
 -- Users
 INSERT INTO "User" (id, "guildId", name, email, "passwordHash", role) VALUES
-  ('u0000001-0000-0000-0000-000000000001', 'g0000000-0000-0000-0000-000000000001', 'Victor Nyamu', 'victor@arizen.local', '$2b$10$placeholderhash', 'ADMIN'),
-  ('u0000002-0000-0000-0000-000000000002', 'g0000000-0000-0000-0000-000000000001', 'Ariadne', 'ariadne@arizen.local', '$2b$10$placeholderhash', 'LEARNER'),
-  ('u0000003-0000-0000-0000-000000000003', 'g0000000-0000-0000-0000-000000000001', 'Ariyana', 'ariyana@arizen.local', '$2b$10$placeholderhash', 'LEARNER')
+  ('u0000001-0000-0000-0000-000000000001', 'g0000000-0000-0000-0000-000000000001', 'Victor Nyamu', 'victor@arizen.local', '$2a$10$jKHICZgTmooKWGzNy73/g.KXIzXnx8qVpnmxjXqMkdVwqYsCeUZLS', 'ADMIN'),
+  ('u0000002-0000-0000-0000-000000000002', 'g0000000-0000-0000-0000-000000000001', 'Ariadne', 'ariadne@arizen.local', '$2a$10$jKHICZgTmooKWGzNy73/g.KXIzXnx8qVpnmxjXqMkdVwqYsCeUZLS', 'LEARNER'),
+  ('u0000003-0000-0000-0000-000000000003', 'g0000000-0000-0000-0000-000000000001', 'Ariyana', 'ariyana@arizen.local', '$2a$10$jKHICZgTmooKWGzNy73/g.KXIzXnx8qVpnmxjXqMkdVwqYsCeUZLS', 'LEARNER')
 ON CONFLICT (email) DO NOTHING;
 
 -- Learner Profiles
