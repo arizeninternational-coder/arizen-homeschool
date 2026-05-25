@@ -41,12 +41,12 @@ async function main() {
   });
   console.log(`✅ Guild: ${guild.name}`);
 
-  // ── Users ──────────────────────────────────────────────────
+  const DEMO_PASSWORD_HASH = "$2a$12$R0vEOtPsQF4u8GThb1K5b.zWneS4re5HHFsAB.gIxPkCEHffDVFni"; // demo123
   // Victor (parent/admin)
   const victorUser = await prisma.user.create({
     data: {
       guildId: guild.id, name: "Victor Nyamu", email: "victor@arizen.local",
-      passwordHash: "$2b$10$placeholderhash", role: "ADMIN" as any,
+      passwordHash: DEMO_PASSWORD_HASH, role: "ADMIN" as any,
     },
   });
 
@@ -54,7 +54,7 @@ async function main() {
   const ariadneUser = await prisma.user.create({
     data: {
       guildId: guild.id, name: "Ariadne", email: "ariadne@arizen.local",
-      passwordHash: "$2b$10$placeholderhash", role: "LEARNER" as any,
+      passwordHash: DEMO_PASSWORD_HASH, role: "LEARNER" as any,
     },
   });
 
@@ -62,7 +62,7 @@ async function main() {
   const ariyanaUser = await prisma.user.create({
     data: {
       guildId: guild.id, name: "Ariyana", email: "ariyana@arizen.local",
-      passwordHash: "$2b$10$placeholderhash", role: "LEARNER" as any,
+      passwordHash: DEMO_PASSWORD_HASH, role: "LEARNER" as any,
     },
   });
 

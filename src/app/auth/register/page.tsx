@@ -4,16 +4,8 @@ import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
-  Flower2,
-  Mail,
-  Lock,
-  User,
-  AlertCircle,
-  ArrowLeft,
-  Eye,
-  EyeOff,
-  GraduationCap,
-  Users,
+  Flower2, Mail, Lock, User, AlertCircle, ArrowLeft,
+  Eye, EyeOff, GraduationCap, Users, Loader2,
 } from "lucide-react";
 
 function RegisterForm() {
@@ -46,14 +38,12 @@ function RegisterForm() {
       setError("Passwords do not match");
       return;
     }
-
     if (form.password.length < 8) {
       setError("Password must be at least 8 characters");
       return;
     }
 
     setLoading(true);
-
     try {
       const res = await fetch("/api/auth/register", {
         method: "POST",
@@ -99,31 +89,32 @@ function RegisterForm() {
   const isParent = form.role === "PARENT";
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[rgb(var(--color-cream))] via-[rgb(245,243,255)] to-[rgb(240,249,255)]">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-        <div className="absolute -top-32 -left-32 w-96 h-96 bg-lavender-light/30 rounded-full blur-3xl" />
-        <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-green-light/20 rounded-full blur-3xl" />
+        <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full blur-3xl" style={{ background: 'rgba(237,233,254,0.3)' }} />
+        <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full blur-3xl" style={{ background: 'rgba(236,253,245,0.2)' }} />
       </div>
 
-      {/* Back to home */}
-      <div className="relative px-4 pt-6">
+      {/* Header */}
+      <header className="relative px-4 sm:px-6 pt-5 pb-3">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-sm font-medium text-text-muted hover:text-primary transition-colors"
+          className="inline-flex items-center gap-2 text-sm font-medium hover:opacity-80 transition-opacity"
+          style={{ color: 'rgb(var(--color-text-muted))' }}
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Home
         </Link>
-      </div>
+      </header>
 
       {/* Main content */}
-      <div className="relative flex-1 flex items-center justify-center px-4 py-8">
-        <div className="w-full max-w-md">
+      <main className="relative flex-1 flex items-center justify-center px-4 py-6 sm:py-10">
+        <div className="w-full max-w-[440px]">
           {/* Logo & Header */}
-          <div className="text-center mb-8">
-            <Link href="/" className="inline-flex items-center gap-2.5 mb-6">
-              <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center shadow-glow">
+          <div className="text-center mb-6">
+            <Link href="/" className="inline-flex items-center gap-3 mb-5 group">
+              <div className="w-11 h-11 rounded-2xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-105" style={{ background: 'linear-gradient(135deg, rgb(var(--color-primary)), #7c3aed)' }}>
                 <Flower2 className="w-6 h-6 text-white" />
               </div>
               <span className="text-xl font-extrabold gradient-text">Arizen School</span>
@@ -134,15 +125,12 @@ function RegisterForm() {
           </div>
 
           {/* Role Toggle */}
-          <div className="flex rounded-2xl bg-surface-soft p-1.5 mb-6 border border-border/50">
+          <div className="flex rounded-2xl p-1.5 mb-6 border" style={{ background: 'rgb(var(--color-surface-soft))', borderColor: 'rgba(226,232,240,0.5)' }}>
             <button
               type="button"
               onClick={() => update("role", "LEARNER")}
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${
-                !isParent
-                  ? "bg-white shadow-sm text-primary"
-                  : "text-text-muted hover:text-text"
-              }`}
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all duration-200"
+              style={!isParent ? { background: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.08)', color: 'rgb(var(--color-primary))' } : { color: 'rgb(var(--color-text-muted))' }}
             >
               <GraduationCap className="w-4 h-4" />
               I&apos;m a Child
@@ -150,11 +138,8 @@ function RegisterForm() {
             <button
               type="button"
               onClick={() => update("role", "PARENT")}
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${
-                isParent
-                  ? "bg-white shadow-sm text-primary"
-                  : "text-text-muted hover:text-text"
-              }`}
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all duration-200"
+              style={isParent ? { background: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.08)', color: 'rgb(var(--color-primary))' } : { color: 'rgb(var(--color-text-muted))' }}
             >
               <Users className="w-4 h-4" />
               I&apos;m a Parent
@@ -162,148 +147,82 @@ function RegisterForm() {
           </div>
 
           {/* Form Card */}
-          <div className="card-glass p-7">
+          <div className="card-glass p-7 sm:p-8">
             {error && (
-              <div className="flex items-start gap-3 bg-danger/8 border border-danger/15 rounded-2xl p-4 mb-5">
-                <AlertCircle className="w-5 h-5 text-danger flex-shrink-0 mt-0.5" />
-                <span className="text-sm text-danger">{error}</span>
+              <div className="alert-error">
+                <AlertCircle className="w-5 h-5" />
+                <span>{error}</span>
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Full Name */}
               <div>
-                <label className="label" htmlFor="name">
-                  Full Name
-                </label>
+                <label className="label" htmlFor="name">Full Name</label>
                 <div className="relative">
-                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted/50" />
-                  <input
-                    id="name"
-                    type="text"
-                    value={form.name}
-                    onChange={(e) => update("name", e.target.value)}
-                    placeholder="Your full name"
-                    required
-                    className="input-field pl-11"
-                  />
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'rgba(100,116,139,0.5)' }} />
+                  <input id="name" type="text" value={form.name} onChange={(e) => update("name", e.target.value)} placeholder="Your full name" required className="input-field pl-11" />
                 </div>
               </div>
 
+              {/* Display Name (child only) */}
               {!isParent && (
                 <div>
-                  <label className="label" htmlFor="displayName">
-                    Display Name
-                  </label>
+                  <label className="label" htmlFor="displayName">Display Name</label>
                   <div className="relative">
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted/50" />
-                    <input
-                      id="displayName"
-                      type="text"
-                      value={form.displayName}
-                      onChange={(e) => update("displayName", e.target.value)}
-                      placeholder="What should we call you?"
-                      className="input-field pl-11"
-                    />
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'rgba(100,116,139,0.5)' }} />
+                    <input id="displayName" type="text" value={form.displayName} onChange={(e) => update("displayName", e.target.value)} placeholder="What should we call you?" className="input-field pl-11" />
                   </div>
                 </div>
               )}
 
+              {/* Email */}
               <div>
-                <label className="label" htmlFor="email">
-                  Email
-                </label>
+                <label className="label" htmlFor="email">Email</label>
                 <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted/50" />
-                  <input
-                    id="email"
-                    type="email"
-                    value={form.email}
-                    onChange={(e) => update("email", e.target.value)}
-                    placeholder="you@example.com"
-                    required
-                    autoComplete="email"
-                    className="input-field pl-11"
-                  />
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'rgba(100,116,139,0.5)' }} />
+                  <input id="email" type="email" value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="you@example.com" required autoComplete="email" className="input-field pl-11" />
                 </div>
               </div>
 
+              {/* Grade (child only) */}
               {!isParent && (
                 <div>
-                  <label className="label" htmlFor="grade">
-                    Grade
-                  </label>
-                  <select
-                    id="grade"
-                    value={form.grade}
-                    onChange={(e) => update("grade", e.target.value)}
-                    className="input-field"
-                  >
+                  <label className="label" htmlFor="grade">Grade</label>
+                  <select id="grade" value={form.grade} onChange={(e) => update("grade", e.target.value)} className="input-field">
                     {[1, 2, 3, 4, 5, 6, 7, 8].map((g) => (
-                      <option key={g} value={g}>
-                        Grade {g}
-                      </option>
+                      <option key={g} value={g}>Grade {g}</option>
                     ))}
                   </select>
                 </div>
               )}
 
+              {/* Password */}
               <div>
-                <label className="label" htmlFor="password">
-                  Password
-                </label>
+                <label className="label" htmlFor="password">Password</label>
                 <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted/50" />
-                  <input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    value={form.password}
-                    onChange={(e) => update("password", e.target.value)}
-                    placeholder="At least 8 characters"
-                    required
-                    autoComplete="new-password"
-                    className="input-field pl-11 pr-11"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted/50 hover:text-text-muted transition-colors"
-                    aria-label={showPassword ? "Hide password" : "Show password"}
-                  >
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'rgba(100,116,139,0.5)' }} />
+                  <input id="password" type={showPassword ? "text" : "password"} value={form.password} onChange={(e) => update("password", e.target.value)} placeholder="At least 8 characters" required autoComplete="new-password" className="input-field pl-11 pr-11" />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 hover:opacity-80 transition-opacity" style={{ color: 'rgba(100,116,139,0.5)' }} aria-label={showPassword ? "Hide password" : "Show password"}>
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
 
+              {/* Confirm Password */}
               <div>
-                <label className="label" htmlFor="confirmPassword">
-                  Confirm Password
-                </label>
+                <label className="label" htmlFor="confirmPassword">Confirm Password</label>
                 <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted/50" />
-                  <input
-                    id="confirmPassword"
-                    type="password"
-                    value={form.confirmPassword}
-                    onChange={(e) => update("confirmPassword", e.target.value)}
-                    placeholder="Repeat your password"
-                    required
-                    autoComplete="new-password"
-                    className="input-field pl-11"
-                  />
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'rgba(100,116,139,0.5)' }} />
+                  <input id="confirmPassword" type="password" value={form.confirmPassword} onChange={(e) => update("confirmPassword", e.target.value)} placeholder="Repeat your password" required autoComplete="new-password" className="input-field pl-11" />
                 </div>
               </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="btn-primary w-full !py-3.5 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
+              {/* Submit */}
+              <button type="submit" disabled={loading} className="btn-primary w-full" style={{ paddingTop: '0.875rem', paddingBottom: '0.875rem' }}>
                 {loading ? (
                   <span className="flex items-center gap-2">
-                    <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                    </svg>
+                    <Loader2 className="w-4 h-4 spinner" />
                     Creating account...
                   </span>
                 ) : (
@@ -314,14 +233,14 @@ function RegisterForm() {
           </div>
 
           {/* Login link */}
-          <p className="text-center text-sm text-text-muted mt-6">
+          <p className="text-center mt-6 text-sm" style={{ color: 'rgb(var(--color-text-muted))' }}>
             Already have an account?{" "}
-            <Link href="/auth/login" className="font-bold text-primary hover:text-primary-dark transition-colors">
+            <Link href="/auth/login" className="font-bold transition-opacity hover:opacity-80" style={{ color: 'rgb(var(--color-primary))' }}>
               Sign in
             </Link>
           </p>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
@@ -329,9 +248,9 @@ function RegisterForm() {
 export default function RegisterPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-14 h-14 rounded-3xl bg-lavender-light flex items-center justify-center animate-pulse-soft">
-          <Flower2 className="w-7 h-7 text-primary" />
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'rgb(var(--color-cream))' }}>
+        <div className="w-14 h-14 rounded-3xl flex items-center justify-center" style={{ background: 'rgb(var(--color-lavender-light))' }}>
+          <Flower2 className="w-7 h-7" style={{ color: 'rgb(var(--color-primary))' }} />
         </div>
       </div>
     }>

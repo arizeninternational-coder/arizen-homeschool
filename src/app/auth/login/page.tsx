@@ -4,7 +4,7 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Flower2, Mail, Lock, AlertCircle, ArrowLeft, Eye, EyeOff } from "lucide-react";
+import { Flower2, Mail, Lock, AlertCircle, ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -28,9 +28,11 @@ export default function LoginPage() {
 
       if (result?.error) {
         setError("Invalid email or password. Please try again.");
-      } else {
+      } else if (result?.ok) {
         router.push("/");
         router.refresh();
+      } else {
+        setError("Something went wrong. Please try again.");
       }
     } catch {
       setError("Something went wrong. Please try again.");
@@ -40,32 +42,32 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[rgb(var(--color-cream))] via-[rgb(245,243,255)] to-[rgb(240,249,255)]">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-        <div className="absolute -top-32 -right-32 w-96 h-96 bg-lavender-light/30 rounded-full blur-3xl" />
-        <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-blue-light/20 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-green-light/10 rounded-full blur-3xl" />
+        <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full blur-3xl" style={{ background: 'rgba(237,233,254,0.3)' }} />
+        <div className="absolute -bottom-32 -left-32 w-96 h-96 rounded-full blur-3xl" style={{ background: 'rgba(224,242,254,0.2)' }} />
       </div>
 
-      {/* Back to home */}
-      <div className="relative px-4 pt-6">
+      {/* Header */}
+      <header className="relative px-4 sm:px-6 pt-5 pb-3">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-sm font-medium text-text-muted hover:text-primary transition-colors"
+          className="inline-flex items-center gap-2 text-sm font-medium hover:opacity-80 transition-opacity"
+          style={{ color: 'rgb(var(--color-text-muted))' }}
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Home
         </Link>
-      </div>
+      </header>
 
       {/* Main content */}
-      <div className="relative flex-1 flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-md">
+      <main className="relative flex-1 flex items-center justify-center px-4 py-8 sm:py-12">
+        <div className="w-full max-w-[420px]">
           {/* Logo & Header */}
           <div className="text-center mb-8">
-            <Link href="/" className="inline-flex items-center gap-2.5 mb-6">
-              <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center shadow-glow">
+            <Link href="/" className="inline-flex items-center gap-3 mb-6 group">
+              <div className="w-11 h-11 rounded-2xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-105" style={{ background: 'linear-gradient(135deg, rgb(var(--color-primary)), #7c3aed)' }}>
                 <Flower2 className="w-6 h-6 text-white" />
               </div>
               <span className="text-xl font-extrabold gradient-text">Arizen School</span>
@@ -75,22 +77,23 @@ export default function LoginPage() {
             <p className="text-body">Sign in to continue your learning journey.</p>
           </div>
 
-          {/* Form Card */}
-          <div className="card-glass p-7">
+          {/* Login Card */}
+          <div className="card-glass p-7 sm:p-8">
             {error && (
-              <div className="flex items-start gap-3 bg-danger/8 border border-danger/15 rounded-2xl p-4 mb-5">
-                <AlertCircle className="w-5 h-5 text-danger flex-shrink-0 mt-0.5" />
-                <span className="text-sm text-danger">{error}</span>
+              <div className="alert-error">
+                <AlertCircle className="w-5 h-5" />
+                <span>{error}</span>
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-5">
+              {/* Email */}
               <div>
                 <label className="label" htmlFor="email">
                   Email
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted/50" />
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'rgba(100,116,139,0.5)' }} />
                   <input
                     id="email"
                     type="email"
@@ -104,12 +107,13 @@ export default function LoginPage() {
                 </div>
               </div>
 
+              {/* Password */}
               <div>
                 <label className="label" htmlFor="password">
                   Password
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted/50" />
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'rgba(100,116,139,0.5)' }} />
                   <input
                     id="password"
                     type={showPassword ? "text" : "password"}
@@ -123,7 +127,8 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted/50 hover:text-text-muted transition-colors"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 hover:opacity-80 transition-opacity"
+                    style={{ color: 'rgba(100,116,139,0.5)' }}
                     aria-label={showPassword ? "Hide password" : "Show password"}
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -131,17 +136,16 @@ export default function LoginPage() {
                 </div>
               </div>
 
+              {/* Submit */}
               <button
                 type="submit"
                 disabled={loading}
-                className="btn-primary w-full !py-3.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-primary w-full"
+                style={{ paddingTop: '0.875rem', paddingBottom: '0.875rem' }}
               >
                 {loading ? (
                   <span className="flex items-center gap-2">
-                    <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                    </svg>
+                    <Loader2 className="w-4 h-4 spinner" />
                     Signing in...
                   </span>
                 ) : (
@@ -152,14 +156,14 @@ export default function LoginPage() {
           </div>
 
           {/* Register link */}
-          <p className="text-center text-sm text-text-muted mt-6">
+          <p className="text-center mt-6 text-sm" style={{ color: 'rgb(var(--color-text-muted))' }}>
             Don&apos;t have an account?{" "}
-            <Link href="/auth/register" className="font-bold text-primary hover:text-primary-dark transition-colors">
+            <Link href="/auth/register" className="font-bold transition-opacity hover:opacity-80" style={{ color: 'rgb(var(--color-primary))' }}>
               Create one free
             </Link>
           </p>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  outputFileTracingRoot: __dirname,
   images: {
     remotePatterns: [],
   },
@@ -10,7 +11,6 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  // Ensure Prisma works on Vercel
   webpack: (config, { isServer }) => {
     if (isServer) {
       config.externals.push('_http_common');
