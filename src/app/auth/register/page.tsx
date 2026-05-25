@@ -3,15 +3,19 @@
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Flower2, Mail, Lock, User, AlertCircle, ArrowLeft, Eye, EyeOff, GraduationCap, Users, Loader2 } from "lucide-react";
-import { ds, colors } from "@/lib/design-system";
+import { Flower2, Mail, Lock, User, AlertCircle, ArrowLeft, Eye, EyeOff, GraduationCap, Users, Loader2, Sparkles } from "lucide-react";
+import { ds, colors, gradients, shadows } from "@/lib/design-system";
 
 function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialRole = searchParams.get("role") || "learner";
 
-  const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "", displayName: "", grade: "5", role: initialRole === "parent" ? "PARENT" : "LEARNER" });
+  const [form, setForm] = useState({
+    name: "", email: "", password: "", confirmPassword: "",
+    displayName: "", grade: "5",
+    role: initialRole === "parent" ? "PARENT" : "LEARNER",
+  });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -49,48 +53,66 @@ function RegisterForm() {
   const isParent = form.role === "PARENT";
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: `linear-gradient(180deg, ${colors.bg} 0%, ${colors.bgSoft} 100%)` }}>
-      {/* BG orbs */}
-      <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }} aria-hidden="true">
-        <div style={{ position: 'absolute', top: '-8rem', left: '-8rem', width: '24rem', height: '24rem', borderRadius: '50%', filter: 'blur(64px)', background: colors.primarySoft }} />
-        <div style={{ position: 'absolute', bottom: '-8rem', right: '-8rem', width: '24rem', height: '24rem', borderRadius: '50%', filter: 'blur(64px)', background: colors.accentSoft }} />
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden', background: colors.bg }}>
+      {/* Background */}
+      <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }} aria-hidden="true">
+        <div style={{ ...ds.orb(colors.accentSoft, '30rem'), top: '-10rem', left: '-10rem', opacity: 0.3 }} className="float-slow" />
+        <div style={{ ...ds.orb(colors.primarySoft, '26rem'), bottom: '-8rem', right: '-8rem', opacity: 0.25 }} className="float-medium" />
+        <div style={{ ...ds.orb(colors.warmSoft, '18rem'), top: '50%', left: '50%', opacity: 0.15 }} className="float-fast" />
       </div>
 
+      {/* Header */}
       <header style={{ position: 'relative', padding: '1.25rem 1rem 0.75rem' }}>
-        <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', fontWeight: 500, color: colors.textMuted, textDecoration: 'none' }}>
+        <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', fontWeight: 600, color: colors.textMuted, textDecoration: 'none' }}>
           <ArrowLeft style={{ width: '16px', height: '16px' }} /> Back to Home
         </Link>
       </header>
 
-      <main style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem 1rem 3rem' }}>
-        <div style={{ width: '100%', maxWidth: '440px' }}>
+      {/* Main */}
+      <main style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem 1rem 3rem' }}>
+        <div style={{ width: '100%', maxWidth: '460px' }} className="fade-in-up">
+          {/* Logo & Header */}
           <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-            <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none' }}>
-              <div style={{ ...ds.logoMark, width: '44px', height: '44px' }}>
-                <Flower2 style={{ width: '24px', height: '24px' }} />
+            <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none', marginBottom: '1rem' }}>
+              <div style={{ ...ds.logoMark, width: '48px', height: '48px' }}>
+                <Flower2 style={{ width: '26px', height: '26px' }} />
               </div>
-              <span style={{ fontSize: '1.25rem', fontWeight: 800, ...ds.textGradient }}>Arizen School</span>
+              <span style={{ fontSize: '1.375rem', fontWeight: 900, ...ds.textGradient }}>Arizen School</span>
             </Link>
-            <h1 style={{ ...ds.headingLg, marginTop: '1.5rem', marginBottom: '0.5rem' }}>Create your account</h1>
+            <h1 style={{ ...ds.headingLg, marginBottom: '0.5rem' }}>Create your account</h1>
             <p style={ds.textBody}>Join Arizen and start your learning adventure.</p>
           </div>
 
           {/* Role Toggle */}
-          <div style={{ display: 'flex', borderRadius: '1rem', padding: '0.375rem', marginBottom: '1.5rem', background: colors.bgSoft, border: `1px solid ${colors.border}` }}>
-            <button type="button" onClick={() => update("role", "LEARNER")} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', padding: '0.625rem', borderRadius: '0.75rem', fontSize: '0.875rem', fontWeight: 700, border: 'none', cursor: 'pointer', transition: 'all 0.2s', ...(isParent ? { color: colors.textMuted, background: 'transparent' } : { color: colors.primary, background: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }) }}>
+          <div style={{ display: 'flex', borderRadius: '1.25rem', padding: '0.375rem', marginBottom: '1.5rem', background: colors.bgSoft, border: `1.5px solid ${colors.border}`, boxShadow: shadows.sm }}>
+            <button type="button" onClick={() => update("role", "LEARNER")} style={{
+              flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+              padding: '0.75rem', borderRadius: '1rem', fontSize: '0.875rem', fontWeight: 800,
+              border: 'none', cursor: 'pointer', transition: 'all 0.25s ease',
+              ...(isParent
+                ? { color: colors.textMuted, background: 'transparent' }
+                : { color: 'white', background: gradients.primary, boxShadow: shadows.primary }),
+            }}>
               <GraduationCap style={{ width: '16px', height: '16px' }} /> I'm a Child
             </button>
-            <button type="button" onClick={() => update("role", "PARENT")} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', padding: '0.625rem', borderRadius: '0.75rem', fontSize: '0.875rem', fontWeight: 700, border: 'none', cursor: 'pointer', transition: 'all 0.2s', ...(isParent ? { color: colors.primary, background: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' } : { color: colors.textMuted, background: 'transparent' }) }}>
+            <button type="button" onClick={() => update("role", "PARENT")} style={{
+              flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+              padding: '0.75rem', borderRadius: '1rem', fontSize: '0.875rem', fontWeight: 800,
+              border: 'none', cursor: 'pointer', transition: 'all 0.25s ease',
+              ...(isParent
+                ? { color: 'white', background: gradients.primary, boxShadow: shadows.primary }
+                : { color: colors.textMuted, background: 'transparent' }),
+            }}>
               <Users style={{ width: '16px', height: '16px' }} /> I'm a Parent
             </button>
           </div>
 
           {/* Form Card */}
-          <div style={ds.cardFlat}>
+          <div style={ds.cardGlass}>
             {error && (
-              <div style={ds.alertError}>
+              <div style={ds.alertError} className="fade-in">
                 <AlertCircle style={{ width: '20px', height: '20px', color: colors.danger, flexShrink: 0, marginTop: '2px' }} />
-                <span style={{ fontSize: '0.875rem', color: colors.danger }}>{error}</span>
+                <span style={{ fontSize: '0.875rem', color: colors.danger, fontWeight: 600 }}>{error}</span>
               </div>
             )}
 
@@ -99,7 +121,10 @@ function RegisterForm() {
                 <label style={ds.label} htmlFor="name">Full Name</label>
                 <div style={{ position: 'relative' }}>
                   <User style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: colors.textMuted }} />
-                  <input id="name" type="text" value={form.name} onChange={(e) => update("name", e.target.value)} placeholder="Your full name" required style={{ ...ds.input, paddingLeft: '2.75rem' }} />
+                  <input id="name" type="text" value={form.name} onChange={(e) => update("name", e.target.value)} placeholder="Your full name" required style={{ ...ds.input, paddingLeft: '2.75rem' }}
+                    onFocus={(e) => { e.currentTarget.style.borderColor = colors.primary; e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primarySoft}`; e.currentTarget.style.background = 'white'; }}
+                    onBlur={(e) => { e.currentTarget.style.borderColor = colors.border; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.background = colors.bgSoft; }}
+                  />
                 </div>
               </div>
 
@@ -108,7 +133,10 @@ function RegisterForm() {
                   <label style={ds.label} htmlFor="displayName">Display Name</label>
                   <div style={{ position: 'relative' }}>
                     <User style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: colors.textMuted }} />
-                    <input id="displayName" type="text" value={form.displayName} onChange={(e) => update("displayName", e.target.value)} placeholder="What should we call you?" style={{ ...ds.input, paddingLeft: '2.75rem' }} />
+                    <input id="displayName" type="text" value={form.displayName} onChange={(e) => update("displayName", e.target.value)} placeholder="What should we call you?" style={{ ...ds.input, paddingLeft: '2.75rem' }}
+                      onFocus={(e) => { e.currentTarget.style.borderColor = colors.primary; e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primarySoft}`; e.currentTarget.style.background = 'white'; }}
+                      onBlur={(e) => { e.currentTarget.style.borderColor = colors.border; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.background = colors.bgSoft; }}
+                    />
                   </div>
                 </div>
               )}
@@ -117,14 +145,20 @@ function RegisterForm() {
                 <label style={ds.label} htmlFor="email">Email</label>
                 <div style={{ position: 'relative' }}>
                   <Mail style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: colors.textMuted }} />
-                  <input id="email" type="email" value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="you@example.com" required autoComplete="email" style={{ ...ds.input, paddingLeft: '2.75rem' }} />
+                  <input id="email" type="email" value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="you@example.com" required autoComplete="email" style={{ ...ds.input, paddingLeft: '2.75rem' }}
+                    onFocus={(e) => { e.currentTarget.style.borderColor = colors.primary; e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primarySoft}`; e.currentTarget.style.background = 'white'; }}
+                    onBlur={(e) => { e.currentTarget.style.borderColor = colors.border; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.background = colors.bgSoft; }}
+                  />
                 </div>
               </div>
 
               {!isParent && (
                 <div>
                   <label style={ds.label} htmlFor="grade">Grade</label>
-                  <select id="grade" value={form.grade} onChange={(e) => update("grade", e.target.value)} style={ds.input}>
+                  <select id="grade" value={form.grade} onChange={(e) => update("grade", e.target.value)} style={{ ...ds.input, cursor: 'pointer' }}
+                    onFocus={(e) => { e.currentTarget.style.borderColor = colors.primary; e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primarySoft}`; }}
+                    onBlur={(e) => { e.currentTarget.style.borderColor = colors.border; e.currentTarget.style.boxShadow = 'none'; }}
+                  >
                     {[1, 2, 3, 4, 5, 6, 7, 8].map((g) => <option key={g} value={g}>Grade {g}</option>)}
                   </select>
                 </div>
@@ -134,8 +168,11 @@ function RegisterForm() {
                 <label style={ds.label} htmlFor="password">Password</label>
                 <div style={{ position: 'relative' }}>
                   <Lock style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: colors.textMuted }} />
-                  <input id="password" type={showPassword ? "text" : "password"} value={form.password} onChange={(e) => update("password", e.target.value)} placeholder="At least 8 characters" required autoComplete="new-password" style={{ ...ds.input, paddingLeft: '2.75rem', paddingRight: '2.75rem' }} />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: colors.textMuted, padding: 0 }}>
+                  <input id="password" type={showPassword ? "text" : "password"} value={form.password} onChange={(e) => update("password", e.target.value)} placeholder="At least 8 characters" required autoComplete="new-password" style={{ ...ds.input, paddingLeft: '2.75rem', paddingRight: '2.75rem' }}
+                    onFocus={(e) => { e.currentTarget.style.borderColor = colors.primary; e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primarySoft}`; e.currentTarget.style.background = 'white'; }}
+                    onBlur={(e) => { e.currentTarget.style.borderColor = colors.border; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.background = colors.bgSoft; }}
+                  />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: colors.textMuted, padding: 0, display: 'flex', alignItems: 'center' }}>
                     {showPassword ? <EyeOff style={{ width: '16px', height: '16px' }} /> : <Eye style={{ width: '16px', height: '16px' }} />}
                   </button>
                 </div>
@@ -145,23 +182,40 @@ function RegisterForm() {
                 <label style={ds.label} htmlFor="confirmPassword">Confirm Password</label>
                 <div style={{ position: 'relative' }}>
                   <Lock style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: colors.textMuted }} />
-                  <input id="confirmPassword" type="password" value={form.confirmPassword} onChange={(e) => update("confirmPassword", e.target.value)} placeholder="Repeat your password" required autoComplete="new-password" style={{ ...ds.input, paddingLeft: '2.75rem' }} />
+                  <input id="confirmPassword" type="password" value={form.confirmPassword} onChange={(e) => update("confirmPassword", e.target.value)} placeholder="Repeat your password" required autoComplete="new-password" style={{ ...ds.input, paddingLeft: '2.75rem' }}
+                    onFocus={(e) => { e.currentTarget.style.borderColor = colors.primary; e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primarySoft}`; e.currentTarget.style.background = 'white'; }}
+                    onBlur={(e) => { e.currentTarget.style.borderColor = colors.border; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.background = colors.bgSoft; }}
+                  />
                 </div>
               </div>
 
-              <button type="submit" disabled={loading} style={{ ...ds.btnPrimary, width: '100%', padding: '0.875rem', marginTop: '0.25rem', opacity: loading ? 0.6 : 1 }}>
+              <button type="submit" disabled={loading} style={{
+                ...ds.btnPrimary,
+                width: '100%',
+                padding: '0.9375rem',
+                marginTop: '0.25rem',
+                opacity: loading ? 0.7 : 1,
+                cursor: loading ? 'not-allowed' : 'pointer',
+                gap: '0.5rem',
+              }}>
                 {loading ? (
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <Loader2 style={{ width: '16px', height: '16px' }} className="spinner" /> Creating account...
-                  </span>
-                ) : "Create Account"}
+                  <>
+                    <Loader2 style={{ width: '18px', height: '18px' }} className="spinner" />
+                    Creating account...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles style={{ width: '16px', height: '16px' }} />
+                    Create Account
+                  </>
+                )}
               </button>
             </form>
           </div>
 
-          <p style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.875rem', color: colors.textMuted }}>
+          <p style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.875rem', color: colors.textMuted, fontWeight: 600 }}>
             Already have an account?{" "}
-            <Link href="/auth/login" style={{ fontWeight: 700, color: colors.primary, textDecoration: 'none' }}>Sign in</Link>
+            <Link href="/auth/login" style={{ fontWeight: 800, color: colors.primary, textDecoration: 'none' }}>Sign in</Link>
           </p>
         </div>
       </main>

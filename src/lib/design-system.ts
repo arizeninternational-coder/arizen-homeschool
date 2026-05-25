@@ -1,26 +1,30 @@
 /**
- * Arizen School — Design System
- * 
- * Usage in components:
- *   import { ds } from '@/lib/design-system'
- *   
- *   <div style={ds.card}>...</div>
- *   <button style={ds.btnPrimary}>...</button>
- *   <h1 style={ds.headingHero}>...</h1>
+ * Arizen School — Design System v3
+ * Warm • Calm • Premium • Child-friendly
+ *
+ * Usage: import { ds, colors, gradients } from '@/lib/design-system'
  */
 
 export const colors = {
   bg: 'rgb(var(--color-bg))',
   bgSoft: 'rgb(var(--color-bg-soft))',
   bgWarm: 'rgb(var(--color-bg-warm))',
+  bgBlue: 'rgb(var(--color-bg-blue))',
+  bgGreen: 'rgb(var(--color-bg-green))',
+  bgPink: 'rgb(var(--color-bg-pink))',
+  bgPurple: 'rgb(var(--color-bg-purple))',
   primary: 'rgb(var(--color-primary))',
   primaryLight: 'rgb(var(--color-primary-light))',
   primarySoft: 'rgb(var(--color-primary-soft))',
   primaryDark: 'rgb(var(--color-primary-dark))',
   accent: 'rgb(var(--color-accent))',
+  accentLight: 'rgb(var(--color-accent-light))',
   accentSoft: 'rgb(var(--color-accent-soft))',
+  accentDark: 'rgb(var(--color-accent-dark))',
   warm: 'rgb(var(--color-warm))',
+  warmLight: 'rgb(var(--color-warm-light))',
   warmSoft: 'rgb(var(--color-warm-soft))',
+  warmDark: 'rgb(var(--color-warm-dark))',
   text: 'rgb(var(--color-text))',
   textHeading: 'rgb(var(--color-text-heading))',
   textMuted: 'rgb(var(--color-text-muted))',
@@ -30,6 +34,33 @@ export const colors = {
   success: 'rgb(var(--color-success))',
   danger: 'rgb(var(--color-danger))',
   warning: 'rgb(var(--color-warning))',
+  info: 'rgb(var(--color-info))',
+} as const;
+
+export const gradients = {
+  primary: `linear-gradient(135deg, ${colors.primary}, ${colors.primaryDark})`,
+  primarySoft: `linear-gradient(135deg, ${colors.primarySoft}, white)`,
+  accent: `linear-gradient(135deg, ${colors.accent}, ${colors.accentDark})`,
+  warm: `linear-gradient(135deg, ${colors.warm}, ${colors.warmDark})`,
+  hero: `linear-gradient(180deg, ${colors.bg} 0%, ${colors.bgBlue} 50%, ${colors.bgGreen} 100%)`,
+  card: `linear-gradient(135deg, white, ${colors.bgSoft})`,
+  cardHover: `linear-gradient(135deg, white, ${colors.primarySoft})`,
+  sunset: `linear-gradient(135deg, ${colors.warmSoft}, ${colors.accentSoft})`,
+  sky: `linear-gradient(135deg, ${colors.bgBlue}, ${colors.primarySoft})`,
+  textPrimary: `linear-gradient(135deg, ${colors.primary}, ${colors.primaryDark})`,
+  textAccent: `linear-gradient(135deg, ${colors.accent}, ${colors.warm})`,
+  textWarm: `linear-gradient(135deg, ${colors.warm}, ${colors.accent})`,
+} as const;
+
+export const shadows = {
+  sm: '0 1px 2px rgba(0,0,0,0.04), 0 2px 4px rgba(0,0,0,0.02)',
+  md: '0 2px 8px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04)',
+  lg: '0 4px 16px rgba(0,0,0,0.08), 0 8px 32px rgba(0,0,0,0.04)',
+  xl: '0 8px 32px rgba(0,0,0,0.1), 0 16px 64px rgba(0,0,0,0.05)',
+  primary: '0 4px 16px rgba(20,184,166,0.2), 0 8px 32px rgba(20,184,166,0.1)',
+  accent: '0 4px 16px rgba(251,113,133,0.2), 0 8px 32px rgba(251,113,133,0.1)',
+  warm: '0 4px 16px rgba(245,158,11,0.2), 0 8px 32px rgba(245,158,11,0.1)',
+  glow: '0 0 40px rgba(20,184,166,0.15)',
 } as const;
 
 export const ds = {
@@ -42,7 +73,7 @@ export const ds = {
   containerNarrow: {
     maxWidth: '720px',
     margin: '0 auto',
-    padding: '0 1rem',
+    padding: '0 1.25rem',
   },
   containerBase: {
     maxWidth: '1100px',
@@ -56,7 +87,7 @@ export const ds = {
     borderRadius: '1.5rem',
     border: `1px solid ${colors.borderLight}`,
     padding: '2rem',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.03)',
+    boxShadow: shadows.md,
     transition: 'box-shadow 0.3s ease, transform 0.3s ease',
   },
   cardInteractive: {
@@ -64,16 +95,27 @@ export const ds = {
     borderRadius: '1.5rem',
     border: `1px solid ${colors.borderLight}`,
     padding: '1.75rem',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.03)',
-    transition: 'all 0.3s ease',
+    boxShadow: shadows.md,
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
     cursor: 'pointer' as const,
+    textDecoration: 'none',
+    display: 'block',
   },
   cardFlat: {
     background: 'white',
     borderRadius: '1.5rem',
     border: `1px solid ${colors.borderLight}`,
     padding: '2rem',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
+    boxShadow: shadows.sm,
+  },
+  cardGlass: {
+    background: 'rgba(255,255,255,0.8)',
+    backdropFilter: 'blur(16px)',
+    WebkitBackdropFilter: 'blur(16px)',
+    borderRadius: '1.5rem',
+    border: `1px solid rgba(255,255,255,0.6)`,
+    padding: '2rem',
+    boxShadow: shadows.lg,
   },
 
   // ── Buttons ──
@@ -83,15 +125,16 @@ export const ds = {
     justifyContent: 'center',
     gap: '0.5rem',
     borderRadius: '1rem',
-    padding: '0.8rem 1.75rem',
+    padding: '0.85rem 2rem',
     fontSize: '0.9375rem',
     fontWeight: 700,
     color: 'white',
-    background: colors.primary,
+    background: gradients.primary,
     border: 'none',
     cursor: 'pointer',
-    transition: 'all 0.2s ease',
-    boxShadow: '0 2px 8px rgba(20,184,166,0.25)',
+    transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+    boxShadow: shadows.primary,
+    letterSpacing: '0.01em',
   } as React.CSSProperties,
   btnSecondary: {
     display: 'inline-flex',
@@ -99,14 +142,46 @@ export const ds = {
     justifyContent: 'center',
     gap: '0.5rem',
     borderRadius: '1rem',
-    padding: '0.8rem 1.75rem',
+    padding: '0.85rem 2rem',
     fontSize: '0.9375rem',
     fontWeight: 600,
     color: colors.primaryDark,
     background: colors.primarySoft,
-    border: `1px solid ${colors.primaryLight}`,
+    border: `1.5px solid ${colors.primaryLight}`,
     cursor: 'pointer',
-    transition: 'all 0.2s ease',
+    transition: 'all 0.25s ease',
+  } as React.CSSProperties,
+  btnAccent: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '0.5rem',
+    borderRadius: '1rem',
+    padding: '0.85rem 2rem',
+    fontSize: '0.9375rem',
+    fontWeight: 700,
+    color: 'white',
+    background: gradients.accent,
+    border: 'none',
+    cursor: 'pointer',
+    transition: 'all 0.25s ease',
+    boxShadow: shadows.accent,
+  } as React.CSSProperties,
+  btnWarm: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '0.5rem',
+    borderRadius: '1rem',
+    padding: '0.85rem 2rem',
+    fontSize: '0.9375rem',
+    fontWeight: 700,
+    color: 'white',
+    background: gradients.warm,
+    border: 'none',
+    cursor: 'pointer',
+    transition: 'all 0.25s ease',
+    boxShadow: shadows.warm,
   } as React.CSSProperties,
   btnGhost: {
     display: 'inline-flex',
@@ -123,38 +198,61 @@ export const ds = {
     cursor: 'pointer',
     transition: 'all 0.2s ease',
   } as React.CSSProperties,
+  btnOutline: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '0.5rem',
+    borderRadius: '1rem',
+    padding: '0.8rem 1.75rem',
+    fontSize: '0.9375rem',
+    fontWeight: 600,
+    color: colors.primary,
+    background: 'transparent',
+    border: `2px solid ${colors.primary}`,
+    cursor: 'pointer',
+    transition: 'all 0.25s ease',
+  } as React.CSSProperties,
 
   // ── Form ──
   input: {
     width: '100%',
-    padding: '0.8rem 1rem',
+    padding: '0.85rem 1.1rem',
     borderRadius: '1rem',
     fontSize: '0.9375rem',
+    fontWeight: 500,
     color: colors.text,
-    background: 'white',
+    background: colors.bgSoft,
     border: `1.5px solid ${colors.border}`,
-    transition: 'border-color 0.2s, box-shadow 0.2s',
+    transition: 'all 0.2s ease',
     outline: 'none',
+    fontFamily: "'Nunito', system-ui, sans-serif",
   } as React.CSSProperties,
+  inputFocus: {
+    borderColor: colors.primary,
+    boxShadow: `0 0 0 3px ${colors.primarySoft}`,
+    background: 'white',
+  },
   label: {
     display: 'block',
     fontSize: '0.8125rem',
-    fontWeight: 600,
-    marginBottom: '0.4rem',
+    fontWeight: 700,
+    marginBottom: '0.45rem',
     color: colors.text,
-    letterSpacing: '0.01em',
+    letterSpacing: '0.02em',
+    textTransform: 'uppercase' as const,
   } as React.CSSProperties,
 
   // ── Typography ──
   headingHero: {
-    fontSize: '2.5rem',
-    fontWeight: 800,
+    fontSize: 'clamp(2rem, 5vw, 3rem)',
+    fontWeight: 900,
     letterSpacing: '-0.03em',
-    lineHeight: 1.15,
+    lineHeight: 1.1,
     color: colors.textHeading,
   } as React.CSSProperties,
   headingLg: {
-    fontSize: '1.625rem',
+    fontSize: 'clamp(1.35rem, 3vw, 1.75rem)',
     fontWeight: 800,
     letterSpacing: '-0.02em',
     color: colors.textHeading,
@@ -162,7 +260,7 @@ export const ds = {
   } as React.CSSProperties,
   headingMd: {
     fontSize: '1.25rem',
-    fontWeight: 700,
+    fontWeight: 800,
     color: colors.textHeading,
     letterSpacing: '-0.01em',
   } as React.CSSProperties,
@@ -175,16 +273,18 @@ export const ds = {
     fontSize: '0.9375rem',
     lineHeight: 1.7,
     color: colors.textMuted,
+    fontWeight: 500,
   } as React.CSSProperties,
   textBodyLg: {
     fontSize: '1.0625rem',
     lineHeight: 1.7,
     color: colors.textMuted,
+    fontWeight: 500,
   } as React.CSSProperties,
   textTagline: {
     fontSize: '0.75rem',
-    fontWeight: 700,
-    letterSpacing: '0.1em',
+    fontWeight: 800,
+    letterSpacing: '0.12em',
     textTransform: 'uppercase' as const,
     color: colors.primary,
   } as React.CSSProperties,
@@ -194,8 +294,18 @@ export const ds = {
     display: 'flex',
     alignItems: 'flex-start' as const,
     gap: '0.65rem',
-    background: 'rgba(248,113,113,0.07)',
-    border: '1px solid rgba(248,113,113,0.15)',
+    background: 'rgba(239,68,68,0.06)',
+    border: '1px solid rgba(239,68,68,0.15)',
+    borderRadius: '1rem',
+    padding: '0.85rem 1rem',
+    marginBottom: '1rem',
+  } as React.CSSProperties,
+  alertSuccess: {
+    display: 'flex',
+    alignItems: 'flex-start' as const,
+    gap: '0.65rem',
+    background: 'rgba(34,197,94,0.06)',
+    border: '1px solid rgba(34,197,94,0.15)',
     borderRadius: '1rem',
     padding: '0.85rem 1rem',
     marginBottom: '1rem',
@@ -207,14 +317,26 @@ export const ds = {
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: '1rem',
-    background: colors.primary,
+    background: gradients.primary,
     color: 'white',
-    boxShadow: '0 2px 10px rgba(20,184,166,0.25)',
+    boxShadow: shadows.primary,
   } as React.CSSProperties,
 
   // ── Gradient Text ──
   textGradient: {
-    background: `linear-gradient(135deg, ${colors.primary}, ${colors.primaryDark})`,
+    background: gradients.textPrimary,
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    backgroundClip: 'text',
+  } as React.CSSProperties,
+  textGradientAccent: {
+    background: gradients.textAccent,
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    backgroundClip: 'text',
+  } as React.CSSProperties,
+  textGradientWarm: {
+    background: gradients.textWarm,
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
     backgroundClip: 'text',
@@ -227,9 +349,9 @@ export const ds = {
     left: 0,
     right: 0,
     zIndex: 50,
-    background: 'rgba(255,255,255,0.85)',
-    backdropFilter: 'blur(12px)',
-    WebkitBackdropFilter: 'blur(12px)',
+    background: 'rgba(255,251,245,0.85)',
+    backdropFilter: 'blur(16px)',
+    WebkitBackdropFilter: 'blur(16px)',
     borderBottom: `1px solid ${colors.borderLight}`,
   } as React.CSSProperties,
 
@@ -237,4 +359,16 @@ export const ds = {
   section: {
     padding: '5rem 0',
   } as React.CSSProperties,
+
+  // ── Decorative ──
+  orb: (color: string, size: string = '20rem') => ({
+    position: 'absolute' as const,
+    width: size,
+    height: size,
+    borderRadius: '50%',
+    filter: 'blur(64px)',
+    background: color,
+    opacity: 0.3,
+    pointerEvents: 'none' as const,
+  }),
 } as const;
