@@ -16,9 +16,16 @@ export async function GET(request: NextRequest) {
   results.checks.envVars = {};
   for (const v of requiredEnvVars) {
     const val = process.env[v];
-    results.checks.envVars[v] = val
-      ? `SET (${val.substring(0, 15)}...)`
-      : "MISSING";
+    if (v === "DATABASE_URL" && val) {
+      // Show which port is being used
+      const portMatch = val.match(/:(\d+)\//);
+      const port = portMatch ? portMatch[1] : "unknown";
+      results.checks.envVars[v] = `SET (port ${port}, ${val.substring(0, 20)}...)`;
+    } else {
+      results.checks.envVars[v] = val
+        ? `SET (${val.substring(0, 15)}...)`
+        : "MISSING";
+    }
     if (!val) results.errors.push(`Missing env var: ${v}`);
   }
 
