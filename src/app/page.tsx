@@ -2,7 +2,7 @@ import Link from "next/link";
 import {
   Heart, BookOpen, Sparkles, Shield, ChevronRight, GraduationCap, Users,
   Flower2, Sun, Star, TreePine, Palette, Globe, Lightbulb, Puzzle,
-  ArrowRight, Play, CheckCircle2
+  ArrowRight, CheckCircle2
 } from "lucide-react";
 import { ds, colors, gradients, shadows } from "@/lib/design-system";
 
@@ -10,14 +10,12 @@ import { ds, colors, gradients, shadows } from "@/lib/design-system";
 function FloatingDecorations() {
   return (
     <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }} aria-hidden="true">
-      {/* Soft gradient orbs */}
       <div style={{ ...ds.orb(colors.primarySoft, '32rem'), top: '-12rem', left: '-10rem' }} className="float-slow" />
       <div style={{ ...ds.orb(colors.bgPink, '26rem'), top: '15%', right: '-12rem' }} className="float-medium" />
       <div style={{ ...ds.orb(colors.warmSoft, '22rem'), bottom: '5%', left: '10%' }} className="float-fast" />
       <div style={{ ...ds.orb(colors.bgBlue, '20rem'), bottom: '-6rem', right: '15%' }} className="float-x" />
       <div style={{ ...ds.orb(colors.bgGreen, '18rem'), top: '40%', left: '50%' }} className="float-slow" />
 
-      {/* Floating icons */}
       {[
         { Icon: Star, x: '7%', y: '15%', size: 28, color: colors.warm, opacity: 0.12, anim: 'float-slow' },
         { Icon: Puzzle, x: '88%', y: '30%', size: 24, color: colors.accent, opacity: 0.1, anim: 'float-medium' },
@@ -33,7 +31,6 @@ function FloatingDecorations() {
         </div>
       ))}
 
-      {/* Subtle grid dots */}
       <div style={{
         position: 'absolute', inset: 0,
         backgroundImage: `radial-gradient(circle, ${colors.primaryLight}12 1px, transparent 1px)`,
@@ -79,7 +76,6 @@ function HeroSection() {
       <FloatingDecorations />
 
       <div style={{ position: 'relative', maxWidth: '56rem', margin: '0 auto', textAlign: 'center' }}>
-        {/* Trust badge */}
         <div className="fade-in-up" style={{
           display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
           borderRadius: '9999px', padding: '0.45rem 1.25rem', marginBottom: '2.5rem',
@@ -93,7 +89,6 @@ function HeroSection() {
           </span>
         </div>
 
-        {/* Main headline */}
         <h1 className="fade-in-up" style={{
           fontSize: 'clamp(2.25rem, 5.5vw, 3.5rem)',
           fontWeight: 900,
@@ -109,7 +104,6 @@ function HeroSection() {
           <span style={{ color: colors.primary }}>your child</span>
         </h1>
 
-        {/* Supporting copy */}
         <p className="fade-in-up" style={{
           fontSize: 'clamp(1rem, 2vw, 1.125rem)',
           lineHeight: 1.75,
@@ -124,7 +118,6 @@ function HeroSection() {
           <span style={{ color: colors.primary, fontWeight: 700 }}>gentle adventure</span>.
         </p>
 
-        {/* CTAs */}
         <div className="fade-in-up" style={{
           display: 'flex', flexDirection: 'column', alignItems: 'center',
           justifyContent: 'center', gap: '1rem', marginBottom: '4.5rem',
@@ -148,7 +141,6 @@ function HeroSection() {
           </Link>
         </div>
 
-        {/* Trust indicators */}
         <div className="fade-in-up" style={{
           display: 'flex', flexWrap: 'wrap', alignItems: 'center',
           justifyContent: 'center', gap: '2.5rem',
@@ -180,10 +172,7 @@ function HeroSection() {
 /* ─── Stats Bar ─── */
 function StatsBar() {
   return (
-    <section style={{
-      padding: '0 1.5rem 4rem',
-      position: 'relative',
-    }}>
+    <section style={{ padding: '0 1.5rem 4rem', position: 'relative' }}>
       <div style={{
         maxWidth: '56rem', margin: '0 auto',
         display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
@@ -199,24 +188,11 @@ function StatsBar() {
           { value: 'CBC', label: 'Curriculum' },
           { value: 'Free', label: 'To get started' },
         ].map((stat) => (
-          <div key={stat.label} style={{
-            background: 'white',
-            padding: '2rem 1.25rem',
-            textAlign: 'center',
-          }}>
-            <div style={{
-              fontSize: '1.375rem', fontWeight: 900,
-              color: colors.primary,
-              marginBottom: '0.25rem',
-              letterSpacing: '-0.02em',
-            }}>
+          <div key={stat.label} style={{ background: 'white', padding: '2rem 1.25rem', textAlign: 'center' }}>
+            <div style={{ fontSize: '1.375rem', fontWeight: 900, color: colors.primary, marginBottom: '0.25rem', letterSpacing: '-0.02em' }}>
               {stat.value}
             </div>
-            <div style={{
-              fontSize: '0.75rem', fontWeight: 600,
-              color: colors.textMuted,
-              letterSpacing: '0.02em',
-            }}>
+            <div style={{ fontSize: '0.75rem', fontWeight: 600, color: colors.textMuted, letterSpacing: '0.02em' }}>
               {stat.label}
             </div>
           </div>
@@ -239,6 +215,7 @@ function CTACards() {
       iconColor: 'white',
       border: colors.primaryLight,
       cta: "Set Up Parent Account",
+      ctaColor: colors.primary,
     },
     {
       href: "/auth/register?role=learner",
@@ -250,6 +227,7 @@ function CTACards() {
       iconColor: 'white',
       border: colors.accentLight,
       cta: "Start Learning",
+      ctaColor: colors.accent,
     },
     {
       href: "/auth/login",
@@ -261,6 +239,7 @@ function CTACards() {
       iconColor: 'white',
       border: colors.warmLight,
       cta: "Continue Learning",
+      ctaColor: colors.warm,
     },
   ];
 
@@ -270,78 +249,43 @@ function CTACards() {
         <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
           <h2 style={{
             fontSize: 'clamp(1.5rem, 3.5vw, 2rem)',
-            fontWeight: 900,
-            letterSpacing: '-0.03em',
-            color: colors.textHeading,
-            marginBottom: '0.75rem',
-            lineHeight: 1.15,
+            fontWeight: 900, letterSpacing: '-0.03em',
+            color: colors.textHeading, marginBottom: '0.75rem', lineHeight: 1.15,
           }}>
             How would you like to <span style={ds.textGradient}>join us</span>?
           </h2>
-          <p style={{
-            fontSize: '1rem', color: colors.textMuted,
-            maxWidth: '30rem', margin: '0 auto',
-            fontWeight: 500, lineHeight: 1.7,
-          }}>
+          <p style={{ fontSize: '1rem', color: colors.textMuted, maxWidth: '30rem', margin: '0 auto', fontWeight: 500, lineHeight: 1.7 }}>
             Choose your path and we'll set up the perfect experience.
           </p>
         </div>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-          gap: '1.75rem',
-        }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.75rem' }}>
           {cards.map((c, i) => {
             const Icon = c.icon;
             return (
-              <Link key={c.title} href={c.href} className="scale-in" style={{
-                textDecoration: 'none',
-                display: 'block',
-                borderRadius: '1.75rem',
-                overflow: 'hidden',
-                background: c.gradient,
-                border: `1.5px solid ${c.border}`,
+              <Link key={c.title} href={c.href} className={`scale-in cta-card-hover`} style={{
+                textDecoration: 'none', display: 'block',
+                borderRadius: '1.75rem', overflow: 'hidden',
+                background: c.gradient, border: `1.5px solid ${c.border}`,
                 boxShadow: shadows.md,
                 transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                 animationDelay: `${i * 0.1}s`,
-              }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-6px)';
-                  e.currentTarget.style.boxShadow = shadows.xl;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = shadows.md;
-                }}
-              >
+              }}>
                 <div style={{ padding: '2.25rem' }}>
                   <div style={{
                     width: '64px', height: '64px', borderRadius: '1.5rem',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     marginBottom: '1.5rem', background: c.iconBg,
-                    boxShadow: `0 4px 20px ${c.iconColor === 'white' ? colors.primaryLight : c.iconColor}40`,
+                    boxShadow: `0 4px 20px ${colors.primaryLight}40`,
                   }}>
                     <Icon style={{ width: '30px', height: '30px', color: c.iconColor }} />
                   </div>
-                  <h3 style={{
-                    fontSize: '1.375rem', fontWeight: 800,
-                    color: colors.textHeading, marginBottom: '0.625rem',
-                    letterSpacing: '-0.02em',
-                  }}>
+                  <h3 style={{ fontSize: '1.375rem', fontWeight: 800, color: colors.textHeading, marginBottom: '0.625rem', letterSpacing: '-0.02em' }}>
                     {c.title}
                   </h3>
-                  <p style={{
-                    fontSize: '0.9375rem', color: colors.textMuted,
-                    lineHeight: 1.65, marginBottom: '1.75rem',
-                    fontWeight: 500,
-                  }}>
+                  <p style={{ fontSize: '0.9375rem', color: colors.textMuted, lineHeight: 1.65, marginBottom: '1.75rem', fontWeight: 500 }}>
                     {c.desc}
                   </p>
-                  <div style={{
-                    display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
-                    fontWeight: 700, fontSize: '0.875rem',
-                    color: c.iconColor === 'white' ? colors.primary : c.iconColor,
-                  }}>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, fontSize: '0.875rem', color: c.ctaColor }}>
                     {c.cta} <ChevronRight style={{ width: '16px', height: '16px' }} />
                   </div>
                 </div>
@@ -357,36 +301,12 @@ function CTACards() {
 /* ─── Features ─── */
 function FeaturesSection() {
   const features = [
-    {
-      icon: Heart, title: "Emotionally Intelligent",
-      desc: "Lessons adapt to your child's emotional state and unique learning pace — no stress, just growth.",
-      gradient: `linear-gradient(135deg, #ffedd5, #fed7aa)`, color: "#ea580c",
-    },
-    {
-      icon: TreePine, title: "CBC Aligned",
-      desc: "Curriculum aligned with Kenya's Competency-Based Curriculum for Grades 1–8.",
-      gradient: `linear-gradient(135deg, #d1fae5, #a7f3d0)`, color: "#059669",
-    },
-    {
-      icon: Star, title: "Gamified Learning",
-      desc: "XP, streaks, badges, and quests — your child stays motivated and excited to learn.",
-      gradient: `linear-gradient(135deg, #ccfbf1, #99f6e4)`, color: "#0d9488",
-    },
-    {
-      icon: Globe, title: "World Cultures",
-      desc: "Explore diverse cultures, languages, and perspectives from around the globe.",
-      gradient: `linear-gradient(135deg, #e0f2fe, #bae6fd)`, color: "#0284c7",
-    },
-    {
-      icon: Palette, title: "Creative Expression",
-      desc: "Art, music, storytelling, and hands-on projects that nurture creativity.",
-      gradient: `linear-gradient(135deg, #fef9c3, #fef08a)`, color: "#ca8a04",
-    },
-    {
-      icon: Shield, title: "Safe & Private",
-      desc: "Your family's data is protected. No ads, no tracking, no compromises.",
-      gradient: `linear-gradient(135deg, #fce7f3, #fbcfe8)`, color: "#be185d",
-    },
+    { icon: Heart, title: "Emotionally Intelligent", desc: "Lessons adapt to your child's emotional state and unique learning pace — no stress, just growth.", gradient: `linear-gradient(135deg, #ffedd5, #fed7aa)`, color: "#ea580c" },
+    { icon: TreePine, title: "CBC Aligned", desc: "Curriculum aligned with Kenya's Competency-Based Curriculum for Grades 1–8.", gradient: `linear-gradient(135deg, #d1fae5, #a7f3d0)`, color: "#059669" },
+    { icon: Star, title: "Gamified Learning", desc: "XP, streaks, badges, and quests — your child stays motivated and excited to learn.", gradient: `linear-gradient(135deg, #ccfbf1, #99f6e4)`, color: "#0d9488" },
+    { icon: Globe, title: "World Cultures", desc: "Explore diverse cultures, languages, and perspectives from around the globe.", gradient: `linear-gradient(135deg, #e0f2fe, #bae6fd)`, color: "#0284c7" },
+    { icon: Palette, title: "Creative Expression", desc: "Art, music, storytelling, and hands-on projects that nurture creativity.", gradient: `linear-gradient(135deg, #fef9c3, #fef08a)`, color: "#ca8a04" },
+    { icon: Shield, title: "Safe & Private", desc: "Your family's data is protected. No ads, no tracking, no compromises.", gradient: `linear-gradient(135deg, #fce7f3, #fbcfe8)`, color: "#be185d" },
   ];
 
   return (
@@ -403,48 +323,23 @@ function FeaturesSection() {
               Why Parents Love Us
             </span>
           </div>
-          <h2 style={{
-            fontSize: 'clamp(1.5rem, 3.5vw, 2rem)',
-            fontWeight: 900, letterSpacing: '-0.03em',
-            color: colors.textHeading, marginBottom: '0.75rem',
-            lineHeight: 1.15,
-          }}>
+          <h2 style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2rem)', fontWeight: 900, letterSpacing: '-0.03em', color: colors.textHeading, marginBottom: '0.75rem', lineHeight: 1.15 }}>
             Every child learns <span style={ds.textGradient}>differently</span>
           </h2>
-          <p style={{
-            fontSize: '1rem', color: colors.textMuted,
-            maxWidth: '32rem', margin: '0 auto',
-            fontWeight: 500, lineHeight: 1.7,
-          }}>
+          <p style={{ fontSize: '1rem', color: colors.textMuted, maxWidth: '32rem', margin: '0 auto', fontWeight: 500, lineHeight: 1.7 }}>
             Arizen School meets each learner exactly where they are — and helps them grow.
           </p>
         </div>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-          gap: '1.75rem',
-        }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.75rem' }}>
           {features.map((f, i) => {
             const Icon = f.icon;
             return (
-              <div key={f.title} className="fade-in-up" style={{
-                background: 'white',
-                borderRadius: '1.5rem',
-                border: `1px solid ${colors.borderLight}`,
-                padding: '2rem',
-                boxShadow: shadows.sm,
-                animationDelay: `${i * 0.08}s`,
+              <div key={f.title} className={`fade-in-up feature-card-hover`} style={{
+                background: 'white', borderRadius: '1.5rem',
+                border: `1px solid ${colors.borderLight}`, padding: '2rem',
+                boxShadow: shadows.sm, animationDelay: `${i * 0.08}s`,
                 transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-              }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-4px)';
-                  e.currentTarget.style.boxShadow = shadows.lg;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = shadows.sm;
-                }}
-              >
+              }}>
                 <div style={{
                   width: '56px', height: '56px', borderRadius: '1.375rem',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -453,17 +348,10 @@ function FeaturesSection() {
                 }}>
                   <Icon style={{ width: '28px', height: '28px', color: f.color }} />
                 </div>
-                <h3 style={{
-                  fontSize: '1.125rem', fontWeight: 800,
-                  color: colors.textHeading, marginBottom: '0.625rem',
-                  letterSpacing: '-0.01em',
-                }}>
+                <h3 style={{ fontSize: '1.125rem', fontWeight: 800, color: colors.textHeading, marginBottom: '0.625rem', letterSpacing: '-0.01em' }}>
                   {f.title}
                 </h3>
-                <p style={{
-                  fontSize: '0.9375rem', color: colors.textMuted,
-                  lineHeight: 1.65, fontWeight: 500,
-                }}>
+                <p style={{ fontSize: '0.9375rem', color: colors.textMuted, lineHeight: 1.65, fontWeight: 500 }}>
                   {f.desc}
                 </p>
               </div>
@@ -481,22 +369,18 @@ function BottomCTA() {
     <section style={{
       padding: '5rem 1.5rem 6rem',
       background: `linear-gradient(160deg, ${colors.primarySoft}, ${colors.bgBlue}, ${colors.bgGreen})`,
-      textAlign: 'center',
-      position: 'relative', overflow: 'hidden',
+      textAlign: 'center', position: 'relative', overflow: 'hidden',
     }}>
-      {/* Decorative orbs */}
       <div style={{
         position: 'absolute', top: '-5rem', left: '50%', transform: 'translateX(-50%)',
         width: '20rem', height: '20rem', borderRadius: '50%',
         background: colors.primarySoft, filter: 'blur(80px)', opacity: 0.5,
       }} />
-
       <div style={{ position: 'relative' }}>
         <h2 style={{
-          fontSize: 'clamp(1.5rem, 4vw, 2.25rem)',
-          fontWeight: 900, letterSpacing: '-0.03em',
-          color: colors.textHeading, marginBottom: '1rem',
-          lineHeight: 1.15,
+          fontSize: 'clamp(1.5rem, 4vw, 2.25rem)', fontWeight: 900,
+          letterSpacing: '-0.03em', color: colors.textHeading,
+          marginBottom: '1rem', lineHeight: 1.15,
         }}>
           Ready to start your child's
           <br />
@@ -510,8 +394,7 @@ function BottomCTA() {
           Join families who've discovered a better way to learn — personalized, joyful, and safe.
         </p>
         <Link href="/auth/register" style={{
-          ...ds.btnPrimary,
-          fontSize: '1.0625rem', padding: '1.125rem 2.5rem',
+          ...ds.btnPrimary, fontSize: '1.0625rem', padding: '1.125rem 2.5rem',
           gap: '0.625rem', textDecoration: 'none',
           boxShadow: `0 8px 32px ${colors.primary}30`,
         }}>
@@ -525,16 +408,8 @@ function BottomCTA() {
 /* ─── Footer ─── */
 function Footer() {
   return (
-    <footer style={{
-      padding: '2.5rem 1.5rem',
-      borderTop: `1px solid ${colors.borderLight}`,
-      background: colors.bgSoft,
-    }}>
-      <div style={{
-        maxWidth: '68rem', margin: '0 auto',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        flexWrap: 'wrap', gap: '1rem',
-      }}>
+    <footer style={{ padding: '2.5rem 1.5rem', borderTop: `1px solid ${colors.borderLight}`, background: colors.bgSoft }}>
+      <div style={{ maxWidth: '68rem', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
           <div style={{ ...ds.logoMark, width: '34px', height: '34px', borderRadius: '0.75rem' }}>
             <Flower2 style={{ width: '18px', height: '18px' }} />

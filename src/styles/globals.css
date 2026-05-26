@@ -169,6 +169,23 @@ a {
   transition: color 0.2s ease;
 }
 
+/* ── Card Hover Effects ── */
+.cta-card-hover {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.cta-card-hover:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.08), 0 16px 64px rgba(0,0,0,0.04);
+}
+
+.feature-card-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.feature-card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06), 0 8px 32px rgba(0,0,0,0.03);
+}
+
 /* ── Responsive ── */
 @media (max-width: 640px) {
   .fade-in-up {
