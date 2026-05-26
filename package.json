@@ -11,8 +11,8 @@
     "db:migrate": "npx prisma migrate dev",
     "db:push": "npx prisma db push",
     "db:studio": "npx prisma studio",
-    "postinstall": "prisma generate",
-    "vercel-build": "unset DIRECT_URL && npx prisma generate && npx prisma migrate deploy && next build"
+    "postinstall": "npx prisma generate",
+    "vercel-build": "npx prisma generate && npx prisma migrate deploy && next build"
   },
   "dependencies": {
     "@prisma/client": "^5.0.0",
