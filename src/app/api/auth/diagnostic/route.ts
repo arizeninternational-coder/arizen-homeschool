@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 export async function GET(request: NextRequest) {
   const results: any = {
     status: "ok",
+    version: "v4-port-diagnostic",
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV,
     checks: {},
