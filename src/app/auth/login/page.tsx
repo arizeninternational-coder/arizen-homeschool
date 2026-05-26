@@ -33,16 +33,19 @@ function LoginForm() {
     setError("");
     setLoading(true);
     try {
+      console.log("[LOGIN] Attempting sign in for:", email.toLowerCase().trim());
       const result = await signIn("credentials", { email: email.toLowerCase().trim(), password, redirect: false });
+      console.log("[LOGIN] signIn result:", JSON.stringify(result));
       if (result?.error) {
         setError("Invalid email or password. Please try again.");
       } else if (result?.ok) {
-        router.push("/");
-        router.refresh();
+        console.log("[LOGIN] Success, redirecting...");
+        window.location.href = "/";
       } else {
         setError("Something went wrong. Please try again.");
       }
-    } catch {
+    } catch (err: any) {
+      console.error("[LOGIN] Error:", err);
       setError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
