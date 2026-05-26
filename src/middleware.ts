@@ -31,12 +31,16 @@ export async function middleware(req: NextRequest) {
   }
 
   // Check auth
-  const token = await getToken({ req, secret });
-
-  if (!token) {
-    const loginUrl = new URL("/auth/login", req.url);
-    loginUrl.searchParams.set("callbackUrl", pathname);
-    return NextResponse.redirect(loginUrl);
+  try {
+    const token = await getToken({ req, secret });
+    if (!token) {
+      const loginUrl = new URL("/auth/login", req.url);
+      loginUrl.searchParams.set("callbackUrl", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+  } catch {
+    // If auth check fails (e.g. DB unavailable), allow request through
+    return NextResponse.next();
   }
 
   return NextResponse.next();
