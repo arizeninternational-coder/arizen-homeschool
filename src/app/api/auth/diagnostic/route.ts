@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
+import { supabase } from "@/lib/supabase";
 import bcrypt from "bcryptjs";
 import { createConnection } from "net";
 
@@ -23,7 +24,7 @@ function testTcpConnection(host: string, port: number, timeoutMs = 5000): Promis
 export async function GET(request: NextRequest) {
   const results: any = {
     status: "ok",
-    version: "v5-tcp-test",
+    version: "v6-supabase-test",
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV,
     vercel: !!process.env.VERCEL,
@@ -32,7 +33,7 @@ export async function GET(request: NextRequest) {
   };
 
   // 1. Check environment variables (don't expose values)
-  const requiredEnvVars = ["DATABASE_URL", "DIRECT_URL", "NEXTAUTH_SECRET", "NEXTAUTH_URL"];
+  const requiredEnvVars = ["DATABASE_URL", "DIRECT_URL", "NEXTAUTH_SECRET", "NEXTAUTH_URL", "NEXT_PUBLIC_SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_ANON_KEY"];
   results.checks.envVars = {};
   for (const v of requiredEnvVars) {
     const val = process.env[v];
@@ -40,6 +41,8 @@ export async function GET(request: NextRequest) {
       const portMatch = val.match(/:(\d+)\//);
       const port = portMatch ? portMatch[1] : "unknown";
       results.checks.envVars[v] = `SET (port ${port})`;
+    } else if (v === "NEXT_PUBLIC_SUPABASE_ANON_KEY" && val) {
+      results.checks.envVars[v] = val ? `SET (${val.substring(0, 10)}...)` : "MISSING";
     } else {
       results.checks.envVars[v] = val
         ? `SET (${val.substring(0, 15)}...)`
@@ -61,7 +64,26 @@ export async function GET(request: NextRequest) {
     results.errors.push(`TCP 6543 unreachable: ${tcp6543.error}`);
   }
 
-  // 2. Check database connection
+  // 1c. Supabase REST API test (HTTPS - works even when TCP fails)
+  try {
+    const { data, error: supaError } = await supabase
+      .from("Guild")
+      .select("id")
+      .limit(1);
+    results.checks.supabaseRest = {
+      works: !supaError,
+      error: supaError?.message || null,
+      guildCount: data?.length || 0,
+    };
+    if (supaError) {
+      results.errors.push(`Supabase REST API failed: ${supaError.message}`);
+    }
+  } catch (supaCatch: any) {
+    results.checks.supabaseRest = { works: false, error: supaCatch.message };
+    results.errors.push(`Supabase REST API exception: ${supaCatch.message}`);
+  }
+
+  // 2. Check database connection (Prisma - TCP based, may fail on Vercel)
   try {
     const userCount = await prisma.user.count();
     const guildCount = await prisma.guild.count();

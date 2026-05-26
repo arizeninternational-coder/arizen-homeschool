@@ -1,7 +1,8 @@
-// NextAuth config — updated for multi-learner support
+// NextAuth config — uses Supabase REST API for auth (bypasses Prisma TCP issues on Vercel)
 import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/db/prisma";
+import { supabase } from "@/lib/supabase";
 import bcrypt from "bcryptjs";
 
 export const authOptions: NextAuthOptions = {
@@ -22,11 +23,19 @@ export const authOptions: NextAuthOptions = {
           const email = credentials.email.toLowerCase().trim();
           console.log(`[AUTH] Login attempt: ${email}`);
 
-          const user = await prisma.user.findUnique({
-            where: { email },
-            include: { guild: true, learnerProfile: true },
-          });
+          // Use Supabase REST API to query user (HTTPS, not TCP)
+          const { data: users, error: dbError } = await supabase
+            .from("User")
+            .select("id, name, email, image, role, passwordHash, guildId")
+            .eq("email", email)
+            .limit(1);
 
+          if (dbError) {
+            console.error("[AUTH] Supabase query error:", dbError.message);
+            throw new Error("Invalid email or password");
+          }
+
+          const user = users?.[0];
           if (!user) {
             console.log(`[AUTH] User not found: ${email}`);
             throw new Error("Invalid email or password");
@@ -39,7 +48,7 @@ export const authOptions: NextAuthOptions = {
 
           const isRealHash = /^\$2[aby]\$\d+\$/.test(user.passwordHash);
           if (!isRealHash) {
-            console.log(`[AUTH] Invalid hash format for: ${email} (hash: ${user.passwordHash.substring(0, 15)}...)`);
+            console.log(`[AUTH] Invalid hash format for: ${email}`);
             throw new Error("Invalid email or password");
           }
 
@@ -47,6 +56,39 @@ export const authOptions: NextAuthOptions = {
           if (!isValid) {
             console.log(`[AUTH] Wrong password for: ${email}`);
             throw new Error("Invalid email or password");
+          }
+
+          // Fetch guild and learner profile via Supabase
+          let guildSlug = null;
+          let learnerProfileId = null;
+          let grade = null;
+          let displayName = null;
+          let totalXp = 0;
+          let currentStreak = 0;
+          let avatarUrl = null;
+
+          if (user.guildId) {
+            const { data: guild } = await supabase
+              .from("Guild")
+              .select("slug")
+              .eq("id", user.guildId)
+              .single();
+            guildSlug = guild?.slug || null;
+          }
+
+          const { data: profile } = await supabase
+            .from("LearnerProfile")
+            .select("id, grade, displayName, totalXp, currentStreak, avatarUrl")
+            .eq("userId", user.id)
+            .single();
+
+          if (profile) {
+            learnerProfileId = profile.id;
+            grade = profile.grade;
+            displayName = profile.displayName;
+            totalXp = profile.totalXp;
+            currentStreak = profile.currentStreak;
+            avatarUrl = profile.avatarUrl;
           }
 
           console.log(`[AUTH] Login success: ${email} (${user.role})`);
@@ -58,19 +100,16 @@ export const authOptions: NextAuthOptions = {
             image: user.image,
             role: user.role,
             guildId: user.guildId,
-            guildSlug: user.guild?.slug || null,
-            learnerProfileId: user.learnerProfile?.id || null,
-            grade: user.learnerProfile?.grade || null,
-            displayName: user.learnerProfile?.displayName || null,
-            totalXp: user.learnerProfile?.totalXp || 0,
-            currentStreak: user.learnerProfile?.currentStreak || 0,
-            avatarUrl: user.learnerProfile?.avatarUrl || null,
+            guildSlug,
+            learnerProfileId,
+            grade,
+            displayName,
+            totalXp,
+            currentStreak,
+            avatarUrl,
           } as any;
         } catch (error: any) {
-          // Log the FULL error for Vercel logs
           console.error("[AUTH] authorize() error:", error?.message || error);
-          console.error("[AUTH] authorize() stack:", error?.stack || "no stack");
-          // Re-throw so NextAuth returns 401
           throw new Error("Invalid email or password");
         }
       },

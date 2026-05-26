@@ -1,6 +1,6 @@
 {
   "name": "arizen-homeschool",
-  "version": "0.1.0",
+  "version": "0.1.1-cache-bust-7",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@prisma/client": "^5.0.0",
+    "@supabase/supabase-js": "^2.57.4",
     "bcryptjs": "^2.4.3",
     "clsx": "^2.1.0",
     "lucide-react": "^0.400.0",
@@ -33,7 +34,7 @@
     "autoprefixer": "^10.4.19",
     "postcss": "^8",
     "prisma": "^5.0.0",
-"tailwindcss": "^3.4.19",
+    "tailwindcss": "^3.4.19",
     "tsx": "^4.7.0",
     "typescript": "^5"
   },
