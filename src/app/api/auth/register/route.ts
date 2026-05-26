@@ -86,6 +86,7 @@ export async function POST(req: NextRequest) {
 
     // Create user via Supabase REST API
     const userRole = role || "LEARNER";
+    console.log(`[AUTH] Attempting to create user: ${normalizedEmail}, role: ${userRole}`);
     const { data: newUser, error: createError } = await supabase
       .from("User")
       .insert({
@@ -99,12 +100,14 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (createError) {
-      console.error("[AUTH] Supabase create error:", createError);
+      console.error("[AUTH] Supabase create error:", JSON.stringify(createError));
       return NextResponse.json(
-        { error: `Registration failed: ${createError.message}` },
+        { error: `Registration failed: ${createError.message || createError.code || 'Unknown database error'}` },
         { status: 500 }
       );
     }
+
+    console.log(`[AUTH] User created: ${newUser.id}`);
 
     // Create learner profile if LEARNER
     let learnerProfile = null;
