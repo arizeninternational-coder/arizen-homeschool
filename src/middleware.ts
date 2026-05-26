@@ -6,6 +6,7 @@ const secret = process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-produ
 
 // Routes that don't require authentication
 const publicPaths = [
+  "/",
   "/auth/login",
   "/auth/register",
   "/api/auth",
