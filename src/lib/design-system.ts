@@ -1,6 +1,6 @@
 /**
- * Arizen School — Design System v3
- * Warm • Calm • Premium • Child-friendly
+ * Arizen School — Design System v4
+ * Soft Mint/Teal • Warm • Premium • Child-friendly
  *
  * Usage: import { ds, colors, gradients } from '@/lib/design-system'
  */
@@ -53,14 +53,16 @@ export const gradients = {
 } as const;
 
 export const shadows = {
-  sm: '0 1px 2px rgba(0,0,0,0.04), 0 2px 4px rgba(0,0,0,0.02)',
-  md: '0 2px 8px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04)',
-  lg: '0 4px 16px rgba(0,0,0,0.08), 0 8px 32px rgba(0,0,0,0.04)',
-  xl: '0 8px 32px rgba(0,0,0,0.1), 0 16px 64px rgba(0,0,0,0.05)',
-  primary: '0 4px 16px rgba(20,184,166,0.2), 0 8px 32px rgba(20,184,166,0.1)',
-  accent: '0 4px 16px rgba(251,113,133,0.2), 0 8px 32px rgba(251,113,133,0.1)',
-  warm: '0 4px 16px rgba(245,158,11,0.2), 0 8px 32px rgba(245,158,11,0.1)',
-  glow: '0 0 40px rgba(20,184,166,0.15)',
+  xs: '0 1px 2px rgba(0,0,0,0.03)',
+  sm: '0 1px 3px rgba(0,0,0,0.04), 0 2px 6px rgba(0,0,0,0.02)',
+  md: '0 2px 8px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.03)',
+  lg: '0 4px 16px rgba(0,0,0,0.06), 0 8px 32px rgba(0,0,0,0.03)',
+  xl: '0 8px 32px rgba(0,0,0,0.08), 0 16px 64px rgba(0,0,0,0.04)',
+  '2xl': '0 12px 48px rgba(0,0,0,0.1), 0 24px 80px rgba(0,0,0,0.05)',
+  primary: '0 4px 20px rgba(13,148,136,0.18), 0 8px 32px rgba(13,148,136,0.08)',
+  accent: '0 4px 20px rgba(251,113,133,0.18), 0 8px 32px rgba(251,113,133,0.08)',
+  warm: '0 4px 20px rgba(245,158,11,0.18), 0 8px 32px rgba(245,158,11,0.08)',
+  glow: '0 0 60px rgba(13,148,136,0.12)',
 } as const;
 
 export const ds = {
@@ -73,12 +75,12 @@ export const ds = {
   containerNarrow: {
     maxWidth: '720px',
     margin: '0 auto',
-    padding: '0 1.25rem',
+    padding: '0 1.5rem',
   },
   containerBase: {
-    maxWidth: '1100px',
+    maxWidth: '1160px',
     margin: '0 auto',
-    padding: '0 1.25rem',
+    padding: '0 1.5rem',
   },
 
   // ── Cards ──
@@ -92,11 +94,11 @@ export const ds = {
   },
   cardInteractive: {
     background: 'white',
-    borderRadius: '1.5rem',
+    borderRadius: '1.75rem',
     border: `1px solid ${colors.borderLight}`,
-    padding: '1.75rem',
+    padding: '2rem',
     boxShadow: shadows.md,
-    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
     cursor: 'pointer' as const,
     textDecoration: 'none',
     display: 'block',
@@ -109,11 +111,11 @@ export const ds = {
     boxShadow: shadows.sm,
   },
   cardGlass: {
-    background: 'rgba(255,255,255,0.8)',
-    backdropFilter: 'blur(16px)',
-    WebkitBackdropFilter: 'blur(16px)',
+    background: 'rgba(255,255,255,0.85)',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
     borderRadius: '1.5rem',
-    border: `1px solid rgba(255,255,255,0.6)`,
+    border: `1px solid rgba(255,255,255,0.7)`,
     padding: '2rem',
     boxShadow: shadows.lg,
   },
@@ -125,14 +127,14 @@ export const ds = {
     justifyContent: 'center',
     gap: '0.5rem',
     borderRadius: '1rem',
-    padding: '0.85rem 2rem',
+    padding: '0.875rem 2rem',
     fontSize: '0.9375rem',
     fontWeight: 700,
     color: 'white',
     background: gradients.primary,
     border: 'none',
     cursor: 'pointer',
-    transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
     boxShadow: shadows.primary,
     letterSpacing: '0.01em',
   } as React.CSSProperties,
@@ -142,7 +144,7 @@ export const ds = {
     justifyContent: 'center',
     gap: '0.5rem',
     borderRadius: '1rem',
-    padding: '0.85rem 2rem',
+    padding: '0.875rem 2rem',
     fontSize: '0.9375rem',
     fontWeight: 600,
     color: colors.primaryDark,
@@ -157,7 +159,7 @@ export const ds = {
     justifyContent: 'center',
     gap: '0.5rem',
     borderRadius: '1rem',
-    padding: '0.85rem 2rem',
+    padding: '0.875rem 2rem',
     fontSize: '0.9375rem',
     fontWeight: 700,
     color: 'white',
@@ -173,7 +175,7 @@ export const ds = {
     justifyContent: 'center',
     gap: '0.5rem',
     borderRadius: '1rem',
-    padding: '0.85rem 2rem',
+    padding: '0.875rem 2rem',
     fontSize: '0.9375rem',
     fontWeight: 700,
     color: 'white',
@@ -189,7 +191,7 @@ export const ds = {
     justifyContent: 'center',
     gap: '0.35rem',
     borderRadius: '0.75rem',
-    padding: '0.55rem 1.1rem',
+    padding: '0.6rem 1.2rem',
     fontSize: '0.875rem',
     fontWeight: 600,
     color: colors.textMuted,
@@ -204,7 +206,7 @@ export const ds = {
     justifyContent: 'center',
     gap: '0.5rem',
     borderRadius: '1rem',
-    padding: '0.8rem 1.75rem',
+    padding: '0.825rem 1.75rem',
     fontSize: '0.9375rem',
     fontWeight: 600,
     color: colors.primary,
@@ -217,7 +219,7 @@ export const ds = {
   // ── Form ──
   input: {
     width: '100%',
-    padding: '0.85rem 1.1rem',
+    padding: '0.875rem 1.125rem',
     borderRadius: '1rem',
     fontSize: '0.9375rem',
     fontWeight: 500,
@@ -237,7 +239,7 @@ export const ds = {
     display: 'block',
     fontSize: '0.8125rem',
     fontWeight: 700,
-    marginBottom: '0.45rem',
+    marginBottom: '0.5rem',
     color: colors.text,
     letterSpacing: '0.02em',
     textTransform: 'uppercase' as const,
@@ -245,29 +247,30 @@ export const ds = {
 
   // ── Typography ──
   headingHero: {
-    fontSize: 'clamp(2rem, 5vw, 3rem)',
+    fontSize: 'clamp(2.25rem, 5.5vw, 3.5rem)',
     fontWeight: 900,
-    letterSpacing: '-0.03em',
+    letterSpacing: '-0.035em',
     lineHeight: 1.1,
     color: colors.textHeading,
   } as React.CSSProperties,
   headingLg: {
-    fontSize: 'clamp(1.35rem, 3vw, 1.75rem)',
-    fontWeight: 800,
-    letterSpacing: '-0.02em',
+    fontSize: 'clamp(1.5rem, 3.5vw, 2rem)',
+    fontWeight: 900,
+    letterSpacing: '-0.03em',
     color: colors.textHeading,
-    lineHeight: 1.2,
+    lineHeight: 1.15,
   } as React.CSSProperties,
   headingMd: {
-    fontSize: '1.25rem',
+    fontSize: '1.375rem',
+    fontWeight: 800,
+    color: colors.textHeading,
+    letterSpacing: '-0.02em',
+  } as React.CSSProperties,
+  headingSm: {
+    fontSize: '1.125rem',
     fontWeight: 800,
     color: colors.textHeading,
     letterSpacing: '-0.01em',
-  } as React.CSSProperties,
-  headingSm: {
-    fontSize: '1.0625rem',
-    fontWeight: 700,
-    color: colors.textHeading,
   } as React.CSSProperties,
   textBody: {
     fontSize: '0.9375rem',
@@ -277,7 +280,7 @@ export const ds = {
   } as React.CSSProperties,
   textBodyLg: {
     fontSize: '1.0625rem',
-    lineHeight: 1.7,
+    lineHeight: 1.75,
     color: colors.textMuted,
     fontWeight: 500,
   } as React.CSSProperties,
@@ -297,7 +300,7 @@ export const ds = {
     background: 'rgba(239,68,68,0.06)',
     border: '1px solid rgba(239,68,68,0.15)',
     borderRadius: '1rem',
-    padding: '0.85rem 1rem',
+    padding: '0.875rem 1.125rem',
     marginBottom: '1rem',
   } as React.CSSProperties,
   alertSuccess: {
@@ -307,7 +310,7 @@ export const ds = {
     background: 'rgba(34,197,94,0.06)',
     border: '1px solid rgba(34,197,94,0.15)',
     borderRadius: '1rem',
-    padding: '0.85rem 1rem',
+    padding: '0.875rem 1.125rem',
     marginBottom: '1rem',
   } as React.CSSProperties,
 
@@ -349,9 +352,9 @@ export const ds = {
     left: 0,
     right: 0,
     zIndex: 50,
-    background: 'rgba(255,251,245,0.85)',
-    backdropFilter: 'blur(16px)',
-    WebkitBackdropFilter: 'blur(16px)',
+    background: 'rgba(253,253,251,0.85)',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
     borderBottom: `1px solid ${colors.borderLight}`,
   } as React.CSSProperties,
 
@@ -366,9 +369,9 @@ export const ds = {
     width: size,
     height: size,
     borderRadius: '50%',
-    filter: 'blur(64px)',
+    filter: 'blur(80px)',
     background: color,
-    opacity: 0.3,
+    opacity: 0.25,
     pointerEvents: 'none' as const,
   }),
 } as const;
