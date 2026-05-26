@@ -5,8 +5,6 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 // Force pooled connection (port 6543) for serverless environments.
-// Vercel serverless functions cannot reach Supabase direct connection (port 5432).
-// The pooled connection via PgBouncer (port 6543) works from serverless.
 function getDatasourceUrl(): string | undefined {
   const url = process.env.DATABASE_URL;
   if (!url) return undefined;
@@ -17,7 +15,6 @@ function getDatasourceUrl(): string | undefined {
   // Replace direct connection (5432) with pooled (6543)
   if (url.includes(":5432/")) {
     let pooled = url.replace(":5432/", ":6543/");
-    // Add pgbouncer params if not present
     if (!pooled.includes("pgbouncer=")) {
       pooled = pooled.replace("?sslmode=require", "?pgbouncer=true&connection_limit=5&sslmode=require");
     }
@@ -28,6 +25,15 @@ function getDatasourceUrl(): string | undefined {
 }
 
 const datasourceUrl = getDatasourceUrl();
+
+// Debug: log to Vercel function logs
+if (typeof process !== "undefined" && process.env.VERCEL) {
+  console.log("[PRISMA] DATABASE_URL port:", process.env.DATABASE_URL?.match(/:(\d+)\//)?.[1] || "unknown");
+  console.log("[PRISMA] Override applied:", !!datasourceUrl);
+  if (datasourceUrl) {
+    console.log("[PRISMA] Pooled URL port:", datasourceUrl.match(/:(\d+)\//)?.[1]);
+  }
+}
 
 const prismaOptions = datasourceUrl
   ? { datasources: { db: { url: datasourceUrl } } }
