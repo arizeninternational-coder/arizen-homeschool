@@ -41,7 +41,7 @@ async function main() {
   });
   console.log(`✅ Guild: ${guild.name}`);
 
-  const DEMO_PASSWORD_HASH = "$2a$12$wcn7184PARFqckSTUaDZx.FsynPFY3wlVGKon.LcdSkvdk16467pu"; // demo123
+  const DEMO_PASSWORD_HASH = "$2a$10$hKjvSVKJZv85IPq9PVV6wOxXuX9v14sm0c5C5aN6XJ2E2qyOz/x5W"; // demo123
   // Victor (parent/admin)
   const victorUser = await prisma.user.create({
     data: {
