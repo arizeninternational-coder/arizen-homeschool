@@ -1,13 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import bcrypt from "bcryptjs";
+import { createConnection } from "net";
+
+function testTcpConnection(host: string, port: number, timeoutMs = 5000): Promise<{ reachable: boolean; error?: string }> {
+  return new Promise((resolve) => {
+    const socket = createConnection({ host, port, timeout: timeoutMs });
+    socket.on("connect", () => {
+      socket.destroy();
+      resolve({ reachable: true });
+    });
+    socket.on("timeout", () => {
+      socket.destroy();
+      resolve({ reachable: false, error: "TCP connection timed out" });
+    });
+    socket.on("error", (err: any) => {
+      resolve({ reachable: false, error: err.message || "TCP connection failed" });
+    });
+  });
+}
 
 export async function GET(request: NextRequest) {
   const results: any = {
     status: "ok",
-    version: "v4-port-diagnostic",
+    version: "v5-tcp-test",
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV,
+    vercel: !!process.env.VERCEL,
     checks: {},
     errors: [],
   };
@@ -27,6 +46,19 @@ export async function GET(request: NextRequest) {
         : "MISSING";
     }
     if (!val) results.errors.push(`Missing env var: ${v}`);
+  }
+
+  // 1b. Raw TCP connectivity test
+  const dbHost = "db.hgufndnqbvcukbxmwtvo.supabase.co";
+  results.checks.tcp = {};
+  const [tcp5432, tcp6543] = await Promise.all([
+    testTcpConnection(dbHost, 5432),
+    testTcpConnection(dbHost, 6543),
+  ]);
+  results.checks.tcp["5432_direct"] = tcp5432;
+  results.checks.tcp["6543_pooled"] = tcp6543;
+  if (!tcp6543.reachable) {
+    results.errors.push(`TCP 6543 unreachable: ${tcp6543.error}`);
   }
 
   // 2. Check database connection
