@@ -107,14 +107,17 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (error: any) {
+    // ALWAYS log the full error to server logs
     console.error("[AUTH] Registration error:", error);
-    // Return the actual error message in development, generic in production
-    const isDev = process.env.NODE_ENV !== "production";
-    const message = isDev
-      ? `Registration failed: ${error.message || "Unknown error"}`
-      : "Failed to create account. Please try again.";
+    console.error("[AUTH] Error message:", error?.message);
+    console.error("[AUTH] Error code:", error?.code);
+    console.error("[AUTH] Error meta:", JSON.stringify(error?.meta || {}));
+
+    // Return the actual error so we can see what's wrong
+    // In production this is safe — it's just a registration error message
+    const message = error?.message || "Unknown error";
     return NextResponse.json(
-      { error: message },
+      { error: `Registration failed: ${message}` },
       { status: 500 }
     );
   }

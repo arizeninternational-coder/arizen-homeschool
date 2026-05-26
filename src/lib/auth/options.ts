@@ -13,58 +13,66 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          console.log("[AUTH] Missing credentials");
+        try {
+          if (!credentials?.email || !credentials?.password) {
+            console.log("[AUTH] Missing credentials");
+            throw new Error("Invalid email or password");
+          }
+
+          const email = credentials.email.toLowerCase().trim();
+          console.log(`[AUTH] Login attempt: ${email}`);
+
+          const user = await prisma.user.findUnique({
+            where: { email },
+            include: { guild: true, learnerProfile: true },
+          });
+
+          if (!user) {
+            console.log(`[AUTH] User not found: ${email}`);
+            throw new Error("Invalid email or password");
+          }
+
+          if (!user.passwordHash) {
+            console.log(`[AUTH] No password set: ${email}`);
+            throw new Error("Invalid email or password");
+          }
+
+          const isRealHash = /^\$2[aby]\$\d+\$/.test(user.passwordHash);
+          if (!isRealHash) {
+            console.log(`[AUTH] Invalid hash format for: ${email} (hash: ${user.passwordHash.substring(0, 15)}...)`);
+            throw new Error("Invalid email or password");
+          }
+
+          const isValid = await bcrypt.compare(credentials.password, user.passwordHash);
+          if (!isValid) {
+            console.log(`[AUTH] Wrong password for: ${email}`);
+            throw new Error("Invalid email or password");
+          }
+
+          console.log(`[AUTH] Login success: ${email} (${user.role})`);
+
+          return {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            image: user.image,
+            role: user.role,
+            guildId: user.guildId,
+            guildSlug: user.guild?.slug || null,
+            learnerProfileId: user.learnerProfile?.id || null,
+            grade: user.learnerProfile?.grade || null,
+            displayName: user.learnerProfile?.displayName || null,
+            totalXp: user.learnerProfile?.totalXp || 0,
+            currentStreak: user.learnerProfile?.currentStreak || 0,
+            avatarUrl: user.learnerProfile?.avatarUrl || null,
+          } as any;
+        } catch (error: any) {
+          // Log the FULL error for Vercel logs
+          console.error("[AUTH] authorize() error:", error?.message || error);
+          console.error("[AUTH] authorize() stack:", error?.stack || "no stack");
+          // Re-throw so NextAuth returns 401
           throw new Error("Invalid email or password");
         }
-
-        const email = credentials.email.toLowerCase().trim();
-        console.log(`[AUTH] Login attempt: ${email}`);
-
-        const user = await prisma.user.findUnique({
-          where: { email },
-          include: { guild: true, learnerProfile: true },
-        });
-
-        if (!user) {
-          console.log(`[AUTH] User not found: ${email}`);
-          throw new Error("Invalid email or password");
-        }
-
-        if (!user.passwordHash) {
-          console.log(`[AUTH] No password set: ${email}`);
-          throw new Error("Invalid email or password");
-        }
-
-        const isRealHash = /^\$2[aby]\$\d+\$/.test(user.passwordHash);
-        if (!isRealHash) {
-          console.log(`[AUTH] Invalid hash format for: ${email} (hash prefix: ${user.passwordHash.substring(0, 10)}...)`);
-          throw new Error("Invalid email or password");
-        }
-
-        const isValid = await bcrypt.compare(credentials.password, user.passwordHash);
-        if (!isValid) {
-          console.log(`[AUTH] Wrong password for: ${email}`);
-          throw new Error("Invalid email or password");
-        }
-
-        console.log(`[AUTH] Login success: ${email} (${user.role})`);
-
-        return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          image: user.image,
-          role: user.role,
-          guildId: user.guildId,
-          guildSlug: user.guild.slug,
-          learnerProfileId: user.learnerProfile?.id || null,
-          grade: user.learnerProfile?.grade || null,
-          displayName: user.learnerProfile?.displayName || null,
-          totalXp: user.learnerProfile?.totalXp || 0,
-          currentStreak: user.learnerProfile?.currentStreak || 0,
-          avatarUrl: user.learnerProfile?.avatarUrl || null,
-        } as any;
       },
     }),
   ],
@@ -102,7 +110,7 @@ export const authOptions: NextAuthOptions = {
   pages: { signIn: "/auth/login", error: "/auth/login" },
   session: { strategy: "jwt", maxAge: 30 * 24 * 60 * 60 },
   secret: process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-production",
-  debug: process.env.NODE_ENV !== "production",
+  debug: true,
 };
 
 export default NextAuth(authOptions);
