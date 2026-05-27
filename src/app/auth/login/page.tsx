@@ -36,16 +36,16 @@ function LoginForm() {
     setLoading(true);
     try {
       console.log("[LOGIN] Attempting sign in for:", email.toLowerCase().trim());
-      const result = await signIn("credentials", { email: email.toLowerCase().trim(), password, redirect: false });
-      console.log("[LOGIN] signIn result:", JSON.stringify(result));
-      if (result?.error) {
-        setError("Invalid email or password. Please try again.");
-      } else if (result?.ok) {
-        console.log("[LOGIN] Success, redirecting...");
-        window.location.href = "/";
-      } else {
-        setError("Something went wrong. Please try again.");
-      }
+      // Use redirect:true so NextAuth handles the full flow including cookie setting
+      await signIn("credentials", { 
+        email: email.toLowerCase().trim(), 
+        password, 
+        redirect: true,
+        callbackUrl: "/"
+      });
+      // If signIn doesn't throw, the redirect is happening automatically
+      // The console.log below won't execute because the page navigates away
+      console.log("[LOGIN] signIn returned (should not see this)");
     } catch (err: any) {
       console.error("[LOGIN] Error:", err);
       setError("Something went wrong. Please try again.");

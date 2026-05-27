@@ -46,20 +46,13 @@ function RegisterForm() {
       const data = await res.json();
       if (!res.ok) { setError(data.error || "Failed to create account"); return; }
       console.log("[REGISTER] Account created, signing in...");
-      const { signIn } = await import("next-auth/react");
-      const result = await signIn("credentials", { 
+      // Use redirect:true so NextAuth handles the full flow
+      await signIn("credentials", { 
         email: form.email.toLowerCase().trim(), 
         password: form.password, 
-        redirect: false 
+        redirect: true,
+        callbackUrl: "/"
       });
-      console.log("[REGISTER] signIn result:", JSON.stringify(result));
-      if (result?.error) { 
-        console.log("[REGISTER] signIn error:", result.error);
-        setError(`Login after registration failed: ${result.error}. Please log in manually.`); 
-      } else { 
-        console.log("[REGISTER] signIn success, redirecting...");
-        window.location.href = "/";
-      }
     } catch { setError("Something went wrong. Please try again."); }
     finally { setLoading(false); }
   }
