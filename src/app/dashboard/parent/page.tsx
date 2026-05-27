@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import {
   Heart, Users, BookOpen, TrendingUp, Settings, LogOut,
   ChevronRight, Flower2, ShieldCheck, Flame, Award, Loader2,
-  LayoutDashboard, ClipboardList
+  LayoutDashboard, ClipboardList, Plus
 } from "lucide-react";
 import { ds, colors, gradients, shadows } from "@/lib/design-system";
 import Link from "next/link";
@@ -29,6 +29,7 @@ const navItems = [
 
 export default function ParentDashboard() {
   const [user, setUser] = useState<any>(null);
+  const [children, setChildren] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -42,6 +43,14 @@ export default function ParentDashboard() {
           return;
         }
         setUser(data.user);
+        // Load linked children
+        try {
+          const childrenRes = await fetch("/api/parent/link-child");
+          if (childrenRes.ok) {
+            const childrenData = await childrenRes.json();
+            setChildren(childrenData.children || []);
+          }
+        } catch { /* ignore children load error */ }
       } catch { window.location.replace("/auth/login"); }
       finally { setLoading(false); }
     }
@@ -142,22 +151,50 @@ export default function ParentDashboard() {
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.25rem" }}>
               <h2 style={{ fontSize: "1.125rem", fontWeight: 800, color: colors.text }}>My Children</h2>
               <Link href="/dashboard/parent/children" style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem", fontSize: "0.8125rem", fontWeight: 700, color: colors.primary, textDecoration: "none" }}>
-                View All <ChevronRight style={{ width: 14, height: 14 }} />
+                Manage <ChevronRight style={{ width: 14, height: 14 }} />
               </Link>
             </div>
 
-            <div style={{ ...ds.card, textAlign: "center", padding: "3rem 2rem" }}>
-              <div style={{ ...ds.logoMark, width: 56, height: 56, margin: "0 auto 1.25rem", background: colors.bgSoft }}>
-                <Users style={{ width: 28, height: 28, color: colors.textMuted }} />
+            {children.length === 0 ? (
+              <div style={{ ...ds.card, textAlign: "center", padding: "2.5rem 2rem" }}>
+                <div style={{ ...ds.logoMark, width: 48, height: 48, margin: "0 auto 1rem", background: colors.bgSoft }}>
+                  <Users style={{ width: 24, height: 24, color: colors.textMuted }} />
+                </div>
+                <h3 style={{ fontSize: "1rem", fontWeight: 700, color: colors.text, marginBottom: "0.375rem" }}>No children linked</h3>
+                <p style={{ color: colors.textMuted, fontSize: "0.875rem", maxWidth: 320, margin: "0 auto 1rem" }}>
+                  Link a learner account to start tracking progress.
+                </p>
+                <Link href="/dashboard/parent/children" style={{ ...ds.btnPrimary, fontSize: "0.875rem", textDecoration: "none", display: "inline-flex" }}>
+                  <Plus style={{ width: 14, height: 14 }} /> Add Child
+                </Link>
               </div>
-              <h3 style={{ fontSize: "1.125rem", fontWeight: 700, color: colors.text, marginBottom: "0.5rem" }}>No children linked yet</h3>
-              <p style={{ color: colors.textMuted, fontSize: "0.9375rem", maxWidth: 360, margin: "0 auto 1.5rem" }}>
-                Link your children&apos;s learner accounts to start tracking their progress and achievements.
-              </p>
-              <Link href="/dashboard/parent/children" style={{ ...ds.btnPrimary, textDecoration: "none", display: "inline-flex" }}>
-                <Users style={{ width: 16, height: 16 }} /> Manage Children
-              </Link>
-            </div>
+            ) : (
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "1rem" }}>
+                {children.map((link: any) => {
+                  const profile = link.childUser?.learnerProfile;
+                  const displayName = profile?.displayName || link.childUser?.name || "Learner";
+                  return (
+                    <div key={link.id} style={{ ...ds.card, padding: "1.25rem" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.75rem" }}>
+                        <div style={{ width: 40, height: 40, borderRadius: "50%", background: gradients.primary, display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: 700, fontSize: "1rem", flexShrink: 0 }}>
+                          {displayName.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <div style={{ fontWeight: 700, color: colors.text, fontSize: "0.9375rem" }}>{displayName}</div>
+                          {profile && <div style={{ fontSize: "0.75rem", color: colors.textMuted }}>Grade {profile.grade}</div>}
+                        </div>
+                      </div>
+                      {profile && (
+                        <div style={{ display: "flex", gap: "1rem", fontSize: "0.75rem" }}>
+                          <span style={{ color: colors.primary, fontWeight: 600 }}>{profile.totalXp} XP</span>
+                          <span style={{ color: colors.warm, fontWeight: 600 }}>{profile.currentStreak}d streak</span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* Quick Actions */}

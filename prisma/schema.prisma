@@ -107,6 +107,8 @@ model User {
   accounts      Account[]
   sessions      Session[]
   reflections   Reflection[]
+  parentLinks   ParentChild[] @relation("ParentUsers")
+  childLinks    ParentChild[] @relation("ChildUsers")
 }
 
 model LearnerProfile {
@@ -424,4 +426,20 @@ model CbcPci {
   id              String   @id @default(uuid())
   name            String   @unique
   description     String?
+}
+
+// ── Parent-Child Linking ──────────────────────────────────────
+
+model ParentChild {
+  id             String   @id @default(uuid())
+  parentId       String
+  childUserId    String
+  createdAt      DateTime @default(now())
+
+  parent         User     @relation("ParentUsers", fields: [parentId], references: [id])
+  childUser      User     @relation("ChildUsers", fields: [childUserId], references: [id])
+
+  @@unique([parentId, childUserId])
+  @@index([parentId])
+  @@index([childUserId])
 }
