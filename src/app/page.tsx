@@ -1,21 +1,12 @@
-"use client";
-
-import { useState, useEffect } from "react";
 import Link from "next/link";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth/options";
 import {
   Heart, BookOpen, Sparkles, Shield, ChevronRight, GraduationCap, Users,
   Flower2, Sun, Star, TreePine, Palette, Globe, Lightbulb, Puzzle,
-  ArrowRight, CheckCircle2, LogOut, User
+  ArrowRight, CheckCircle2
 } from "lucide-react";
-import { signOut } from "next-auth/react";
 import { ds, colors, gradients, shadows } from "@/lib/design-system";
-
-interface AuthUser {
-  id: string;
-  name: string | null;
-  email: string;
-  role: string;
-}
 
 /* ─── Floating Decorations ─── */
 function FloatingDecorations() {
@@ -26,7 +17,6 @@ function FloatingDecorations() {
       <div style={{ ...ds.orb(colors.warmSoft, '22rem'), bottom: '5%', left: '10%' }} className="float-fast" />
       <div style={{ ...ds.orb(colors.bgBlue, '20rem'), bottom: '-6rem', right: '15%' }} className="float-x" />
       <div style={{ ...ds.orb(colors.bgGreen, '18rem'), top: '40%', left: '50%' }} className="float-slow" />
-
       {[
         { Icon: Star, x: '7%', y: '15%', size: 28, color: colors.warm, opacity: 0.12, anim: 'float-slow' },
         { Icon: Puzzle, x: '88%', y: '30%', size: 24, color: colors.accent, opacity: 0.1, anim: 'float-medium' },
@@ -41,7 +31,6 @@ function FloatingDecorations() {
           <Icon style={{ width: `${size}px`, height: `${size}px`, color }} />
         </div>
       ))}
-
       <div style={{
         position: 'absolute', inset: 0,
         backgroundImage: `radial-gradient(circle, ${colors.primaryLight}12 1px, transparent 1px)`,
@@ -52,26 +41,8 @@ function FloatingDecorations() {
   );
 }
 
-/* ─── Navbar ─── */
-function Navbar() {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch("/api/auth/session")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data?.user) setUser(data.user);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
-
-  const handleLogout = async () => {
-    await signOut({ redirect: false });
-    window.location.replace("/");
-  };
-
+/* ─── Logged-out Navbar ─── */
+function LoggedOutNavbar() {
   return (
     <nav style={ds.nav}>
       <div style={{ maxWidth: '1160px', margin: '0 auto', padding: '0 1.5rem' }}>
@@ -82,31 +53,10 @@ function Navbar() {
             </div>
             <span style={{ fontSize: '1.25rem', fontWeight: 900, letterSpacing: '-0.02em', ...ds.textGradient }}>Arizen School</span>
           </Link>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            {loading ? (
-              <div style={{ width: 80, height: 36, borderRadius: 8, background: colors.border, opacity: 0.5 }} />
-            ) : user ? (
-              <>
-                <span style={{ fontSize: '0.875rem', color: colors.textMuted, fontWeight: 600 }}>
-                  Hi, {user.name?.split(" ")[0] || "there"}!
-                </span>
-                <Link
-                  href={user.role === "ADMIN" ? "/dashboard/admin" : user.role === "PARENT" ? "/dashboard/parent" : "/dashboard/student"}
-                  style={{ ...ds.btnGhost, fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.375rem' }}
-                >
-                  <User style={{ width: 16, height: 16 }} /> Dashboard
-                </Link>
-                <button onClick={handleLogout} style={{ ...ds.btnGhost, color: colors.danger, fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
-                  <LogOut style={{ width: 16, height: 16 }} /> Sign Out
-                </button>
-              </>
-            ) : (
-              <>
-                <Link href="/auth/login" style={{ ...ds.btnGhost, fontWeight: 700 }}>Sign In</Link>
-                <Link href="/auth/register" style={{ ...ds.btnPrimary, fontSize: '0.875rem', padding: '0.65rem 1.6rem' }}>Get Started</Link>
-              </>
-            )}
-          </div>
+          <form method="POST" action="/api/auth/signout" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <Link href="/auth/login" style={{ ...ds.btnGhost, fontWeight: 700 }}>Sign In</Link>
+            <Link href="/auth/register" style={{ ...ds.btnPrimary, fontSize: '0.875rem', padding: '0.65rem 1.6rem' }}>Get Started</Link>
+          </form>
         </div>
       </div>
     </nav>
@@ -124,7 +74,6 @@ function HeroSection() {
       paddingRight: '1.5rem',
     }}>
       <FloatingDecorations />
-
       <div style={{ position: 'relative', maxWidth: '56rem', margin: '0 auto', textAlign: 'center' }}>
         <div className="fade-in-up" style={{
           display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
@@ -138,63 +87,46 @@ function HeroSection() {
             Emotionally Intelligent Learning
           </span>
         </div>
-
         <h1 className="fade-in-up" style={{
           fontSize: 'clamp(2.25rem, 5.5vw, 3.5rem)',
-          fontWeight: 900,
-          letterSpacing: '-0.035em',
-          lineHeight: 1.1,
-          color: colors.textHeading,
-          marginBottom: '1.75rem',
-          animationDelay: '0.1s',
+          fontWeight: 900, letterSpacing: '-0.035em', lineHeight: 1.1,
+          color: colors.textHeading, marginBottom: '1.75rem', animationDelay: '0.1s',
         }}>
           A personalized learning
           <br />
           <span style={ds.textGradient}>experience</span> for{' '}
           <span style={{ color: colors.primary }}>your child</span>
         </h1>
-
         <p className="fade-in-up" style={{
-          fontSize: 'clamp(1rem, 2vw, 1.125rem)',
-          lineHeight: 1.75,
-          color: colors.textMuted,
-          maxWidth: '34rem',
-          margin: '0 auto 3rem',
-          fontWeight: 500,
-          animationDelay: '0.2s',
+          fontSize: 'clamp(1rem, 2vw, 1.125rem)', lineHeight: 1.75,
+          color: colors.textMuted, maxWidth: '34rem', margin: '0 auto 3rem',
+          fontWeight: 500, animationDelay: '0.2s',
         }}>
           A personalized, emotionally intelligent learning system for your child.
           Where curiosity meets calm, and every lesson feels like a{' '}
           <span style={{ color: colors.primary, fontWeight: 700 }}>gentle adventure</span>.
         </p>
-
         <div className="fade-in-up" style={{
           display: 'flex', flexDirection: 'column', alignItems: 'center',
-          justifyContent: 'center', gap: '1rem', marginBottom: '4.5rem',
-          animationDelay: '0.3s',
+          justifyContent: 'center', gap: '1rem', marginBottom: '4.5rem', animationDelay: '0.3s',
         }}>
           <Link href="/auth/register" style={{
-            ...ds.btnPrimary,
-            width: '100%', maxWidth: '300px',
+            ...ds.btnPrimary, width: '100%', maxWidth: '300px',
             fontSize: '1.0625rem', padding: '1.0625rem 2.25rem',
             gap: '0.625rem', textDecoration: 'none',
           }}>
             Get Started Free <ArrowRight style={{ width: '18px', height: '18px' }} />
           </Link>
           <Link href="/auth/login" style={{
-            ...ds.btnOutline,
-            width: '100%', maxWidth: '300px',
-            fontSize: '1rem', padding: '1rem 2.25rem',
-            textDecoration: 'none',
+            ...ds.btnOutline, width: '100%', maxWidth: '300px',
+            fontSize: '1rem', padding: '1rem 2.25rem', textDecoration: 'none',
           }}>
             I Have an Account
           </Link>
         </div>
-
         <div className="fade-in-up" style={{
           display: 'flex', flexWrap: 'wrap', alignItems: 'center',
-          justifyContent: 'center', gap: '2.5rem',
-          animationDelay: '0.4s',
+          justifyContent: 'center', gap: '2.5rem', animationDelay: '0.4s',
         }}>
           {[
             { icon: Heart, label: "Emotionally Safe", color: colors.accent },
@@ -205,8 +137,7 @@ function HeroSection() {
               <div style={{
                 width: '36px', height: '36px', borderRadius: '0.75rem',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                background: `${color}12`,
-                boxShadow: `0 2px 8px ${color}10`,
+                background: `${color}12`, boxShadow: `0 2px 8px ${color}10`,
               }}>
                 <Icon style={{ width: '17px', height: '17px', color }} />
               </div>
@@ -225,12 +156,8 @@ function StatsBar() {
     <section style={{ padding: '0 1.5rem 4rem', position: 'relative' }}>
       <div style={{
         maxWidth: '56rem', margin: '0 auto',
-        display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
-        gap: '1px',
-        background: colors.borderLight,
-        borderRadius: '1.5rem',
-        overflow: 'hidden',
-        boxShadow: shadows.md,
+        display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1px',
+        background: colors.borderLight, borderRadius: '1.5rem', overflow: 'hidden', boxShadow: shadows.md,
       }}>
         {[
           { value: 'Fun', label: 'Learning style' },
@@ -262,10 +189,8 @@ function CTACards() {
       desc: "Track progress, celebrate milestones, and support your child's unique learning journey.",
       gradient: `linear-gradient(160deg, ${colors.primarySoft}, white 60%)`,
       iconBg: `linear-gradient(135deg, ${colors.primary}, ${colors.primaryDark})`,
-      iconColor: 'white',
-      border: colors.primaryLight,
-      cta: "Set Up Parent Account",
-      ctaColor: colors.primary,
+      iconColor: 'white', border: colors.primaryLight,
+      cta: "Set Up Parent Account", ctaColor: colors.primary,
     },
     {
       href: "/auth/register?role=learner",
@@ -274,10 +199,8 @@ function CTACards() {
       desc: "Explore lessons, earn XP, go on quests, and discover the joy of learning!",
       gradient: `linear-gradient(160deg, ${colors.accentSoft}, white 60%)`,
       iconBg: `linear-gradient(135deg, ${colors.accent}, ${colors.accentDark})`,
-      iconColor: 'white',
-      border: colors.accentLight,
-      cta: "Start Learning",
-      ctaColor: colors.accent,
+      iconColor: 'white', border: colors.accentLight,
+      cta: "Start Learning", ctaColor: colors.accent,
     },
     {
       href: "/auth/login",
@@ -286,21 +209,18 @@ function CTACards() {
       desc: "Welcome back! Pick up where you left off — your adventure awaits.",
       gradient: `linear-gradient(160deg, ${colors.warmSoft}, white 60%)`,
       iconBg: `linear-gradient(135deg, ${colors.warm}, ${colors.warmDark})`,
-      iconColor: 'white',
-      border: colors.warmLight,
-      cta: "Continue Learning",
-      ctaColor: colors.warm,
+      iconColor: 'white', border: colors.warmLight,
+      cta: "Continue Learning", ctaColor: colors.warm,
     },
   ];
-
   return (
     <section style={{ padding: '2rem 1.5rem 5rem' }}>
       <div style={{ maxWidth: '64rem', margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
           <h2 style={{
-            fontSize: 'clamp(1.5rem, 3.5vw, 2rem)',
-            fontWeight: 900, letterSpacing: '-0.03em',
-            color: colors.textHeading, marginBottom: '0.75rem', lineHeight: 1.15,
+            fontSize: 'clamp(1.5rem, 3.5vw, 2rem)', fontWeight: 900,
+            letterSpacing: '-0.03em', color: colors.textHeading,
+            marginBottom: '0.75rem', lineHeight: 1.15,
           }}>
             How would you like to <span style={ds.textGradient}>join us</span>?
           </h2>
@@ -312,7 +232,7 @@ function CTACards() {
           {cards.map((c, i) => {
             const Icon = c.icon;
             return (
-              <Link key={c.title} href={c.href} className={`scale-in cta-card-hover`} style={{
+              <Link key={c.title} href={c.href} className="scale-in cta-card-hover" style={{
                 textDecoration: 'none', display: 'block',
                 borderRadius: '1.75rem', overflow: 'hidden',
                 background: c.gradient, border: `1.5px solid ${c.border}`,
@@ -351,14 +271,13 @@ function CTACards() {
 /* ─── Features ─── */
 function FeaturesSection() {
   const features = [
-    { icon: Heart, title: "Emotionally Intelligent", desc: "Lessons adapt to your child's emotional state and unique learning pace — no stress, just growth.", gradient: `linear-gradient(135deg, #ffedd5, #fed7aa)`, color: "#ea580c" },
-    { icon: TreePine, title: "CBC Aligned", desc: "Curriculum aligned with Kenya's Competency-Based Curriculum for Grades 1–8.", gradient: `linear-gradient(135deg, #d1fae5, #a7f3d0)`, color: "#059669" },
-    { icon: Star, title: "Gamified Learning", desc: "XP, streaks, badges, and quests — your child stays motivated and excited to learn.", gradient: `linear-gradient(135deg, #ccfbf1, #99f6e4)`, color: "#0d9488" },
-    { icon: Globe, title: "World Cultures", desc: "Explore diverse cultures, languages, and perspectives from around the globe.", gradient: `linear-gradient(135deg, #e0f2fe, #bae6fd)`, color: "#0284c7" },
-    { icon: Palette, title: "Creative Expression", desc: "Art, music, storytelling, and hands-on projects that nurture creativity.", gradient: `linear-gradient(135deg, #fef9c3, #fef08a)`, color: "#ca8a04" },
-    { icon: Shield, title: "Safe & Private", desc: "Your family's data is protected. No ads, no tracking, no compromises.", gradient: `linear-gradient(135deg, #fce7f3, #fbcfe8)`, color: "#be185d" },
+    { icon: Heart, title: "Emotionally Intelligent", desc: "Lessons adapt to your child's emotional state and unique learning pace — no stress, just growth.", gradient: "linear-gradient(135deg, #ffedd5, #fed7aa)", color: "#ea580c" },
+    { icon: TreePine, title: "CBC Aligned", desc: "Curriculum aligned with Kenya's Competency-Based Curriculum for Grades 1–8.", gradient: "linear-gradient(135deg, #d1fae5, #a7f3d0)", color: "#059669" },
+    { icon: Star, title: "Gamified Learning", desc: "XP, streaks, badges, and quests — your child stays motivated and excited to learn.", gradient: "linear-gradient(135deg, #ccfbf1, #99f6e4)", color: "#0d9488" },
+    { icon: Globe, title: "World Cultures", desc: "Explore diverse cultures, languages, and perspectives from around the globe.", gradient: "linear-gradient(135deg, #e0f2fe, #bae6fd)", color: "#0284c7" },
+    { icon: Palette, title: "Creative Expression", desc: "Art, music, storytelling, and hands-on projects that nurture creativity.", gradient: "linear-gradient(135deg, #fef9c3, #fef08a)", color: "#ca8a04" },
+    { icon: Shield, title: "Safe & Private", desc: "Your family's data is protected. No ads, no tracking, no compromises.", gradient: "linear-gradient(135deg, #fce7f3, #fbcfe8)", color: "#be185d" },
   ];
-
   return (
     <section style={{ padding: '4rem 1.5rem 6rem', background: colors.bgSoft, borderRadius: '3rem 3rem 0 0' }}>
       <div style={{ maxWidth: '68rem', margin: '0 auto' }}>
@@ -369,9 +288,7 @@ function FeaturesSection() {
             background: colors.primarySoft, border: `1px solid ${colors.primaryLight}`,
           }}>
             <CheckCircle2 style={{ width: '14px', height: '14px', color: colors.primary }} />
-            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: colors.primary, letterSpacing: '0.06em' }}>
-              Why Parents Love Us
-            </span>
+            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: colors.primary, letterSpacing: '0.06em' }}>Why Parents Love Us</span>
           </div>
           <h2 style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2rem)', fontWeight: 900, letterSpacing: '-0.03em', color: colors.textHeading, marginBottom: '0.75rem', lineHeight: 1.15 }}>
             Every child learns <span style={ds.textGradient}>differently</span>
@@ -384,7 +301,7 @@ function FeaturesSection() {
           {features.map((f, i) => {
             const Icon = f.icon;
             return (
-              <div key={f.title} className={`fade-in-up feature-card-hover`} style={{
+              <div key={f.title} className="fade-in-up feature-card-hover" style={{
                 background: 'white', borderRadius: '1.5rem',
                 border: `1px solid ${colors.borderLight}`, padding: '2rem',
                 boxShadow: shadows.sm, animationDelay: `${i * 0.08}s`,
@@ -474,19 +391,63 @@ function Footer() {
   );
 }
 
-/* ─── Page ─── */
-export const dynamic = "force-dynamic";
+/* ─── Redirect Card for logged-in users ─── */
+function RedirectCard({ role, name }: { role: string; name: string | null }) {
+  const dashboardUrl = role === "ADMIN" ? "/dashboard/admin" : role === "PARENT" ? "/dashboard/parent" : "/dashboard/student";
+  const roleLabel = role === "ADMIN" ? "Admin" : role === "PARENT" ? "Parent" : "Student";
+  return (
+    <section style={{ padding: '6rem 1.5rem', textAlign: 'center' }}>
+      <div style={{
+        maxWidth: '30rem', margin: '0 auto',
+        background: 'white', borderRadius: '2rem',
+        border: `1px solid ${colors.borderLight}`,
+        padding: '3rem 2rem', boxShadow: shadows.lg,
+      }}>
+        <div style={{
+          width: '64px', height: '64px', borderRadius: '1.5rem',
+          margin: '0 auto 1.5rem',
+          background: `linear-gradient(135deg, ${colors.primary}, ${colors.primaryDark})`,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <Sparkles style={{ width: '28px', height: '28px', color: 'white' }} />
+        </div>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: colors.textHeading, marginBottom: '0.5rem' }}>
+          Welcome back, {name?.split(" ")[0] || "friend"}!
+        </h2>
+        <p style={{ fontSize: '0.9375rem', color: colors.textMuted, marginBottom: '2rem' }}>
+          You're signed in as a <strong>{roleLabel}</strong>. Head to your dashboard to continue.
+        </p>
+        <Link href={dashboardUrl} style={{
+          ...ds.btnPrimary, fontSize: '1rem', padding: '1rem 2rem', textDecoration: 'none',
+        }}>
+          Go to {roleLabel} Dashboard
+        </Link>
+      </div>
+    </section>
+  );
+}
 
-export default function HomePage() {
+/* ─── Page (Server Component) ─── */
+export default async function HomePage() {
+  const session = await getServerSession(authOptions);
+  const user = session?.user as { name?: string; role?: string } | undefined;
+  const isLoggedIn = !!user;
+
   return (
     <div style={{ minHeight: '100vh', background: colors.bg }}>
-      <Navbar />
+      <LoggedOutNavbar />
       <main>
-        <HeroSection />
-        <StatsBar />
-        <CTACards />
-        <FeaturesSection />
-        <BottomCTA />
+        {isLoggedIn ? (
+          <RedirectCard role={user.role || "LEARNER"} name={user.name || null} />
+        ) : (
+          <>
+            <HeroSection />
+            <StatsBar />
+            <CTACards />
+            <FeaturesSection />
+            <BottomCTA />
+          </>
+        )}
       </main>
       <Footer />
     </div>
