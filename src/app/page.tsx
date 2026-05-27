@@ -428,6 +428,8 @@ function RedirectCard({ role, name }: { role: string; name: string | null }) {
 }
 
 /* ─── Page (Server Component) ─── */
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const session = await getServerSession(authOptions);
   const user = session?.user as { name?: string; role?: string } | undefined;

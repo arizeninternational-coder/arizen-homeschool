@@ -14,6 +14,8 @@ export const metadata: Metadata = {
   description: "A personalized, emotionally intelligent learning system for your child.",
 };
 
+export const dynamic = "force-dynamic";
+
 export default function RootLayout({
   children,
 }: {
