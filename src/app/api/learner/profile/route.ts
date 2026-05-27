@@ -1,14 +1,13 @@
 // GET /api/learner/profile — Get current learner's full profile
-import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
+import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { withAuth } from "@/lib/api-guard";
 
-const secret = process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-production";
-
-export async function GET(req: NextRequest) {
+export const GET = withAuth(async (req, user) => {
   try {
-    const token = await getToken({ req, secret });
-    if (!token?.learnerProfileId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!user.learnerProfileId) {
+      return NextResponse.json({ profile: null });
+    }
 
     const { data: profile, error } = await supabase
       .from("LearnerProfile")
@@ -16,12 +15,11 @@ export async function GET(req: NextRequest) {
         id, displayName, grade, totalXp, currentStreak, bestStreak, avatarUrl,
         user:User(id, name, email)
       `)
-      .eq("id", token.learnerProfileId)
+      .eq("id", user.learnerProfileId)
       .single();
 
     if (error || !profile) return NextResponse.json({ error: "Profile not found" }, { status: 404 });
 
-    // Get counts
     const [{ data: badges }, { data: completedProgress }] = await Promise.all([
       supabase.from("Badge").select("id", { count: "exact", head: true }).eq("learnerId", profile.id),
       supabase.from("Progress").select("id", { count: "exact", head: true }).eq("learnerId", profile.id).not("completedAt", "is", null),
@@ -42,6 +40,6 @@ export async function GET(req: NextRequest) {
     });
   } catch (err) {
     console.error("GET learner profile error:", err);
-    return NextResponse.json({ error: "Failed to fetch profile" }, { status: 500});
+    return NextResponse.json({ error: "Failed to fetch profile" }, { status: 500 });
   }
-}
+});

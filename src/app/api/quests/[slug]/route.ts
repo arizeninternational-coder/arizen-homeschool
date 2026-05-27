@@ -1,22 +1,18 @@
 // GET /api/quests/[slug] — Get quest with lessons and progress
-import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
+import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-
-const secret = process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-production";
+import { withAuth } from "@/lib/api-guard";
 
 function respondError(message: string, status = 400) {
   return NextResponse.json({ error: message }, { status });
 }
 
-export async function GET(req: NextRequest) {
+export const GET = withAuth(async (req, user, url) => {
   try {
-    const token = await getToken({ req, secret });
-    if (!token?.guildId) return respondError("Unauthorized", 401);
-    const guildId = token.guildId as string;
+    const guildId = user.guildSlug;
+    if (!guildId) return respondError("No guild assigned", 400);
 
-    const { searchParams } = new URL(req.url);
-    const slug = searchParams.get("slug");
+    const slug = url.searchParams.get("slug");
     if (!slug) return respondError("Slug required", 400);
 
     const { data: quest, error } = await supabase
@@ -37,7 +33,7 @@ export async function GET(req: NextRequest) {
       .orderBy("orderIndex");
 
     // Get progress
-    const learnerProfileId = token.learnerProfileId as string | null;
+    const learnerProfileId = user.learnerProfileId;
     let progressMap: Record<string, { mastery: number; completedAt: string | null }> = {};
     if (learnerProfileId) {
       const allIds = [quest.id, ...(lessons || []).map((l: any) => l.id)];
@@ -46,7 +42,6 @@ export async function GET(req: NextRequest) {
         .select("questId, lessonId, masteryPercent, completedAt")
         .eq("learnerId", learnerProfileId)
         .in("questId", allIds);
-      // Also check lessonId matches
       const { data: lessonProgress } = await supabase
         .from("Progress")
         .select("lessonId, masteryPercent, completedAt")
@@ -78,4 +73,4 @@ export async function GET(req: NextRequest) {
     console.error("GET quest error:", err);
     return respondError("Failed to fetch quest", 500);
   }
-}
+});

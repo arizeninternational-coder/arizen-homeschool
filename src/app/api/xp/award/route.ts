@@ -1,19 +1,15 @@
 // POST /api/xp/award — Award XP to learner
-import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
+import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { withAuthPost } from "@/lib/api-guard";
 import { updateStreak, awardXp } from "@/lib/auth/utils";
 
-const secret = process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-production";
-
-export async function POST(req: NextRequest) {
+export const POST = withAuthPost(async (req, user, body: any) => {
   try {
-    const token = await getToken({ req, secret });
-    if (!token?.learnerProfileId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!user.learnerProfileId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const body = await req.json();
     const { amount, sourceType, sourceId, description } = body;
-    const learnerId = token.learnerProfileId as string;
+    const learnerId = user.learnerProfileId;
 
     if (!amount || amount <= 0) return NextResponse.json({ error: "Invalid XP amount" }, { status: 400 });
 
@@ -54,7 +50,7 @@ export async function POST(req: NextRequest) {
     console.error("XP award error:", err);
     return NextResponse.json({ error: "Failed to award XP" }, { status: 500 });
   }
-}
+});
 
 async function checkAndAwardBadges(learnerId: string): Promise<any[]> {
   const { data: profile } = await supabase

@@ -1,23 +1,19 @@
 // GET /api/themes — List themes or get single theme with quests/lessons
-import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
+import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-
-const secret = process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-production";
+import { withAuth } from "@/lib/api-guard";
 
 function respondError(message: string, status = 400) {
   return NextResponse.json({ error: message }, { status });
 }
 
-export async function GET(req: NextRequest) {
+export const GET = withAuth(async (req, user, url) => {
   try {
-    const token = await getToken({ req, secret });
-    if (!token?.guildId) return respondError("Unauthorized", 401);
-    const guildId = token.guildId as string;
+    const guildId = user.guildSlug; // guildSlug is the guild identifier
+    if (!guildId) return respondError("No guild assigned", 400);
 
-    const { searchParams } = new URL(req.url);
-    const slug = searchParams.get("slug");
-    const grade = searchParams.get("grade");
+    const slug = url.searchParams.get("slug");
+    const grade = url.searchParams.get("grade");
 
     // Single theme by slug
     if (slug) {
@@ -41,7 +37,7 @@ export async function GET(req: NextRequest) {
       if (themeErr || !theme) return respondError("Theme not found", 404);
 
       // Get learner progress
-      const learnerProfileId = token.learnerProfileId as string | null;
+      const learnerProfileId = user.learnerProfileId;
       let progressMap: Record<string, { mastery: number; completedAt: string | null }> = {};
 
       if (learnerProfileId) {
@@ -116,4 +112,4 @@ export async function GET(req: NextRequest) {
     console.error("GET /api/themes error:", err);
     return respondError("Failed to fetch themes", 500);
   }
-}
+});

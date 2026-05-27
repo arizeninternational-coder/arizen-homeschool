@@ -1,19 +1,21 @@
 // GET /api/learners — List learners in guild
-import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
+import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-const secret = process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-production";
+import { withAuth } from "@/lib/api-guard";
 
-export async function GET(req: NextRequest) {
+export const GET = withAuth(async (req, user) => {
   try {
-    const token = await getToken({ req, secret });
-    if (!token?.guildId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const guildId = user.guildSlug;
+    if (!guildId) return NextResponse.json({ error: "No guild assigned" }, { status: 400 });
+
     const { data, error } = await supabase
       .from("LearnerProfile")
       .select("id, displayName, grade, totalXp, currentStreak, avatarUrl")
-      .eq("guildId", token.guildId)
+      .eq("guildId", guildId)
       .order("grade", { ascending: true });
     if (error) throw error;
     return NextResponse.json({ learners: data || [] });
-  } catch (err) { return NextResponse.json({ error: "Failed" }, { status: 500 }); }
-}
+  } catch (err) {
+    return NextResponse.json({ error: "Failed" }, { status: 500 });
+  }
+});

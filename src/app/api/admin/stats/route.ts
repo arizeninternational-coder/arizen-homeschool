@@ -1,17 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
+// GET /api/admin/stats — Admin dashboard stats (ADMIN only)
+import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { withAuth } from "@/lib/api-guard";
 
-const secret = process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-production";
-
-export async function GET(request: NextRequest) {
+export const GET = withAuth(async (req, user) => {
   try {
-    const token = await getToken({ req: request, secret });
-    if (!token || token.role !== "ADMIN") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    // Fetch stats using Supabase REST API
     const [
       { count: usersCount },
       { count: parentsCount },
@@ -36,4 +29,4 @@ export async function GET(request: NextRequest) {
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
-}
+}, { roles: ["ADMIN"] });

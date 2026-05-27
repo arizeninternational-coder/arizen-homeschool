@@ -1,15 +1,17 @@
 // GET /api/learner/badges — Get learner badges
-import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
+import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-const secret = process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-production";
+import { withAuth } from "@/lib/api-guard";
 
-export async function GET(req: NextRequest) {
+export const GET = withAuth(async (req, user) => {
   try {
-    const token = await getToken({ req, secret });
-    if (!token?.learnerProfileId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    const { data, error } = await supabase.from("Badge").select("*").eq("learnerId", token.learnerProfileId).order("awardedAt", { ascending: false });
+    if (!user.learnerProfileId) {
+      return NextResponse.json({ badges: [] });
+    }
+    const { data, error } = await supabase.from("Badge").select("*").eq("learnerId", user.learnerProfileId).order("awardedAt", { ascending: false });
     if (error) throw error;
     return NextResponse.json({ badges: data || [] });
-  } catch (err) { return NextResponse.json({ error: "Failed to fetch badges" }, { status: 500 }); }
-}
+  } catch (err) {
+    return NextResponse.json({ error: "Failed to fetch badges" }, { status: 500 });
+  }
+});

@@ -1,21 +1,18 @@
 // GET /api/lessons/[slug] — Get lesson content
 // POST /api/lessons/[slug] — Mark lesson complete
-import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
+import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { withAuth, withAuthPost } from "@/lib/api-guard";
 import { updateStreak, awardXp } from "@/lib/auth/utils";
-
-const secret = process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-production";
 
 function respondError(message: string, status = 400) {
   return NextResponse.json({ error: message }, { status });
 }
 
-export async function GET(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
+export const GET = withAuth(async (req, user, url) => {
   try {
-    const token = await getToken({ req, secret });
-    if (!token?.guildId) return respondError("Unauthorized", 401);
-    const { slug } = await params;
+    const slug = url.searchParams.get("slug");
+    if (!slug) return respondError("Slug required", 400);
 
     const { data: lesson, error } = await supabase
       .from("Lesson")
@@ -28,12 +25,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
 
     // Get progress
     let progress = null;
-    const learnerProfileId = token.learnerProfileId as string | null;
-    if (learnerProfileId) {
+    if (user.learnerProfileId) {
       const { data: p } = await supabase
         .from("Progress")
         .select("masteryPercent, completedAt")
-        .eq("learnerId", learnerProfileId)
+        .eq("learnerId", user.learnerProfileId)
         .eq("lessonId", lesson.id)
         .single();
       progress = p;
@@ -50,16 +46,17 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
     console.error("GET lesson error:", err);
     return respondError("Failed to fetch lesson", 500);
   }
-}
+});
 
-export async function POST(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
+export const POST = withAuthPost(async (req, user, body: any) => {
   try {
-    const token = await getToken({ req, secret });
-    if (!token?.learnerProfileId) return respondError("Unauthorized", 401);
-    const { slug } = await params;
-    const body = await req.json();
+    if (!user.learnerProfileId) return respondError("Unauthorized", 401);
+
+    const slug = body.slug as string;
+    if (!slug) return respondError("Slug required", 400);
+
     const masteryPercent = body.masteryPercent || 100;
-    const learnerId = token.learnerProfileId as string;
+    const learnerId = user.learnerProfileId;
 
     const { data: lesson, error } = await supabase
       .from("Lesson")
@@ -113,4 +110,4 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
     console.error("POST lesson complete error:", err);
     return respondError("Failed to complete lesson", 500);
   }
-}
+});

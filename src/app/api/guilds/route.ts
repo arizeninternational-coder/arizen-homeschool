@@ -1,14 +1,12 @@
 // GET /api/guilds — List published themes for the user's guild
-import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
+import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-const secret = process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-production";
+import { withAuth } from "@/lib/api-guard";
 
-export async function GET(req: NextRequest) {
+export const GET = withAuth(async (req, user) => {
   try {
-    const token = await getToken({ req, secret });
-    if (!token?.guildId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    const guildId = token.guildId as string;
+    const guildId = user.guildSlug;
+    if (!guildId) return NextResponse.json({ error: "No guild assigned" }, { status: 400 });
 
     const { data: themes, error } = await supabase
       .from("Theme")
@@ -24,13 +22,12 @@ export async function GET(req: NextRequest) {
     if (error) return NextResponse.json({ error: "Failed to fetch themes" }, { status: 500 });
 
     // Get progress for learner
-    const learnerProfileId = token.learnerProfileId as string | null;
     let progressMap: Record<string, number> = {};
-    if (learnerProfileId) {
+    if (user.learnerProfileId) {
       const { data: progressRecords } = await supabase
         .from("Progress")
         .select("lessonId, questId, masteryPercent")
-        .eq("learnerId", learnerProfileId);
+        .eq("learnerId", user.learnerProfileId);
       for (const p of progressRecords || []) {
         const key = p.lessonId || p.questId;
         if (key) progressMap[key] = p.masteryPercent;
@@ -51,4 +48,4 @@ export async function GET(req: NextRequest) {
     console.error("GET /api/guilds error:", err);
     return NextResponse.json({ error: "Failed to fetch themes" }, { status: 500 });
   }
-}
+});

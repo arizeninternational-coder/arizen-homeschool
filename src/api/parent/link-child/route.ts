@@ -1,22 +1,15 @@
-// POST /api/parent/link-child — Link a learner account to the current parent
-
-import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
+// POST /api/parent/link-child — Link a learner account to the current parent (PARENT only)
+// GET /api/parent/children — Get linked children for current parent (PARENT only)
+import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { withAuth, withAuthPost } from "@/lib/api-guard";
 
-const secret = process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-production";
-
-export async function POST(req: NextRequest) {
+export const POST = withAuthPost(async (req, user, body: any) => {
   try {
-    const token = await getToken({ req, secret });
-    if (!token?.sub) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    if (token.role !== "PARENT") return NextResponse.json({ error: "Only parents can link children" }, { status: 403 });
-
-    const body = await req.json();
+    const parentId = user.id;
     const { childEmail } = body;
     if (!childEmail) return NextResponse.json({ error: "Child email is required" }, { status: 400 });
 
-    const parentId = token.sub as string;
     const normalizedEmail = childEmail.toLowerCase().trim();
 
     // Find the child user
@@ -63,18 +56,13 @@ export async function POST(req: NextRequest) {
     });
   } catch (err: any) {
     console.error("[PARENT_LINK] Error:", err);
-    return NextResponse.json({ error: "Failed to link child" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to link child" }, { status: 500});
   }
-}
+}, { roles: ["PARENT"] });
 
-// GET /api/parent/children — Get linked children for current parent
-export async function GET(req: NextRequest) {
+export const GET = withAuth(async (req, user) => {
   try {
-    const token = await getToken({ req, secret });
-    if (!token?.sub) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    if (token.role !== "PARENT") return NextResponse.json({ error: "Only parents can list children" }, { status: 403 });
-
-    const parentId = token.sub as string;
+    const parentId = user.id;
 
     const { data: links, error } = await supabase
       .from("ParentChild")
@@ -96,4 +84,4 @@ export async function GET(req: NextRequest) {
     console.error("[PARENT_CHILDREN] Error:", err);
     return NextResponse.json({ error: "Failed to fetch children" }, { status: 500 });
   }
-}
+}, { roles: ["PARENT"] });

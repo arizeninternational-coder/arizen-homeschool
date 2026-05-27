@@ -1,20 +1,22 @@
 // GET /api/learner/progress — Get all progress
-import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
+import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-const secret = process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-production";
+import { withAuth } from "@/lib/api-guard";
 
-export async function GET(req: NextRequest) {
+export const GET = withAuth(async (req, user) => {
   try {
-    const token = await getToken({ req, secret });
-    if (!token?.learnerProfileId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!user.learnerProfileId) {
+      return NextResponse.json({ progress: [] });
+    }
     const { data, error } = await supabase
       .from("Progress")
       .select("*")
-      .eq("learnerId", token.learnerProfileId)
+      .eq("learnerId", user.learnerProfileId)
       .order("lastAccessed", { ascending: false })
       .limit(100);
     if (error) throw error;
     return NextResponse.json({ progress: data || [] });
-  } catch (err) { return NextResponse.json({ error: "Failed to fetch progress" }, { status: 500 }); }
-}
+  } catch (err) {
+    return NextResponse.json({ error: "Failed to fetch progress" }, { status: 500 });
+  }
+});
