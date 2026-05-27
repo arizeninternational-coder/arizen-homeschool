@@ -3,59 +3,166 @@
 export const dynamic = "force-dynamic";
 
 import { useState, useEffect } from "react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
-import { Award, ArrowLeft, Lock } from "lucide-react";
-import { ds, colors } from "@/lib/design-system";
+import {
+  Sparkles, Award, Lock, Zap, LogOut, Compass, BookOpen, Target, Heart, User
+} from "lucide-react";
+import { ds, colors, gradients } from "@/lib/design-system";
+
+interface Badge {
+  id: string;
+  badgeType: string;
+  name: string;
+  description: string;
+  awardedAt: string;
+  iconUrl?: string;
+}
+
+const badgeIcons: Record<string, string> = {
+  first_lesson: "🎯",
+  ten_lessons: "📚",
+  first_quest: "⚔️",
+  five_quests: "🏆",
+  streak_3: "🔥",
+  streak_7: "🌟",
+  xp_1000: "💎",
+  xp_5000: "👑",
+  level_5: "⭐",
+  level_10: "🏅",
+};
+
+const allBadgeTypes = [
+  { type: "first_lesson", name: "First Step", description: "Complete your first lesson" },
+  { type: "ten_lessons", name: "Quick Learner", description: "Complete 10 lessons" },
+  { type: "first_quest", name: "Quest Complete!", description: "Complete your first quest" },
+  { type: "five_quests", name: "Quest Master", description: "Complete 5 quests" },
+  { type: "streak_3", name: "Streak Starter", description: "3-day learning streak" },
+  { type: "streak_7", name: "Week Warrior", description: "7-day learning streak" },
+  { type: "xp_1000", name: "XP Champion", description: "Earn 1,000 XP" },
+  { type: "xp_5000", name: "XP Legend", description: "Earn 5,000 XP" },
+  { type: "level_5", name: "Rising Star", description: "Reach level 5" },
+  { type: "level_10", name: "Mastermind", description: "Reach level 10" },
+];
 
 export default function StudentBadgesPage() {
-  const [user, setUser] = useState<any>(null);
+  const { data: session, status } = useSession();
+  const [earnedBadges, setEarnedBadges] = useState<Badge[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/auth/session")
-      .then((r) => r.json())
-      .then((d) => { if (d?.user) setUser(d.user); })
-      .catch(() => {})
+    if (status === "unauthenticated") window.location.replace("/auth/login");
+  }, [status]);
+
+  useEffect(() => {
+    if (status !== "authenticated") return;
+    fetch("/api/learner/badges")
+      .then(r => r.json())
+      .then(data => setEarnedBadges(data.badges || []))
+      .catch(console.error)
       .finally(() => setLoading(false));
-  }, []);
+  }, [status]);
 
-  if (loading) return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: colors.bg }}><p style={{ color: colors.textMuted }}>Loading...</p></div>;
+  if (status === "loading") return <LoadingScreen />;
 
-  const displayName = user?.displayName || user?.name?.split(" ")[0] || "Learner";
+  const navItems = [
+    { icon: Compass, label: "Dashboard", href: "/dashboard/student" },
+    { icon: BookOpen, label: "My Lessons", href: "/dashboard/student/lessons" },
+    { icon: Target, label: "Quests", href: "/dashboard/student/quests" },
+    { icon: Award, label: "Badges", href: "/dashboard/student/badges", active: true },
+    { icon: Heart, label: "Reflections", href: "/dashboard/student/reflections" },
+    { icon: User, label: "Profile", href: "/dashboard/student/profile" },
+  ];
+
+  const earnedTypes = new Set(earnedBadges.map(b => b.badgeType));
+  const earnedCount = earnedBadges.length;
+  const totalCount = allBadgeTypes.length;
 
   return (
-    <div style={{ minHeight: '100vh', background: colors.bg }}>
-      <div style={{ maxWidth: 900, margin: '0 auto', padding: '2rem 1.5rem' }}>
-        <Link href="/dashboard/student" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: colors.textMuted, textDecoration: 'none', fontSize: '0.875rem', fontWeight: 600, marginBottom: '1.5rem' }}>
-          <ArrowLeft style={{ width: 16, height: 16 }} /> Back to Dashboard
+    <div style={{ minHeight: "100vh", background: colors.bg }}>
+      <header style={{ background: 'rgba(253,253,251,0.85)', backdropFilter: 'blur(12px)', borderBottom: `1px solid ${colors.border}`, padding: "0.75rem 1.5rem", display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 10 }}>
+        <Link href="/dashboard/student" style={{ display: "flex", alignItems: "center", gap: "0.75rem", textDecoration: "none" }}>
+          <Sparkles style={{ width: 28, height: 28, color: colors.primary }} />
+          <span style={{ fontWeight: 800, fontSize: "1.125rem", ...ds.textGradient }}>Arizen School</span>
         </Link>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: colors.text, marginBottom: '0.5rem' }}>Badges</h1>
-        <p style={{ color: colors.textMuted, marginBottom: '2rem' }}>Track your achievements and unlock new badges as you learn.</p>
-
-        <div style={{ ...ds.card, textAlign: 'center', padding: '3rem 2rem' }}>
-          <Award style={{ width: 48, height: 48, color: colors.primary, margin: '0 auto 1rem', opacity: 0.4 }} />
-          <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: colors.text, marginBottom: '0.5rem' }}>No badges earned yet</h3>
-          <p style={{ color: colors.textMuted, fontSize: '0.9375rem', maxWidth: 400, margin: '0 auto 2rem' }}>
-            Complete lessons and quests to earn your first badge. Every achievement counts!
-          </p>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', maxWidth: 600, margin: '0 auto' }}>
-            {[
-              { name: "First Steps", icon: "🌟", req: "Complete your first lesson" },
-              { name: "Quick Learner", icon: "⚡", req: "Complete 10 lessons" },
-              { name: "Explorer", icon: "🧭", req: "Complete your first quest" },
-              { name: "Scholar", icon: "📚", req: "Reach Level 5" },
-            ].map((b) => (
-              <div key={b.name} style={{ padding: '1.25rem 1rem', borderRadius: 16, border: `1px solid ${colors.border}`, background: colors.bgSoft, textAlign: 'center' }}>
-                <div style={{ fontSize: '1.75rem', marginBottom: '0.5rem', filter: 'grayscale(0.6)', opacity: 0.6 }}>{b.icon}</div>
-                <div style={{ fontSize: '0.8125rem', fontWeight: 700, color: colors.text, marginBottom: '0.25rem' }}>{b.name}</div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem', fontSize: '0.6875rem', color: colors.textMuted }}>
-                  <Lock style={{ width: 10, height: 10 }} /> {b.req}
-                </div>
-              </div>
-            ))}
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", padding: "0.375rem 0.75rem", borderRadius: 20, background: colors.primarySoft, color: colors.primary, fontWeight: 700, fontSize: "0.8125rem" }}>
+            <Zap style={{ width: 14, height: 14 }} /> {((session?.user as any)?.totalXp || 0).toLocaleString()} XP
           </div>
+          <button onClick={() => signOut({ callbackUrl: "/" })} style={{ display: "flex", alignItems: "center", gap: "0.375rem", padding: "0.375rem 0.75rem", borderRadius: 8, border: `1px solid ${colors.border}`, background: "none", color: colors.textMuted, cursor: "pointer", fontSize: "0.8125rem", fontWeight: 600 }}>
+            <LogOut style={{ width: 14, height: 14 }} /> Exit
+          </button>
         </div>
+      </header>
+
+      <div style={{ display: "flex" }}>
+        <nav style={{ width: 200, padding: "1.5rem 0", borderRight: `1px solid ${colors.border}`, minHeight: "calc(100vh - 60px)", flexShrink: 0 }}>
+          {navItems.map((item) => (
+            <Link key={item.href} href={item.href} style={{ display: "flex", alignItems: "center", gap: "0.625rem", padding: "0.625rem 1.25rem", textDecoration: "none", background: item.active ? colors.primarySoft : "transparent", color: item.active ? colors.primary : colors.textMuted, fontWeight: item.active ? 700 : 500, fontSize: "0.875rem", borderLeft: item.active ? `3px solid ${colors.primary}` : "3px solid transparent" }}>
+              <item.icon style={{ width: 18, height: 18 }} />
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+
+        <main style={{ flex: 1, padding: "2rem" }}>
+          <div style={{ marginBottom: "1.5rem" }}>
+            <h1 style={{ fontSize: "1.5rem", fontWeight: 800, color: colors.text, marginBottom: "0.25rem" }}>Badges</h1>
+            <p style={{ color: colors.textMuted, fontSize: "0.9375rem" }}>
+              {earnedCount}/{totalCount} badges earned
+            </p>
+            <div style={{ marginTop: "0.5rem", height: 8, borderRadius: 4, background: colors.border, maxWidth: 300 }}>
+              <div style={{ height: "100%", borderRadius: 4, background: gradients.primary, width: `${totalCount > 0 ? (earnedCount / totalCount) * 100 : 0}%`, transition: "width 0.3s" }} />
+            </div>
+          </div>
+
+          {loading ? (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: "1rem" }}>
+              {[1,2,3,4,5,6].map(i => <div key={i} style={{ ...ds.card, padding: "1.5rem", height: 160, background: colors.bgAlt }} />)}
+            </div>
+          ) : (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: "1rem" }}>
+              {allBadgeTypes.map((badgeDef) => {
+                const earned = earnedBadges.find(b => b.badgeType === badgeDef.type);
+                const isEarned = !!earned;
+                return (
+                  <div key={badgeDef.type} style={{ ...ds.card, padding: "1.25rem", textAlign: "center", opacity: isEarned ? 1 : 0.5, position: "relative" }}>
+                    {!isEarned && (
+                      <div style={{ position: "absolute", top: "0.5rem", right: "0.5rem" }}>
+                        <Lock style={{ width: 14, height: 14, color: colors.textMuted }} />
+                      </div>
+                    )}
+                    <div style={{ fontSize: "2.5rem", marginBottom: "0.5rem", filter: isEarned ? "none" : "grayscale(1)" }}>
+                      {badgeIcons[badgeDef.type] || "🏅"}
+                    </div>
+                    <div style={{ fontWeight: 700, color: isEarned ? colors.text : colors.textMuted, fontSize: "0.8125rem", marginBottom: "0.25rem" }}>
+                      {badgeDef.name}
+                    </div>
+                    <div style={{ fontSize: "0.6875rem", color: colors.textMuted, lineHeight: 1.3 }}>
+                      {badgeDef.description}
+                    </div>
+                    {earned?.awardedAt && (
+                      <div style={{ fontSize: "0.625rem", color: colors.success, fontWeight: 600, marginTop: "0.5rem" }}>
+                        ✓ {new Date(earned.awardedAt).toLocaleDateString()}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </main>
+      </div>
+    </div>
+  );
+}
+
+function LoadingScreen() {
+  return (
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: colors.bg }}>
+      <div style={{ textAlign: "center" }}>
+        <Sparkles style={{ width: 48, height: 48, color: colors.primary, margin: "0 auto 1rem" }} />
+        <p style={{ color: colors.textMuted, fontWeight: 600 }}>Loading badges...</p>
       </div>
     </div>
   );
