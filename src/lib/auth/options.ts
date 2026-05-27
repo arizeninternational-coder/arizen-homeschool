@@ -16,12 +16,10 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         try {
           if (!credentials?.email || !credentials?.password) {
-            console.log("[AUTH] Missing credentials");
             throw new Error("Invalid email or password");
           }
 
           const email = credentials.email.toLowerCase().trim();
-          console.log(`[AUTH] Login attempt: ${email}`);
 
           // Use Supabase REST API to query user (HTTPS, not TCP)
           const { data: users, error: dbError } = await supabase

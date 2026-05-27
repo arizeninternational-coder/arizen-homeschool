@@ -35,18 +35,15 @@ function LoginForm() {
     setError("");
     setLoading(true);
     try {
-      console.log("[LOGIN] Attempting sign in for:", email.toLowerCase().trim());
       const result = await signIn("credentials", { 
         email: email.toLowerCase().trim(), 
         password, 
         redirect: false 
       });
-      console.log("[LOGIN] Result:", JSON.stringify(result));
       if (result?.error) {
         setError("Invalid email or password. Please try again.");
         setLoading(false);
-      } else {
-        // Success - force full page reload to pick up session
+      } else { 
         window.location.replace("/");
       }
     } catch (err: any) {
