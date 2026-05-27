@@ -1,10 +1,21 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Heart, BookOpen, Sparkles, Shield, ChevronRight, GraduationCap, Users,
   Flower2, Sun, Star, TreePine, Palette, Globe, Lightbulb, Puzzle,
-  ArrowRight, CheckCircle2
+  ArrowRight, CheckCircle2, LogOut, User
 } from "lucide-react";
+import { signOut } from "next-auth/react";
 import { ds, colors, gradients, shadows } from "@/lib/design-system";
+
+interface AuthUser {
+  id: string;
+  name: string | null;
+  email: string;
+  role: string;
+}
 
 /* ─── Floating Decorations ─── */
 function FloatingDecorations() {
@@ -43,6 +54,24 @@ function FloatingDecorations() {
 
 /* ─── Navbar ─── */
 function Navbar() {
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/auth/session")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.user) setUser(data.user);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const handleLogout = async () => {
+    await signOut({ redirect: false });
+    window.location.replace("/");
+  };
+
   return (
     <nav style={ds.nav}>
       <div style={{ maxWidth: '1160px', margin: '0 auto', padding: '0 1.5rem' }}>
@@ -54,8 +83,29 @@ function Navbar() {
             <span style={{ fontSize: '1.25rem', fontWeight: 900, letterSpacing: '-0.02em', ...ds.textGradient }}>Arizen School</span>
           </Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <Link href="/auth/login" style={{ ...ds.btnGhost, fontWeight: 700 }}>Sign In</Link>
-            <Link href="/auth/register" style={{ ...ds.btnPrimary, fontSize: '0.875rem', padding: '0.65rem 1.6rem' }}>Get Started</Link>
+            {loading ? (
+              <div style={{ width: 80, height: 36, borderRadius: 8, background: colors.border, opacity: 0.5 }} />
+            ) : user ? (
+              <>
+                <span style={{ fontSize: '0.875rem', color: colors.textMuted, fontWeight: 600 }}>
+                  Hi, {user.name?.split(" ")[0] || "there"}!
+                </span>
+                <Link
+                  href={user.role === "ADMIN" ? "/dashboard/admin" : user.role === "PARENT" ? "/dashboard/parent" : "/dashboard/student"}
+                  style={{ ...ds.btnGhost, fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.375rem' }}
+                >
+                  <User style={{ width: 16, height: 16 }} /> Dashboard
+                </Link>
+                <button onClick={handleLogout} style={{ ...ds.btnGhost, color: colors.danger, fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                  <LogOut style={{ width: 16, height: 16 }} /> Sign Out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href="/auth/login" style={{ ...ds.btnGhost, fontWeight: 700 }}>Sign In</Link>
+                <Link href="/auth/register" style={{ ...ds.btnPrimary, fontSize: '0.875rem', padding: '0.65rem 1.6rem' }}>Get Started</Link>
+              </>
+            )}
           </div>
         </div>
       </div>

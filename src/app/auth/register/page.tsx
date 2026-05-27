@@ -55,7 +55,18 @@ function RegisterForm() {
         setError(`Login after registration failed: ${result.error}. Please log in manually.`); 
         setLoading(false);
       } else { 
-        window.location.replace("/");
+        // Fetch session to get role, then redirect accordingly
+        const sessionRes = await fetch("/api/auth/session");
+        const sessionData = await sessionRes.json();
+        const role = sessionData?.user?.role;
+        
+        if (role === "ADMIN") {
+          window.location.replace("/dashboard/admin");
+        } else if (role === "PARENT") {
+          window.location.replace("/dashboard/parent");
+        } else {
+          window.location.replace("/dashboard/student");
+        }
       }
     } catch { setError("Something went wrong. Please try again."); }
     finally { setLoading(false); }

@@ -154,6 +154,15 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
+    async redirect({ url, baseUrl }) {
+      // After login, redirect to role-specific dashboard
+      if (url.startsWith(baseUrl)) {
+        // The callback URL will be set by the login page based on role
+        // Default to homepage which will handle role-based redirect
+        return url;
+      }
+      return baseUrl;
+    },
   },
   pages: { signIn: "/auth/login", error: "/auth/login" },
   session: { strategy: "jwt", maxAge: 30 * 24 * 60 * 60 },

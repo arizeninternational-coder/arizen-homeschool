@@ -44,7 +44,19 @@ function LoginForm() {
         setError("Invalid email or password. Please try again.");
         setLoading(false);
       } else { 
-        window.location.replace("/");
+        // Fetch session to get role, then redirect accordingly
+        const sessionRes = await fetch("/api/auth/session");
+        const sessionData = await sessionRes.json();
+        const role = sessionData?.user?.role;
+        
+        if (role === "ADMIN") {
+          window.location.replace("/dashboard/admin");
+        } else if (role === "PARENT") {
+          window.location.replace("/dashboard/parent");
+        } else {
+          // LEARNER or any other role
+          window.location.replace("/dashboard/student");
+        }
       }
     } catch (err: any) {
       console.error("[LOGIN] Error:", err);

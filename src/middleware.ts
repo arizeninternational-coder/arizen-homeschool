@@ -4,19 +4,26 @@ import { getToken } from "next-auth/jwt";
 
 const secret = process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-production";
 
-// Routes that don't require authentication
+// Public paths that don't require authentication
 const publicPaths = [
   "/",
   "/auth/login",
   "/auth/register",
-  "/api/auth",
 ];
+
+// Role-based path prefixes
+const rolePaths: Record<string, string[]> = {
+  ADMIN: ["/dashboard/admin"],
+  PARENT: ["/dashboard/parent"],
+  LEARNER: ["/dashboard/student"],
+  TEACHER: ["/dashboard/student"],
+};
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Allow public paths
-  if (publicPaths.some((p) => pathname.startsWith(p))) {
+  if (publicPaths.some((p) => pathname === p || pathname.startsWith(p + "/"))) {
     return NextResponse.next();
   }
 
@@ -30,7 +37,12 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // Check auth
+  // Allow API auth routes
+  if (pathname.startsWith("/api/auth")) {
+    return NextResponse.next();
+  }
+
+  // Check auth for all other routes
   try {
     const token = await getToken({ req, secret });
     if (!token) {
@@ -38,8 +50,28 @@ export async function middleware(req: NextRequest) {
       loginUrl.searchParams.set("callbackUrl", pathname);
       return NextResponse.redirect(loginUrl);
     }
+
+    const userRole = token.role as string;
+
+    // Check role-based access
+    for (const [role, paths] of Object.entries(rolePaths)) {
+      if (paths.some((p) => pathname.startsWith(p))) {
+        if (userRole !== role) {
+          // User is trying to access a role-specific page they don't have
+          // Redirect to their correct dashboard
+          if (userRole === "ADMIN") {
+            return NextResponse.redirect(new URL("/dashboard/admin", req.url));
+          } else if (userRole === "PARENT") {
+            return NextResponse.redirect(new URL("/dashboard/parent", req.url));
+          } else {
+            return NextResponse.redirect(new URL("/dashboard/student", req.url));
+          }
+        }
+        break;
+      }
+    }
   } catch {
-    // If auth check fails (e.g. DB unavailable), allow request through
+    // If auth check fails, allow request through
     return NextResponse.next();
   }
 
@@ -48,12 +80,6 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
     "/((?!_next/static|_next/image|favicon.ico).*)",
   ],
 };
