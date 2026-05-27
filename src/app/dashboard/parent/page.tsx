@@ -72,7 +72,7 @@ export default function ParentDashboard() {
 
   if (!user) return null;
 
-  const displayName = user.name || "Parent";
+  const displayName = user.name || user.email || "Parent";
 
   return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: colors.bg, position: "relative", overflow: "hidden" }}>
@@ -131,9 +131,9 @@ export default function ParentDashboard() {
           {/* Quick Stats */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem", marginBottom: "2.5rem" }}>
             {[
-              { icon: Users, label: "Children", value: "0", color: colors.primary, bgColor: colors.primarySoft },
-              { icon: Flame, label: "Active Streaks", value: "0", color: colors.warm, bgColor: colors.warmSoft },
-              { icon: Award, label: "Total XP", value: "0", color: colors.accent, bgColor: colors.accentSoft },
+              { icon: Users, label: "Children", value: String(children.length), color: colors.primary, bgColor: colors.primarySoft },
+              { icon: Flame, label: "Active Streaks", value: String(children.filter((c: any) => c.childUser?.learnerProfile?.currentStreak > 0).length), color: colors.warm, bgColor: colors.warmSoft },
+              { icon: Award, label: "Total XP", value: String(children.reduce((sum: number, c: any) => sum + (c.childUser?.learnerProfile?.totalXp || 0), 0)), color: colors.accent, bgColor: colors.accentSoft },
               { icon: BookOpen, label: "Lessons Done", value: "0", color: colors.info, bgColor: colors.bgBlue },
             ].map((stat) => (
               <div key={stat.label} style={{ ...ds.card, padding: "1.25rem" }}>

@@ -142,6 +142,8 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (session.user) {
         (session.user as any).id = token.sub;
+        (session.user as any).name = token.name;
+        (session.user as any).email = token.email;
         (session.user as any).role = token.role;
         (session.user as any).guildId = token.guildId;
         (session.user as any).guildSlug = token.guildSlug;

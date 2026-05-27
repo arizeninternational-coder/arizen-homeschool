@@ -25,16 +25,32 @@ interface Theme {
 export default function StudentThemesPage() {
   const [themes, setThemes] = useState<Theme[]>([]);
   const [loading, setLoading] = useState(true);
+  const [studentGrade, setStudentGrade] = useState<number | null>(null);
   const [selectedGrade, setSelectedGrade] = useState<number | null>(null);
 
   useEffect(() => {
+    // Fetch student profile to get grade
+    fetch("/api/learner/profile")
+      .then(r => r.json())
+      .then(data => {
+        if (data.profile?.grade) {
+          setStudentGrade(data.profile.grade);
+          setSelectedGrade(data.profile.grade); // Auto-filter by student's grade
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (selectedGrade === null && studentGrade === null) return;
     const url = selectedGrade ? `/api/themes?grade=${selectedGrade}` : "/api/themes";
+    setLoading(true);
     fetch(url)
       .then(r => r.json())
       .then(data => setThemes(data.themes || []))
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [selectedGrade]);
+  }, [selectedGrade, studentGrade]);
 
   const uniqueGrades = [...new Set(themes.map(t => t.grade).filter(Boolean))].sort() as number[];
 

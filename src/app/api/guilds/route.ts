@@ -5,7 +5,7 @@ import { withAuth } from "@/lib/api-guard";
 
 export const GET = withAuth(async (req, user) => {
   try {
-    const guildId = user.guildSlug;
+    const guildId = user.guildId || user.guildSlug;
     if (!guildId) return NextResponse.json({ error: "No guild assigned" }, { status: 400 });
 
     const { data: themes, error } = await supabase

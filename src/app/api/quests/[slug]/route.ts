@@ -9,7 +9,7 @@ function respondError(message: string, status = 400) {
 
 export const GET = withAuth(async (req, user, url) => {
   try {
-    const guildId = user.guildSlug;
+    const guildId = user.guildId || user.guildSlug;
     if (!guildId) return respondError("No guild assigned", 400);
 
     const slug = url.searchParams.get("slug");

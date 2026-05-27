@@ -8,21 +8,23 @@ import Link from "next/link";
 import {
   Users, BookOpen, GraduationCap, Award, Settings, BarChart3,
   Shield, LogOut, Plus, ChevronRight, TrendingUp, Activity,
-  UserCheck, Layers, Zap
+  UserCheck, Layers, Zap, AlertCircle
 } from "lucide-react";
 import { ds, colors, gradients, shadows } from "@/lib/design-system";
 
-interface AdminUser {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
+interface AdminStats {
+  users: number;
+  parents: number;
+  learners: number;
+  lessons: number;
+  quests: number;
 }
 
 export default function AdminDashboard() {
-  const [user, setUser] = useState<AdminUser | null>(null);
+  const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({ users: 0, parents: 0, learners: 0, lessons: 0, quests: 0 });
+  const [stats, setStats] = useState<AdminStats>({ users: 0, parents: 0, learners: 0, lessons: 0, quests: 0 });
+  const [statsError, setStatsError] = useState<string | null>(null);
 
   useEffect(() => {
     async function checkAuth() {
@@ -34,11 +36,23 @@ export default function AdminDashboard() {
           return;
         }
         setUser(data.user);
-        // Fetch stats
-        const statsRes = await fetch("/api/admin/stats");
-        if (statsRes.ok) {
-          const statsData = await statsRes.json();
-          setStats(statsData);
+        // Fetch stats — do NOT swallow errors
+        try {
+          const statsRes = await fetch("/api/admin/stats");
+          if (statsRes.ok) {
+            const statsData = await statsRes.json();
+            if (statsData.error) {
+              setStatsError(statsData.error);
+            } else {
+              setStats(statsData);
+              setStatsError(null);
+            }
+          } else {
+            const errBody = await statsRes.json().catch(() => ({}));
+            setStatsError(errBody.error || `Stats API returned ${statsRes.status}`);
+          }
+        } catch (statsErr: any) {
+          setStatsError(statsErr?.message || "Failed to load dashboard stats");
         }
       } catch {
         window.location.replace("/auth/login");
@@ -61,6 +75,10 @@ export default function AdminDashboard() {
   }
 
   if (!user) return null;
+
+  // Fix: proper name fallback chain
+  const displayName = user.name || user.email || "Admin";
+  const firstName = displayName.includes(" ") ? displayName.split(" ")[0] : displayName;
 
   const navItems = [
     { icon: BarChart3, label: "Dashboard", href: "/dashboard/admin", active: true, desc: "Overview & analytics" },
@@ -111,26 +129,34 @@ export default function AdminDashboard() {
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
           <div>
-            <h1 style={{ fontSize: "1.5rem", fontWeight: 800, color: colors.text, marginBottom: "0.25rem" }}>Welcome back, {user.name?.split(" ")[0]} 👋</h1>
+            <h1 style={{ fontSize: "1.5rem", fontWeight: 800, color: colors.text, marginBottom: "0.25rem" }}>Welcome back, {firstName} 👋</h1>
             <p style={{ color: colors.textMuted, fontSize: "0.875rem" }}>Here's what's happening across your homeschool network.</p>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
             <div style={{ padding: "0.375rem 0.875rem", borderRadius: 20, background: colors.primarySoft, color: colors.primary, fontSize: "0.75rem", fontWeight: 700 }}>ADMIN</div>
             <div style={{ width: 36, height: 36, borderRadius: "50%", background: gradients.primary, display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: 700, fontSize: "0.875rem" }}>
-              {user.name?.charAt(0) || "A"}
+              {firstName.charAt(0).toUpperCase()}
             </div>
           </div>
         </div>
 
+        {/* Stats error banner */}
+        {statsError && (
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.75rem 1rem", borderRadius: 10, marginBottom: "1.5rem", background: `${colors.warning || "#F59E0B"}15`, border: `1px solid ${colors.warning || "#F59E0B"}30`, color: colors.warning || "#B45309", fontSize: "0.875rem", fontWeight: 600 }}>
+            <AlertCircle style={{ width: 16, height: 16 }} />
+            Unable to load some dashboard stats: {statsError}
+          </div>
+        )}
+
         {/* Stats */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "1rem", marginBottom: "2rem" }}>
-            {[
-              { label: "Total Users", value: stats.users, icon: Users, color: colors.primary },
-              { label: "Parents", value: stats.parents, icon: UserCheck, color: colors.accent },
-              { label: "Learners", value: stats.learners, icon: GraduationCap, color: colors.success },
-              { label: "Lessons", value: stats.lessons, icon: BookOpen, color: colors.warning },
-              { label: "Quests", value: stats.quests, icon: Layers, color: colors.primary },
-            ].map((stat) => (
+          {[
+            { label: "Total Users", value: stats.users, icon: Users, color: colors.primary },
+            { label: "Parents", value: stats.parents, icon: UserCheck, color: colors.accent },
+            { label: "Learners", value: stats.learners, icon: GraduationCap, color: colors.success },
+            { label: "Lessons", value: stats.lessons, icon: BookOpen, color: colors.warning },
+            { label: "Quests", value: stats.quests, icon: Layers, color: colors.primary },
+          ].map((stat) => (
             <div key={stat.label} style={{ ...ds.card, padding: "1.25rem" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.75rem" }}>
                 <div style={{ width: 40, height: 40, borderRadius: 10, background: `${stat.color}15`, display: "flex", alignItems: "center", justifyContent: "center" }}>

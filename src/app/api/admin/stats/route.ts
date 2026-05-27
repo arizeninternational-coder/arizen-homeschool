@@ -5,28 +5,39 @@ import { withAuth } from "@/lib/api-guard";
 
 export const GET = withAuth(async (req, user) => {
   try {
-    const [
-      { count: usersCount },
-      { count: parentsCount },
-      { count: learnersCount },
-      { count: lessonsCount },
-      { count: questsCount },
-    ] = await Promise.all([
-      supabase.from("User").select("*", { count: "exact", head: true }),
-      supabase.from("User").select("*", { count: "exact", head: true }).eq("role", "PARENT"),
-      supabase.from("User").select("*", { count: "exact", head: true }).eq("role", "LEARNER"),
-      supabase.from("Lesson").select("*", { count: "exact", head: true }),
-      supabase.from("Quest").select("*", { count: "exact", head: true }),
+    // Fetch all stats in parallel
+    const results = await Promise.allSettled([
+      supabase.from("User").select("id", { count: "exact", head: true }),
+      supabase.from("User").select("id", { count: "exact", head: true }).eq("role", "PARENT"),
+      supabase.from("LearnerProfile").select("id", { count: "exact", head: true }),
+      supabase.from("Lesson").select("id", { count: "exact", head: true }),
+      supabase.from("Quest").select("id", { count: "exact", head: true }),
     ]);
 
+    const [usersRes, parentsRes, learnersRes, lessonsRes, questsRes] = results;
+
+    // Log any failures for debugging
+    const errors: string[] = [];
+    if (usersRes.status === "rejected") errors.push(`users: ${usersRes.reason?.message}`);
+    if (parentsRes.status === "rejected") errors.push(`parents: ${parentsRes.reason?.message}`);
+    if (learnersRes.status === "rejected") errors.push(`learners: ${learnersRes.reason?.message}`);
+    if (lessonsRes.status === "rejected") errors.push(`lessons: ${lessonsRes.reason?.message}`);
+    if (questsRes.status === "rejected") errors.push(`quests: ${questsRes.reason?.message}`);
+
+    if (errors.length > 0) {
+      console.error("[ADMIN_STATS] Partial failures:", errors.join("; "));
+    }
+
     return NextResponse.json({
-      users: usersCount || 0,
-      parents: parentsCount || 0,
-      learners: learnersCount || 0,
-      lessons: lessonsCount || 0,
-      quests: questsCount || 0,
+      users: usersRes.status === "fulfilled" ? (usersRes.value.count ?? 0) : 0,
+      parents: parentsRes.status === "fulfilled" ? (parentsRes.value.count ?? 0) : 0,
+      learners: learnersRes.status === "fulfilled" ? (learnersRes.value.count ?? 0) : 0,
+      lessons: lessonsRes.status === "fulfilled" ? (lessonsRes.value.count ?? 0) : 0,
+      quests: questsRes.status === "fulfilled" ? (questsRes.value.count ?? 0) : 0,
+      ...(errors.length > 0 ? { _errors: errors } : {}),
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("[ADMIN_STATS] Critical error:", error);
+    return NextResponse.json({ error: error.message || "Failed to fetch stats" }, { status: 500 });
   }
 }, { roles: ["ADMIN"] });
