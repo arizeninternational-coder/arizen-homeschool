@@ -148,31 +148,26 @@ export default function AdminDashboard() {
         <h2 style={{ fontSize: "1.125rem", fontWeight: 700, color: colors.text, marginBottom: "1rem" }}>Quick Actions</h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem", marginBottom: "2rem" }}>
           {[
-            { label: "Add User", icon: Plus, desc: "Create new account" },
-            { label: "Create Lesson", icon: BookOpen, desc: "New lesson content" },
-            { label: "Design Quest", icon: Layers, desc: "Build a new quest" },
-            { label: "Issue Badge", icon: Award, desc: "Award achievement" },
+            { label: "Manage Users", icon: Plus, desc: "View and manage accounts", href: "/dashboard/admin/users" },
+            { label: "Create Lesson", icon: BookOpen, desc: "Add new lesson content", href: "/dashboard/admin/lessons" },
+            { label: "Design Quest", icon: Layers, desc: "Build a new quest", href: "/dashboard/admin/quests" },
+            { label: "Issue Badge", icon: Award, desc: "Configure achievements", href: "/dashboard/admin/badges" },
           ].map((action) => (
-            <button key={action.label} style={{ ...ds.card, padding: "1.25rem", textAlign: "left", cursor: "pointer", border: `1.5px solid ${colors.border}`, background: colors.surface, transition: "all 0.15s" }}>
+            <Link key={action.label} href={action.href} style={{ ...ds.card, padding: "1.25rem", textAlign: "left", cursor: "pointer", border: `1.5px solid ${colors.border}`, background: colors.surface, transition: "all 0.15s", textDecoration: "none", display: "block" }}>
               <action.icon style={{ width: 24, height: 24, color: colors.primary, marginBottom: "0.75rem" }} />
               <div style={{ fontWeight: 700, color: colors.text, fontSize: "0.9375rem" }}>{action.label}</div>
               <div style={{ fontSize: "0.75rem", color: colors.textMuted, marginTop: "0.25rem" }}>{action.desc}</div>
-            </button>
+            </Link>
           ))}
         </div>
 
         {/* Recent Activity */}
         <h2 style={{ fontSize: "1.125rem", fontWeight: 700, color: colors.text, marginBottom: "1rem" }}>System Activity</h2>
         <div style={{ ...ds.card, padding: "1.5rem" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.75rem 0", borderBottom: `1px solid ${colors.border}` }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.75rem 0" }}>
             <Activity style={{ width: 18, height: 18, color: colors.primary }} />
             <span style={{ fontSize: "0.875rem", color: colors.text }}>Dashboard loaded successfully</span>
             <span style={{ fontSize: "0.75rem", color: colors.textMuted, marginLeft: "auto" }}>Just now</span>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.75rem 0" }}>
-            <Zap style={{ width: 18, height: 18, color: colors.warning }} />
-            <span style={{ fontSize: "0.875rem", color: colors.text }}>Auth system connected via Supabase REST API</span>
-            <span style={{ fontSize: "0.75rem", color: colors.textMuted, marginLeft: "auto" }}>Active</span>
           </div>
         </div>
       </main>

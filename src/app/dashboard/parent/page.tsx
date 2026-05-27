@@ -52,32 +52,6 @@ const navItems = [
   { label: "Settings", icon: Settings, href: "/dashboard/parent/settings", active: false },
 ];
 
-// Placeholder children data — will be replaced with Supabase query
-const placeholderChildren: ChildProfile[] = [
-  {
-    id: "child-1",
-    name: "Emma Johnson",
-    grade: 3,
-    displayName: "Emma",
-    avatarUrl: null,
-    totalXp: 1250,
-    currentStreak: 7,
-    lastActivityDate: "2026-05-26",
-    progressSummary: "Completed 4 lessons this week. Excelling in Environmental Science.",
-  },
-  {
-    id: "child-2",
-    name: "Liam Johnson",
-    grade: 5,
-    displayName: "Liam",
-    avatarUrl: null,
-    totalXp: 980,
-    currentStreak: 3,
-    lastActivityDate: "2026-027",
-    progressSummary: "Working on Grade 5 Mathematics. Needs support with fractions.",
-  },
-];
-
 export default function ParentDashboard() {
   const router = useRouter();
   const [user, setUser] = useState<SessionUser | null>(null);
@@ -107,18 +81,8 @@ export default function ParentDashboard() {
         }
 
         setUser(data.user);
-
-        // TODO: Query Supabase for linked children
-        // For now, use placeholder data
-        // const { data: linkedChildren } = await supabase
-        //   .from("User")
-        //   .select(`
-        //     id, name, role,
-        //     learnerProfile:LearnerProfile(grade, displayName, avatarUrl, totalXp, currentStreak, lastActivityDate)
-        //   `)
-        //   .eq("guildId", data.user.guildId)
-        //   .eq("role", "LEARNER");
-        setChildren(placeholderChildren);
+        // TODO: Query Supabase for linked children by parent account
+        setChildren([]);
         setLoading(false);
       } catch (err) {
         console.error("[PARENT_DASHBOARD] Auth check failed:", err);
@@ -562,10 +526,10 @@ export default function ParentDashboard() {
                   Link your children's accounts to start tracking their learning
                   progress and achievements.
                 </p>
-                <button style={ds.btnPrimary}>
+                <Link href="/dashboard/parent/children" style={{ ...ds.btnPrimary, textDecoration: 'none', display: 'inline-flex' }}>
                   <Users style={{ width: "16px", height: "16px" }} />
-                  Link a Child
-                </button>
+                  Manage Children
+                </Link>
               </div>
             ) : (
               <div

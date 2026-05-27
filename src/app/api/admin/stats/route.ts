@@ -16,18 +16,22 @@ export async function GET(request: NextRequest) {
       { count: usersCount },
       { count: parentsCount },
       { count: learnersCount },
+      { count: lessonsCount },
+      { count: questsCount },
     ] = await Promise.all([
       supabase.from("User").select("*", { count: "exact", head: true }),
       supabase.from("User").select("*", { count: "exact", head: true }).eq("role", "PARENT"),
       supabase.from("User").select("*", { count: "exact", head: true }).eq("role", "LEARNER"),
+      supabase.from("Lesson").select("*", { count: "exact", head: true }),
+      supabase.from("Quest").select("*", { count: "exact", head: true }),
     ]);
 
     return NextResponse.json({
       users: usersCount || 0,
       parents: parentsCount || 0,
       learners: learnersCount || 0,
-      lessons: 0, // TODO: fetch from Lesson table
-      quests: 0,  // TODO: fetch from Quest table
+      lessons: lessonsCount || 0,
+      quests: questsCount || 0,
     });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
