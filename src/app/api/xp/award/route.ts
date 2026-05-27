@@ -1,6 +1,8 @@
+// POST /api/xp/award — Award XP to learner
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db/prisma";
 import { getToken } from "next-auth/jwt";
+import { supabase } from "@/lib/supabase";
+import { updateStreak, awardXp } from "@/lib/auth/utils";
 
 const secret = process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-production";
 
@@ -15,73 +17,27 @@ export async function POST(req: NextRequest) {
 
     if (!amount || amount <= 0) return NextResponse.json({ error: "Invalid XP amount" }, { status: 400 });
 
-    // Create XP record and update profile in transaction
-    const [record, profile] = await prisma.$transaction([
-      prisma.xpRecord.create({
-        data: {
-          learnerId,
-          sourceType: sourceType || "BONUS",
-          sourceId: sourceId || "manual",
-          amount,
-          description: description || `${sourceType} XP`,
-        },
-      }),
-      prisma.learnerProfile.update({
-        where: { id: learnerId },
-        data: { totalXp: { increment: amount } },
-      }),
-    ]);
+    // Award base XP
+    await awardXp(learnerId, amount, sourceType || "BONUS", sourceId || "manual", description || `${sourceType} XP`);
 
-    // Check for streak bonus
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const lastActivity = profile.lastActivityDate ? new Date(profile.lastActivityDate) : null;
+    // Check streak bonus
     let streakBonus = 0;
+    await updateStreak(learnerId);
 
-    if (lastActivity) {
-      lastActivity.setHours(0, 0, 0, 0);
-      const diffDays = Math.floor((today.getTime() - lastActivity.getTime()) / (1000 * 60 * 60 * 24));
+    // Get updated profile for streak info
+    const { data: profile } = await supabase
+      .from("LearnerProfile")
+      .select("currentStreak, totalXp")
+      .eq("id", learnerId)
+      .single();
 
-      if (diffDays === 1) {
-        // Consecutive day — check for streak bonus
-        const newStreak = profile.currentStreak + 1;
-        const streakBonuses: Record<number, number> = { 3: 25, 7: 75, 14: 200, 30: 500 };
-        streakBonus = streakBonuses[newStreak] || 0;
+    if (profile) {
+      const streakBonuses: Record<number, number> = { 3: 25, 7: 75, 14: 200, 30: 500 };
+      streakBonus = streakBonuses[profile.currentStreak] || 0;
 
-        await prisma.learnerProfile.update({
-          where: { id: learnerId },
-          data: {
-            currentStreak: newStreak,
-            bestStreak: Math.max(newStreak, profile.bestStreak),
-            lastActivityDate: new Date(),
-          },
-        });
-
-        if (streakBonus > 0) {
-          await prisma.xpRecord.create({
-            data: {
-              learnerId,
-              sourceType: "STREAK",
-              sourceId: `streak_${newStreak}`,
-              amount: streakBonus,
-              description: `${newStreak}-day streak bonus!`,
-            },
-          });
-        }
-      } else if (diffDays > 1) {
-        // Streak broken — reset to 1
-        await prisma.learnerProfile.update({
-          where: { id: learnerId },
-          data: { currentStreak: 1, lastActivityDate: new Date() },
-        });
+      if (streakBonus > 0) {
+        await awardXp(learnerId, streakBonus, "STREAK", `streak_${profile.currentStreak}`, `${profile.currentStreak}-day streak bonus!`);
       }
-      // If diffDays === 0, same day — no streak change
-    } else {
-      // First activity ever
-      await prisma.learnerProfile.update({
-        where: { id: learnerId },
-        data: { currentStreak: 1, bestStreak: Math.max(1, profile.bestStreak), lastActivityDate: new Date() },
-      });
     }
 
     // Check for new badges
@@ -91,46 +47,54 @@ export async function POST(req: NextRequest) {
       success: true,
       xpAwarded: amount,
       streakBonus,
-      totalXp: profile.totalXp + amount + streakBonus,
+      totalXp: profile?.totalXp || 0,
       newBadges,
     });
-  } catch (err) {
+  } catch (err: any) {
     console.error("XP award error:", err);
     return NextResponse.json({ error: "Failed to award XP" }, { status: 500 });
   }
 }
 
 async function checkAndAwardBadges(learnerId: string): Promise<any[]> {
-  const profile = await prisma.learnerProfile.findUnique({ where: { id: learnerId } });
+  const { data: profile } = await supabase
+    .from("LearnerProfile")
+    .select("totalXp, currentStreak")
+    .eq("id", learnerId)
+    .single();
+
   if (!profile) return [];
 
-  const lessonCount = await prisma.progress.count({ where: { learnerId, lessonId: { not: null }, completedAt: { not: null } } });
-  const questCount = await prisma.progress.count({ where: { learnerId, questId: { not: null }, completedAt: { not: null } } });
-  const existingBadges = await prisma.badge.findMany({ where: { learnerId } });
-  const existingTypes = new Set(existingBadges.map(b => b.badgeType));
+  const [{ data: lessonCount }, { data: questCount }, { data: existingBadges }] = await Promise.all([
+    supabase.from("Progress").select("id", { count: "exact", head: true }).eq("learnerId", learnerId).not("lessonId", "is", null).not("completedAt", "is", null),
+    supabase.from("Progress").select("id", { count: "exact", head: true }).eq("learnerId", learnerId).not("questId", "is", null).not("completedAt", "is", null),
+    supabase.from("Badge").select("badgeType").eq("learnerId", learnerId),
+  ]);
 
+  const existingTypes = new Set((existingBadges || []).map((b: any) => b.badgeType));
   const newBadges: any[] = [];
-  const stats = { totalXp: profile.totalXp, currentStreak: profile.currentStreak, lessonsCompleted: lessonCount, questsCompleted: questCount, level: Math.floor(profile.totalXp / 500) + 1, subjectsStudied: 5 };
+  const level = Math.floor(profile.totalXp / 500) + 1;
 
-  const thresholds: Record<string, { name: string; description: string; check: () => boolean }> = {
-    first_lesson: { name: "First Step", description: "Completed your first lesson", check: () => lessonCount >= 1 },
-    ten_lessons: { name: "Quick Learner", description: "Completed 10 lessons", check: () => lessonCount >= 10 },
-    first_quest: { name: "Quest Complete!", description: "Completed your first quest", check: () => questCount >= 1 },
-    five_quests: { name: "Quest Master", description: "Completed 5 quests", check: () => questCount >= 5 },
-    streak_3: { name: "Streak Starter", description: "3-day learning streak", check: () => profile.currentStreak >= 3 },
-    streak_7: { name: "Week Warrior", description: "7-day learning streak", check: () => profile.currentStreak >= 7 },
-    xp_1000: { name: "XP Champion", description: "Earned 1,000 XP", check: () => profile.totalXp >= 1000 },
-    xp_5000: { name: "XP Legend", description: "Earned 5,000 XP", check: () => profile.totalXp >= 5000 },
-    level_5: { name: "Rising Star", description: "Reached Level 5", check: () => stats.level >= 5 },
-    level_10: { name: "Mastermind", description: "Reached Level 10", check: () => stats.level >= 10 },
+  const thresholds: Record<string, { name: string; check: () => boolean }> = {
+    first_lesson: { name: "First Step", check: () => (lessonCount?.length || 0) >= 1 },
+    ten_lessons: { name: "Quick Learner", check: () => (lessonCount?.length || 0) >= 10 },
+    first_quest: { name: "Quest Complete!", check: () => (questCount?.length || 0) >= 1 },
+    five_quests: { name: "Quest Master", check: () => (questCount?.length || 0) >= 5 },
+    streak_3: { name: "Streak Starter", check: () => profile.currentStreak >= 3 },
+    streak_7: { name: "Week Warrior", check: () => profile.currentStreak >= 7 },
+    xp_1000: { name: "XP Champion", check: () => profile.totalXp >= 1000 },
+    xp_5000: { name: "XP Legend", check: () => profile.totalXp >= 5000 },
+    level_5: { name: "Rising Star", check: () => level >= 5 },
+    level_10: { name: "Mastermind", check: () => level >= 10 },
   };
 
   for (const [type, badge] of Object.entries(thresholds)) {
     if (!existingTypes.has(type) && badge.check()) {
-      const created = await prisma.badge.create({
-        data: { learnerId, badgeType: type, name: badge.name, description: badge.description },
-      });
-      newBadges.push(created);
+      const { data: created } = await supabase.from("Badge").insert({
+        learnerId, badgeType: type, name: badge.name,
+        description: `${badge.name} achievement`,
+      }).select().single();
+      if (created) newBadges.push(created);
     }
   }
 

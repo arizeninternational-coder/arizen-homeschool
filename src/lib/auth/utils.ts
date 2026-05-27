@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/db/prisma";
+import { supabase } from "@/lib/supabase";
 import bcrypt from "bcryptjs";
 
 export async function createUser(data: {
@@ -11,95 +11,73 @@ export async function createUser(data: {
   displayName?: string;
 }) {
   const passwordHash = await bcrypt.hash(data.password, 12);
-  const role = (data.role as any) || "LEARNER";
+  const userRole = data.role || "LEARNER";
 
-  return prisma.user.create({
-    data: {
+  const { data: user, error } = await supabase
+    .from("User")
+    .insert({
       guildId: data.guildId,
       email: data.email,
       name: data.name,
       passwordHash,
-      role,
-      learnerProfile: role === "LEARNER"
-        ? {
-            create: {
-              guildId: data.guildId,
-              displayName: data.displayName || data.name,
-              grade: data.grade || 5,
-            },
-          }
-        : undefined,
-    },
-    include: { learnerProfile: true },
-  });
-}
+      role: userRole,
+    })
+    .select("id, name, email, role")
+    .single();
 
-export async function validateCredentials(email: string, password: string) {
-  const user = await prisma.user.findUnique({
-    where: { email },
-    include: { guild: true, learnerProfile: true },
-  });
+  if (error) throw error;
 
-  if (!user || !user.passwordHash) return null;
-
-  const isValid = await bcrypt.compare(password, user.passwordHash);
-  if (!isValid) return null;
+  // Create learner profile if LEARNER
+  if (userRole === "LEARNER") {
+    await supabase.from("LearnerProfile").insert({
+      userId: user.id,
+      guildId: data.guildId,
+      displayName: data.displayName || data.name,
+      grade: data.grade || 5,
+    });
+  }
 
   return user;
 }
 
 export async function updateStreak(learnerId: string) {
-  const profile = await prisma.learnerProfile.findUnique({
-    where: { id: learnerId },
-  });
+  const { data: profile } = await supabase
+    .from("LearnerProfile")
+    .select("currentStreak, bestStreak, lastActivityDate")
+    .eq("id", learnerId)
+    .single();
 
   if (!profile) return;
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const lastActivity = profile.lastActivityDate
-    ? new Date(profile.lastActivityDate)
-    : null;
+  const lastActivity = profile.lastActivityDate ? new Date(profile.lastActivityDate) : null;
 
   if (lastActivity) {
     lastActivity.setHours(0, 0, 0, 0);
-    const diffDays = Math.floor(
-      (today.getTime() - lastActivity.getTime()) / (1000 * 60 * 60 * 24)
-    );
+    const diffDays = Math.floor((today.getTime() - lastActivity.getTime()) / (1000 * 60 * 60 * 24));
 
     if (diffDays === 1) {
-      // Consecutive day — increment streak
       const newStreak = profile.currentStreak + 1;
-      await prisma.learnerProfile.update({
-        where: { id: learnerId },
-        data: {
-          currentStreak: newStreak,
-          bestStreak: Math.max(newStreak, profile.bestStreak),
-          lastActivityDate: new Date(),
-        },
-      });
+      await supabase.from("LearnerProfile").update({
+        currentStreak: newStreak,
+        bestStreak: Math.max(newStreak, profile.bestStreak),
+        lastActivityDate: new Date().toISOString(),
+      }).eq("id", learnerId);
     } else if (diffDays > 1) {
-      // Streak broken
-      await prisma.learnerProfile.update({
-        where: { id: learnerId },
-        data: {
-          currentStreak: 1,
-          lastActivityDate: new Date(),
-        },
-      });
-    }
-    // If diffDays === 0, same day — no change
-  } else {
-    // First activity
-    await prisma.learnerProfile.update({
-      where: { id: learnerId },
-      data: {
+      await supabase.from("LearnerProfile").update({
         currentStreak: 1,
-        bestStreak: Math.max(1, profile.bestStreak),
-        lastActivityDate: new Date(),
-      },
-    });
+        lastActivityDate: new Date().toISOString(),
+      }).eq("id", learnerId);
+    }
+    // diffDays === 0: same day, no change
+  } else {
+    await supabase.from("LearnerProfile").update({
+      currentStreak: 1,
+      bestStreak: Math.max(1, profile.bestStreak),
+      lastActivityDate: new Date().toISOString(),
+    }).eq("id", learnerId);
   }
 }
 
@@ -110,23 +88,24 @@ export async function awardXp(
   sourceId: string,
   description?: string
 ) {
-  const [record] = await prisma.$transaction([
-    prisma.xpRecord.create({
-      data: {
-        learnerId,
-        sourceType: sourceType as any,
-        sourceId,
-        amount,
-        description,
-      },
-    }),
-    prisma.learnerProfile.update({
-      where: { id: learnerId },
-      data: {
-        totalXp: { increment: amount },
-      },
-    }),
-  ]);
+  await supabase.from("XpRecord").insert({
+    learnerId,
+    sourceType,
+    sourceId,
+    amount,
+    description,
+  });
 
-  return record;
+  // Increment totalXp on profile
+  const { data: profile } = await supabase
+    .from("LearnerProfile")
+    .select("totalXp")
+    .eq("id", learnerId)
+    .single();
+
+  if (profile) {
+    await supabase.from("LearnerProfile").update({
+      totalXp: profile.totalXp + amount,
+    }).eq("id", learnerId);
+  }
 }

@@ -1,91 +1,80 @@
-// ── Quests ───────────────────────────────────────────────────
-
+// GET /api/quests/[slug] — Get quest with lessons and progress
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db/prisma";
 import { getToken } from "next-auth/jwt";
+import { supabase } from "@/lib/supabase";
 
 const secret = process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-production";
-
-function json(data: unknown, status = 200) {
-  return NextResponse.json(data, { status });
-}
 
 function respondError(message: string, status = 400) {
   return NextResponse.json({ error: message }, { status });
 }
 
-// GET /api/quests?slug=xxx — Get quest with all lessons and progress
 export async function GET(req: NextRequest) {
   try {
     const token = await getToken({ req, secret });
     if (!token?.guildId) return respondError("Unauthorized", 401);
+    const guildId = token.guildId as string;
 
     const { searchParams } = new URL(req.url);
     const slug = searchParams.get("slug");
     if (!slug) return respondError("Slug required", 400);
 
-    const quest = await prisma.quest.findFirst({
-      where: {
-        slug,
-        theme: { guildId: token.guildId as string },
-        status: "PUBLISHED",
-      },
-      include: {
-        theme: { select: { id: true, title: true, slug: true, grade: true } },
-        lessons: {
-          where: { status: "PUBLISHED" },
-          orderBy: { orderIndex: "asc" },
-          include: {
-            _count: { select: { activities: true } },
-          },
-        },
-        sideQuests: {
-          where: { status: "PUBLISHED" },
-          select: { id: true, title: true, slug: true, sideQuestType: true, xpReward: true },
-        },
-        activities: {
-          where: { status: "PUBLISHED" },
-          select: { id: true, title: true, activityType: true, xpReward: true },
-        },
-      },
-    });
+    const { data: quest, error } = await supabase
+      .from("Quest")
+      .select("id, title, slug, description, questType, orderIndex, coverImage, xpReward")
+      .eq("slug", slug)
+      .eq("status", "PUBLISHED")
+      .single();
 
-    if (!quest) return respondError("Quest not found", 404);
+    if (error || !quest) return respondError("Quest not found", 404);
+
+    // Get lessons
+    const { data: lessons } = await supabase
+      .from("Lesson")
+      .select("id, title, slug, description, orderIndex, xpReward")
+      .eq("questId", quest.id)
+      .eq("status", "PUBLISHED")
+      .orderBy("orderIndex");
 
     // Get progress
     const learnerProfileId = token.learnerProfileId as string | null;
-    const progressMap: Record<string, { mastery: number; completedAt: string | null }> = {};
-
+    let progressMap: Record<string, { mastery: number; completedAt: string | null }> = {};
     if (learnerProfileId) {
-      const records = await prisma.progress.findMany({
-        where: {
-          learnerId: learnerProfileId,
-          OR: [
-            { questId: quest.id },
-            { lesson: { questId: quest.id } },
-          ],
-        },
-      });
-      for (const r of records) {
-        const key = r.lessonId || r.questId;
-        if (key) progressMap[key] = { mastery: r.masteryPercent, completedAt: r.completedAt?.toISOString() || null };
+      const allIds = [quest.id, ...(lessons || []).map((l: any) => l.id)];
+      const { data: progressRecords } = await supabase
+        .from("Progress")
+        .select("questId, lessonId, masteryPercent, completedAt")
+        .eq("learnerId", learnerProfileId)
+        .in("questId", allIds);
+      // Also check lessonId matches
+      const { data: lessonProgress } = await supabase
+        .from("Progress")
+        .select("lessonId, masteryPercent, completedAt")
+        .eq("learnerId", learnerProfileId)
+        .in("lessonId", (lessons || []).map((l: any) => l.id));
+
+      for (const r of progressRecords || []) {
+        const key = r.questId || r.lessonId;
+        if (key) progressMap[key] = { mastery: r.masteryPercent, completedAt: r.completedAt };
+      }
+      for (const r of lessonProgress || []) {
+        if (r.lessonId) progressMap[r.lessonId] = { mastery: r.masteryPercent, completedAt: r.completedAt };
       }
     }
 
-    return json({
+    return NextResponse.json({
       quest: {
         ...quest,
-        progress: progressMap[quest.id]?.mastery || 0,
-        isCompleted: !!progressMap[quest.id]?.completedAt,
-        lessons: quest.lessons.map((l) => ({
+        lessons: (lessons || []).map((l: any) => ({
           ...l,
-          activitiesCount: l._count.activities,
           progress: progressMap[l.id]?.mastery || 0,
           isCompleted: !!progressMap[l.id]?.completedAt,
         })),
+        progress: progressMap[quest.id]?.mastery || 0,
+        isCompleted: !!progressMap[quest.id]?.completedAt,
       },
     });
-  } catch (err) {
+  } catch (err: any) {
     console.error("GET quest error:", err);
     return respondError("Failed to fetch quest", 500);
   }

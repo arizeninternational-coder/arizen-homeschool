@@ -1,84 +1,54 @@
-// ── Guilds ───────────────────────────────────────────────────
-
+// GET /api/guilds — List published themes for the user's guild
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db/prisma";
 import { getToken } from "next-auth/jwt";
-
+import { supabase } from "@/lib/supabase";
 const secret = process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-production";
 
-function json(data: unknown, status = 200) {
-  return NextResponse.json(data, { status });
-}
-
-function respondError(message: string, status = 400) {
-  return NextResponse.json({ error: message }, { status });
-}
-
-// GET /api/guilds — List published themes for the user's guild
 export async function GET(req: NextRequest) {
   try {
     const token = await getToken({ req, secret });
-    if (!token?.guildId) return respondError("Unauthorized", 401);
+    if (!token?.guildId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const guildId = token.guildId as string;
 
-    const themes = await prisma.theme.findMany({
-      where: {
-        guildId: token.guildId as string,
-        status: "PUBLISHED",
-      },
-      include: {
-        themeSubjects: true,
-        quests: {
-          where: { status: "PUBLISHED" },
-          orderBy: { orderIndex: "asc" },
-          select: {
-            id: true,
-            title: true,
-            slug: true,
-            questType: true,
-            orderIndex: true,
-            xpReward: true,
-            _count: { select: { lessons: true } },
-          },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-    });
+    const { data: themes, error } = await supabase
+      .from("Theme")
+      .select(`
+        id, title, slug, description, drivingQuestion, durationWeeks, grade,
+        themeSubjects:ThemeSubject(subject),
+        quests:Quest(id, title, slug, questType, orderIndex, xpReward, status)
+      `)
+      .eq("guildId", guildId)
+      .eq("status", "PUBLISHED")
+      .orderBy("createdAt", { ascending: false });
 
-    // Get learner progress if available
+    if (error) return NextResponse.json({ error: "Failed to fetch themes" }, { status: 500 });
+
+    // Get progress for learner
     const learnerProfileId = token.learnerProfileId as string | null;
     let progressMap: Record<string, number> = {};
-
     if (learnerProfileId) {
-      const progressRecords = await prisma.progress.findMany({
-        where: { learnerId: learnerProfileId },
-        select: { lessonId: true, questId: true, masteryPercent: true, completedAt: true },
-      });
-
-      for (const p of progressRecords) {
+      const { data: progressRecords } = await supabase
+        .from("Progress")
+        .select("lessonId, questId, masteryPercent")
+        .eq("learnerId", learnerProfileId);
+      for (const p of progressRecords || []) {
         const key = p.lessonId || p.questId;
         if (key) progressMap[key] = p.masteryPercent;
       }
     }
 
-    return json({
-      themes: themes.map((t) => ({
-        id: t.id,
-        title: t.title,
-        slug: t.slug,
-        description: t.description,
-        drivingQuestion: t.drivingQuestion,
-        durationWeeks: t.durationWeeks,
-        grade: t.grade,
-        subjects: t.themeSubjects.map((s) => s.subject),
-        quests: t.quests.map((q) => ({
+    return NextResponse.json({
+      themes: (themes || []).map((t: any) => ({
+        ...t,
+        subjects: (t.themeSubjects || []).map((s: any) => s.subject),
+        quests: (t.quests || []).map((q: any) => ({
           ...q,
-          lessonsCount: q._count.lessons,
           progress: progressMap[q.id] || 0,
         })),
       })),
     });
   } catch (err) {
     console.error("GET /api/guilds error:", err);
-    return respondError("Failed to fetch themes", 500);
+    return NextResponse.json({ error: "Failed to fetch themes" }, { status: 500 });
   }
 }

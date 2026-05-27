@@ -1,8 +1,7 @@
 // GET /api/learner/profile — Get current learner's full profile
-
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db/prisma";
 import { getToken } from "next-auth/jwt";
+import { supabase } from "@/lib/supabase";
 
 const secret = process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-production";
 
@@ -11,23 +10,22 @@ export async function GET(req: NextRequest) {
     const token = await getToken({ req, secret });
     if (!token?.learnerProfileId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const learnerId = token.learnerProfileId as string;
+    const { data: profile, error } = await supabase
+      .from("LearnerProfile")
+      .select(`
+        id, displayName, grade, totalXp, currentStreak, bestStreak, avatarUrl,
+        user:User(id, name, email)
+      `)
+      .eq("id", token.learnerProfileId)
+      .single();
 
-    const profile = await prisma.learnerProfile.findUnique({
-      where: { id: learnerId },
-      include: {
-        user: { select: { name: true, email: true, image: true } },
-        _count: {
-          select: {
-            progress: { where: { completedAt: { not: null } } },
-            badges: true,
-            xpRecords: true,
-          },
-        },
-      },
-    });
+    if (error || !profile) return NextResponse.json({ error: "Profile not found" }, { status: 404 });
 
-    if (!profile) return NextResponse.json({ error: "Profile not found" }, { status: 404 });
+    // Get counts
+    const [{ data: badges }, { data: completedProgress }] = await Promise.all([
+      supabase.from("Badge").select("id", { count: "exact", head: true }).eq("learnerId", profile.id),
+      supabase.from("Progress").select("id", { count: "exact", head: true }).eq("learnerId", profile.id).not("completedAt", "is", null),
+    ]);
 
     return NextResponse.json({
       profile: {
@@ -37,13 +35,13 @@ export async function GET(req: NextRequest) {
         totalXp: profile.totalXp,
         currentStreak: profile.currentStreak,
         bestStreak: profile.bestStreak,
-        completedItems: profile._count.progress,
-        badgesCount: profile._count.badges,
-        xpEventsCount: profile._count.xpRecords,
+        completedItems: completedProgress?.length || 0,
+        badgesCount: badges?.length || 0,
+        xpEventsCount: 0,
       },
     });
   } catch (err) {
     console.error("GET learner profile error:", err);
-    return NextResponse.json({ error: "Failed to fetch profile" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch profile" }, { status: 500});
   }
 }
