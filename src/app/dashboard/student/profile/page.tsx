@@ -3,60 +3,59 @@
 export const dynamic = "force-dynamic";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
-import { User, ArrowLeft } from "lucide-react";
-import { ds, colors } from "@/lib/design-system";
+import { useSession } from "next-auth/react";
+import { User, Zap, Flame, Award, Target } from "lucide-react";
+import { ds, colors, gradients } from "@/lib/design-system";
 
 export default function StudentProfilePage() {
-  const [user, setUser] = useState<any>(null);
+  const { data: session } = useSession();
+  const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/auth/session")
-      .then((r) => r.json())
-      .then((d) => { if (d?.user) setUser(d.user); })
-      .catch(() => {})
+    fetch("/api/learner/profile")
+      .then(r => r.json())
+      .then(data => { if (data.profile) setProfile(data.profile); })
+      .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: colors.bg }}><p style={{ color: colors.textMuted }}>Loading...</p></div>;
-
-  const displayName = user?.displayName || user?.name?.split(" ")[0] || "Learner";
+  const user = session?.user as any;
+  const displayName = profile?.displayName || user?.name || "Learner";
+  const totalXp = profile?.totalXp || 0;
+  const streak = profile?.currentStreak || 0;
+  const badgesCount = profile?.badgesCount || 0;
+  const completedItems = profile?.completedItems || 0;
+  const level = Math.floor(totalXp / 500) + 1;
 
   return (
-    <div style={{ minHeight: '100vh', background: colors.bg }}>
-      <div style={{ maxWidth: 600, margin: '0 auto', padding: '2rem 1.5rem' }}>
-        <Link href="/dashboard/student" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: colors.textMuted, textDecoration: 'none', fontSize: '0.875rem', fontWeight: 600, marginBottom: '1.5rem' }}>
-          <ArrowLeft style={{ width: 16, height: 16 }} /> Back to Dashboard
-        </Link>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: colors.text, marginBottom: '2rem' }}>My Profile</h1>
+    <>
+      <h1 style={{ fontSize: "1.375rem", fontWeight: 800, color: colors.text, marginBottom: "1.25rem" }}>My Profile</h1>
 
-        <div style={{ ...ds.card, textAlign: 'center', padding: '2.5rem 2rem' }}>
-          <div style={{ width: 80, height: 80, borderRadius: '50%', margin: '0 auto 1.5rem', background: `linear-gradient(135deg, ${colors.primary}, ${colors.primaryDark})`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '2rem', fontWeight: 800 }}>
-            {displayName.charAt(0).toUpperCase()}
-          </div>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: colors.text, marginBottom: '0.25rem' }}>{displayName}</h2>
-          <p style={{ color: colors.textMuted, fontSize: '0.875rem', marginBottom: '0.5rem' }}>{user?.email}</p>
-          <div style={{ display: 'inline-block', padding: '0.25rem 0.75rem', borderRadius: 20, background: colors.primarySoft, color: colors.primary, fontSize: '0.75rem', fontWeight: 700, marginBottom: '2rem' }}>
-            {user?.role || "LEARNER"}
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', borderTop: `1px solid ${colors.border}`, paddingTop: '1.5rem' }}>
-            <div>
-              <div style={{ fontSize: '1.5rem', fontWeight: 800, color: colors.primary }}>{user?.totalXp || 0}</div>
-              <div style={{ fontSize: '0.75rem', color: colors.textMuted, fontWeight: 600 }}>Total XP</div>
-            </div>
-            <div>
-              <div style={{ fontSize: '1.5rem', fontWeight: 800, color: colors.warm }}>{user?.currentStreak || 0}</div>
-              <div style={{ fontSize: '0.75rem', color: colors.textMuted, fontWeight: 600 }}>Day Streak</div>
-            </div>
-            <div>
-              <div style={{ fontSize: '1.5rem', fontWeight: 800, color: colors.accent }}>{user?.grade || '—'}</div>
-              <div style={{ fontSize: '0.75rem', color: colors.textMuted, fontWeight: 600 }}>Grade</div>
-            </div>
-          </div>
+      {/* Profile card */}
+      <div style={{ padding: "1.5rem", borderRadius: 16, background: gradients.primary, color: "white", marginBottom: "1.5rem", textAlign: "center" }}>
+        <div style={{ width: 64, height: 64, borderRadius: "50%", background: "rgba(255,255,255,0.2)", margin: "0 auto 0.75rem", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <User style={{ width: 32, height: 32 }} />
         </div>
+        <h2 style={{ fontSize: "1.25rem", fontWeight: 800, marginBottom: "0.25rem" }}>{displayName}</h2>
+        <p style={{ opacity: 0.8, fontSize: "0.875rem" }}>Level {level} Learner</p>
       </div>
-    </div>
+
+      {/* Stats */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: "0.75rem" }}>
+        {[
+          { label: "Total XP", value: totalXp.toLocaleString(), icon: Zap, color: colors.primary },
+          { label: "Streak", value: `${streak}d`, icon: Flame, color: colors.warm },
+          { label: "Badges", value: String(badgesCount), icon: Award, color: colors.accent },
+          { label: "Completed", value: String(completedItems), icon: Target, color: colors.success || colors.primary },
+        ].map((stat) => (
+          <div key={stat.label} style={{ ...ds.card, padding: "1rem", textAlign: "center" }}>
+            <stat.icon style={{ width: 24, height: 24, color: stat.color, margin: "0 auto 0.375rem" }} />
+            <div style={{ fontSize: "1.125rem", fontWeight: 800, color: colors.text }}>{stat.value}</div>
+            <div style={{ fontSize: "0.6875rem", color: colors.textMuted, fontWeight: 600 }}>{stat.label}</div>
+          </div>
+        ))}
+      </div>
+    </>
   );
 }
