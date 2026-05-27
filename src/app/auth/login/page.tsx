@@ -44,18 +44,28 @@ function LoginForm() {
         setError("Invalid email or password. Please try again.");
         setLoading(false);
       } else { 
-        // Fetch session to get role, then redirect accordingly
-        const sessionRes = await fetch("/api/auth/session");
-        const sessionData = await sessionRes.json();
-        const role = sessionData?.user?.role;
+        // signIn with redirect:false succeeds — cookie is set
+        // Fetch session with retry to get role (cookie may need a tick to propagate)
+        let role = null;
+        for (let attempt = 0; attempt < 3; attempt++) {
+          await new Promise(r => setTimeout(r, 200));
+          const sessionRes = await fetch("/api/auth/session");
+          const sessionData = await sessionRes.json();
+          if (sessionData?.user?.role) {
+            role = sessionData.user.role;
+            break;
+          }
+        }
         
         if (role === "ADMIN") {
           window.location.replace("/dashboard/admin");
         } else if (role === "PARENT") {
           window.location.replace("/dashboard/parent");
-        } else {
-          // LEARNER or any other role
+        } else if (role) {
           window.location.replace("/dashboard/student");
+        } else {
+          // Fallback: go to homepage which will show dashboard link
+          window.location.replace("/");
         }
       }
     } catch (err: any) {

@@ -53,12 +53,21 @@ export async function middleware(req: NextRequest) {
 
     const userRole = token.role as string;
 
+    // Redirect logged-in users from /auth/* to their dashboard
+    if (pathname.startsWith("/auth/")) {
+      if (userRole === "ADMIN") {
+        return NextResponse.redirect(new URL("/dashboard/admin", req.url));
+      } else if (userRole === "PARENT") {
+        return NextResponse.redirect(new URL("/dashboard/parent", req.url));
+      } else {
+        return NextResponse.redirect(new URL("/dashboard/student", req.url));
+      }
+    }
+
     // Check role-based access
     for (const [role, paths] of Object.entries(rolePaths)) {
       if (paths.some((p) => pathname.startsWith(p))) {
         if (userRole !== role) {
-          // User is trying to access a role-specific page they don't have
-          // Redirect to their correct dashboard
           if (userRole === "ADMIN") {
             return NextResponse.redirect(new URL("/dashboard/admin", req.url));
           } else if (userRole === "PARENT") {
@@ -71,7 +80,6 @@ export async function middleware(req: NextRequest) {
       }
     }
   } catch {
-    // If auth check fails, allow request through
     return NextResponse.next();
   }
 

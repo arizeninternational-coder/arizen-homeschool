@@ -91,7 +91,7 @@ export default function ParentDashboard() {
         const res = await fetch("/api/auth/session");
         const data = await res.json();
 
-        if (!data.authenticated) {
+        if (!data?.user) {
           window.location.replace("/auth/login");
           return;
         }
@@ -292,6 +292,7 @@ export default function ParentDashboard() {
               <a
                 key={item.label}
                 href={item.href}
+                className={item.active ? "nav-item-active" : "nav-item"}
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
@@ -311,18 +312,6 @@ export default function ParentDashboard() {
                         color: colors.textMuted,
                         background: "transparent",
                       }),
-                }}
-                onMouseEnter={(e) => {
-                  if (!item.active) {
-                    e.currentTarget.style.background = colors.bgSoft;
-                    e.currentTarget.style.color = colors.text;
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!item.active) {
-                    e.currentTarget.style.background = "transparent";
-                    e.currentTarget.style.color = colors.textMuted;
-                  }
                 }}
               >
                 <item.icon style={{ width: "15px", height: "15px" }} />
@@ -365,6 +354,7 @@ export default function ParentDashboard() {
             </div>
             <button
               onClick={handleLogout}
+              className="logout-btn"
               style={{
                 ...ds.btnGhost,
                 color: colors.textMuted,
@@ -372,14 +362,6 @@ export default function ParentDashboard() {
                 borderRadius: "0.75rem",
               }}
               title="Sign out"
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = colors.danger;
-                e.currentTarget.style.background = "rgba(239,68,68,0.06)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = colors.textMuted;
-                e.currentTarget.style.background = "transparent";
-              }}
             >
               <LogOut style={{ width: "18px", height: "18px" }} />
             </button>

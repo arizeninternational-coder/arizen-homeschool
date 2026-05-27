@@ -186,6 +186,23 @@ a {
   box-shadow: 0 4px 16px rgba(0,0,0,0.06), 0 8px 32px rgba(0,0,0,0.03);
 }
 
+/* ── Dashboard Nav Hover ── */
+.nav-item:hover {
+  background: rgb(var(--color-bg-soft)) !important;
+  color: rgb(var(--color-text)) !important;
+}
+.nav-item-active:hover {
+  background: rgba(20, 184, 166, 0.12) !important;
+}
+
+.logout-btn {
+  transition: all 0.15s ease;
+}
+.logout-btn:hover {
+  color: #ef4444 !important;
+  background: rgba(239, 68, 68, 0.06) !important;
+}
+
 /* ── Responsive ── */
 @media (max-width: 640px) {
   .fade-in-up {
