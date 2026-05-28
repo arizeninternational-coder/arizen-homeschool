@@ -37,7 +37,7 @@ export default function AdminLessonsPage() {
   useEffect(() => {
     async function load() {
       try {
-        const res = await fetch("/api/admin/lessons");
+        const res = await fetch("/api/admin/lessons", { credentials: "include" });
         if (res.ok) {
           const data = await res.json();
           setLessons(data.lessons || []);
@@ -70,7 +70,7 @@ export default function AdminLessonsPage() {
           <Link href="/dashboard/admin" style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", color: colors.textMuted, textDecoration: "none", fontSize: "0.875rem", fontWeight: 600 }}>
             <ArrowLeft style={{ width: 16, height: 16 }} /> Back to Admin Dashboard
           </Link>
-          <button onClick={() => signOut()} style={{ display: "flex", alignItems: "center", gap: "0.375rem", padding: "0.375rem 0.75rem", borderRadius: 8, border: `1px solid ${colors.border}`, background: "none", color: colors.textMuted, cursor: "pointer", fontSize: "0.8125rem", fontWeight: 600 }}>
+          <button onClick={() => signOut({ callbackUrl: "/" })} style={{ display: "flex", alignItems: "center", gap: "0.375rem", padding: "0.375rem 0.75rem", borderRadius: 8, border: `1px solid ${colors.border}`, background: "none", color: colors.textMuted, cursor: "pointer", fontSize: "0.8125rem", fontWeight: 600 }}>
             Sign Out
           </button>
         </div>

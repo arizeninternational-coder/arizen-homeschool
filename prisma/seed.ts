@@ -12,6 +12,13 @@ async function main() {
 
   // ── Cleanup existing content ──────────────────────────────
   console.log("🧹 Cleaning existing data...");
+  await prisma.coinAwardTracking.deleteMany();
+  await prisma.rewardRule.deleteMany();
+  await prisma.studentInventory.deleteMany();
+  await prisma.avatarItem.deleteMany();
+  await prisma.studentAvatar.deleteMany();
+  await prisma.coinTransaction.deleteMany();
+  await prisma.studentWallet.deleteMany();
   await prisma.xpRecord.deleteMany();
   await prisma.reflection.deleteMany();
   await prisma.progress.deleteMany();
@@ -96,6 +103,12 @@ async function main() {
   // ── CBC Reference Data ─────────────────────────────────────
   await seedCbcReferenceData();
 
+  // ── Reward Rules ───────────────────────────────────────────
+  await seedRewardRules();
+
+  // ── Avatar Shop Items ──────────────────────────────────────
+  await seedAvatarItems();
+
   // ── Sample progress for demo ──────────────────────────────
   await seedSampleProgress(ariadne.id, g2DbQuests, g5DbQuests);
   await seedSampleProgress(ariyana.id, g2DbQuests, g5DbQuests);
@@ -106,6 +119,8 @@ async function main() {
   const lessonCount = await prisma.lesson.count();
   const activityCount = await prisma.activity.count();
   const sideQuestCount = await prisma.sideQuest.count();
+  const rewardRuleCount = await prisma.rewardRule.count();
+  const avatarItemCount = await prisma.avatarItem.count();
 
   console.log("\n" + "═".repeat(50));
   console.log("✅ SEED COMPLETE!");
@@ -118,6 +133,8 @@ async function main() {
   console.log(`   Lessons: ${lessonCount}`);
   console.log(`   Activities: ${activityCount}`);
   console.log(`   Side Quests: ${sideQuestCount}`);
+  console.log(`   Reward Rules: ${rewardRuleCount}`);
+  console.log(`   Avatar Shop Items: ${avatarItemCount}`);
   console.log("═".repeat(50));
 }
 
@@ -308,6 +325,57 @@ async function seedSampleProgress(
       },
     });
   }
+}
+
+async function seedRewardRules() {
+  const rules = [
+    { action: "complete_lesson", coins: 10, xp: 50, dailyLimit: 0, description: "Coins and XP for completing a lesson" },
+    { action: "complete_reflection", coins: 5, xp: 30, dailyLimit: 0, description: "Coins and XP for completing a reflection" },
+    { action: "complete_quest", coins: 30, xp: 150, dailyLimit: 0, description: "Coins and XP for completing a quest" },
+    { action: "complete_theme", coins: 50, xp: 300, dailyLimit: 0, description: "Coins and XP for completing an entire theme" },
+    { action: "three_day_streak", coins: 15, xp: 0, dailyLimit: 0, description: "Bonus coins for a 3-day learning streak" },
+    { action: "seven_day_streak", coins: 40, xp: 0, dailyLimit: 0, description: "Bonus coins for a 7-day learning streak" },
+    { action: "parent_approved_activity", coins: 20, xp: 0, dailyLimit: 0, description: "Coins for parent-approved activity completion" },
+  ];
+
+  for (const rule of rules) {
+    await prisma.rewardRule.create({ data: rule });
+  }
+  console.log(`   Reward Rules: ${rules.length} rules seeded ✅`);
+}
+
+async function seedAvatarItems() {
+  const items = [
+    { name: "Math Wizard Hat", category: "HATS" as any, price: 50, rarity: "RARE" as any, emoji: "🎩", unlockType: "LESSON_COUNT" as any, unlockRequirement: 5, unlockDescription: "Complete 5 math lessons" },
+    { name: "Explorer Telescope", category: "LEARNING_TOOLS" as any, price: 80, rarity: "RARE" as any, emoji: "🔭", unlockType: "LESSON_COUNT" as any, unlockRequirement: 3, unlockDescription: "Complete 3 science lessons" },
+    { name: "Scientist Goggles", category: "GLASSES" as any, price: 60, rarity: "RARE" as any, emoji: "🥽", unlockType: "LESSON_COUNT" as any, unlockRequirement: 3, unlockDescription: "Complete 3 science lessons" },
+    { name: "Storyteller Cape", category: "CLOTHING" as any, price: 70, rarity: "EPIC" as any, emoji: "🧥", unlockType: "LESSON_COUNT" as any, unlockRequirement: 5, unlockDescription: "Complete 5 reading lessons" },
+    { name: "Artist Brush", category: "LEARNING_TOOLS" as any, price: 40, rarity: "COMMON" as any, emoji: "🖌️", unlockType: "ALWAYS_AVAILABLE" as any, unlockRequirement: 0, unlockDescription: "Always available" },
+    { name: "Nature Guardian Backpack", category: "ACCESSORIES" as any, price: 55, rarity: "RARE" as any, emoji: "🎒", unlockType: "LESSON_COUNT" as any, unlockRequirement: 3, unlockDescription: "Complete 3 environmental lessons" },
+    { name: "Reading Champion Glasses", category: "GLASSES" as any, price: 45, rarity: "COMMON" as any, emoji: "👓", unlockType: "LESSON_COUNT" as any, unlockRequirement: 3, unlockDescription: "Complete 3 reading lessons" },
+    { name: "Safari Explorer Hat", category: "HATS" as any, price: 35, rarity: "COMMON" as any, emoji: "🧢", unlockType: "ALWAYS_AVAILABLE" as any, unlockRequirement: 0, unlockDescription: "Always available" },
+    { name: "Space Background", category: "BACKGROUNDS" as any, price: 100, rarity: "EPIC" as any, emoji: "🚀", unlockType: "XP_THRESHOLD" as any, unlockRequirement: 500, unlockDescription: "Earn 500 XP" },
+    { name: "Library Background", category: "BACKGROUNDS" as any, price: 80, rarity: "RARE" as any, emoji: "📚", unlockType: "LESSON_COUNT" as any, unlockRequirement: 10, unlockDescription: "Complete 10 reading lessons" },
+    { name: "Forest Background", category: "BACKGROUNDS" as any, price: 80, rarity: "RARE" as any, emoji: "🌲", unlockType: "LESSON_COUNT" as any, unlockRequirement: 5, unlockDescription: "Complete 5 environmental lessons" },
+    { name: "Science Lab Background", category: "BACKGROUNDS" as any, price: 120, rarity: "EPIC" as any, emoji: "🔬", unlockType: "LESSON_COUNT" as any, unlockRequirement: 10, unlockDescription: "Complete 10 science lessons" },
+    { name: "Robot Companion", category: "PETS" as any, price: 150, rarity: "LEGENDARY" as any, emoji: "🤖", unlockType: "LESSON_COUNT" as any, unlockRequirement: 20, unlockDescription: "Complete 20 lessons" },
+    { name: "Rabbit Companion", category: "PETS" as any, price: 90, rarity: "RARE" as any, emoji: "🐰", unlockType: "LESSON_COUNT" as any, unlockRequirement: 10, unlockDescription: "Complete 10 lessons" },
+    { name: "Soccer Boots", category: "SHOES" as any, price: 30, rarity: "COMMON" as any, emoji: "👟", unlockType: "ALWAYS_AVAILABLE" as any, unlockRequirement: 0, unlockDescription: "Always available" },
+    { name: "Creative Crown", category: "HATS" as any, price: 200, rarity: "LEGENDARY" as any, emoji: "👑", unlockType: "LESSON_COUNT" as any, unlockRequirement: 50, unlockDescription: "Complete 50 lessons" },
+    { name: "Kindness Hoodie", category: "CLOTHING" as any, price: 45, rarity: "COMMON" as any, emoji: "🧤", unlockType: "ALWAYS_AVAILABLE" as any, unlockRequirement: 0, unlockDescription: "Always available" },
+    { name: "Star Backpack", category: "ACCESSORIES" as any, price: 50, rarity: "RARE" as any, emoji: "⭐", unlockType: "QUEST_COUNT" as any, unlockRequirement: 5, unlockDescription: "Complete 5 quests" },
+    { name: "Globe Explorer Tool", category: "LEARNING_TOOLS" as any, price: 65, rarity: "RARE" as any, emoji: "🌍", unlockType: "LESSON_COUNT" as any, unlockRequirement: 5, unlockDescription: "Complete 5 geography lessons" },
+    { name: "Music Maker Headphones", category: "ACCESSORIES" as any, price: 55, rarity: "RARE" as any, emoji: "🎧", unlockType: "LESSON_COUNT" as any, unlockRequirement: 5, unlockDescription: "Complete 5 creative arts lessons" },
+  ];
+
+  // Avoid duplicates on re-seed
+  for (const item of items) {
+    const existing = await prisma.avatarItem.findFirst({ where: { name: item.name } });
+    if (!existing) {
+      await prisma.avatarItem.create({ data: item });
+    }
+  }
+  console.log(`   Avatar Shop Items: ${items.length} items seeded ✅`);
 }
 
 function formatThemeTitle(slug: string): string {

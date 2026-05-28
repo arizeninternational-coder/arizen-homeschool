@@ -1,9 +1,13 @@
 // GET /api/admin/stats — Admin dashboard stats (ADMIN only)
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import { withAuth } from "@/lib/api-guard";
+import { requireAdmin } from "@/lib/api-guard";
 
-export const GET = withAuth(async (req, user) => {
+export async function GET(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (auth instanceof NextResponse) return auth;
+  const { user } = auth;
+
   try {
     // Fetch all stats in parallel
     const results = await Promise.allSettled([
@@ -40,4 +44,4 @@ export const GET = withAuth(async (req, user) => {
     console.error("[ADMIN_STATS] Critical error:", error);
     return NextResponse.json({ error: error.message || "Failed to fetch stats" }, { status: 500 });
   }
-}, { roles: ["ADMIN"] });
+}

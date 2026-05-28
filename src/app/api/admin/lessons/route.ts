@@ -1,9 +1,13 @@
 // GET /api/admin/lessons — List all lessons with quest/theme info (ADMIN only)
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import { withAuth } from "@/lib/api-guard";
+import { requireAdmin } from "@/lib/api-guard";
 
-export const GET = withAuth(async (req, user) => {
+export async function GET(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (auth instanceof NextResponse) return auth;
+  const { user } = auth;
+
   try {
     const { data: lessons, error } = await supabase
       .from("Lesson")
@@ -38,4 +42,4 @@ export const GET = withAuth(async (req, user) => {
     console.error("[ADMIN_LESSONS] Critical error:", err);
     return NextResponse.json({ error: err.message || "Failed to fetch lessons" }, { status: 500 });
   }
-}, { roles: ["ADMIN"] });
+}

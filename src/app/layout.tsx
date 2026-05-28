@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import "@/styles/globals.css";
 import { AuthProvider } from "@/components/layout/AuthProvider";
+import { ToastProvider } from "@/components/ui/Toast";
 
 const nunito = Nunito({
   subsets: ["latin"],
@@ -24,7 +25,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={nunito.variable}>
       <body className="font-sans antialiased">
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <ToastProvider>{children}</ToastProvider>
+        </AuthProvider>
       </body>
     </html>
   );

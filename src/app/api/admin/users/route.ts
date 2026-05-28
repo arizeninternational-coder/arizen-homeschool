@@ -1,9 +1,13 @@
 // GET /api/admin/users — List all users with their profiles (ADMIN only)
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import { withAuth } from "@/lib/api-guard";
+import { requireAdmin } from "@/lib/api-guard";
 
-export const GET = withAuth(async (req, user) => {
+export async function GET(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (auth instanceof NextResponse) return auth;
+  const { user } = auth;
+
   try {
     const { data: users, error } = await supabase
       .from("User")
@@ -27,4 +31,4 @@ export const GET = withAuth(async (req, user) => {
     console.error("[ADMIN_USERS] Critical error:", err);
     return NextResponse.json({ error: err.message || "Failed to fetch users" }, { status: 500 });
   }
-}, { roles: ["ADMIN"] });
+}

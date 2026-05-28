@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import {
-  Zap, Award, Target, BookOpen, ChevronRight, Sparkles
+  Zap, Award, Target, BookOpen, ChevronRight, Sparkles, Coins, ShoppingBag
 } from "lucide-react";
 import { ds, colors, gradients } from "@/lib/design-system";
 
@@ -22,14 +22,29 @@ interface LearnerProfile {
 export default function StudentDashboard() {
   const { data: session } = useSession();
   const [profile, setProfile] = useState<LearnerProfile | null>(null);
+  const [coinBalance, setCoinBalance] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/learner/profile")
-      .then(r => r.json())
-      .then(data => { if (data.profile) setProfile(data.profile); })
-      .catch(console.error)
-      .finally(() => setLoading(false));
+    async function load() {
+      try {
+        const [profileRes, walletRes] = await Promise.allSettled([
+          fetch("/api/learner/profile").then(r => r.json()),
+          fetch("/api/coins/wallet").then(r => r.json()),
+        ]);
+        if (profileRes.status === "fulfilled" && profileRes.value.profile) {
+          setProfile(profileRes.value.profile);
+        }
+        if (walletRes.status === "fulfilled") {
+          setCoinBalance(walletRes.value.wallet?.balance || walletRes.value.balance || 0);
+        }
+      } catch (err) {
+        console.error("[DASHBOARD] Load error:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
   }, []);
 
   const user = session?.user as any;
@@ -67,10 +82,10 @@ export default function StudentDashboard() {
       {/* Stats Row */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: "0.75rem", marginBottom: "1.5rem" }}>
         {[
-          { label: "Total XP", value: totalXp.toLocaleString(), icon: Zap, color: colors.xp || colors.primary },
-          { label: "Streak", value: `${streak} days`, icon: Zap, color: colors.streak || colors.warm },
+          { label: "Total XP", value: totalXp.toLocaleString(), icon: Zap, color: colors.primary },
+          { label: "Spark Coins", value: coinBalance.toLocaleString(), icon: Coins, color: "#D97706" },
+          { label: "Streak", value: `${streak} days`, icon: Zap, color: colors.warm },
           { label: "Badges", value: String(badgesCount), icon: Award, color: colors.info || colors.accent },
-          { label: "Completed", value: String(completedItems), icon: Target, color: colors.primary },
         ].map((stat) => (
           <div key={stat.label} style={{ ...ds.card, padding: "0.875rem", textAlign: "center" }}>
             <stat.icon style={{ width: 20, height: 20, color: stat.color, margin: "0 auto 0.375rem" }} />
@@ -109,6 +124,16 @@ export default function StudentDashboard() {
           <div style={{ minWidth: 0 }}>
             <div style={{ fontWeight: 700, color: colors.text, fontSize: "0.875rem" }}>Badges</div>
             <div style={{ fontSize: "0.6875rem", color: colors.textMuted }}>{badgesCount} earned</div>
+          </div>
+          <ChevronRight style={{ width: 14, height: 14, color: colors.textMuted, marginLeft: "auto", flexShrink: 0 }} />
+        </Link>
+        <Link href="/dashboard/student/shop" style={{ ...ds.card, padding: "1rem", textDecoration: "none", display: "flex", alignItems: "center", gap: "0.75rem" }}>
+          <div style={{ width: 36, height: 36, borderRadius: 10, background: "#FEF3C7", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <ShoppingBag style={{ width: 18, height: 18, color: "#D97706" }} />
+          </div>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontWeight: 700, color: colors.text, fontSize: "0.875rem" }}>Avatar Shop</div>
+            <div style={{ fontSize: "0.6875rem", color: colors.textMuted }}>Customize your character</div>
           </div>
           <ChevronRight style={{ width: 14, height: 14, color: colors.textMuted, marginLeft: "auto", flexShrink: 0 }} />
         </Link>

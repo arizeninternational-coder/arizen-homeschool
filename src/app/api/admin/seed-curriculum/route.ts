@@ -2,7 +2,7 @@
 // GET — returns usage instructions
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import { withAuth, withAuthPost } from "@/lib/api-guard";
+import { requireAdmin } from "@/lib/api-guard";
 
 // Placeholder content for all lessons
 const DEFAULT_CONTENT = {
@@ -141,7 +141,7 @@ const CURRICULUM: Array<[number, string, string, string, string[]]> = [
   [5, "Creative Arts", "Appreciation", "Critique", ["Observing Creative Works","Discussing Visual Elements","Discussing Musical Elements","Giving Feedback on Self-Made Work","Giving Feedback on Peer-Made Work"]],
 ];
 
-// GET — usage instructions
+// GET — usage instructions (public, no auth needed)
 export function GET() {
   return NextResponse.json({
     message: "Use POST from the admin dashboard to run this seed.",
@@ -150,8 +150,12 @@ export function GET() {
   });
 }
 
-// POST — run the seed
-export const POST = withAuthPost(async (req, user, body: any) => {
+// POST — run the seed (admin only, using requireAdmin for consistency)
+export async function POST(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (auth instanceof NextResponse) return auth;
+  const { user } = auth;
+
   const logs: string[] = [];
   let themesCreated = 0, themesSkipped = 0;
   let questsCreated = 0, questsSkipped = 0;
@@ -170,7 +174,6 @@ export const POST = withAuthPost(async (req, user, body: any) => {
     if (guild) {
       guildId = guild.id;
     } else {
-      // Create guild
       const { data: newGuild } = await supabase
         .from("Guild")
         .insert({ name: "Arizen International", slug: "arizen-international", description: "CBC-aligned learning." })
@@ -205,7 +208,7 @@ export const POST = withAuthPost(async (req, user, body: any) => {
         const { data: newTheme, error: themeErr } = await supabase
           .from("Theme")
           .insert({
-            guild_id: guildId,
+            guildId: guildId,
             title: `${subStrand}`,
             slug: themeSlug,
             description: `Draft theme: ${subStrand} (${subject}, Grade ${grade})`,
@@ -240,13 +243,13 @@ export const POST = withAuthPost(async (req, user, body: any) => {
         const { data: newQuest, error: questErr } = await supabase
           .from("Quest")
           .insert({
-            theme_id: themeId,
+            themeId: themeId,
             title: `${subStrand} Quest`,
             slug: questSlug,
             description: `Draft quest: ${subStrand} (${subject}, Grade ${grade})`,
-            quest_type: "MAIN",
-            order_index: 1,
-            xp_reward: JSON.stringify({ base: 50 }),
+            questType: "MAIN",
+            orderIndex: 1,
+            xpReward: JSON.stringify({ base: 50 }),
             status: "DRAFT",
           })
           .select("id")
@@ -266,7 +269,6 @@ export const POST = withAuthPost(async (req, user, body: any) => {
       for (const topic of topics) {
         const lessonSlug = `lesson-${subStrand.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 30)}-${topic.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 40)}`;
 
-        // Check if lesson exists
         const { data: existingLesson } = await supabase
           .from("Lesson")
           .select("id")
@@ -290,13 +292,13 @@ export const POST = withAuthPost(async (req, user, body: any) => {
         const { error: lessonErr } = await supabase
           .from("Lesson")
           .insert({
-            quest_id: questId,
+            questId: questId,
             title: topic,
             slug: lessonSlug,
             description: DEFAULT_CONTENT.learningOutcomes,
-            content_blocks: contentBlocks,
-            xp_reward: JSON.stringify({ base: 50 }),
-            order_index: 1,
+            contentBlocks: contentBlocks,
+            xpReward: JSON.stringify({ base: 50 }),
+            orderIndex: 1,
             status: "DRAFT",
           });
 
@@ -332,11 +334,11 @@ export const POST = withAuthPost(async (req, user, body: any) => {
       ...(errors.length > 0 ? { errors } : {}),
     });
   } catch (err: any) {
-  console.error("[SEED_CURRICULUM] Critical error:", err);
-  return NextResponse.json({
-    error: err.message || "Failed to seed curriculum",
-    logs,
-    partialResults: { themesCreated, questsCreated, lessonsCreated },
-  }, { status: 500 });
+    console.error("[SEED_CURRICULUM] Critical error:", err);
+    return NextResponse.json({
+      error: err.message || "Failed to seed curriculum",
+      logs,
+      partialResults: { themesCreated, questsCreated, lessonsCreated },
+    }, { status: 500 });
   }
-}, { roles: ["ADMIN"] });
+}

@@ -7,7 +7,7 @@ import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Sparkles, LogOut, Zap, Flame, Menu, X,
+  Sparkles, LogOut, Zap, Flame, Menu, X, ShoppingBag,
   Compass, BookOpen, Target, Award, Heart, User
 } from "lucide-react";
 import { ds, colors } from "@/lib/design-system";
@@ -27,7 +27,7 @@ const NAV_ITEMS: NavItem[] = [
   { icon: BookOpen, label: "My Lessons", href: "/dashboard/student/lessons" },
   { icon: Target, label: "Quests", href: "/dashboard/student/quests" },
   { icon: Award, label: "Badges", href: "/dashboard/student/badges" },
-  { icon: Heart, label: "Reflections", href: "/dashboard/student/reflections" },
+  { icon: ShoppingBag, label: "Shop", href: "/dashboard/student/shop" },
   { icon: User, label: "Profile", href: "/dashboard/student/profile" },
 ];
 
@@ -105,32 +105,141 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
       )}
 
       {/* Top Nav */}
-      <header style={{ background: "rgba(253,253,251,0.92)", backdropFilter: "blur(12px)", borderBottom: `1px solid ${colors.border}`, padding: "0.625rem 1rem", display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 30 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+      <header
+        style={{
+          background: "rgba(253,253,251,0.92)",
+          backdropFilter: "blur(12px)",
+          borderBottom: `1px solid ${colors.border}`,
+          padding: "0.5rem 0.75rem",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          position: "sticky",
+          top: 0,
+          zIndex: 30,
+          gap: "0.5rem",
+          flexWrap: "nowrap",
+          overflow: "hidden",
+        }}
+      >
+        {/* Left side: menu button + brand */}
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", minWidth: 0, flex: "0 1 auto", overflow: "hidden" }}>
+          {/* Menu toggle — mobile only */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            style={{ display: isDesktop ? "none" : "flex", alignItems: "center", justifyContent: "center", width: 36, height: 36, borderRadius: 8, border: `1px solid ${colors.border}`, background: "white", color: colors.text, cursor: "pointer", flexShrink: 0 }}
+            style={{
+              display: isDesktop ? "none" : "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 44,
+              height: 44,
+              minWidth: 44,
+              borderRadius: 10,
+              border: `1px solid ${colors.border}`,
+              background: "white",
+              color: colors.text,
+              cursor: "pointer",
+              flexShrink: 0,
+            }}
             aria-label="Toggle menu"
           >
-            {mobileMenuOpen ? <X style={{ width: 18, height: 18 }} /> : <Menu style={{ width: 18, height: 18 }} />}
+            {mobileMenuOpen ? <X style={{ width: 20, height: 20 }} /> : <Menu style={{ width: 20, height: 20 }} />}
           </button>
-          <Link href="/dashboard/student" style={{ display: "flex", alignItems: "center", gap: "0.5rem", textDecoration: "none" }}>
-            <Sparkles style={{ width: 24, height: 24, color: colors.primary }} />
-            <span style={{ fontWeight: 800, fontSize: "1rem", ...ds.textGradient }}>Arizen School</span>
+
+          <Link href="/dashboard/student" style={{ display: "flex", alignItems: "center", gap: "0.375rem", textDecoration: "none", minWidth: 0, overflow: "hidden" }}>
+            <Sparkles style={{ width: 24, height: 24, minWidth: 24, color: colors.primary, flexShrink: 0 }} />
+            {/* Hide text on very small screens (<380px) */}
+            <span
+              style={{
+                fontWeight: 800,
+                fontSize: "0.9375rem",
+                ...ds.textGradient,
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+              className="brand-text"
+            >
+              Arizen School
+            </span>
           </Link>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.375rem" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.25rem", padding: "0.25rem 0.625rem", borderRadius: 16, background: colors.primarySoft, color: colors.primary, fontWeight: 700, fontSize: "0.75rem" }}>
-            <Zap style={{ width: 12, height: 12 }} /> {totalXp.toLocaleString()}
+
+        {/* Right side: XP, streak, logout */}
+        <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", flexShrink: 0, flexWrap: "nowrap" }}>
+          {/* XP pill */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.25rem",
+              padding: "0.375rem 0.625rem",
+              borderRadius: 16,
+              background: colors.primarySoft,
+              color: colors.primary,
+              fontWeight: 700,
+              fontSize: "0.75rem",
+              whiteSpace: "nowrap",
+              flexShrink: 0,
+              maxWidth: "120px",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            <Zap style={{ width: 12, height: 12, minWidth: 12, flexShrink: 0 }} />
+            <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>{totalXp.toLocaleString()}</span>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.25rem", padding: "0.25rem 0.625rem", borderRadius: 16, background: colors.warmSoft, color: colors.warmDark, fontWeight: 700, fontSize: "0.75rem", whiteSpace: "nowrap" }}>
-            <Flame style={{ width: 12, height: 12 }} /> {streak}d
+
+          {/* Streak pill */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.25rem",
+              padding: "0.375rem 0.625rem",
+              borderRadius: 16,
+              background: colors.warmSoft,
+              color: colors.warmDark,
+              fontWeight: 700,
+              fontSize: "0.75rem",
+              whiteSpace: "nowrap",
+              flexShrink: 0,
+            }}
+          >
+            <Flame style={{ width: 12, height: 12, minWidth: 12, flexShrink: 0 }} />
+            {streak}d
           </div>
-          <button onClick={() => signOut({ callbackUrl: "/" })} style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 36, height: 36, borderRadius: 8, border: `1px solid ${colors.border}`, background: "none", color: colors.textMuted, cursor: "pointer" }} aria-label="Sign out">
-            <LogOut style={{ width: 16, height: 16 }} />
+
+          {/* Logout button — minimum 44x44px tap target */}
+          <button
+            onClick={() => signOut({ callbackUrl: "/" })}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 44,
+              height: 44,
+              minWidth: 44,
+              minHeight: 44,
+              borderRadius: 10,
+              border: `1px solid ${colors.border}`,
+              background: "rgba(239,68,68,0.04)",
+              color: colors.danger || "#EF4444",
+              cursor: "pointer",
+              flexShrink: 0,
+            }}
+            aria-label="Sign out"
+          >
+            <LogOut style={{ width: 18, height: 18 }} />
           </button>
         </div>
       </header>
+
+      <style>{`
+        @media (max-width: 379px) {
+          .brand-text { display: none !important; }
+        }
+      `}</style>
 
       <div style={{ display: "flex", position: "relative" }}>
         {/* Sidebar — slide-out on mobile, always visible on desktop */}
@@ -177,6 +286,23 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
               </Link>
             );
           })}
+          {/* Logout in mobile menu */}
+          <div style={{ borderTop: `1px solid ${colors.border}`, marginTop: "0.5rem", paddingTop: "0.5rem" }}>
+            <button
+              onClick={() => { setMobileMenuOpen(false); signOut({ callbackUrl: "/" }); }}
+              style={{
+                display: "flex", alignItems: "center", gap: "0.625rem",
+                padding: "0.75rem 1rem", width: "100%",
+                background: "none", border: "none",
+                color: colors.danger || "#EF4444",
+                fontWeight: 700, fontSize: "0.875rem",
+                cursor: "pointer", textAlign: "left",
+              }}
+            >
+              <LogOut style={{ width: 18, height: 18 }} />
+              Sign Out
+            </button>
+          </div>
         </nav>
 
         {/* Main content */}

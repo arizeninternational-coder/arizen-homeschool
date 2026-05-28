@@ -443,3 +443,165 @@ model ParentChild {
   @@index([parentId])
   @@index([childUserId])
 }
+
+// ── Spark Coins & Shop Enums ─────────────────────────────────
+
+enum WalletTransactionType {
+  EARNED
+  SPENT
+  BONUS
+  ADJUSTMENT
+}
+
+enum WalletTransactionSource {
+  LESSON
+  QUEST
+  REFLECTION
+  THEME
+  STREAK
+  SHOP_PURCHASE
+  PARENT_REWARD
+  BONUS
+  ADJUSTMENT
+}
+
+enum AvatarItemCategory {
+  BASE_AVATAR
+  HAIR
+  CLOTHING
+  HATS
+  SHOES
+  GLASSES
+  ACCESSORIES
+  LEARNING_TOOLS
+  BACKGROUNDS
+  PETS
+}
+
+enum AvatarItemRarity {
+  COMMON
+  RARE
+  EPIC
+  LEGENDARY
+}
+
+enum AvatarUnlockType {
+  ALWAYS_AVAILABLE
+  COINS_ONLY
+  LESSON_COUNT
+  QUEST_COUNT
+  STREAK_DAYS
+  XP_THRESHOLD
+  BADGE_COUNT
+}
+
+// ── Spark Coins & Shop Models ───────────────────────────────
+
+model StudentWallet {
+  id              String   @id @default(uuid())
+  learnerId       String   @unique
+  balance         Int      @default(0)
+  lifetimeEarned  Int      @default(0)
+  lifetimeSpent   Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  learner         LearnerProfile @relation(fields: [learnerId], references: [id])
+  transactions    CoinTransaction[]
+  @@index([learnerId])
+}
+
+model CoinTransaction {
+  id              String   @id @default(uuid())
+  learnerId       String
+  amount          Int
+  type            WalletTransactionType
+  source          WalletTransactionSource
+  sourceId        String?
+  description     String?
+  balanceAfter    Int      @default(0)
+  createdAt       DateTime @default(now())
+
+  learner         StudentWallet @relation(fields: [learnerId], references: [id])
+  @@index([learnerId])
+  @@index([createdAt])
+}
+
+model StudentAvatar {
+  id                    String   @id @default(uuid())
+  learnerId             String   @unique
+  baseAvatar            String   @default("default")
+  skinTone              String   @default("medium")
+  hairStyle             String   @default("short")
+  hairColor             String   @default("brown")
+  faceExpression        String   @default("smile")
+  equippedHatId         String?
+  equippedTopId         String?
+  equippedBottomId      String?
+  equippedShoesId       String?
+  equippedGlassesId     String?
+  equippedAccessoryId   String?
+  equippedToolId        String?
+  equippedPetId         String?
+  equippedBackgroundId  String?
+  updatedAt             DateTime @updatedAt
+
+  learner               LearnerProfile @relation(fields: [learnerId], references: [id])
+  @@index([learnerId])
+}
+
+model AvatarItem {
+  id                    String   @id @default(uuid())
+  name                  String
+  description           String?
+  category              AvatarItemCategory
+  price                 Int      @default(0)
+  rarity                AvatarItemRarity @default(COMMON)
+  emoji                 String   @default("🎁")
+  iconUrl               String?
+  layerImageUrl         String?
+  previewImageUrl       String?
+  isActive              Boolean  @default(true)
+  unlockType            AvatarUnlockType @default(ALWAYS_AVAILABLE)
+  unlockRequirement     Int      @default(0)
+  unlockDescription     String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  inventory             StudentInventory[]
+}
+
+model StudentInventory {
+  id              String   @id @default(uuid())
+  learnerId       String
+  avatarItemId    String
+  equipped        Boolean  @default(false)
+  purchasedAt     DateTime @default(now())
+
+  avatarItem      AvatarItem @relation(fields: [avatarItemId], references: [id])
+  @@unique([learnerId, avatarItemId])
+  @@index([learnerId])
+}
+
+model RewardRule {
+  id              String   @id @default(uuid())
+  action          String   @unique
+  coins           Int      @default(0)
+  xp              Int      @default(0)
+  dailyLimit      Int      @default(0)
+  isActive        Boolean  @default(true)
+  description     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model CoinAwardTracking {
+  id              String   @id @default(uuid())
+  learnerId       String
+  sourceType      String
+  sourceId        String
+  awardedAt       DateTime @default(now())
+
+  @@unique([learnerId, sourceType, sourceId])
+  @@index([learnerId])
+}
