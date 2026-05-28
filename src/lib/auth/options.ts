@@ -27,6 +27,7 @@ export const authOptions: NextAuthOptions = {
           logs.push(`email=${email}`);
 
           // Use Supabase REST API to query user
+          console.log("[AUTH] Querying Supabase for:", email);
           const { data: users, error: dbError } = await supabase
             .from("User")
             .select("id, name, email, image, role, passwordHash, guildId")
@@ -35,6 +36,7 @@ export const authOptions: NextAuthOptions = {
 
           logs.push(`dbError=${dbError ? dbError.message : 'null'}`);
           logs.push(`usersCount=${users?.length || 0}`);
+          console.log("[AUTH]", logs.join(" | "));
           
           if (dbError) {
             logs.push(`ERROR: Supabase query failed: ${dbError.message}`);
