@@ -38,7 +38,7 @@ export default function AdminDashboard() {
         setUser(data.user);
         // Fetch stats — do NOT swallow errors
         try {
-          const statsRes = await fetch("/api/admin/stats");
+          const statsRes = await fetch("/api/admin/stats", { credentials: "include" });
           if (statsRes.ok) {
             const statsData = await statsRes.json();
             if (statsData.error) {
@@ -94,7 +94,7 @@ export default function AdminDashboard() {
   return (
     <div style={{ minHeight: "100vh", background: colors.bg, display: "flex" }}>
       {/* Sidebar */}
-      <aside style={{ width: 260, background: colors.surface, borderRight: `1px solid ${colors.border}`, padding: "1.5rem 0", display: "flex", flexDirection: "column", position: "fixed", top: 0, left: 0, bottom: 0, zIndex: 10 }}>
+      <aside style={{ width: 260, background: colors.surface, borderRight: `1px solid ${colors.border}`, padding: "1.5rem 0", display: "flex", flexDirection: "column", position: "fixed", top: 0, left: 0, bottom: 0, zIndex: 10 }} className="admin-sidebar">
         <div style={{ padding: "0 1.25rem", marginBottom: "2rem" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
             <div style={{ width: 36, height: 36, borderRadius: 10, background: gradients.primary, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -118,7 +118,7 @@ export default function AdminDashboard() {
           ))}
         </nav>
         <div style={{ padding: "0 1.25rem", borderTop: `1px solid ${colors.border}`, paddingTop: "1rem" }}>
-          <button onClick={() => { signOut(); window.location.replace("/"); }} style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.5rem", borderRadius: 8, border: "none", background: "none", color: colors.textMuted, cursor: "pointer", fontSize: "0.875rem", fontWeight: 600, width: "100%" }}>
+          <button onClick={() => { signOut({ callbackUrl: "/" }); }} style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.5rem", borderRadius: 8, border: "none", background: "none", color: colors.textMuted, cursor: "pointer", fontSize: "0.875rem", fontWeight: 600, width: "100%" }}>
             <LogOut style={{ width: 16, height: 16 }} /> Sign Out
           </button>
         </div>
@@ -185,6 +185,42 @@ export default function AdminDashboard() {
               <div style={{ fontSize: "0.75rem", color: colors.textMuted, marginTop: "0.25rem" }}>{action.desc}</div>
             </Link>
           ))}
+        </div>
+
+        {/* Seed Curriculum */}
+        <div style={{ ...ds.card, padding: "1.5rem", marginBottom: "2rem" }}>
+          <h2 style={{ fontSize: "1.125rem", fontWeight: 700, color: colors.text, marginBottom: "0.5rem" }}>Curriculum</h2>
+          <p style={{ color: colors.textMuted, fontSize: "0.875rem", marginBottom: "1rem" }}>
+            Seed draft curriculum structure for Grade 2 and Grade 5. This creates themes, quests, and lesson placeholders. Already-existing records will not be duplicated.
+          </p>
+          <button
+            onClick={async () => {
+              const btn = document.activeElement as HTMLButtonElement;
+              if (btn) { btn.disabled = true; btn.textContent = "Seeding..."; }
+              try {
+                const res = await fetch("/api/admin/seed-curriculum", {
+                  method: "POST",
+                  credentials: "include",
+                  headers: { "Content-Type": "application/json" },
+                });
+                const data = await res.json();
+                if (data.success) {
+                  alert("✅ " + data.message);
+                } else {
+                  alert("❌ Error: " + (data.error || "Failed to seed curriculum"));
+                  console.error("[SEED] Error:", data);
+                }
+              } catch (err: any) {
+                alert("❌ Network error: " + err.message);
+                console.error("[SEED] Network error:", err);
+              } finally {
+                if (btn) { btn.disabled = false; btn.textContent = "Seed Draft Curriculum"; }
+              }
+            }}
+            style={{ ...ds.btnPrimary, padding: "0.75rem 1.5rem", fontSize: "0.875rem", cursor: "pointer" }}
+          >
+            🌱 Seed Draft Curriculum
+          </button>
         </div>
 
         {/* Recent Activity */}

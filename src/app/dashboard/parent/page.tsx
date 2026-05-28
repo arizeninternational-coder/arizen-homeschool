@@ -45,7 +45,7 @@ export default function ParentDashboard() {
         setUser(data.user);
         // Load linked children
         try {
-          const childrenRes = await fetch("/api/parent/link-child");
+          const childrenRes = await fetch("/api/parent/link-child", { credentials: "include" });
           if (childrenRes.ok) {
             const childrenData = await childrenRes.json();
             setChildren(childrenData.children || []);
@@ -104,7 +104,7 @@ export default function ParentDashboard() {
             <ShieldCheck style={{ width: 14, height: 14, color: colors.primary }} />
             <span style={{ fontSize: "0.8125rem", fontWeight: 700, color: colors.text }}>{displayName}</span>
           </div>
-          <Link href="/api/auth/signout" style={{ ...ds.btnGhost, color: colors.textMuted, padding: "0.5rem", borderRadius: "0.75rem" }} title="Sign out">
+          <Link href="/" onClick={() => signOut({ callbackUrl: "/" })} style={{ ...ds.btnGhost, color: colors.textMuted, padding: "0.5rem", borderRadius: "0.75rem" }} title="Sign out">
             <LogOut style={{ width: 18, height: 18 }} />
           </Link>
         </div>

@@ -53,10 +53,35 @@ function LoggedOutNavbar() {
             </div>
             <span style={{ fontSize: '1.25rem', fontWeight: 900, letterSpacing: '-0.02em', ...ds.textGradient }}>Arizen School</span>
           </Link>
-          <form method="POST" action="/api/auth/signout" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <Link href="/auth/login" style={{ ...ds.btnGhost, fontWeight: 700 }}>Sign In</Link>
-            <Link href="/auth/register" style={{ ...ds.btnPrimary, fontSize: '0.875rem', padding: '0.65rem 1.6rem' }}>Get Started</Link>
-          </form>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <Link href="/auth/login" style={{ ...ds.btnGhost, fontWeight: 700, textDecoration: 'none' }}>Sign In</Link>
+            <Link href="/auth/register" style={{ ...ds.btnPrimary, fontSize: '0.875rem', padding: '0.65rem 1.6rem', textDecoration: 'none' }}>Get Started</Link>
+          </div>
+        </div>
+      </div>
+    </nav>
+  );
+}
+
+/* ─── Logged-in Navbar ─── */
+function LoggedInNavbar({ role }: { role: string }) {
+  const dashboardUrl = role === "ADMIN" ? "/dashboard/admin" : role === "PARENT" ? "/dashboard/parent" : "/dashboard/student";
+  return (
+    <nav style={ds.nav}>
+      <div style={{ maxWidth: '1160px', margin: '0 auto', padding: '0 1.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '72px' }}>
+          <Link href={dashboardUrl} style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', textDecoration: 'none' }}>
+            <div style={{ ...ds.logoMark, width: '40px', height: '40px', borderRadius: '0.875rem' }}>
+              <Flower2 style={{ width: '22px', height: '22px' }} />
+            </div>
+            <span style={{ fontSize: '1.25rem', fontWeight: 900, letterSpacing: '-0.02em', ...ds.textGradient }}>Arizen School</span>
+          </Link>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <Link href={dashboardUrl} style={{ ...ds.btnGhost, fontWeight: 700, textDecoration: 'none' }}>Dashboard</Link>
+            <form method="POST" action="/api/auth/signout" style={{ margin: 0 }}>
+              <button type="submit" style={{ ...ds.btnPrimary, fontSize: '0.875rem', padding: '0.65rem 1.6rem', border: 'none', cursor: 'pointer' }}>Sign Out</button>
+            </form>
+          </div>
         </div>
       </div>
     </nav>
@@ -437,7 +462,11 @@ export default async function HomePage() {
 
   return (
     <div style={{ minHeight: '100vh', background: colors.bg }}>
-      <LoggedOutNavbar />
+      {isLoggedIn ? (
+        <LoggedInNavbar role={user.role || "LEARNER"} />
+      ) : (
+        <LoggedOutNavbar />
+      )}
       <main>
         {isLoggedIn ? (
           <RedirectCard role={user.role || "LEARNER"} name={user.name || null} />

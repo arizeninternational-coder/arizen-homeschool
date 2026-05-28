@@ -180,7 +180,7 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
         </nav>
 
         {/* Main content */}
-        <main style={{ flex: 1, padding: "1.5rem", maxWidth: "100%", minWidth: 0 }}>
+        <main style={{ flex: 1, padding: "1.5rem", maxWidth: "100%", minWidth: 0, marginLeft: isDesktop ? 220 : 0 }}>
           {children}
         </main>
       </div>

@@ -32,7 +32,10 @@ export interface AuthUser {
 export async function getAuthUser(req: NextRequest): Promise<AuthUser | null> {
   try {
     const token = await getToken({ req, secret: NEXTAUTH_SECRET });
-    if (!token?.email) return null;
+    if (!token?.email) {
+      console.log("[AUTH_GUARD] getToken returned null or no email. Token sub:", token?.sub);
+      return null;
+    }
 
     const { data: user, error } = await supabase
       .from("User")
@@ -40,7 +43,10 @@ export async function getAuthUser(req: NextRequest): Promise<AuthUser | null> {
       .eq("email", token.email as string)
       .single();
 
-    if (error || !user) return null;
+    if (error || !user) {
+      console.log("[AUTH_GUARD] User lookup failed:", error?.message || "no user", "email:", token.email);
+      return null;
+    }
 
     // For learners, also fetch their LearnerProfile id
     if (user.role === "LEARNER") {

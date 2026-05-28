@@ -59,7 +59,7 @@ export default function ParentChildrenPage() {
 
   async function loadChildren() {
     try {
-      const res = await fetch("/api/parent/link-child");
+      const res = await fetch("/api/parent/link-child", { credentials: "include" });
       if (res.ok) {
         const data = await res.json();
         setChildren(data.children || []);
@@ -75,6 +75,7 @@ export default function ParentChildrenPage() {
     try {
       const res = await fetch("/api/parent/create-child", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: createName.trim(),
@@ -103,6 +104,7 @@ export default function ParentChildrenPage() {
     try {
       const res = await fetch("/api/parent/link-child", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ childEmail: linkEmail.trim() }),
       });
@@ -127,7 +129,7 @@ export default function ParentChildrenPage() {
           <Link href="/dashboard/parent" style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", color: colors.textMuted, textDecoration: "none", fontSize: "0.875rem", fontWeight: 600 }}>
             <ArrowLeft style={{ width: 16, height: 16 }} /> Back to Dashboard
           </Link>
-          <button onClick={() => signOut()} style={{ display: "flex", alignItems: "center", gap: "0.375rem", padding: "0.375rem 0.75rem", borderRadius: 8, border: `1px solid ${colors.border}`, background: "none", color: colors.textMuted, cursor: "pointer", fontSize: "0.8125rem", fontWeight: 600 }}>
+          <button onClick={() => signOut({ callbackUrl: "/" })} style={{ display: "flex", alignItems: "center", gap: "0.375rem", padding: "0.375rem 0.75rem", borderRadius: 8, border: `1px solid ${colors.border}`, background: "none", color: colors.textMuted, cursor: "pointer", fontSize: "0.8125rem", fontWeight: 600 }}>
             Sign Out
           </button>
         </div>
