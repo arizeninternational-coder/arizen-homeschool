@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth/options";
 import {
   Heart, BookOpen, Sparkles, Shield, ChevronRight, GraduationCap, Users,
   Flower2, Sun, Star, TreePine, Palette, Globe, Lightbulb, Puzzle,
-  ArrowRight, CheckCircle2
+  ArrowRight, CheckCircle2, Smile, Brain, Eye
 } from "lucide-react";
 import { ds, colors, gradients, shadows } from "@/lib/design-system";
 
@@ -355,6 +355,159 @@ function FeaturesSection() {
   );
 }
 
+/* ─── Emotional Intelligence Section (NEW) ─── */
+function EQSection() {
+  const eqFeatures = [
+    {
+      icon: Smile,
+      emoji: "😊😌🤔😐",
+      title: "Daily emotional check-ins",
+      desc: "Children start each day by naming how they feel. All emotions are welcome — from happy to worried, curious to tired.",
+      gradient: "linear-gradient(160deg, #FEF9C3, #FDE04730)",
+      borderColor: "#FDE047",
+      iconBg: "linear-gradient(135deg, #FEF9C3, #FDE047)",
+      iconColor: "#854D0E",
+    },
+    {
+      icon: Brain,
+      emoji: "💭✨",
+      title: "Reflection prompts",
+      desc: "Gentle questions help learners notice their thoughts and build inner awareness — building emotional resilience one day at a time.",
+      gradient: "linear-gradient(160deg, #E0E7FF, #A5B4FC30)",
+      borderColor: "#A5B4FC",
+      iconBg: "linear-gradient(135deg, #E0E7FF, #A5B4FC)",
+      iconColor: "#4338CA",
+    },
+    {
+      icon: Eye,
+      emoji: "👨‍👩‍👧‍👦💛",
+      title: "Parent learning insights",
+      desc: "Parents see emotional patterns, not private details. Stay connected to your child's journey with calm, clear insights.",
+      gradient: "linear-gradient(160deg, #FFE4E6, #FDA4AF30)",
+      borderColor: "#FDA4AF",
+      iconBg: "linear-gradient(135deg, #FFE4E6, #FDA4AF)",
+      iconColor: "#BE123C",
+    },
+  ];
+
+  // Mini emotion pill display
+  const emotionPills = [
+    { emoji: "😊", label: "Happy", bg: "#FEF9C3", border: "#FDE047" },
+    { emoji: "😌", label: "Calm", bg: "#D1FAE5", border: "#6EE7B7" },
+    { emoji: "🤔", label: "Curious", bg: "#E0E7FF", border: "#A5B4FC" },
+    { emoji: "😐", label: "Okay", bg: "#E0F2FE", border: "#7DD3FC" },
+    { emoji: "😟", label: "Worried", bg: "#EDE9FE", border: "#C4B5FD" },
+    { emoji: "😴", label: "Tired", bg: "#DDD6FE", border: "#A78BFA" },
+    { emoji: "😤", label: "Frustrated", bg: "#FFE4E6", border: "#FDA4AF" },
+  ];
+
+  return (
+    <section style={{
+      padding: '5rem 1.5rem',
+      background: `linear-gradient(180deg, ${colors.bgSoft} 0%, white 100%)`,
+      position: 'relative',
+    }}>
+      <div style={{ maxWidth: '68rem', margin: '0 auto' }}>
+        {/* Header */}
+        <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
+            borderRadius: '9999px', padding: '0.45rem 1.25rem', marginBottom: '1.5rem',
+            background: 'linear-gradient(135deg, #FEF9C3, #D1FAE5, #E0E7FF)',
+            border: '1.5px solid #FDE04760',
+            boxShadow: '0 2px 12px rgba(253,224,71,0.15)',
+          }}>
+            <Heart style={{ width: '14px', height: '14px', color: "#059669" }} />
+            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: "#059669", letterSpacing: '0.06em' }}>
+              Emotional Intelligence
+            </span>
+          </div>
+          <h2 style={{
+            fontSize: 'clamp(1.5rem, 3.5vw, 2.25rem)', fontWeight: 900,
+            letterSpacing: '-0.03em', color: colors.textHeading,
+            marginBottom: '1rem', lineHeight: 1.15,
+          }}>
+            Learning starts with how{' '}
+            <span style={{
+              background: 'linear-gradient(135deg, #059669, #0d9488)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}>a child feels</span>
+          </h2>
+          <p style={{
+            fontSize: '1.0625rem', color: colors.textMuted, maxWidth: '38rem',
+            margin: '0 auto 2rem', fontWeight: 500, lineHeight: 1.7,
+          }}>
+            Arizen helps children build self-awareness through simple daily check-ins, reflections, and calm learning routines.
+          </p>
+
+          {/* Emotion pill display */}
+          <div style={{
+            display: 'flex', flexWrap: 'wrap', justifyContent: 'center',
+            gap: '0.5rem', maxWidth: 540, margin: '0 auto',
+          }}>
+            {emotionPills.map((e) => (
+              <span
+                key={e.label}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '0.3rem',
+                  padding: '0.4rem 0.875rem', borderRadius: 999,
+                  background: e.bg, border: `1.5px solid ${e.border}`,
+                  fontSize: '0.8125rem', fontWeight: 700, color: '#44403c',
+                  fontFamily: "'Nunito', system-ui, sans-serif",
+                }}
+              >
+                {e.emoji} {e.label}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Feature Cards */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
+          {eqFeatures.map((f, i) => {
+            const Icon = f.icon;
+            return (
+              <div key={f.title} className="fade-in-up feature-card-hover" style={{
+                background: f.gradient,
+                borderRadius: '1.75rem',
+                border: `1.5px solid ${f.borderColor}60`,
+                padding: '2.25rem',
+                boxShadow: shadows.sm,
+                animationDelay: `${i * 0.1}s`,
+                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+              }}>
+                <div style={{
+                  width: '56px', height: '56px', borderRadius: '1.375rem',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  marginBottom: '1.25rem', background: f.iconBg,
+                  boxShadow: `0 4px 16px ${f.borderColor}40`,
+                }}>
+                  <Icon style={{ width: '26px', height: '26px', color: f.iconColor }} />
+                </div>
+                <h3 style={{
+                  fontSize: '1.125rem', fontWeight: 800,
+                  color: colors.textHeading, marginBottom: '0.625rem',
+                  letterSpacing: '-0.01em',
+                }}>
+                  {f.title}
+                </h3>
+                <p style={{
+                  fontSize: '0.9375rem', color: colors.textMuted,
+                  lineHeight: 1.65, fontWeight: 500,
+                }}>
+                  {f.desc}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ─── Bottom CTA ─── */
 function BottomCTA() {
   return (
@@ -476,6 +629,7 @@ export default async function HomePage() {
             <StatsBar />
             <CTACards />
             <FeaturesSection />
+            <EQSection />
             <BottomCTA />
           </>
         )}

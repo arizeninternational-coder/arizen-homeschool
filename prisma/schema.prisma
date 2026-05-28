@@ -605,3 +605,27 @@ model CoinAwardTracking {
   @@unique([learnerId, sourceType, sourceId])
   @@index([learnerId])
 }
+
+enum EmotionType {
+  HAPPY
+  CALM
+  CURIOUS
+  OKAY
+  WORRIED
+  TIRED
+  FRUSTRATED
+}
+
+model EmotionalCheckin {
+  id              String       @id @default(uuid())
+  learnerId       String
+  emotion         EmotionType
+  emotionLabel    String
+  note            String?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  learner         LearnerProfile @relation(fields: [learnerId], references: [id])
+  @@index([learnerId])
+  @@index([createdAt])
+}

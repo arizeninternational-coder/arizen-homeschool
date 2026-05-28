@@ -193,3 +193,17 @@ ON CONFLICT DO NOTHING;
 --    StudentWallet, CoinTransaction, StudentAvatar, AvatarItem,
 --    StudentInventory, RewardRule, CoinAwardTracking
 --    + 7 reward rules + 20 shop items seeded
+
+-- ── Emotional Checkins (added Day 2) ─────────────────────────
+CREATE TABLE IF NOT EXISTS "EmotionalCheckin" (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  "learnerId"     UUID NOT NULL REFERENCES "LearnerProfile"(id) ON DELETE CASCADE,
+  emotion         VARCHAR(20) NOT NULL,
+  "emotionLabel"  VARCHAR(30) NOT NULL,
+  note            TEXT,
+  "createdAt"     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  "updatedAt"     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_emotional_checkin_learner ON "EmotionalCheckin"("learnerId");
+CREATE INDEX IF NOT EXISTS idx_emotional_checkin_created ON "EmotionalCheckin"("createdAt");
