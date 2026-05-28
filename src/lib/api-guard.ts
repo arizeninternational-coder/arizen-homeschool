@@ -1,16 +1,12 @@
 /**
- * API Route Auth Guard — v5
+ * API Route Auth Guard — v6
  *
- * Primary: Use next-auth/jwt getToken()
- * Fallback: Manual JWT decode from cookie
- * Compatible with Next.js App Router + Vercel serverless
+ * Reads the NextAuth session by directly parsing the cookie header.
+ * Works reliably on Vercel serverless where getToken() can fail.
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
 import { supabase } from "@/lib/supabase";
-
-const NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-production";
 
 export interface AuthUser {
   id: string;
@@ -23,33 +19,10 @@ export interface AuthUser {
 }
 
 /**
- * Manually decode the JWT from the session cookie.
- * Uses the same cookie names and secret as NextAuth config.
+ * Decode a JWT payload without verification.
  */
-function decodeSessionFromCookie(req: NextRequest): Record<string, any> | null {
-  // NextAuth uses these cookie names (from auth/options.ts)
-  const cookieNames = [
-    "__Secure-next-auth.session-token",  // production
-    "next-auth.session-token",            // development
-  ];
-
-  let token: string | null = null;
-  for (const name of cookieNames) {
-    const val = req.cookies.get(name)?.value;
-    if (val) { token = val; break; }
-  }
-
-  if (!token) {
-    // Last resort: check any cookie with "session-token" in the name
-    for (const c of req.cookies.getAll()) {
-      if (c.name.includes("session-token")) { token = c.value; break; }
-    }
-  }
-
-  if (!token) return null;
-
+function decodeJwtPayload(token: string): Record<string, any> | null {
   try {
-    // JWT decode (without verification — we just need the payload)
     const parts = token.split(".");
     if (parts.length !== 3) return null;
     const payload = parts[1];
@@ -59,6 +32,42 @@ function decodeSessionFromCookie(req: NextRequest): Record<string, any> | null {
   } catch {
     return null;
   }
+}
+
+/**
+ * Extract session from cookie header directly.
+ * Works on Vercel serverless where req.cookies may not work.
+ */
+function getSessionFromCookie(req: NextRequest): Record<string, any> | null {
+  // Try req.cookies first (works in most environments)
+  const cookieNames = [
+    "__Secure-next-auth.session-token",
+    "next-auth.session-token",
+  ];
+
+  for (const name of cookieNames) {
+    const val = req.cookies.get(name)?.value;
+    if (val) {
+      const payload = decodeJwtPayload(val);
+      if (payload) return payload;
+    }
+  }
+
+  // Fallback: parse from Cookie header directly (Vercel serverless)
+  const cookieHeader = req.headers.get("cookie") || "";
+  for (const part of cookieHeader.split(";")) {
+    const [rawName, ...rawVal] = part.split("=");
+    const name = rawName.trim();
+    if (name.includes("session-token")) {
+      const val = rawVal.join("=").trim();
+      if (val) {
+        const payload = decodeJwtPayload(val);
+        if (payload) return payload;
+      }
+    }
+  }
+
+  return null;
 }
 
 /**
@@ -102,47 +111,85 @@ async function lookupUserById(userId: string): Promise<AuthUser | null> {
 }
 
 /**
+ * Look up user in Supabase by email.
+ */
+async function lookupUserByEmail(email: string): Promise<AuthUser | null> {
+  try {
+    const { data: user, error } = await supabase
+      .from("User")
+      .select("id, email, name, role, guildId")
+      .eq("email", email)
+      .single();
+
+    if (error || !user) return null;
+
+    let guildSlug: string | null = null;
+    if (user.guildId) {
+      const { data: guild } = await supabase.from("Guild").select("slug").eq("id", user.guildId).single();
+      guildSlug = guild?.slug || null;
+    }
+
+    let learnerProfileId: string | undefined;
+    const userRole = (user.role || "").toUpperCase();
+    if (userRole === "LEARNER" || userRole === "TEACHER") {
+      const { data: profile } = await supabase.from("LearnerProfile").select("id").eq("userId", user.id).single();
+      if (profile) learnerProfileId = profile.id;
+    }
+
+    return {
+      id: user.id,
+      email: user.email || email,
+      name: user.name || "",
+      role: user.role || "LEARNER",
+      guildSlug,
+      guildId: user.guildId || null,
+      learnerProfileId,
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Get authenticated user from request.
- * Tries getToken first, then falls back to manual cookie decode.
  */
 export async function getAuthUser(req: NextRequest): Promise<AuthUser | null> {
   try {
-    // Strategy 1: next-auth/jwt getToken()
-    const nToken = await getToken({ req, secret: NEXTAUTH_SECRET });
-    if (nToken?.sub) {
-      const user = await lookupUserById(nToken.sub as string);
-      if (user) return user;
-      // Token valid but DB lookup failed — use token data
-      return {
-        id: nToken.sub as string,
-        email: (nToken.email as string) || "",
-        name: (nToken.name as string) || "",
-        role: ((nToken as any).role as string) || "LEARNER",
-        guildSlug: (nToken as any).guildSlug || null,
-        guildId: (nToken as any).guildId || null,
-      };
+    const jwt = getSessionFromCookie(req);
+    if (!jwt) {
+      console.log("[AUTH_GUARD] No session found in cookies");
+      return null;
     }
 
-    // Strategy 2: Manual cookie decode
-    const jwt = decodeSessionFromCookie(req);
-    if (jwt?.email) {
-      // Try looking up by email first
-      const { data: userByEmail } = await supabase
-        .from("User")
-        .select("id")
-        .eq("email", jwt.email as string)
-        .single();
-      if (userByEmail) {
-        const user = await lookupUserById(userByEmail.id);
-        if (user) return user;
+    console.log("[AUTH_GUARD] JWT payload:", { sub: jwt.sub, email: jwt.email, name: jwt.name });
+
+    // Strategy 1: Look up by user ID (sub)
+    if (jwt.sub) {
+      const user = await lookupUserById(jwt.sub as string);
+      if (user) {
+        console.log("[AUTH_GUARD] Found user by ID:", user.email, "role:", user.role);
+        return user;
       }
     }
-    if (jwt?.sub) {
-      const user = await lookupUserById(jwt.sub as string);
-      if (user) return user;
+
+    // Strategy 2: Look up by email
+    if (jwt.email) {
+      const user = await lookupUserByEmail(jwt.email as string);
+      if (user) {
+        console.log("[AUTH_GUARD] Found user by email:", user.email, "role:", user.role);
+        return user;
+      }
     }
 
-    return null;
+    // Strategy 3: Construct from JWT claims (last resort)
+    return {
+      id: (jwt.sub as string) || "",
+      email: (jwt.email as string) || "",
+      name: (jwt.name as string) || "",
+      role: ((jwt as any).role as string) || "LEARNER",
+      guildSlug: null,
+      guildId: null,
+    };
   } catch (err: any) {
     console.error("[AUTH_GUARD] Error:", err?.message);
     return null;
@@ -159,7 +206,7 @@ export async function requireAdmin(req: NextRequest): Promise<{ user: AuthUser }
     return NextResponse.json({ error: "Unauthorized — please log in" }, { status: 401 });
   }
   if (!hasRole(user.role, ["ADMIN"])) {
-    return NextResponse.json({ error: "Forbidden — admin access required", details: `Role: ${user.role}` }, { status: 403 });
+    return NextResponse.json({ error: "Forbidden", details: "Role: " + user.role }, { status: 403 });
   }
   return { user };
 }
@@ -172,7 +219,7 @@ export function withAuth(
     const user = await getAuthUser(req);
     if (!user) return NextResponse.json({ error: "Unauthorized — please log in" }, { status: 401 });
     if (options?.roles && !hasRole(user.role, options.roles)) {
-      return NextResponse.json({ error: "Forbidden", details: `Role ${user.role}` }, { status: 403 });
+      return NextResponse.json({ error: "Forbidden", details: "Role: " + user.role }, { status: 403 });
     }
     return handler(req, user, new URL(req.url));
   };
@@ -186,10 +233,10 @@ export function withAuthPost(
     const user = await getAuthUser(req);
     if (!user) return NextResponse.json({ error: "Unauthorized — please log in" }, { status: 401 });
     if (options?.roles && !hasRole(user.role, options.roles)) {
-      return NextResponse.json({ error: "Forbidden", details: `Role ${user.role}` }, { status: 403 });
+      return NextResponse.json({ error: "Forbidden", details: "Role: " + user.role }, { status: 403 });
     }
     let body: unknown = {};
-    try { body = await req.json(); } catch { /* empty ok */ }
+    try { body = await req.json(); } catch { /* ok */ }
     return handler(req, user, body);
   };
 }
