@@ -91,8 +91,8 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // Allow health check and diagnostic endpoints
-  if (pathname.startsWith("/api/health") || pathname.startsWith("/api/diagnostic")) {
+  // Allow health check, diagnostic, and dev endpoints
+  if (pathname.startsWith("/api/health") || pathname.startsWith("/api/diagnostic") || pathname.startsWith("/api/dev")) {
     return NextResponse.next();
   }
 
