@@ -217,6 +217,45 @@ a {
   }
 }
 
+/* ── Student dashboard responsive ── */
+@media (min-width: 768px) {
+  .student-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .student-grid > *:first-child {
+    grid-column: 1 / -1 !important;
+  }
+  .student-grid > *:last-child {
+    grid-column: 1 / -1 !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .student-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+  .student-grid > *:first-child {
+    grid-column: 1 / -1 !important;
+  }
+  .student-grid > *:last-child {
+    grid-column: 1 / -1 !important;
+  }
+}
+
+/* ── Value strip responsive ── */
+@media (min-width: 768px) {
+  .value-strip {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+}
+
+/* ── Join section responsive ── */
+@media (min-width: 768px) {
+  .join-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
 /* ── Hero desktop layout ── */
 @media (min-width: 768px) {
   .hero-grid {

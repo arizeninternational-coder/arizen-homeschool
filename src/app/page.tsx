@@ -1,644 +1,37 @@
 import Link from "next/link";
-import {
-  Heart, BookOpen, Sparkles, Shield, ChevronRight, GraduationCap, Users,
-  Flower2, Sun, Star, TreePine, Palette, Globe, Lightbulb, Puzzle,
-  ArrowRight, CheckCircle2, Smile, Brain, Eye, Zap
-} from "lucide-react";
-import { ds, colors, gradients, shadows } from "@/lib/design-system";
+import React from "react";
 
-/* ─── Floating Decorations ─── */
-function FloatingDecorations() {
-  return (
-    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }} aria-hidden="true">
-      <div style={{ ...ds.orb(colors.primarySoft, '32rem'), top: '-12rem', left: '-10rem' }} className="float-slow" />
-      <div style={{ ...ds.orb(colors.bgPink, '26rem'), top: '15%', right: '-12rem' }} className="float-medium" />
-      <div style={{ ...ds.orb(colors.warmSoft, '22rem'), bottom: '5%', left: '10%' }} className="float-fast" />
-      <div style={{ ...ds.orb(colors.bgBlue, '20rem'), bottom: '-6rem', right: '15%' }} className="float-x" />
-      <div style={{ ...ds.orb(colors.bgGreen, '18rem'), top: '40%', left: '50%' }} className="float-slow" />
-      {[
-        { Icon: Star, x: '7%', y: '15%', size: 28, color: colors.warm, opacity: 0.12, anim: 'float-slow' },
-        { Icon: Puzzle, x: '88%', y: '30%', size: 24, color: colors.accent, opacity: 0.1, anim: 'float-medium' },
-        { Icon: Lightbulb, x: '10%', y: '70%', size: 22, color: colors.warm, opacity: 0.08, anim: 'float-fast' },
-        { Icon: Heart, x: '90%', y: '55%', size: 26, color: colors.accent, opacity: 0.1, anim: 'float-x' },
-        { Icon: TreePine, x: '85%', y: '80%', size: 24, color: colors.primary, opacity: 0.08, anim: 'float-slow' },
-        { Icon: Palette, x: '15%', y: '45%', size: 20, color: colors.accent, opacity: 0.07, anim: 'float-medium' },
-        { Icon: Sparkles, x: '50%', y: '10%', size: 18, color: colors.primary, opacity: 0.1, anim: 'float-x' },
-        { Icon: Globe, x: '75%', y: '15%', size: 22, color: colors.primary, opacity: 0.06, anim: 'float-fast' },
-      ].map(({ Icon, x, y, size, color, opacity, anim }, i) => (
-        <div key={i} style={{ position: 'absolute', top: y, left: x, opacity }} className={anim}>
-          <Icon style={{ width: `${size}px`, height: `${size}px`, color }} />
-        </div>
-      ))}
-      <div style={{
-        position: 'absolute', inset: 0,
-        backgroundImage: `radial-gradient(circle, ${colors.primaryLight}12 1px, transparent 1px)`,
-        backgroundSize: '32px 32px',
-        opacity: 0.4,
-      }} />
-    </div>
-  );
-}
+/* ═══════════════════════════════════════════════════════
+   ARIZEN SCHOOL — Homepage v2
+   Built to spec: warm, premium, child-friendly, emotionally intelligent
+   ═══════════════════════════════════════════════════════ */
 
-/* ─── Logged-out Navbar ─── */
-function LoggedOutNavbar() {
-  return (
-    <nav style={ds.nav}>
-      <div style={{ maxWidth: '1160px', margin: '0 auto', padding: '0 1rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '56px', gap: '0.5rem' }}>
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none', minWidth: 0, flexShrink: 0 }}>
-            <div style={{ ...ds.logoMark, width: '32px', height: '32px', borderRadius: '0.625rem' }}>
-              <Flower2 style={{ width: '18px', height: '18px' }} />
-            </div>
-            <span style={{ fontSize: '1.125rem', fontWeight: 900, letterSpacing: '-0.02em', ...ds.textGradient, whiteSpace: 'nowrap' }}>Arizen School</span>
-          </Link>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
-            <Link href="/auth/login" style={{
-              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-              padding: '0.4rem 0.875rem', borderRadius: '0.625rem',
-              fontSize: '0.8125rem', fontWeight: 700, textDecoration: 'none',
-              color: colors.textMuted, background: 'transparent', border: 'none', whiteSpace: 'nowrap',
-            }}>Sign In</Link>
-            <Link href="/auth/register" style={{
-              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-              padding: '0.4rem 0.875rem', borderRadius: '0.625rem',
-              fontSize: '0.8125rem', fontWeight: 700, textDecoration: 'none',
-              color: 'white', background: gradients.primary, border: 'none',
-              boxShadow: shadows.primary, whiteSpace: 'nowrap',
-            }}>Get Started</Link>
-          </div>
-        </div>
-      </div>
-    </nav>
-  );
-}
+const C = {
+  page: "#F7FBF7",
+  teal: "#047A70",
+  tealLight: "#E6F5F1",
+  dark: "#111827",
+  body: "#475569",
+  white: "#FFFFFF",
+  border: "#E2E8F0",
+  purple: "#F1ECFF",
+  yellow: "#FFF4D8",
+  green: "#EAF8EE",
+  coral: "#FFE4E6",
+};
 
-/* ─── Logged-in Navbar ─── */
-function LoggedInNavbar({ role }: { role: string }) {
-  const dashboardUrl = role === "ADMIN" ? "/dashboard/admin" : role === "PARENT" ? "/dashboard/parent" : "/dashboard/student";
-  return (
-    <nav style={ds.nav}>
-      <div style={{ maxWidth: '1160px', margin: '0 auto', padding: '0 1.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '72px' }}>
-          <Link href={dashboardUrl} style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', textDecoration: 'none' }}>
-            <div style={{ ...ds.logoMark, width: '40px', height: '40px', borderRadius: '0.875rem' }}>
-              <Flower2 style={{ width: '22px', height: '22px' }} />
-            </div>
-            <span style={{ fontSize: '1.25rem', fontWeight: 900, letterSpacing: '-0.02em', ...ds.textGradient }}>Arizen School</span>
-          </Link>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <Link href={dashboardUrl} style={{ ...ds.btnGhost, fontWeight: 700, textDecoration: 'none' }}>Dashboard</Link>
-            <form method="POST" action="/api/auth/signout" style={{ margin: 0 }}>
-              <button type="submit" style={{ ...ds.btnPrimary, fontSize: '0.875rem', padding: '0.65rem 1.6rem', border: 'none', cursor: 'pointer' }}>Sign Out</button>
-            </form>
-          </div>
-        </div>
-      </div>
-    </nav>
-  );
-}
-
-/* ─── Hero Section ─── */
-function HeroSection() {
-  return (
-    <section style={{
-      position: 'relative',
-      paddingTop: '8rem',
-      paddingBottom: '4rem',
-      paddingLeft: '1.5rem',
-      paddingRight: '1.5rem',
-    }}>
-      <FloatingDecorations />
-      <div style={{ position: 'relative', maxWidth: '68rem', margin: '0 auto' }}>
-        {/* Mobile: stack, Desktop: side-by-side */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '2.5rem', alignItems: 'center' }} className="hero-grid">
-          <div>
-            <h1 className="fade-in-up" style={{
-              fontSize: 'clamp(2rem, 5vw, 3.25rem)',
-              fontWeight: 900, letterSpacing: '-0.035em', lineHeight: 1.1,
-              color: colors.textHeading, marginBottom: '1.25rem', animationDelay: '0.1s',
-            }}>
-              Welcome to emotionally<br />intelligent learning
-            </h1>
-            <p className="fade-in-up" style={{
-              fontSize: 'clamp(0.9375rem, 2vw, 1.0625rem)', lineHeight: 1.7,
-              color: colors.textMuted, marginBottom: '2rem',
-              fontWeight: 500, animationDelay: '0.2s',
-            }}>
-              A personalized learning experience that helps your child build confidence, curiosity, and self-awareness while mastering core subjects.
-            </p>
-            <div className="fade-in-up" style={{
-              display: 'flex', flexWrap: 'wrap', gap: '0.75rem', animationDelay: '0.3s',
-            }}>
-              <Link href="/auth/register" style={{
-                ...ds.btnPrimary, fontSize: '1rem', padding: '0.875rem 1.75rem',
-                gap: '0.5rem', textDecoration: 'none',
-              }}>
-                Get Started <ArrowRight style={{ width: 16, height: 16 }} />
-              </Link>
-              <Link href="/auth/login" style={{
-                ...ds.btnOutline, fontSize: '1rem', padding: '0.875rem 1.75rem', textDecoration: 'none',
-              }}>
-                Sign In
-              </Link>
-            </div>
-            <div style={{
-              display: 'flex', flexWrap: 'wrap', gap: '1.5rem', marginTop: '2rem',
-            }}>
-              {[
-                { icon: Heart, label: "Emotionally Safe", color: colors.accent },
-                { icon: Shield, label: "Privacy First", color: colors.primary },
-                { icon: Zap, label: "Gamified", color: colors.warm },
-              ].map(({ icon: Icon, label, color }) => (
-                <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <div style={{
-                    width: 28, height: 28, borderRadius: 8,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: `${color}12`,
-                  }}>
-                    <Icon style={{ width: 14, height: 14, color }} />
-                  </div>
-                  <span style={{ fontSize: '0.75rem', fontWeight: 700, color: colors.textMuted }}>{label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Right-side product preview card */}
-          <div className="fade-in-up" style={{
-            background: 'linear-gradient(135deg, white, #F0FDF4)',
-            borderRadius: 24, border: `1.5px solid ${colors.borderLight}`,
-            padding: '1.5rem', boxShadow: shadows.lg, animationDelay: '0.25s',
-            display: 'none',
-          }} className="hero-preview">
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-              {[
-                { emoji: '📚', label: 'Lessons', color: '#0D9488' },
-                { emoji: '⚔️', label: 'Quests', color: '#7C3AED' },
-                { emoji: '💚', label: 'EQ Check-in', color: '#059669' },
-                { emoji: '🏆', label: 'Badges', color: '#D97706' },
-                { emoji: '🪙', label: 'Spark Coins', color: '#EAB308' },
-                { emoji: '🎨', label: 'Avatars', color: '#EC4899' },
-              ].map((item) => (
-                <div key={item.label} style={{
-                  padding: '0.75rem', borderRadius: 14, background: 'white',
-                  border: `1px solid ${colors.borderLight}`, textAlign: 'center',
-                  boxShadow: shadows.xs,
-                }}>
-                  <div style={{ fontSize: '1.5rem', marginBottom: '0.25rem' }}>{item.emoji}</div>
-                  <div style={{ fontSize: '0.6875rem', fontWeight: 700, color: item.color }}>{item.label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ─── Stats Bar ─── */
-function StatsBar() {
-  return (
-    <section style={{ padding: '0 1.5rem 4rem', position: 'relative' }}>
-      <div style={{
-        maxWidth: '56rem', margin: '0 auto',
-        display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1px',
-        background: colors.borderLight, borderRadius: '1.5rem', overflow: 'hidden', boxShadow: shadows.md,
-      }}>
-        {[
-          { value: 'Fun', label: 'Learning style' },
-          { value: 'Safe', label: 'Environment' },
-          { value: 'CBC', label: 'Curriculum' },
-          { value: 'Free', label: 'To get started' },
-        ].map((stat) => (
-          <div key={stat.label} style={{ background: 'white', padding: '2rem 1.25rem', textAlign: 'center' }}>
-            <div style={{ fontSize: '1.375rem', fontWeight: 900, color: colors.primary, marginBottom: '0.25rem', letterSpacing: '-0.02em' }}>
-              {stat.value}
-            </div>
-            <div style={{ fontSize: '0.75rem', fontWeight: 600, color: colors.textMuted, letterSpacing: '0.02em' }}>
-              {stat.label}
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-/* ─── CTA Cards ─── */
-function CTACards() {
-  const cards = [
-    {
-      href: "/auth/register?role=parent",
-      icon: Users,
-      title: "I'm a Parent",
-      desc: "Track progress, celebrate milestones, and support your child's unique learning journey.",
-      gradient: `linear-gradient(160deg, ${colors.primarySoft}, white 60%)`,
-      iconBg: `linear-gradient(135deg, ${colors.primary}, ${colors.primaryDark})`,
-      iconColor: 'white', border: colors.primaryLight,
-      cta: "Set Up Parent Account", ctaColor: colors.primary,
-    },
-    {
-      href: "/auth/register?role=learner",
-      icon: GraduationCap,
-      title: "I'm a Child",
-      desc: "Explore lessons, earn XP, go on quests, and discover the joy of learning!",
-      gradient: `linear-gradient(160deg, ${colors.accentSoft}, white 60%)`,
-      iconBg: `linear-gradient(135deg, ${colors.accent}, ${colors.accentDark})`,
-      iconColor: 'white', border: colors.accentLight,
-      cta: "Start Learning", ctaColor: colors.accent,
-    },
-    {
-      href: "/auth/login",
-      icon: BookOpen,
-      title: "Sign In",
-      desc: "Welcome back! Pick up where you left off — your adventure awaits.",
-      gradient: `linear-gradient(160deg, ${colors.warmSoft}, white 60%)`,
-      iconBg: `linear-gradient(135deg, ${colors.warm}, ${colors.warmDark})`,
-      iconColor: 'white', border: colors.warmLight,
-      cta: "Continue Learning", ctaColor: colors.warm,
-    },
-  ];
-  return (
-    <section style={{ padding: '2rem 1.5rem 5rem' }}>
-      <div style={{ maxWidth: '64rem', margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-          <h2 style={{
-            fontSize: 'clamp(1.5rem, 3.5vw, 2rem)', fontWeight: 900,
-            letterSpacing: '-0.03em', color: colors.textHeading,
-            marginBottom: '0.75rem', lineHeight: 1.15,
-          }}>
-            How would you like to <span style={ds.textGradient}>join us</span>?
-          </h2>
-          <p style={{ fontSize: '1rem', color: colors.textMuted, maxWidth: '30rem', margin: '0 auto', fontWeight: 500, lineHeight: 1.7 }}>
-            Choose your path and we'll set up the perfect experience.
-          </p>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.75rem' }}>
-          {cards.map((c, i) => {
-            const Icon = c.icon;
-            return (
-              <Link key={c.title} href={c.href} className="scale-in cta-card-hover" style={{
-                textDecoration: 'none', display: 'block',
-                borderRadius: '1.75rem', overflow: 'hidden',
-                background: c.gradient, border: `1.5px solid ${c.border}`,
-                boxShadow: shadows.md,
-                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                animationDelay: `${i * 0.1}s`,
-              }}>
-                <div style={{ padding: '2.25rem' }}>
-                  <div style={{
-                    width: '64px', height: '64px', borderRadius: '1.5rem',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    marginBottom: '1.5rem', background: c.iconBg,
-                    boxShadow: `0 4px 20px ${colors.primaryLight}40`,
-                  }}>
-                    <Icon style={{ width: '30px', height: '30px', color: c.iconColor }} />
-                  </div>
-                  <h3 style={{ fontSize: '1.375rem', fontWeight: 800, color: colors.textHeading, marginBottom: '0.625rem', letterSpacing: '-0.02em' }}>
-                    {c.title}
-                  </h3>
-                  <p style={{ fontSize: '0.9375rem', color: colors.textMuted, lineHeight: 1.65, marginBottom: '1.75rem', fontWeight: 500 }}>
-                    {c.desc}
-                  </p>
-                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, fontSize: '0.875rem', color: c.ctaColor }}>
-                    {c.cta} <ChevronRight style={{ width: '16px', height: '16px' }} />
-                  </div>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ─── Features ─── */
-function FeaturesSection() {
-  const features = [
-    { icon: Heart, title: "Emotionally Intelligent", desc: "Lessons adapt to your child's emotional state and unique learning pace — no stress, just growth.", gradient: "linear-gradient(135deg, #ffedd5, #fed7aa)", color: "#ea580c" },
-    { icon: TreePine, title: "CBC Aligned", desc: "Curriculum aligned with Kenya's Competency-Based Curriculum for Grades 1–8.", gradient: "linear-gradient(135deg, #d1fae5, #a7f3d0)", color: "#059669" },
-    { icon: Star, title: "Gamified Learning", desc: "XP, streaks, badges, and quests — your child stays motivated and excited to learn.", gradient: "linear-gradient(135deg, #ccfbf1, #99f6e4)", color: "#0d9488" },
-    { icon: Globe, title: "World Cultures", desc: "Explore diverse cultures, languages, and perspectives from around the globe.", gradient: "linear-gradient(135deg, #e0f2fe, #bae6fd)", color: "#0284c7" },
-    { icon: Palette, title: "Creative Expression", desc: "Art, music, storytelling, and hands-on projects that nurture creativity.", gradient: "linear-gradient(135deg, #fef9c3, #fef08a)", color: "#ca8a04" },
-    { icon: Shield, title: "Safe & Private", desc: "Your family's data is protected. No ads, no tracking, no compromises.", gradient: "linear-gradient(135deg, #fce7f3, #fbcfe8)", color: "#be185d" },
-  ];
-  return (
-    <section style={{ padding: '4rem 1.5rem 6rem', background: colors.bgSoft, borderRadius: '3rem 3rem 0 0' }}>
-      <div style={{ maxWidth: '68rem', margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
-          <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
-            borderRadius: '9999px', padding: '0.35rem 1rem', marginBottom: '1.25rem',
-            background: colors.primarySoft, border: `1px solid ${colors.primaryLight}`,
-          }}>
-            <CheckCircle2 style={{ width: '14px', height: '14px', color: colors.primary }} />
-            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: colors.primary, letterSpacing: '0.06em' }}>Why Parents Love Us</span>
-          </div>
-          <h2 style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2rem)', fontWeight: 900, letterSpacing: '-0.03em', color: colors.textHeading, marginBottom: '0.75rem', lineHeight: 1.15 }}>
-            Every child learns <span style={ds.textGradient}>differently</span>
-          </h2>
-          <p style={{ fontSize: '1rem', color: colors.textMuted, maxWidth: '32rem', margin: '0 auto', fontWeight: 500, lineHeight: 1.7 }}>
-            Arizen School meets each learner exactly where they are — and helps them grow.
-          </p>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.75rem' }}>
-          {features.map((f, i) => {
-            const Icon = f.icon;
-            return (
-              <div key={f.title} className="fade-in-up feature-card-hover" style={{
-                background: 'white', borderRadius: '1.5rem',
-                border: `1px solid ${colors.borderLight}`, padding: '2rem',
-                boxShadow: shadows.sm, animationDelay: `${i * 0.08}s`,
-                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-              }}>
-                <div style={{
-                  width: '56px', height: '56px', borderRadius: '1.375rem',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  marginBottom: '1.375rem', background: f.gradient,
-                  boxShadow: `0 4px 16px ${f.color}20`,
-                }}>
-                  <Icon style={{ width: '28px', height: '28px', color: f.color }} />
-                </div>
-                <h3 style={{ fontSize: '1.125rem', fontWeight: 800, color: colors.textHeading, marginBottom: '0.625rem', letterSpacing: '-0.01em' }}>
-                  {f.title}
-                </h3>
-                <p style={{ fontSize: '0.9375rem', color: colors.textMuted, lineHeight: 1.65, fontWeight: 500 }}>
-                  {f.desc}
-                </p>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ─── Emotional Intelligence Section (NEW) ─── */
-function EQSection() {
-  const eqFeatures = [
-    {
-      icon: Smile,
-      emoji: "😊😌🤔😐",
-      title: "Daily emotional check-ins",
-      desc: "Children start each day by naming how they feel. All emotions are welcome — from happy to worried, curious to tired.",
-      gradient: "linear-gradient(160deg, #FEF9C3, #FDE04730)",
-      borderColor: "#FDE047",
-      iconBg: "linear-gradient(135deg, #FEF9C3, #FDE047)",
-      iconColor: "#854D0E",
-    },
-    {
-      icon: Brain,
-      emoji: "💭✨",
-      title: "Reflection prompts",
-      desc: "Gentle questions help learners notice their thoughts and build inner awareness — building emotional resilience one day at a time.",
-      gradient: "linear-gradient(160deg, #E0E7FF, #A5B4FC30)",
-      borderColor: "#A5B4FC",
-      iconBg: "linear-gradient(135deg, #E0E7FF, #A5B4FC)",
-      iconColor: "#4338CA",
-    },
-    {
-      icon: Eye,
-      emoji: "👨‍👩‍👧‍👦💛",
-      title: "Parent learning insights",
-      desc: "Parents see emotional patterns, not private details. Stay connected to your child's journey with calm, clear insights.",
-      gradient: "linear-gradient(160deg, #FFE4E6, #FDA4AF30)",
-      borderColor: "#FDA4AF",
-      iconBg: "linear-gradient(135deg, #FFE4E6, #FDA4AF)",
-      iconColor: "#BE123C",
-    },
-  ];
-
-  // Mini emotion pill display
-  const emotionPills = [
-    { emoji: "😊", label: "Happy", bg: "#FEF9C3", border: "#FDE047" },
-    { emoji: "😌", label: "Calm", bg: "#D1FAE5", border: "#6EE7B7" },
-    { emoji: "🤔", label: "Curious", bg: "#E0E7FF", border: "#A5B4FC" },
-    { emoji: "😐", label: "Okay", bg: "#E0F2FE", border: "#7DD3FC" },
-    { emoji: "😟", label: "Worried", bg: "#EDE9FE", border: "#C4B5FD" },
-    { emoji: "😴", label: "Tired", bg: "#DDD6FE", border: "#A78BFA" },
-    { emoji: "😤", label: "Frustrated", bg: "#FFE4E6", border: "#FDA4AF" },
-  ];
-
-  return (
-    <section style={{
-      padding: '5rem 1.5rem',
-      background: `linear-gradient(180deg, ${colors.bgSoft} 0%, white 100%)`,
-      position: 'relative',
-    }}>
-      <div style={{ maxWidth: '68rem', margin: '0 auto' }}>
-        {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
-          <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
-            borderRadius: '9999px', padding: '0.45rem 1.25rem', marginBottom: '1.5rem',
-            background: 'linear-gradient(135deg, #FEF9C3, #D1FAE5, #E0E7FF)',
-            border: '1.5px solid #FDE04760',
-            boxShadow: '0 2px 12px rgba(253,224,71,0.15)',
-          }}>
-            <Heart style={{ width: '14px', height: '14px', color: "#059669" }} />
-            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: "#059669", letterSpacing: '0.06em' }}>
-              Emotional Intelligence
-            </span>
-          </div>
-          <h2 style={{
-            fontSize: 'clamp(1.5rem, 3.5vw, 2.25rem)', fontWeight: 900,
-            letterSpacing: '-0.03em', color: colors.textHeading,
-            marginBottom: '1rem', lineHeight: 1.15,
-          }}>
-            Learning starts with how{' '}
-            <span style={{
-              background: 'linear-gradient(135deg, #059669, #0d9488)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-            }}>a child feels</span>
-          </h2>
-          <p style={{
-            fontSize: '1.0625rem', color: colors.textMuted, maxWidth: '38rem',
-            margin: '0 auto 2rem', fontWeight: 500, lineHeight: 1.7,
-          }}>
-            Arizen helps children build self-awareness through simple daily check-ins, reflections, and calm learning routines.
-          </p>
-
-          {/* Emotion pill display */}
-          <div style={{
-            display: 'flex', flexWrap: 'wrap', justifyContent: 'center',
-            gap: '0.5rem', maxWidth: 540, margin: '0 auto',
-          }}>
-            {emotionPills.map((e) => (
-              <span
-                key={e.label}
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '0.3rem',
-                  padding: '0.4rem 0.875rem', borderRadius: 999,
-                  background: e.bg, border: `1.5px solid ${e.border}`,
-                  fontSize: '0.8125rem', fontWeight: 700, color: '#44403c',
-                  fontFamily: "'Nunito', system-ui, sans-serif",
-                }}
-              >
-                {e.emoji} {e.label}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {/* Feature Cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
-          {eqFeatures.map((f, i) => {
-            const Icon = f.icon;
-            return (
-              <div key={f.title} className="fade-in-up feature-card-hover" style={{
-                background: f.gradient,
-                borderRadius: '1.75rem',
-                border: `1.5px solid ${f.borderColor}60`,
-                padding: '2.25rem',
-                boxShadow: shadows.sm,
-                animationDelay: `${i * 0.1}s`,
-                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-              }}>
-                <div style={{
-                  width: '56px', height: '56px', borderRadius: '1.375rem',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  marginBottom: '1.25rem', background: f.iconBg,
-                  boxShadow: `0 4px 16px ${f.borderColor}40`,
-                }}>
-                  <Icon style={{ width: '26px', height: '26px', color: f.iconColor }} />
-                </div>
-                <h3 style={{
-                  fontSize: '1.125rem', fontWeight: 800,
-                  color: colors.textHeading, marginBottom: '0.625rem',
-                  letterSpacing: '-0.01em',
-                }}>
-                  {f.title}
-                </h3>
-                <p style={{
-                  fontSize: '0.9375rem', color: colors.textMuted,
-                  lineHeight: 1.65, fontWeight: 500,
-                }}>
-                  {f.desc}
-                </p>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ─── Bottom CTA ─── */
-function BottomCTA() {
-  return (
-    <section style={{
-      padding: '5rem 1.5rem 6rem',
-      background: `linear-gradient(160deg, ${colors.primarySoft}, ${colors.bgBlue}, ${colors.bgGreen})`,
-      textAlign: 'center', position: 'relative', overflow: 'hidden',
-    }}>
-      <div style={{
-        position: 'absolute', top: '-5rem', left: '50%', transform: 'translateX(-50%)',
-        width: '20rem', height: '20rem', borderRadius: '50%',
-        background: colors.primarySoft, filter: 'blur(80px)', opacity: 0.5,
-      }} />
-      <div style={{ position: 'relative' }}>
-        <h2 style={{
-          fontSize: 'clamp(1.5rem, 4vw, 2.25rem)', fontWeight: 900,
-          letterSpacing: '-0.03em', color: colors.textHeading,
-          marginBottom: '1rem', lineHeight: 1.15,
-        }}>
-          Ready to start your child's
-          <br />
-          <span style={ds.textGradient}>learning adventure</span>?
-        </h2>
-        <p style={{
-          fontSize: '1.0625rem', color: colors.textMuted,
-          maxWidth: '28rem', margin: '0 auto 2.5rem',
-          fontWeight: 500, lineHeight: 1.7,
-        }}>
-          Join families who've discovered a better way to learn — personalized, joyful, and safe.
-        </p>
-        <Link href="/auth/register" style={{
-          ...ds.btnPrimary, fontSize: '1.0625rem', padding: '1.125rem 2.5rem',
-          gap: '0.625rem', textDecoration: 'none',
-          boxShadow: `0 8px 32px ${colors.primary}30`,
-        }}>
-          Get Started — It's Free <Sparkles style={{ width: '18px', height: '18px' }} />
-        </Link>
-      </div>
-    </section>
-  );
-}
-
-/* ─── Footer ─── */
-function Footer() {
-  return (
-    <footer style={{ padding: '2.5rem 1.5rem', borderTop: `1px solid ${colors.borderLight}`, background: colors.bgSoft }}>
-      <div style={{ maxWidth: '68rem', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
-          <div style={{ ...ds.logoMark, width: '34px', height: '34px', borderRadius: '0.75rem' }}>
-            <Flower2 style={{ width: '18px', height: '18px' }} />
-          </div>
-          <span style={{ fontSize: '0.9375rem', fontWeight: 800, letterSpacing: '-0.01em', ...ds.textGradient }}>Arizen School</span>
-        </div>
-        <p style={{ fontSize: '0.75rem', color: colors.textMuted, fontWeight: 600 }}>
-          &copy; {new Date().getFullYear()} Arizen International. All rights reserved.
-        </p>
-      </div>
-    </footer>
-  );
-}
-
-/* ─── Redirect Card for logged-in users ─── */
-function RedirectCard({ role, name }: { role: string; name: string | null }) {
-  const dashboardUrl = role === "ADMIN" ? "/dashboard/admin" : role === "PARENT" ? "/dashboard/parent" : "/dashboard/student";
-  const roleLabel = role === "ADMIN" ? "Admin" : role === "PARENT" ? "Parent" : "Student";
-  return (
-    <section style={{ padding: '6rem 1.5rem', textAlign: 'center' }}>
-      <div style={{
-        maxWidth: '30rem', margin: '0 auto',
-        background: 'white', borderRadius: '2rem',
-        border: `1px solid ${colors.borderLight}`,
-        padding: '3rem 2rem', boxShadow: shadows.lg,
-      }}>
-        <div style={{
-          width: '64px', height: '64px', borderRadius: '1.5rem',
-          margin: '0 auto 1.5rem',
-          background: `linear-gradient(135deg, ${colors.primary}, ${colors.primaryDark})`,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}>
-          <Sparkles style={{ width: '28px', height: '28px', color: 'white' }} />
-        </div>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: colors.textHeading, marginBottom: '0.5rem' }}>
-          Welcome back, {name?.split(" ")[0] || "friend"}!
-        </h2>
-        <p style={{ fontSize: '0.9375rem', color: colors.textMuted, marginBottom: '2rem' }}>
-          You're signed in as a <strong>{roleLabel}</strong>. Head to your dashboard to continue.
-        </p>
-        <Link href={dashboardUrl} style={{
-          ...ds.btnPrimary, fontSize: '1rem', padding: '1rem 2rem', textDecoration: 'none',
-        }}>
-          Go to {roleLabel} Dashboard
-        </Link>
-      </div>
-    </section>
-  );
-}
-
-/* ─── Page (Server Component) ─── */
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  // Read session directly from cookie (bypasses NextAuth server-side issues on Vercel)
-  const { cookies } = await import("next/headers");
-  const { jwtVerify } = await import("jose");
-  const secret = process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-production";
+  // Read session via direct cookie (Vercel-safe, no getServerSession)
   let isLoggedIn = false;
-  let userRole: string = "LEARNER";
+  let userRole = "LEARNER";
   let userName: string | undefined;
 
   try {
+    const { cookies } = await import("next/headers");
+    const { jwtVerify } = await import("jose");
+    const secret = process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-production";
     const cookieStore = await cookies();
     const isProd = process.env.NODE_ENV === "production";
     const cookieName = isProd ? "__Secure-next-auth.session-token" : "next-auth.session-token";
@@ -653,28 +46,253 @@ export default async function HomePage() {
     }
   } catch {}
 
+  if (isLoggedIn) {
+    const dash = userRole === "ADMIN" ? "/dashboard/admin" : userRole === "PARENT" ? "/dashboard/parent" : "/dashboard/student";
+    return (
+      <div style={{ minHeight: "100vh", background: C.page }}>
+        <Navbar loggedIn role={userRole} />
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "70vh", padding: "2rem" }}>
+          <div style={{ textAlign: "center", background: C.white, borderRadius: 32, border: `1px solid ${C.border}`, padding: "3rem 2.5rem", maxWidth: 420, boxShadow: "0 4px 24px rgba(0,0,0,0.04)" }}>
+            <div style={{ fontSize: 48, marginBottom: "1rem" }}>✨</div>
+            <h2 style={{ fontSize: "1.5rem", fontWeight: 800, color: C.dark, marginBottom: "0.5rem" }}>Welcome back{userName ? `, ${userName.split(" ")[0]}` : ""}!</h2>
+            <p style={{ color: C.body, marginBottom: "2rem", fontSize: "0.9375rem" }}>You're signed in. Head to your dashboard to continue.</p>
+            <Link href={dash} style={{ display: "inline-block", background: C.teal, color: "white", fontWeight: 700, fontSize: "1rem", padding: "0.875rem 2rem", borderRadius: 14, textDecoration: "none" }}>Go to Dashboard →</Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div style={{ minHeight: '100vh', background: colors.bg }}>
-      {isLoggedIn ? (
-        <LoggedInNavbar role={userRole} />
-      ) : (
-        <LoggedOutNavbar />
+    <main style={{ minHeight: "100vh", overflow: "hidden", background: C.page, color: C.dark, fontFamily: "'Nunito', system-ui, sans-serif" }}>
+      <Navbar />
+
+      {/* ── Hero ── */}
+      <section style={{ maxWidth: 1280, margin: "0 auto", padding: "3.5rem 1.5rem 3rem" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "2.5rem", alignItems: "center" }} className="hero-grid">
+          {/* Left copy */}
+          <div>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem", background: C.tealLight, borderRadius: 999, padding: "0.4rem 1.1rem", marginBottom: "1.5rem", fontSize: "0.8125rem", fontWeight: 700, color: C.teal }}>
+              <span>♡</span> Learning that understands every child
+            </div>
+
+            <h1 style={{ fontSize: "clamp(2.25rem, 5vw, 3.25rem)", fontWeight: 900, lineHeight: 1.1, letterSpacing: "-0.035em", color: C.dark, marginBottom: "1.25rem" }}>
+              Welcome to emotionally{" "}
+              <span style={{ color: C.teal }}>intelligent learning</span>
+            </h1>
+
+            <p style={{ fontSize: "clamp(0.9375rem, 2vw, 1.0625rem)", lineHeight: 1.75, color: C.body, marginBottom: "2rem", maxWidth: 520 }}>
+              A personalized learning experience that helps your child build confidence, curiosity, emotional awareness, and mastery of core subjects.
+            </p>
+
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", marginBottom: "2rem" }}>
+              <Link href="/auth/register" style={{ display: "inline-block", background: C.teal, color: "#fff", fontWeight: 700, fontSize: "1rem", padding: "0.875rem 1.75rem", borderRadius: 14, textDecoration: "none", boxShadow: "0 4px 16px rgba(4,122,112,0.18)" }}>
+                Get Started →
+              </Link>
+              <Link href="/auth/login" style={{ display: "inline-block", background: C.white, color: C.teal, fontWeight: 700, fontSize: "1rem", padding: "0.875rem 1.75rem", borderRadius: 14, textDecoration: "none", border: `1.5px solid ${C.teal}` }}>
+                Sign In
+              </Link>
+            </div>
+
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+              {[
+                { icon: "🛡️", text: "Emotionally Safe" },
+                { icon: "📚", text: "CBC-Aligned" },
+                { icon: "👨‍👩‍👧", text: "Parent-Friendly" },
+                { icon: "🎮", text: "Gamified Learning" },
+              ].map((b) => (
+                <span key={b.text} style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem", background: C.white, border: `1px solid ${C.border}`, borderRadius: 12, padding: "0.35rem 0.875rem", fontSize: "0.8125rem", fontWeight: 600, color: "#374151", boxShadow: "0 1px 4px rgba(0,0,0,0.03)" }}>
+                  <span>{b.icon}</span> {b.text}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Right: Dashboard Preview */}
+          <DashboardPreview />
+        </div>
+      </section>
+
+      {/* ── Value Strip ── */}
+      <section style={{ maxWidth: 1280, margin: "0 auto", padding: "0 1.5rem 3rem" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "1rem", background: C.white, border: `1px solid ${C.border}`, borderRadius: 24, padding: "1.5rem", boxShadow: "0 2px 16px rgba(0,0,0,0.03)" }} className="value-strip">
+          <ValueItem icon="🎉" title="Fun learning style">Engaging lessons, stories, and activities kids love.</ValueItem>
+          <ValueItem icon="🛡️" title="Safe environment">Built with care to keep kids safe and supported.</ValueItem>
+          <ValueItem icon="📖" title="CBC curriculum">Aligned with the Competency Based Curriculum.</ValueItem>
+          <ValueItem icon="🎁" title="Free to get started">Explore lessons and features at no cost.</ValueItem>
+        </div>
+      </section>
+
+      {/* ── Join Section ── */}
+      <section style={{ maxWidth: 1280, margin: "0 auto", padding: "0 1.5rem 4rem", textAlign: "center" }}>
+        <h2 style={{ fontSize: "clamp(1.5rem, 3.5vw, 2rem)", fontWeight: 900, letterSpacing: "-0.03em", color: C.dark, marginBottom: "0.5rem" }}>
+          How would you like to <span style={{ color: C.teal }}>join us</span>?
+        </h2>
+        <p style={{ color: C.body, fontSize: "1rem", marginBottom: "2rem" }}>Choose your path and we'll set up the perfect experience.</p>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "1rem" }} className="join-grid">
+          <JoinCard icon="👩‍👧" title="Parent" text="Create an account, add your child, and follow their progress." href="/auth/register?role=parent" />
+          <JoinCard icon="🧒🏽" title="Student" text="Start lessons, complete quests, earn coins, and grow your avatar." href="/auth/register?role=learner" />
+          <JoinCard icon="🛡️" title="Admin" text="Manage grades, subjects, lessons, badges, and student progress." href="/auth/register" />
+        </div>
+      </section>
+
+      {/* ── Footer ── */}
+      <footer style={{ borderTop: `1px solid ${C.border}`, padding: "2rem 1.5rem" }}>
+        <div style={{ maxWidth: 1280, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.625rem" }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: C.teal, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 900, fontSize: "1.125rem" }}>A</div>
+            <span style={{ fontSize: "1rem", fontWeight: 800, color: C.teal }}>Arizen School</span>
+          </div>
+          <p style={{ fontSize: "0.8125rem", color: C.body }}>© {new Date().getFullYear()} Arizen International. All rights reserved.</p>
+        </div>
+      </footer>
+    </main>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════
+   COMPONENTS
+   ═══════════════════════════════════════════════════════ */
+
+function Navbar({ loggedIn, role }: { loggedIn?: boolean; role?: string }) {
+  const dashUrl = role === "ADMIN" ? "/dashboard/admin" : role === "PARENT" ? "/dashboard/parent" : "/dashboard/student";
+
+  return (
+    <nav style={{ height: 72, borderBottom: `1px solid ${C.border}`, background: "rgba(255,255,255,0.85)", backdropFilter: "blur(12px)", position: "sticky", top: 0, zIndex: 50 }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 1.5rem", display: "flex", alignItems: "center", justifyContent: "space-between", height: "100%" }}>
+        <Link href="/" style={{ display: "flex", alignItems: "center", gap: "0.625rem", textDecoration: "none" }}>
+          <div style={{ width: 40, height: 40, borderRadius: 12, background: C.teal, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 900, fontSize: "1.25rem" }}>A</div>
+          <span style={{ fontSize: "1.25rem", fontWeight: 900, letterSpacing: "-0.02em", color: C.teal }}>Arizen School</span>
+        </Link>
+
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+          {loggedIn ? (
+            <>
+              <Link href={dashUrl} style={{ fontWeight: 700, color: "#374151", textDecoration: "none", fontSize: "0.9375rem" }}>Dashboard</Link>
+              <button onClick={async () => { await fetch("/api/auth/logout", { method: "POST", credentials: "include" }); window.location.href = "/"; }} style={{ background: C.teal, color: "#fff", fontWeight: 700, fontSize: "0.875rem", padding: "0.5rem 1.25rem", borderRadius: 12, border: "none", cursor: "pointer" }}>Sign Out</button>
+            </>
+          ) : (
+            <>
+              <Link href="/auth/login" style={{ fontWeight: 700, color: "#374151", textDecoration: "none", fontSize: "0.9375rem" }}>Sign In</Link>
+              <Link href="/auth/register" style={{ background: C.teal, color: "#fff", fontWeight: 700, fontSize: "0.875rem", padding: "0.5rem 1.25rem", borderRadius: 12, textDecoration: "none", boxShadow: "0 2px 8px rgba(4,122,112,0.15)" }}>Get Started</Link>
+            </>
+          )}
+        </div>
+      </div>
+    </nav>
+  );
+}
+
+function DashboardPreview() {
+  return (
+    <div style={{ borderRadius: 28, border: `1px solid ${C.border}`, background: C.white, padding: "1.5rem", boxShadow: "0 8px 40px rgba(4,122,112,0.08), 0 2px 8px rgba(0,0,0,0.03)" }}>
+      {/* Greeting row */}
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "1rem", marginBottom: "1.25rem" }}>
+        <div>
+          <h3 style={{ fontSize: "1.375rem", fontWeight: 900, color: C.dark, marginBottom: "0.25rem" }}>Good morning, Alex! 👋</h3>
+          <p style={{ color: C.body, fontSize: "0.875rem" }}>Ready to learn something amazing today?</p>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexShrink: 0 }}>
+          <div style={{ width: 52, height: 52, borderRadius: "50%", background: C.yellow, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.75rem", border: "2px solid #FDE047" }}>🧒🏽</div>
+          <div>
+            <div style={{ fontSize: "1.25rem", fontWeight: 800, color: C.dark }}>450</div>
+            <div style={{ fontSize: "0.75rem", color: "#94A3B8", fontWeight: 600 }}>Spark Coins</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Cards grid */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "0.75rem" }}>
+        {/* Today's Lesson — large purple card */}
+        <div style={{ background: C.purple, borderRadius: 18, padding: "1.25rem" }}>
+          <p style={{ fontSize: "0.8125rem", fontWeight: 700, color: "#6D28D9" }}>Today's Lesson</p>
+          <h4 style={{ fontSize: "1.125rem", fontWeight: 800, color: C.dark, marginTop: "0.5rem" }}>Understanding Feelings</h4>
+          <span style={{ display: "inline-block", marginTop: "0.35rem", background: "rgba(255,255,255,0.7)", borderRadius: 999, padding: "0.2rem 0.75rem", fontSize: "0.6875rem", fontWeight: 700, color: "#7C3AED" }}>Life Skills</span>
+          <p style={{ marginTop: "0.75rem", fontSize: "0.875rem", lineHeight: 1.55, color: C.body, maxWidth: 340 }}>Learn how to identify and manage your emotions in a healthy way.</p>
+          <div style={{ marginTop: "1rem", display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: "1rem" }}>
+            <button style={{ background: C.teal, color: "#fff", fontWeight: 700, fontSize: "0.8125rem", padding: "0.625rem 1.25rem", borderRadius: 12, border: "none", cursor: "pointer" }}>Continue Lesson →</button>
+            <div style={{ fontSize: "2.75rem" }}>🧘🏽‍♂️</div>
+          </div>
+        </div>
+
+        {/* EQ Check-in */}
+        <MiniCard icon="💚" title="EQ Check-in" text="How are you feeling today?" button="Check In" bg={C.green} />
+
+        {/* Quest Progress */}
+        <MiniCard icon="⚔️" title="Quest Progress" text="Complete quests and earn rewards!" progress={6} total={10} />
+
+        {/* Spark Coins */}
+        <MiniCard icon="🪙" title="Spark Coins" text="450 coins earned — keep learning to earn more!" bg={C.yellow} />
+
+        {/* Avatar Progress */}
+        <div style={{ background: C.green, borderRadius: 18, padding: "1.25rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
+            <div style={{ fontSize: "3.5rem", flexShrink: 0 }}>🧒🏽</div>
+            <div style={{ flex: 1 }}>
+              <h4 style={{ fontWeight: 800, color: C.dark }}>Avatar Progress</h4>
+              <p style={{ fontSize: "0.8125rem", color: C.body, marginBottom: "0.5rem" }}>Level 7</p>
+              <div style={{ height: 8, borderRadius: 4, background: "#fff", overflow: "hidden" }}>
+                <div style={{ height: "100%", width: "68%", borderRadius: 4, background: "linear-gradient(90deg, #047A70, #0D9488)" }} />
+              </div>
+              <p style={{ fontSize: "0.6875rem", fontWeight: 700, color: "#94A3B8", marginTop: "0.35rem" }}>680 / 1000 XP</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Badges */}
+        <MiniCard icon="🏆" title="Badges Earned" text="12 badges unlocked" button="View All" />
+      </div>
+    </div>
+  );
+}
+
+function MiniCard({ icon, title, text, button, bg, progress, total }: {
+  icon: string; title: string; text: string; button?: string; bg?: string; progress?: number; total?: number;
+}) {
+  return (
+    <div style={{ borderRadius: 18, border: `1px solid ${C.border}`, background: bg || C.white, padding: "1.125rem" }}>
+      <div style={{ fontSize: "1.75rem", marginBottom: "0.35rem" }}>{icon}</div>
+      <h4 style={{ fontWeight: 800, color: C.dark, fontSize: "0.9375rem" }}>{title}</h4>
+      <p style={{ fontSize: "0.8125rem", color: C.body, lineHeight: 1.5, marginTop: "0.25rem" }}>{text}</p>
+
+      {progress !== undefined && total !== undefined && (
+        <>
+          <div style={{ marginTop: "0.75rem", height: 8, borderRadius: 4, background: "#F1F5F9", overflow: "hidden" }}>
+            <div style={{ height: "100%", width: `${(progress / total) * 100}%`, borderRadius: 4, background: C.teal }} />
+          </div>
+          <p style={{ fontSize: "0.6875rem", fontWeight: 700, color: "#94A3B8", marginTop: "0.35rem" }}>{progress} / {total}</p>
+        </>
       )}
-      <main>
-        {isLoggedIn ? (
-          <RedirectCard role={userRole} name={userName || null} />
-        ) : (
-          <>
-            <HeroSection />
-            <StatsBar />
-            <CTACards />
-            <FeaturesSection />
-            <EQSection />
-            <BottomCTA />
-          </>
-        )}
-      </main>
-      <Footer />
+
+      {button && (
+        <button style={{ marginTop: "0.75rem", background: "transparent", border: `1px solid ${C.border}`, borderRadius: 10, padding: "0.35rem 1rem", fontSize: "0.75rem", fontWeight: 700, color: C.teal, cursor: "pointer" }}>{button}</button>
+      )}
+    </div>
+  );
+}
+
+function ValueItem({ icon, title, children }: { icon: string; title: string; children: React.ReactNode }) {
+  return (
+    <div style={{ display: "flex", gap: "1rem", textAlign: "left", alignItems: "flex-start" }}>
+      <div style={{ width: 52, height: 52, flexShrink: 0, borderRadius: "50%", background: C.tealLight, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.5rem" }}>{icon}</div>
+      <div>
+        <h3 style={{ fontWeight: 800, color: C.teal, fontSize: "0.9375rem" }}>{title}</h3>
+        <p style={{ marginTop: "0.25rem", fontSize: "0.8125rem", lineHeight: 1.6, color: C.body }}>{children}</p>
+      </div>
+    </div>
+  );
+}
+
+function JoinCard({ icon, title, text, href }: { icon: string; title: string; text: string; href: string }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: "1.25rem", borderRadius: 24, border: `1px solid ${C.border}`, background: C.white, padding: "1.5rem", textAlign: "left", boxShadow: "0 2px 12px rgba(0,0,0,0.02)" }}>
+      <div style={{ width: 72, height: 72, flexShrink: 0, borderRadius: "50%", background: C.tealLight, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "2.25rem" }}>{icon}</div>
+      <div style={{ flex: 1 }}>
+        <h3 style={{ fontSize: "1.125rem", fontWeight: 800, color: C.dark }}>{title}</h3>
+        <p style={{ marginTop: "0.25rem", fontSize: "0.8125rem", lineHeight: 1.55, color: C.body }}>{text}</p>
+      </div>
+      <Link href={href} style={{ width: 40, height: 40, flexShrink: 0, borderRadius: "50%", border: `1.5px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, color: C.teal, textDecoration: "none", fontSize: "1.125rem" }}>→</Link>
     </div>
   );
 }

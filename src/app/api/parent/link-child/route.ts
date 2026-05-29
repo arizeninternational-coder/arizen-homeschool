@@ -174,13 +174,7 @@ export async function GET(request: Request) {
 
     const { data: links, error } = await supabase
       .from("ParentChild")
-      .select(`
-        id,
-        childUserId,
-        createdAt,
-        childUser:User!ParentChild_childUserId_fkey(id, email, name),
-        learnerProfile:LearnerProfile(userId)
-      `)
+      .select("id, childUserId, createdAt")
       .eq("parentId", parentId);
 
     if (error) {
@@ -190,16 +184,33 @@ export async function GET(request: Request) {
       throw error;
     }
 
-    const children = (links || []).map((link: any) => ({
-      id: link.childUserId,
-      name: link.learnerProfile?.[0]?.displayName || link.childUser?.name || link.childUser?.email,
-      email: link.childUser?.email,
-      grade: link.learnerProfile?.[0]?.grade,
-      totalXp: link.learnerProfile?.[0]?.totalXp ?? 0,
-      currentStreak: link.learnerProfile?.[0]?.currentStreak ?? 0,
-      avatarUrl: link.learnerProfile?.[0]?.avatarUrl,
-      linkedAt: link.createdAt,
-    }));
+    // Fetch child user + learner profile data in a second step
+    // (Supabase REST doesn't always resolve relation queries reliably)
+    const children = [];
+    for (const link of links || []) {
+      const { data: childUser } = await supabase
+        .from("User")
+        .select("id, email, name")
+        .eq("id", link.childUserId)
+        .maybeSingle();
+      const { data: profile } = await supabase
+        .from("LearnerProfile")
+        .select("id, displayName, grade, totalXp, currentStreak, avatarUrl")
+        .eq("userId", link.childUserId)
+        .maybeSingle();
+      if (childUser) {
+        children.push({
+          id: link.childUserId,
+          name: profile?.displayName || childUser?.name || childUser?.email,
+          email: childUser?.email,
+          grade: profile?.grade,
+          totalXp: profile?.totalXp ?? 0,
+          currentStreak: profile?.currentStreak ?? 0,
+          avatarUrl: profile?.avatarUrl,
+          linkedAt: link.createdAt,
+        });
+      }
+    }
 
     return NextResponse.json({ children });
   } catch (e: any) {

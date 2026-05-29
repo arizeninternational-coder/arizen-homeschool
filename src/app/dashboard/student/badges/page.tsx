@@ -234,7 +234,7 @@ export default function StudentBadgesPage() {
           const cat = badgeCategory[badgeDef.type] || "lesson";
           const catColor = categoryColors[cat];
           // Simulate progress for locked badges (would come from API in real app)
-          const progress = earned ? 100 : (badgeDef.type === "first_lesson" ? 0 : Math.floor(Math.random() * 60) + 10);
+          const progress = earned ? 100 : 0;
 
           if (isEarned) {
             // ── Earned Badge Card ──
@@ -336,7 +336,8 @@ export default function StudentBadgesPage() {
                 fontSize: "2.75rem",
                 marginBottom: "0.5rem",
                 lineHeight: 1,
-                opacity: 0.55,
+                opacity: 0.7,
+                filter: "grayscale(0.3)",
               }}>
                 {badgeIcons[badgeDef.type] || "🏅"}
               </div>
@@ -344,7 +345,7 @@ export default function StudentBadgesPage() {
               {/* Badge name */}
               <div style={{
                 fontWeight: 800,
-                color: colors.textMuted,
+                color: "#475569",
                 fontSize: "0.875rem",
                 marginBottom: "0.25rem",
                 lineHeight: 1.2,
@@ -355,10 +356,9 @@ export default function StudentBadgesPage() {
               {/* Description */}
               <div style={{
                 fontSize: "0.75rem",
-                color: colors.textMuted,
+                color: "#64748B",
                 lineHeight: 1.4,
                 marginBottom: "0.625rem",
-                opacity: 0.8,
               }}>
                 {badgeDef.description}
               </div>

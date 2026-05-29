@@ -24,8 +24,9 @@ interface StudentLayoutProps {
 
 const NAV_ITEMS: NavItem[] = [
   { icon: Compass, label: "Dashboard", href: "/dashboard/student" },
-  { icon: BookOpen, label: "My Lessons", href: "/dashboard/student/lessons" },
+  { icon: BookOpen, label: "My Subjects", href: "/dashboard/student/subjects" },
   { icon: Target, label: "Quests", href: "/dashboard/student/quests" },
+  { icon: Heart, label: "Reflections", href: "/dashboard/student/reflections" },
   { icon: Award, label: "Badges", href: "/dashboard/student/badges" },
   { icon: ShoppingBag, label: "Shop", href: "/dashboard/student/shop" },
   { icon: User, label: "Profile", href: "/dashboard/student/profile" },
