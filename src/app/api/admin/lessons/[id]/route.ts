@@ -16,7 +16,6 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
         title,
         slug,
         description,
-        content,
         status,
         orderIndex,
         xpReward,
@@ -47,6 +46,16 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
         return NextResponse.json({ error: "Lesson not found" }, { status: 404 });
       }
       console.error("[ADMIN_LESSON_DETAIL] Error:", error.message);
+      // If column doesn't exist, try with minimal columns
+      if (error.message?.includes("does not exist")) {
+        const { data: minimal, error: err2 } = await supabase
+          .from("Lesson")
+          .select("id, title, slug, description, status, orderIndex, xpReward, createdAt, updatedAt")
+          .eq("id", params.id)
+          .single();
+        if (err2) return NextResponse.json({ error: err2.message }, { status: 500 });
+        return NextResponse.json({ lesson: minimal });
+      }
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
