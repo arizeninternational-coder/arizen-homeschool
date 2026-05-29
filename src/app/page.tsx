@@ -35,28 +35,43 @@ export default async function HomePage() {
     const cookieStore = await cookies();
     const isProd = process.env.NODE_ENV === "production";
     const cookieName = isProd ? "__Secure-next-auth.session-token" : "next-auth.session-token";
-    const token = cookieStore.get(cookieName)?.value || cookieStore.get("next-auth.session-token")?.value;
+    const token = cookieStore.get(cookieName)?.value || cookieStore.get("next-auth.session-token")?.value || cookieStore.get("__Secure-next-auth.session-token")?.value;
     if (token) {
       const { payload } = await jwtVerify(token, new TextEncoder().encode(secret), { algorithms: ["HS256"] });
       if (payload.sub && payload.role) {
         isLoggedIn = true;
-        userRole = (payload.role as string).toUpperCase();
-        userName = payload.name as string | undefined;
+        userRole = String(payload.role).toUpperCase();
+        userName = payload.name ? String(payload.name) : undefined;
       }
     }
-  } catch {}
+  } catch (e) {
+    // Silently fail — user just won't see logged-in state on homepage
+    console.error("[HOMEPAGE] Session check failed:", e);
+  }
 
   if (isLoggedIn) {
     const dash = userRole === "ADMIN" ? "/dashboard/admin" : userRole === "PARENT" ? "/dashboard/parent" : "/dashboard/student";
+    const firstName = userName ? userName.split(" ")[0] : "";
     return (
       <div style={{ minHeight: "100vh", background: C.page }}>
-        <Navbar loggedIn role={userRole} />
+        <nav style={{ height: 72, borderBottom: `1px solid ${C.border}`, background: "rgba(255,255,255,0.85)", backdropFilter: "blur(12px)", position: "sticky", top: 0, zIndex: 50 }}>
+          <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 1.5rem", display: "flex", alignItems: "center", justifyContent: "space-between", height: "100%" }}>
+            <Link href="/" style={{ display: "flex", alignItems: "center", gap: "0.625rem", textDecoration: "none" }}>
+              <div style={{ width: 40, height: 40, borderRadius: 12, background: C.teal, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 900, fontSize: "1.25rem" }}>A</div>
+              <span style={{ fontSize: "1.25rem", fontWeight: 900, letterSpacing: "-0.02em", color: C.teal }}>Arizen School</span>
+            </Link>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+              <Link href={dash} style={{ fontWeight: 700, color: "#374151", textDecoration: "none", fontSize: "0.9375rem" }}>Dashboard</Link>
+              <button onClick={async () => { try { await fetch("/api/auth/logout", { method: "POST", credentials: "include" }); } catch {} window.location.href = "/"; }} style={{ background: C.teal, color: "#fff", fontWeight: 700, fontSize: "0.875rem", padding: "0.5rem 1.25rem", borderRadius: 12, border: "none", cursor: "pointer" }}>Sign Out</button>
+            </div>
+          </div>
+        </nav>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "70vh", padding: "2rem" }}>
           <div style={{ textAlign: "center", background: C.white, borderRadius: 32, border: `1px solid ${C.border}`, padding: "3rem 2.5rem", maxWidth: 420, boxShadow: "0 4px 24px rgba(0,0,0,0.04)" }}>
             <div style={{ fontSize: 48, marginBottom: "1rem" }}>✨</div>
-            <h2 style={{ fontSize: "1.5rem", fontWeight: 800, color: C.dark, marginBottom: "0.5rem" }}>Welcome back{userName ? `, ${userName.split(" ")[0]}` : ""}!</h2>
-            <p style={{ color: C.body, marginBottom: "2rem", fontSize: "0.9375rem" }}>You're signed in. Head to your dashboard to continue.</p>
-            <Link href={dash} style={{ display: "inline-block", background: C.teal, color: "white", fontWeight: 700, fontSize: "1rem", padding: "0.875rem 2rem", borderRadius: 14, textDecoration: "none" }}>Go to Dashboard →</Link>
+            <h2 style={{ fontSize: "1.5rem", fontWeight: 800, color: C.dark, marginBottom: "0.5rem" }}>Welcome back{firstName ? `, ${firstName}` : ""}!</h2>
+            <p style={{ color: C.body, marginBottom: "2rem", fontSize: "0.9375rem" }}>You are signed in. Head to your dashboard to continue.</p>
+            <Link href={dash} style={{ display: "inline-block", background: C.teal, color: "#fff", fontWeight: 700, fontSize: "1rem", padding: "0.875rem 2rem", borderRadius: 14, textDecoration: "none" }}>Go to Dashboard →</Link>
           </div>
         </div>
       </div>
