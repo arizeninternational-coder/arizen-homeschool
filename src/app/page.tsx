@@ -1,10 +1,8 @@
 import Link from "next/link";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth/options";
 import {
   Heart, BookOpen, Sparkles, Shield, ChevronRight, GraduationCap, Users,
   Flower2, Sun, Star, TreePine, Palette, Globe, Lightbulb, Puzzle,
-  ArrowRight, CheckCircle2, Smile, Brain, Eye
+  ArrowRight, CheckCircle2, Smile, Brain, Eye, Zap
 } from "lucide-react";
 import { ds, colors, gradients, shadows } from "@/lib/design-system";
 
@@ -632,20 +630,39 @@ function RedirectCard({ role, name }: { role: string; name: string | null }) {
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const session = await getServerSession(authOptions);
-  const user = session?.user as { name?: string; role?: string } | undefined;
-  const isLoggedIn = !!user;
+  // Read session directly from cookie (bypasses NextAuth server-side issues on Vercel)
+  const { cookies } = await import("next/headers");
+  const { jwtVerify } = await import("jose");
+  const secret = process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-production";
+  let isLoggedIn = false;
+  let userRole: string = "LEARNER";
+  let userName: string | undefined;
+
+  try {
+    const cookieStore = await cookies();
+    const isProd = process.env.NODE_ENV === "production";
+    const cookieName = isProd ? "__Secure-next-auth.session-token" : "next-auth.session-token";
+    const token = cookieStore.get(cookieName)?.value || cookieStore.get("next-auth.session-token")?.value;
+    if (token) {
+      const { payload } = await jwtVerify(token, new TextEncoder().encode(secret), { algorithms: ["HS256"] });
+      if (payload.sub && payload.role) {
+        isLoggedIn = true;
+        userRole = (payload.role as string).toUpperCase();
+        userName = payload.name as string | undefined;
+      }
+    }
+  } catch {}
 
   return (
     <div style={{ minHeight: '100vh', background: colors.bg }}>
       {isLoggedIn ? (
-        <LoggedInNavbar role={user.role || "LEARNER"} />
+        <LoggedInNavbar role={userRole} />
       ) : (
         <LoggedOutNavbar />
       )}
       <main>
         {isLoggedIn ? (
-          <RedirectCard role={user.role || "LEARNER"} name={user.name || null} />
+          <RedirectCard role={userRole} name={userName || null} />
         ) : (
           <>
             <HeroSection />
