@@ -16,6 +16,7 @@ const eqColors: Record<string, { bg: string; border: string; emoji: string; labe
   calm:       { bg: "#D1FAE5", border: "#6EE7B7", emoji: "😌", label: "Calm" },
   curious:    { bg: "#E0E7FF", border: "#A5B4FC", emoji: "🤔", label: "Curious" },
   okay:       { bg: "#E0F2FE", border: "#7DD3FC", emoji: "😐", label: "Okay" },
+  sad:        { bg: "#DBEAFE", border: "#93C5FD", emoji: "😢", label: "Sad" },
   worried:    { bg: "#EDE9FE", border: "#C4B5FD", emoji: "😟", label: "Worried" },
   tired:      { bg: "#DDD6FE", border: "#A78BFA", emoji: "😴", label: "Tired" },
   frustrated: { bg: "#FFE4E6", border: "#FDA4AF", emoji: "😤", label: "Frustrated" },
@@ -26,6 +27,7 @@ const eqMessages: Record<string, string> = {
   calm:       "A calm mind is ready to learn. Let's begin gently.",
   curious:    "Curiosity is a superpower. Let's explore something new.",
   okay:       "That's okay. You can start small today.",
+  sad:        "I'm sorry you're feeling that way. Let's take one gentle step together.",
   worried:    "Thanks for sharing. Let's take one small step at a time.",
   tired:      "Thanks for noticing. Try one short lesson and take it slowly.",
   frustrated: "That feeling is allowed. Let's begin with something simple.",
@@ -36,6 +38,7 @@ const eqActions: Record<string, string> = {
   calm:       "Continue your learning path",
   curious:    "Explore today's challenge",
   okay:       "Pick a lesson to start",
+  sad:        "Try a gentle lesson",
   worried:    "Start with something easy",
   tired:      "Start with a short lesson",
   frustrated: "Try a gentle practice lesson",
@@ -110,7 +113,7 @@ export default function StudentDashboard() {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ emotion }),
+        body: JSON.stringify({ emotion: emotion.toUpperCase() }),
       });
       if (res.ok) {
         setCheckinEmotion(emotion);

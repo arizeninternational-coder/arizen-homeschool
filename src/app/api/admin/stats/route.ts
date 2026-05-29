@@ -17,9 +17,10 @@ export async function GET(req: NextRequest) {
       supabase.from("LearnerProfile").select("id", { count: "exact", head: true }),
       supabase.from("Lesson").select("id", { count: "exact", head: true }),
       supabase.from("Quest").select("id", { count: "exact", head: true }),
+      supabase.from("AvatarItem").select("id", { count: "exact", head: true }).eq("isActive", true),
     ]);
 
-    const [usersRes, parentsRes, learnersRes, lessonsRes, questsRes] = results;
+    const [usersRes, parentsRes, learnersRes, lessonsRes, questsRes, shopItemsRes] = results;
 
     // Log any failures for debugging
     const errors: string[] = [];
@@ -39,6 +40,7 @@ export async function GET(req: NextRequest) {
       learners: learnersRes.status === "fulfilled" ? (learnersRes.value.count ?? 0) : 0,
       lessons: lessonsRes.status === "fulfilled" ? (lessonsRes.value.count ?? 0) : 0,
       quests: questsRes.status === "fulfilled" ? (questsRes.value.count ?? 0) : 0,
+      shopItems: shopItemsRes.status === "fulfilled" ? (shopItemsRes.value.count ?? 0) : 0,
       ...(errors.length > 0 ? { _errors: errors } : {}),
     });
   } catch (error: any) {

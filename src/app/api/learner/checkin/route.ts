@@ -4,13 +4,14 @@ import { supabase } from "@/lib/supabase";
 import { getAuthUser } from "@/lib/api-guard";
 export const dynamic = "force-dynamic";
 
-const VALID_EMOTIONS = ["HAPPY", "CALM", "CURIOUS", "OKAY", "WORRIED", "TIRED", "FRUSTRATED"];
+const VALID_EMOTIONS = ["HAPPY", "CALM", "CURIOUS", "OKAY", "SAD", "WORRIED", "TIRED", "FRUSTRATED"];
 
 const EMOTION_LABELS: Record<string, string> = {
   HAPPY: "Happy",
   CALM: "Calm",
   CURIOUS: "Curious",
   OKAY: "Okay",
+  SAD: "Sad",
   WORRIED: "Worried",
   TIRED: "Tired",
   FRUSTRATED: "Frustrated",

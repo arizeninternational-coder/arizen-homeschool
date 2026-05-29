@@ -178,6 +178,7 @@ export default function AdminDashboard() {
     { label: "Learners", value: stats.learners, icon: GraduationCap, color: colors.success },
     { label: "Lessons", value: stats.lessons, icon: BookOpen, color: colors.warning },
     { label: "Quests", value: stats.quests, icon: Layers, color: colors.primary },
+    { label: "Shop Items", value: stats.shopItems, icon: ShoppingBag, color: colors.accent },
   ];
 
   const quickActions = [
@@ -190,18 +191,20 @@ export default function AdminDashboard() {
   // Shared sidebar/nav content
   const renderNavContent = (inline: boolean) => (
     <>
-      {/* Brand / Logo area */}
-      <div style={{ padding: "0 1.25rem", marginBottom: "2rem" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-          <div style={{ width: 36, height: 36, borderRadius: 10, background: gradients.primary, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-            <Shield style={{ width: 20, height: 20, color: "white" }} />
-          </div>
-          <div>
-            <div style={{ fontWeight: 800, fontSize: "0.9375rem", color: colors.text }}>Arizen Admin</div>
-            <div style={{ fontSize: "0.75rem", color: colors.textMuted }}>Management Portal</div>
+      {/* Brand / Logo area — only for desktop sidebar, not mobile drawer */}
+      {!inline && (
+        <div style={{ padding: "0 1.25rem", marginBottom: "1.5rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: gradients.primary, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <Shield style={{ width: 20, height: 20, color: "white" }} />
+            </div>
+            <div>
+              <div style={{ fontWeight: 800, fontSize: "0.9375rem", color: colors.text }}>Arizen Admin</div>
+              <div style={{ fontSize: "0.75rem", color: colors.textMuted }}>Management Portal</div>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Navigation links */}
       {!inline && (

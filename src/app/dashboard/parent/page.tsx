@@ -154,16 +154,12 @@ export default function ParentDashboard() {
         <div style={{ maxWidth: 960, margin: "0 auto", padding: "0 1.5rem" }}>
 
           {/* Welcome */}
-          <div style={{ marginBottom: "2.5rem" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
-              <Heart style={{ width: 20, height: 20, color: colors.accent }} />
-              <span style={{ fontSize: "0.75rem", fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: colors.primary }}>Parent Dashboard</span>
-            </div>
-            <h1 style={{ fontSize: "clamp(1.5rem, 3.5vw, 2rem)", fontWeight: 900, letterSpacing: "-0.03em", color: colors.textHeading, marginBottom: "0.75rem", lineHeight: 1.15 }}>
+          <div style={{ marginBottom: "1.25rem" }}>
+            <h1 style={{ fontSize: "clamp(1.25rem, 3vw, 1.5rem)", fontWeight: 900, letterSpacing: "-0.02em", color: colors.textHeading, marginBottom: "0.25rem", lineHeight: 1.15 }}>
               {getGreeting()}, <span style={ds.textGradient}>{displayName.split(" ")[0]}</span> 👋
             </h1>
-            <p style={{ fontSize: "1.0625rem", color: colors.textMuted, maxWidth: 560, fontWeight: 500, lineHeight: 1.7 }}>
-              Welcome to your family&apos;s learning hub. Track your children&apos;s progress, explore lessons, and celebrate their achievements.
+            <p style={{ fontSize: "0.875rem", color: colors.textMuted, maxWidth: 480, fontWeight: 500, lineHeight: 1.5 }}>
+              Track your children's progress and celebrate their achievements.
             </p>
           </div>
 
@@ -250,25 +246,25 @@ export default function ParentDashboard() {
           )}
 
           {/* Quick Stats */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem", marginBottom: "2.5rem" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "0.75rem", marginBottom: "1.25rem" }}>
             {[
               { icon: Users, label: "Children", value: String(children.length), color: colors.primary, bgColor: colors.primarySoft },
-              { icon: Flame, label: "Active Streaks", value: String(children.filter((c: any) => c.childUser?.learnerProfile?.currentStreak > 0).length), color: colors.warm, bgColor: colors.warmSoft },
+              { icon: Flame, label: "Streaks", value: String(children.filter((c: any) => c.childUser?.learnerProfile?.currentStreak > 0).length), color: colors.warm, bgColor: colors.warmSoft },
               { icon: Award, label: "Total XP", value: String(children.reduce((sum: number, c: any) => sum + (c.childUser?.learnerProfile?.totalXp || 0), 0)), color: colors.accent, bgColor: colors.accentSoft },
-              { icon: BookOpen, label: "Lessons Done", value: "0", color: colors.info, bgColor: colors.bgBlue },
+              { icon: BookOpen, label: "Done", value: "0", color: colors.info, bgColor: colors.bgBlue },
             ].map((stat) => (
-              <div key={stat.label} style={{ ...ds.card, padding: "1.25rem" }}>
-                <div style={{ width: 40, height: 40, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "0.75rem", background: stat.bgColor }}>
-                  <stat.icon style={{ width: 20, height: 20, color: stat.color }} />
+              <div key={stat.label} style={{ ...ds.card, padding: "0.875rem" }}>
+                <div style={{ width: 32, height: 32, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "0.5rem", background: stat.bgColor }}>
+                  <stat.icon style={{ width: 16, height: 16, color: stat.color }} />
                 </div>
-                <div style={{ fontSize: "1.5rem", fontWeight: 800, color: colors.text }}>{stat.value}</div>
-                <div style={{ fontSize: "0.8125rem", color: colors.textMuted, fontWeight: 600 }}>{stat.label}</div>
+                <div style={{ fontSize: "1.25rem", fontWeight: 800, color: colors.text }}>{stat.value}</div>
+                <div style={{ fontSize: "0.6875rem", color: colors.textMuted, fontWeight: 600 }}>{stat.label}</div>
               </div>
             ))}
           </div>
 
           {/* Children Section */}
-          <div style={{ marginBottom: "2.5rem" }}>
+          <div style={{ marginBottom: "1.25rem" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.25rem" }}>
               <h2 style={{ fontSize: "1.125rem", fontWeight: 800, color: colors.text }}>My Children</h2>
               <Link href="/dashboard/parent/children" style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem", fontSize: "0.8125rem", fontWeight: 700, color: colors.primary, textDecoration: "none" }}>
