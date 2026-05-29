@@ -47,11 +47,20 @@ export async function POST(req: NextRequest) {
     const normalizedEmail = email.toLowerCase().trim();
 
     // Query user from Supabase
+    console.log("[LOGIN_API] Querying Supabase for:", normalizedEmail);
     const { data: users, error: dbError } = await supabase
       .from("User")
       .select("id, name, email, image, role, passwordHash, guildId")
       .eq("email", normalizedEmail)
       .limit(1);
+    
+    console.log("[LOGIN_API] Supabase result:", { 
+      hasError: !!dbError, 
+      errorMessage: dbError?.message,
+      usersCount: users?.length ?? 0,
+      userId: users?.[0]?.id,
+      hasHash: !!users?.[0]?.passwordHash
+    });
 
     if (dbError) {
       console.error("[LOGIN_API] Supabase error:", dbError.message);
@@ -164,9 +173,9 @@ export async function POST(req: NextRequest) {
     console.log("[LOGIN_API] Success:", user.email, "role:", user.role);
     return response;
   } catch (err: any) {
-    console.error("[LOGIN_API] Critical error:", err);
+    console.error("[LOGIN_API] Critical error:", err?.message, err?.stack);
     return NextResponse.json(
-      { error: "Login failed. Please try again." },
+      { error: "Login failed. Please try again.", details: err?.message },
       { status: 500 }
     );
   }
