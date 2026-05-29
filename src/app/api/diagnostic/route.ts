@@ -15,7 +15,7 @@ function decodeJwtPayload(token: string): Record<string, any> | null {
   }
 }
 
-export const dynamic = "force-diagnostic";
+export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   const lines: string[] = [];
