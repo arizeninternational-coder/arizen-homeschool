@@ -132,6 +132,11 @@ model LearnerProfile {
   xpRecords     XpRecord[]
   badges        Badge[]
   streaks       Streak[]
+  wallet        StudentWallet?
+  avatar        StudentAvatar?
+  emotionalCheckins EmotionalCheckin[]
+  inventory     StudentInventory[]
+  coinTracking  CoinAwardTracking[]
 }
 
 // ── NextAuth Tables ──────────────────────────────────────────
@@ -513,7 +518,7 @@ model StudentWallet {
 
 model CoinTransaction {
   id              String   @id @default(uuid())
-  learnerId       String
+  walletId        String
   amount          Int
   type            WalletTransactionType
   source          WalletTransactionSource
@@ -522,8 +527,8 @@ model CoinTransaction {
   balanceAfter    Int      @default(0)
   createdAt       DateTime @default(now())
 
-  learner         StudentWallet @relation(fields: [learnerId], references: [id])
-  @@index([learnerId])
+  wallet          StudentWallet @relation(fields: [walletId], references: [id])
+  @@index([walletId])
   @@index([createdAt])
 }
 
@@ -579,6 +584,7 @@ model StudentInventory {
   purchasedAt     DateTime @default(now())
 
   avatarItem      AvatarItem @relation(fields: [avatarItemId], references: [id])
+  learner         LearnerProfile @relation(fields: [learnerId], references: [id])
   @@unique([learnerId, avatarItemId])
   @@index([learnerId])
 }
@@ -602,6 +608,7 @@ model CoinAwardTracking {
   sourceId        String
   awardedAt       DateTime @default(now())
 
+  learner         LearnerProfile @relation(fields: [learnerId], references: [id])
   @@unique([learnerId, sourceType, sourceId])
   @@index([learnerId])
 }
