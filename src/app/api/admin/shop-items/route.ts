@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
   try {
     const { data: items, error } = await supabase
       .from("AvatarItem")
-      .select("id, name, description, category, price, rarity, isActive, unlockRequirementType, unlockRequirementValue, createdAt")
+      .select("*")
       .order("createdAt", { ascending: false });
 
     if (error) {
@@ -19,7 +19,22 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ items: items || [] });
+    // Normalize items to ensure consistent fields
+    const normalized = (items || []).map((item: any) => ({
+      id: item.id,
+      name: item.name,
+      description: item.description || "",
+      category: item.category || "OTHER",
+      price: item.price || 0,
+      rarity: item.rarity || "COMMON",
+      isActive: item.isActive !== false,
+      unlockRequirementType: item.unlockRequirementType || null,
+      unlockRequirementValue: item.unlockRequirementValue || null,
+      emoji: item.emoji || "🎁",
+      createdAt: item.createdAt,
+    }));
+
+    return NextResponse.json({ items: normalized });
   } catch (err: any) {
     console.error("[ADMIN_SHOP_ITEMS] Critical error:", err);
     return NextResponse.json({ error: err.message || "Failed to fetch shop items" }, { status: 500 });

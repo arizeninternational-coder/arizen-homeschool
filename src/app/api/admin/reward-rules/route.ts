@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
   try {
     const { data: rules, error } = await supabase
       .from("RewardRule")
-      .select("id, action, coins, xp, dailyLimit, isActive")
+      .select("*")
       .order("action");
 
     if (error) {
@@ -19,7 +19,16 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ rules: rules || [] });
+    const normalized = (rules || []).map((rule: any) => ({
+      id: rule.id,
+      action: rule.action || "",
+      coins: rule.coins || 0,
+      xp: rule.xp || 0,
+      dailyLimit: rule.dailyLimit ?? 0,
+      isActive: rule.isActive !== false,
+    }));
+
+    return NextResponse.json({ rules: normalized });
   } catch (err: any) {
     console.error("[ADMIN_REWARD_RULES] Critical error:", err);
     return NextResponse.json({ error: err.message || "Failed to fetch reward rules" }, { status: 500 });
