@@ -5,132 +5,184 @@ export const dynamic = "force-dynamic";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
-  BookOpen, Clock, ChevronRight, Target, Filter, Sparkles
+  BookOpen, ChevronRight, Sparkles, Clock, CheckCircle, Play, Award, Filter, Search
 } from "lucide-react";
 import { ds, colors } from "@/lib/design-system";
 
-interface Theme {
+interface LessonItem {
   id: string;
   title: string;
   slug: string;
-  description: string;
-  drivingQuestion?: string;
-  durationWeeks?: number;
-  grade?: number;
-  subjects?: string[];
-  questsCount?: number;
-  progress?: number;
+  description: string | null;
+  status: string;
+  orderIndex: number;
+  xpReward: any;
+  createdAt: string;
+  quest?: {
+    id: string;
+    title: string;
+    theme?: {
+      id: string;
+      title: string;
+      grade: number;
+    };
+  };
+  progress?: {
+    status: string;
+    completedAt: string | null;
+  };
 }
 
-export default function StudentThemesPage() {
-  const [themes, setThemes] = useState<Theme[]>([]);
+export default function StudentLessonsPage() {
+  const [lessons, setLessons] = useState<LessonItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [studentGrade, setStudentGrade] = useState<number | null>(null);
-  const [selectedGrade, setSelectedGrade] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [filter, setFilter] = useState<"all" | "available" | "completed">("all");
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
-    // Fetch student profile to get grade
-    fetch("/api/learner/profile")
-      .then(r => r.json())
-      .then(data => {
-        if (data.profile?.grade) {
-          setStudentGrade(data.profile.grade);
-          setSelectedGrade(data.profile.grade); // Auto-filter by student's grade
+    async function load() {
+      try {
+        const res = await fetch("/api/learner/lessons", { credentials: "include" });
+        if (res.ok) {
+          const data = await res.json();
+          setLessons(data.lessons || []);
+        } else {
+          const errBody = await res.json().catch(() => ({}));
+          setError(errBody.error || "Failed to load lessons");
         }
-      })
-      .catch(() => {});
+      } catch (err: any) {
+        setError(err?.message || "Failed to load lessons");
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
   }, []);
 
-  useEffect(() => {
-    if (selectedGrade === null && studentGrade === null) return;
-    const url = selectedGrade ? `/api/themes?grade=${selectedGrade}` : "/api/themes";
-    setLoading(true);
-    fetch(url)
-      .then(r => r.json())
-      .then(data => setThemes(data.themes || []))
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, [selectedGrade, studentGrade]);
+  const filtered = lessons.filter(l => {
+    if (filter === "completed" && l.progress?.status !== "COMPLETED") return false;
+    if (filter === "available" && l.progress?.status === "COMPLETED") return false;
+    if (!search.trim()) return true;
+    const q = search.toLowerCase();
+    return l.title.toLowerCase().includes(q) || l.quest?.theme?.title?.toLowerCase().includes(q) || l.quest?.title?.toLowerCase().includes(q);
+  });
 
-  const uniqueGrades = [...new Set(themes.map(t => t.grade).filter(Boolean))].sort() as number[];
+  const completedCount = lessons.filter(l => l.progress?.status === "COMPLETED").length;
 
   return (
-    <>
-      <div style={{ marginBottom: "1.25rem" }}>
-        <h1 style={{ fontSize: "1.375rem", fontWeight: 800, color: colors.text, marginBottom: "0.25rem" }}>Explore Themes</h1>
-        <p style={{ color: colors.textMuted, fontSize: "0.875rem" }}>Discover topics and start your learning adventure.</p>
-      </div>
+    <div style={{ minHeight: "100vh", background: colors.bg }}>
+      <div style={{ maxWidth: 900, margin: "0 auto", padding: "1.25rem" }}>
+        {/* Header */}
+        <div style={{ marginBottom: "1.25rem" }}>
+          <h1 style={{ fontSize: "1.25rem", fontWeight: 800, color: colors.text, marginBottom: "0.25rem" }}>My Lessons</h1>
+          <p style={{ color: colors.textMuted, fontSize: "0.875rem" }}>
+            {completedCount}/{lessons.length} completed
+          </p>
+        </div>
 
-      {/* Grade Filter */}
-      {uniqueGrades.length > 0 && (
-        <div style={{ display: "flex", gap: "0.375rem", marginBottom: "1.25rem", flexWrap: "wrap" }}>
-          <button onClick={() => setSelectedGrade(null)} style={{ padding: "0.375rem 0.75rem", borderRadius: 20, border: `1px solid ${selectedGrade === null ? colors.primary : colors.border}`, background: selectedGrade === null ? colors.primarySoft : "white", color: selectedGrade === null ? colors.primary : colors.textMuted, fontWeight: 600, fontSize: "0.75rem", cursor: "pointer" }}>
-            All Grades
-          </button>
-          {uniqueGrades.map(g => (
-            <button key={g} onClick={() => setSelectedGrade(g)} style={{ padding: "0.375rem 0.75rem", borderRadius: 20, border: `1px solid ${selectedGrade === g ? colors.primary : colors.border}`, background: selectedGrade === g ? colors.primarySoft : "white", color: selectedGrade === g ? colors.primary : colors.textMuted, fontWeight: 600, fontSize: "0.75rem", cursor: "pointer" }}>
-              Grade {g}
+        {/* Filters */}
+        <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem", flexWrap: "wrap" }}>
+          {([
+            { key: "all", label: `All (${lessons.length})` },
+            { key: "available", label: `To Do (${lessons.length - completedCount})` },
+            { key: "completed", label: `Done (${completedCount})` },
+          ] as const).map(f => (
+            <button
+              key={f.key}
+              onClick={() => setFilter(f.key)}
+              style={{
+                padding: "0.375rem 0.875rem",
+                borderRadius: 8,
+                border: "none",
+                background: filter === f.key ? colors.primary : colors.bgSoft,
+                color: filter === f.key ? "white" : colors.textMuted,
+                fontWeight: 700,
+                fontSize: "0.75rem",
+                cursor: "pointer",
+              }}
+            >
+              {f.label}
             </button>
           ))}
         </div>
-      )}
 
-      {loading ? (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: "0.75rem" }}>
-          {[1,2,3,4].map(i => <div key={i} style={{ ...ds.card, padding: "1.25rem", height: 160, background: colors.bgAlt }} />)}
-        </div>
-      ) : themes.length === 0 ? (
-        <div style={{ ...ds.card, textAlign: "center", padding: "2.5rem 1.5rem" }}>
-          <BookOpen style={{ width: 36, height: 36, color: colors.textMuted, margin: "0 auto 0.75rem", opacity: 0.3 }} />
-          <h3 style={{ fontSize: "1rem", fontWeight: 700, color: colors.text, marginBottom: "0.375rem" }}>No themes available yet</h3>
-          <p style={{ color: colors.textMuted, fontSize: "0.875rem" }}>Check back soon — new learning themes are being added!</p>
-        </div>
-      ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: "0.75rem" }}>
-          {themes.map((theme) => (
-            <ThemeCard key={theme.id} theme={theme} />
-          ))}
-        </div>
-      )}
-    </>
-  );
-}
-
-function ThemeCard({ theme }: { theme: Theme }) {
-  return (
-    <Link href={`/dashboard/student/lessons/${theme.slug}`} style={{ ...ds.card, padding: "1rem", textDecoration: "none", display: "block" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.5rem" }}>
-        <div style={{ width: 36, height: 36, borderRadius: 10, background: `linear-gradient(135deg, ${colors.primary}, ${colors.info || colors.primary})`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <BookOpen style={{ width: 18, height: 18, color: "white" }} />
-        </div>
-        {theme.progress !== undefined && theme.progress > 0 && (
-          <span style={{ fontSize: "0.625rem", fontWeight: 700, color: colors.primary, background: colors.primarySoft, padding: "0.125rem 0.375rem", borderRadius: 6 }}>
-            {theme.progress}%
-          </span>
+        {loading ? (
+          <div style={{ ...ds.card, textAlign: "center", padding: "2.5rem 1.5rem", color: colors.textMuted }}>
+            Loading lessons...
+          </div>
+        ) : error ? (
+          <div style={{ ...ds.alertError }}>
+            <span>{error}</span>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div style={{ ...ds.card, textAlign: "center", padding: "2.5rem 1.5rem" }}>
+            <BookOpen style={{ width: 40, height: 40, color: colors.textMuted, margin: "0 auto 0.75rem", opacity: 0.4 }} />
+            <h3 style={{ fontSize: "1rem", fontWeight: 700, color: colors.text, marginBottom: "0.375rem" }}>
+              {search ? "No lessons match your search" : filter === "completed" ? "No completed lessons yet" : "No lessons available yet"}
+            </h3>
+            <p style={{ color: colors.textMuted, fontSize: "0.875rem" }}>
+              {search ? "Try a different search term." : filter === "completed" ? "Complete your first lesson to see it here." : "Lessons will appear here when your curriculum is published."}
+            </p>
+          </div>
+        ) : (
+          <div style={{ display: "grid", gap: "0.5rem" }}>
+            {filtered.map((lesson) => {
+              const isCompleted = lesson.progress?.status === "COMPLETED";
+              const xpVal = typeof lesson.xpReward === "object" ? (lesson.xpReward?.base || lesson.xpReward?.amount || 0) : (lesson.xpReward || 0);
+              return (
+                <Link
+                  key={lesson.id}
+                  href={`/dashboard/student/lessons/${lesson.id}`}
+                  style={{
+                    ...ds.card,
+                    padding: "1rem",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.75rem",
+                    textDecoration: "none",
+                    border: isCompleted ? `1.5px solid ${colors.success}30` : undefined,
+                  }}
+                >
+                  <div style={{
+                    width: 40, height: 40, borderRadius: 10,
+                    background: isCompleted ? `${colors.success}15` : colors.primarySoft,
+                    display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                  }}>
+                    {isCompleted
+                      ? <CheckCircle style={{ width: 20, height: 20, color: colors.success }} />
+                      : <BookOpen style={{ width: 20, height: 20, color: colors.primary }} />
+                    }
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 700, color: colors.text, fontSize: "0.875rem", marginBottom: "0.125rem" }}>
+                      {lesson.title}
+                    </div>
+                    <div style={{ fontSize: "0.6875rem", color: colors.textMuted }}>
+                      {lesson.quest?.theme && <span>{lesson.quest.theme.title}</span>}
+                      {lesson.quest && lesson.quest.theme && " · "}
+                      {lesson.quest?.title}
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexShrink: 0 }}>
+                    {xpVal > 0 && (
+                      <span style={{ fontSize: "0.6875rem", color: "#B45309", fontWeight: 700, background: "#FEF3C7", padding: "0.15rem 0.4rem", borderRadius: 4 }}>
+                        {xpVal} XP
+                      </span>
+                    )}
+                    {isCompleted && (
+                      <span style={{ fontSize: "0.625rem", color: colors.success, fontWeight: 700, background: `${colors.success}15`, padding: "0.15rem 0.4rem", borderRadius: 4 }}>
+                        DONE
+                      </span>
+                    )}
+                    <ChevronRight style={{ width: 16, height: 16, color: colors.textMuted }} />
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
         )}
       </div>
-      <h3 style={{ fontWeight: 700, color: colors.text, fontSize: "0.9375rem", marginBottom: "0.25rem" }}>{theme.title}</h3>
-      <p style={{ fontSize: "0.75rem", color: colors.textMuted, marginBottom: "0.5rem", lineHeight: 1.4 }}>{theme.description}</p>
-      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.6875rem", color: colors.textMuted, flexWrap: "wrap" }}>
-        {theme.grade && <span style={{ fontWeight: 600 }}>Grade {theme.grade}</span>}
-        {theme.durationWeeks && (
-          <span style={{ display: "flex", alignItems: "center", gap: "0.125rem" }}>
-            <Clock style={{ width: 10, height: 10 }} /> {theme.durationWeeks}w
-          </span>
-        )}
-        {theme.questsCount !== undefined && (
-          <span style={{ display: "flex", alignItems: "center", gap: "0.125rem" }}>
-            <Target style={{ width: 10, height: 10 }} /> {theme.questsCount}
-          </span>
-        )}
-      </div>
-      {theme.subjects && theme.subjects.length > 0 && (
-        <div style={{ display: "flex", gap: "0.25rem", marginTop: "0.5rem", flexWrap: "wrap" }}>
-          {theme.subjects.slice(0, 3).map(s => (
-            <span key={s} style={{ fontSize: "0.625rem", fontWeight: 600, color: colors.primary, background: colors.primarySoft, padding: "0.1rem 0.375rem", borderRadius: 5 }}>{s}</span>
-          ))}
-        </div>
-      )}
-    </Link>
+    </div>
   );
 }

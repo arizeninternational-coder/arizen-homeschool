@@ -59,7 +59,7 @@ export default function ParentDashboard() {
         const res = await fetch("/api/auth/session");
         const data = await res.json();
         if (!data?.user) { window.location.replace("/auth/login"); return; }
-        if (data.user.role !== "PARENT") {
+        if (data.user.role?.toUpperCase() !== "PARENT") {
           window.location.replace(data.user.role === "ADMIN" ? "/dashboard/admin" : "/dashboard/student");
           return;
         }

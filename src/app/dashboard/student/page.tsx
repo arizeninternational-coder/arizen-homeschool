@@ -108,6 +108,7 @@ export default function StudentDashboard() {
     try {
       const res = await fetch("/api/learner/checkin", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ emotion }),
       });
@@ -126,85 +127,86 @@ export default function StudentDashboard() {
     <>
       {/* ─── 1. Greeting Hero ─── */}
       <div style={{
-        padding: "2rem 2rem 2.25rem",
-        borderRadius: 20,
+        padding: "1rem 1.25rem",
+        borderRadius: 16,
         background: "linear-gradient(135deg, #0d9488 0%, #059669 50%, #10b981 100%)",
         color: "white",
-        marginBottom: "2rem",
+        marginBottom: "1rem",
         position: "relative",
         overflow: "hidden",
-        boxShadow: "0 8px 32px rgba(5,150,105,0.22)",
+        boxShadow: "0 4px 16px rgba(5,150,105,0.18)",
       }}>
         {/* Decorative circles */}
         <div style={{
-          position: "absolute", top: "-2rem", right: "-2rem",
-          width: 120, height: 120, borderRadius: "50%",
-          background: "rgba(255,255,255,0.08)",
-        }} />
-        <div style={{
-          position: "absolute", bottom: "-3rem", right: "20%",
-          width: 160, height: 160, borderRadius: "50%",
-          background: "rgba(255,255,255,0.05)",
+          position: "absolute", top: "-1.5rem", right: "-1.5rem",
+          width: 80, height: 80, borderRadius: "50%",
+          background: "rgba(255,255,255,0.06)",
         }} />
         <div style={{ position: "relative" }}>
           <div style={{
-            display: "inline-flex", alignItems: "center", gap: "0.4rem",
-            padding: "0.3rem 0.75rem", borderRadius: 999,
+            display: "inline-flex", alignItems: "center", gap: "0.3rem",
+            padding: "0.2rem 0.6rem", borderRadius: 999,
             background: "rgba(255,255,255,0.15)",
             backdropFilter: "blur(8px)",
-            marginBottom: "0.75rem",
+            marginBottom: "0.4rem",
           }}>
-            <Sparkles style={{ width: 14, height: 14 }} />
-            <span style={{ fontSize: "0.6875rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+            <Sparkles style={{ width: 12, height: 12 }} />
+            <span style={{ fontSize: "0.625rem", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" }}>
               Level {level}
             </span>
           </div>
-          <h1 style={{ fontSize: "clamp(1.5rem, 3.5vw, 2.25rem)", fontWeight: 900, marginBottom: "0.5rem", letterSpacing: "-0.03em" }}>
+          <h1 style={{ fontSize: "clamp(1.125rem, 3vw, 1.5rem)", fontWeight: 900, marginBottom: "0.25rem", letterSpacing: "-0.02em" }}>
             Hey, {displayName}! 👋
           </h1>
-          <p style={{ opacity: 0.88, fontSize: "0.9375rem", fontWeight: 500, maxWidth: 480 }}>
-            Welcome back to your learning adventure. Let's make today amazing.
+          <p style={{ opacity: 0.85, fontSize: "0.8125rem", fontWeight: 500, marginBottom: "0.75rem" }}>
+            {xpInLevel}/500 XP to Level {level + 1}
           </p>
+          <Link href="/dashboard/student/lessons" style={{
+            display: "inline-flex", alignItems: "center", gap: "0.35rem",
+            padding: "0.4rem 1rem", borderRadius: 10,
+            background: "rgba(255,255,255,0.2)", color: "white",
+            fontSize: "0.75rem", fontWeight: 700, textDecoration: "none",
+          }}>
+            Start Today's Lesson <ChevronRight style={{ width: 14, height: 14 }} />
+          </Link>
         </div>
       </div>
 
       {/* ─── 2. Daily EQ Check-In ─── */}
       <div style={{
         background: "white",
-        borderRadius: 20,
+        borderRadius: 16,
         border: "1px solid rgb(var(--color-border-light))",
-        padding: "2rem",
-        marginBottom: "2rem",
-        boxShadow: ds.shadows.md,
+        padding: "1rem",
+        marginBottom: "1rem",
+        boxShadow: ds.shadows.sm,
         position: "relative",
         overflow: "hidden",
       }}>
         {/* Warm top accent */}
         <div style={{
-          position: "absolute", top: 0, left: 0, right: 0, height: 4,
+          position: "absolute", top: 0, left: 0, right: 0, height: 3,
           background: "linear-gradient(90deg, #fde047, #6ee7b7, #a5b4fc, #7dd3fc, #c4b5fd, #a78bfa, #fda4af)",
         }} />
 
         {!checkinSaved ? (
           <>
-            <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
-              <h2 style={{ fontSize: "1.375rem", fontWeight: 800, color: colors.textHeading, marginBottom: "0.5rem", letterSpacing: "-0.02em" }}>
+            <div style={{ textAlign: "center", marginBottom: "0.75rem" }}>
+              <h2 style={{ fontSize: "1rem", fontWeight: 800, color: colors.textHeading, marginBottom: "0.25rem" }}>
                 How are you feeling today?
               </h2>
-              <p style={{ fontSize: "0.875rem", color: colors.textMuted, fontWeight: 500 }}>
-                All feelings are welcome here. 💛
+              <p style={{ fontSize: "0.75rem", color: colors.textMuted, fontWeight: 500 }}>
+                All feelings are welcome. 💛
               </p>
             </div>
 
             <div style={{
               display: "grid",
-              gridTemplateColumns: "repeat(2, 1fr)",
-              gap: "0.625rem",
-              maxWidth: 520,
+              gridTemplateColumns: "repeat(4, 1fr)",
+              gap: "0.375rem",
+              maxWidth: 360,
               margin: "0 auto",
-            }}
-            className="emotion-grid"
-            >
+            }}>
               {emotionKeys.map((key) => {
                 const eq = eqColors[key];
                 return (
@@ -217,27 +219,27 @@ export default function StudentDashboard() {
                       flexDirection: "column",
                       alignItems: "center",
                       justifyContent: "center",
-                      gap: "0.375rem",
-                      padding: "0.875rem 0.625rem",
-                      minHeight: 80,
-                      borderRadius: 16,
-                      border: `2px solid ${eq.border}`,
+                      gap: "0.25rem",
+                      padding: "0.5rem 0.375rem",
+                      minHeight: 60,
+                      borderRadius: 12,
+                      border: `1.5px solid ${eq.border}`,
                       background: eq.bg,
                       cursor: checkinLoading ? "wait" : "pointer",
-                      transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+                      transition: "all 0.2s ease",
                       fontFamily: "'Nunito', system-ui, sans-serif",
                       fontWeight: 700,
-                    } as React.CSSProperties}
+                    }}
                   >
-                    <span style={{ fontSize: "1.75rem", lineHeight: 1 }}>{eq.emoji}</span>
-                    <span style={{ fontSize: "0.8125rem", color: "#44403c", fontWeight: 700 }}>{eq.label}</span>
+                    <span style={{ fontSize: "1.25rem", lineHeight: 1 }}>{eq.emoji}</span>
+                    <span style={{ fontSize: "0.625rem", color: "#44403c", fontWeight: 700 }}>{eq.label}</span>
                   </button>
                 );
               })}
             </div>
             <style>{`
-              @media (min-width: 640px) {
-                .emotion-grid { grid-template-columns: repeat(4, 1fr); }
+              @media (max-width: 360px) {
+                .emotion-grid { grid-template-columns: repeat(3, 1fr) !important; }
               }
             `}</style>
           </>
