@@ -83,20 +83,22 @@ export const POST = withAuthPost(async (req, user, body: any) => {
       return NextResponse.json({ error: "No user found with that email address" }, { status: 404 });
     }
 
-    if (childUser.role !== "LEARNER") {
+    if (childUser.role?.toUpperCase() !== "LEARNER") {
       return NextResponse.json({ error: "The user with that email is not a learner account" }, { status: 400 });
     }
 
-    // Check if already linked
+    // Check if already linked to this parent
     const { data: existing } = await supabase
       .from("ParentChild")
-      .select("id")
-      .eq("parentId", parentId)
+      .select("id, parentId")
       .eq("childUserId", childUser.id)
       .single();
 
     if (existing) {
-      return NextResponse.json({ error: "This child is already linked to your account" }, { status: 409 });
+      if (existing.parentId === parentId) {
+        return NextResponse.json({ error: "This child is already linked to your account" }, { status: 409 });
+      }
+      return NextResponse.json({ error: "This student is already linked to a parent account" }, { status: 409 });
     }
 
     // Create the link

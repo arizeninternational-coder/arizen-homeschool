@@ -231,7 +231,7 @@ export default function AdminQuestsPage() {
         ) : (
           <div style={{ display: "grid", gap: "0.5rem" }}>
             {filtered.map(quest => (
-              <div key={quest.id} style={{ ...ds.card, padding: "1rem 1.25rem", display: "flex", alignItems: "center", gap: "1rem" }}>
+              <Link key={quest.id} href={`/dashboard/admin/quests/${quest.id}`} style={{ ...ds.card, padding: "1rem 1.25rem", display: "flex", alignItems: "center", gap: "1rem", textDecoration: "none" }}>
                 <div style={{ width: 40, height: 40, borderRadius: 10, background: colors.primarySoft, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                   <Layers style={{ width: 18, height: 18, color: colors.primary }} />
                 </div>
@@ -251,7 +251,7 @@ export default function AdminQuestsPage() {
                 <button onClick={() => handleDelete(quest.id, quest.title)} style={{ background: "none", border: "none", cursor: "pointer", color: colors.textMuted, padding: "0.25rem", flexShrink: 0 }} title="Delete">
                   <Trash2 style={{ width: 14, height: 14 }} />
                 </button>
-              </div>
+              </Link>
             ))}
           </div>
         )}

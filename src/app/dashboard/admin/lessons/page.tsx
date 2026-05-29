@@ -122,7 +122,7 @@ export default function AdminLessonsPage() {
         ) : (
           <div style={{ display: "grid", gap: "0.5rem" }}>
             {filtered.map((lesson) => (
-              <div key={lesson.id} style={{ ...ds.card, padding: "1rem 1.25rem", display: "flex", alignItems: "center", gap: "1rem" }}>
+              <Link key={lesson.id} href={`/dashboard/admin/lessons/${lesson.id}`} style={{ ...ds.card, padding: "1rem 1.25rem", display: "flex", alignItems: "center", gap: "1rem", textDecoration: "none" }}>
                 <div style={{ width: 40, height: 40, borderRadius: 10, background: colors.primarySoft, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                   <BookOpen style={{ width: 18, height: 18, color: colors.primary }} />
                 </div>
@@ -154,7 +154,7 @@ export default function AdminLessonsPage() {
                 <span style={{ fontSize: "0.6875rem", color: colors.textMuted, flexShrink: "0" }}>
                   #{lesson.orderIndex}
                 </span>
-              </div>
+              </Link>
             ))}
           </div>
         )}

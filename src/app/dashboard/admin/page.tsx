@@ -8,7 +8,7 @@ import Link from "next/link";
 import {
   Users, BookOpen, GraduationCap, Award, Settings, BarChart3,
   Shield, LogOut, Plus, ChevronRight, TrendingUp, Activity,
-  UserCheck, Layers, Zap, AlertCircle, Menu, X
+  UserCheck, Layers, Zap, AlertCircle, Menu, X, ShoppingBag
 } from "lucide-react";
 import { ds, colors, gradients, shadows } from "@/lib/design-system";
 
@@ -167,6 +167,7 @@ export default function AdminDashboard() {
     { icon: BookOpen, label: "Lessons", href: "/dashboard/admin/lessons", desc: "Lesson content" },
     { icon: Layers, label: "Quests", href: "/dashboard/admin/quests", desc: "Quest management" },
     { icon: Award, label: "Badges", href: "/dashboard/admin/badges", desc: "Achievement badges" },
+    { icon: ShoppingBag, label: "Shop", href: "/dashboard/admin/shop", desc: "Shop items & rewards" },
     { icon: TrendingUp, label: "Reports", href: "/dashboard/admin/reports", desc: "System reports" },
     { icon: Settings, label: "Settings", href: "/dashboard/admin/settings", desc: "App settings" },
   ];
