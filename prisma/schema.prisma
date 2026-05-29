@@ -618,6 +618,7 @@ enum EmotionType {
   CALM
   CURIOUS
   OKAY
+  SAD
   WORRIED
   TIRED
   FRUSTRATED
@@ -635,4 +636,23 @@ model EmotionalCheckin {
   learner         LearnerProfile @relation(fields: [learnerId], references: [id])
   @@index([learnerId])
   @@index([createdAt])
+}
+
+model Homework {
+  id              String   @id @default(uuid())
+  parentId        String
+  learnerId       String
+  title           String
+  subject         String?
+  focusArea       String?
+  instructions    String?
+  linkedLessonId  String?
+  dueDate         DateTime?
+  completedAt     DateTime?
+  status          String   @default("assigned")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([parentId])
+  @@index([learnerId])
 }

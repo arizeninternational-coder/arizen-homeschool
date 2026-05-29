@@ -84,6 +84,9 @@ function safeDs(obj: Record<string, any>): Record<string, any> {
 }
 
 export const ds: Record<string, any> = safeDs({
+  // ── Shadows (also exported standalone) ──
+  shadows,
+
   // ── Layout ──
   page: {
     minHeight: "100vh" as const,

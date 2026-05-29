@@ -1,50 +1,38 @@
-// GET /api/admin/stats — Admin dashboard stats (ADMIN only)
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { requireAdmin } from "@/lib/api-guard";
+
 export const dynamic = "force-dynamic";
 
-export async function GET(req: NextRequest) {
-  const auth = await requireAdmin(req);
-  if (auth instanceof NextResponse) return auth;
-  const { user } = auth;
-
+export async function GET(request: Request) {
   try {
-    // Fetch all stats in parallel
-    const results = await Promise.allSettled([
+    const auth = await requireAdmin(request);
+    if (auth instanceof NextResponse) return auth;
+
+    const [usersRes, parentsRes, learnersRes, lessonsRes, questsRes, badgesRes, shopItemsRes] = await Promise.all([
       supabase.from("User").select("id", { count: "exact", head: true }),
-      supabase.from("User").select("id", { count: "exact", head: true }).eq("role", "PARENT"),
+      supabase.from("User").select("id", { count: "exact", head: true }).eq("role", "Parent"),
       supabase.from("LearnerProfile").select("id", { count: "exact", head: true }),
       supabase.from("Lesson").select("id", { count: "exact", head: true }),
       supabase.from("Quest").select("id", { count: "exact", head: true }),
+      supabase.from("Badge").select("id", { count: "exact", head: true }),
       supabase.from("AvatarItem").select("id", { count: "exact", head: true }).eq("isActive", true),
     ]);
 
-    const [usersRes, parentsRes, learnersRes, lessonsRes, questsRes, shopItemsRes] = results;
-
-    // Log any failures for debugging
-    const errors: string[] = [];
-    if (usersRes.status === "rejected") errors.push(`users: ${usersRes.reason?.message}`);
-    if (parentsRes.status === "rejected") errors.push(`parents: ${parentsRes.reason?.message}`);
-    if (learnersRes.status === "rejected") errors.push(`learners: ${learnersRes.reason?.message}`);
-    if (lessonsRes.status === "rejected") errors.push(`lessons: ${lessonsRes.reason?.message}`);
-    if (questsRes.status === "rejected") errors.push(`quests: ${questsRes.reason?.message}`);
-
-    if (errors.length > 0) {
-      console.error("[ADMIN_STATS] Partial failures:", errors.join("; "));
-    }
-
     return NextResponse.json({
-      users: usersRes.status === "fulfilled" ? (usersRes.value.count ?? 0) : 0,
-      parents: parentsRes.status === "fulfilled" ? (parentsRes.value.count ?? 0) : 0,
-      learners: learnersRes.status === "fulfilled" ? (learnersRes.value.count ?? 0) : 0,
-      lessons: lessonsRes.status === "fulfilled" ? (lessonsRes.value.count ?? 0) : 0,
-      quests: questsRes.status === "fulfilled" ? (questsRes.value.count ?? 0) : 0,
-      shopItems: shopItemsRes.status === "fulfilled" ? (shopItemsRes.value.count ?? 0) : 0,
-      ...(errors.length > 0 ? { _errors: errors } : {}),
+      users: usersRes.count ?? 0,
+      parents: parentsRes.count ?? 0,
+      learners: learnersRes.count ?? 0,
+      lessons: lessonsRes.count ?? 0,
+      quests: questsRes.count ?? 0,
+      badges: badgesRes.count ?? 0,
+      shopItems: shopItemsRes.count ?? 0,
     });
-  } catch (error: any) {
-    console.error("[ADMIN_STATS] Critical error:", error);
-    return NextResponse.json({ error: error.message || "Failed to fetch stats" }, { status: 500 });
+  } catch (e: any) {
+    console.error("Admin stats error:", e);
+    return NextResponse.json(
+      { error: e.message || "Unable to load stats" },
+      { status: 500 }
+    );
   }
 }

@@ -45,17 +45,28 @@ function FloatingDecorations() {
 function LoggedOutNavbar() {
   return (
     <nav style={ds.nav}>
-      <div style={{ maxWidth: '1160px', margin: '0 auto', padding: '0 1.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '72px' }}>
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', textDecoration: 'none' }}>
-            <div style={{ ...ds.logoMark, width: '40px', height: '40px', borderRadius: '0.875rem' }}>
-              <Flower2 style={{ width: '22px', height: '22px' }} />
+      <div style={{ maxWidth: '1160px', margin: '0 auto', padding: '0 1rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '56px', gap: '0.5rem' }}>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none', minWidth: 0, flexShrink: 0 }}>
+            <div style={{ ...ds.logoMark, width: '32px', height: '32px', borderRadius: '0.625rem' }}>
+              <Flower2 style={{ width: '18px', height: '18px' }} />
             </div>
-            <span style={{ fontSize: '1.25rem', fontWeight: 900, letterSpacing: '-0.02em', ...ds.textGradient }}>Arizen School</span>
+            <span style={{ fontSize: '1.125rem', fontWeight: 900, letterSpacing: '-0.02em', ...ds.textGradient, whiteSpace: 'nowrap' }}>Arizen School</span>
           </Link>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <Link href="/auth/login" style={{ ...ds.btnGhost, fontWeight: 700, textDecoration: 'none' }}>Sign In</Link>
-            <Link href="/auth/register" style={{ ...ds.btnPrimary, fontSize: '0.875rem', padding: '0.65rem 1.6rem', textDecoration: 'none' }}>Get Started</Link>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
+            <Link href="/auth/login" style={{
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              padding: '0.4rem 0.875rem', borderRadius: '0.625rem',
+              fontSize: '0.8125rem', fontWeight: 700, textDecoration: 'none',
+              color: colors.textMuted, background: 'transparent', border: 'none', whiteSpace: 'nowrap',
+            }}>Sign In</Link>
+            <Link href="/auth/register" style={{
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              padding: '0.4rem 0.875rem', borderRadius: '0.625rem',
+              fontSize: '0.8125rem', fontWeight: 700, textDecoration: 'none',
+              color: 'white', background: gradients.primary, border: 'none',
+              boxShadow: shadows.primary, whiteSpace: 'nowrap',
+            }}>Get Started</Link>
           </div>
         </div>
       </div>
@@ -93,82 +104,94 @@ function HeroSection() {
   return (
     <section style={{
       position: 'relative',
-      paddingTop: '9rem',
-      paddingBottom: '5rem',
+      paddingTop: '8rem',
+      paddingBottom: '4rem',
       paddingLeft: '1.5rem',
       paddingRight: '1.5rem',
     }}>
       <FloatingDecorations />
-      <div style={{ position: 'relative', maxWidth: '56rem', margin: '0 auto', textAlign: 'center' }}>
-        <div className="fade-in-up" style={{
-          display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
-          borderRadius: '9999px', padding: '0.45rem 1.25rem', marginBottom: '2.5rem',
-          background: `linear-gradient(135deg, ${colors.primarySoft}, white)`,
-          border: `1.5px solid ${colors.primaryLight}`,
-          boxShadow: `0 2px 12px ${colors.primarySoft}`,
-        }}>
-          <Sparkles style={{ width: '14px', height: '14px', color: colors.primary }} />
-          <span style={{ fontSize: '0.75rem', fontWeight: 800, color: colors.primary, letterSpacing: '0.06em' }}>
-            Emotionally Intelligent Learning
-          </span>
-        </div>
-        <h1 className="fade-in-up" style={{
-          fontSize: 'clamp(2.25rem, 5.5vw, 3.5rem)',
-          fontWeight: 900, letterSpacing: '-0.035em', lineHeight: 1.1,
-          color: colors.textHeading, marginBottom: '1.75rem', animationDelay: '0.1s',
-        }}>
-          A personalized learning
-          <br />
-          <span style={ds.textGradient}>experience</span> for{' '}
-          <span style={{ color: colors.primary }}>your child</span>
-        </h1>
-        <p className="fade-in-up" style={{
-          fontSize: 'clamp(1rem, 2vw, 1.125rem)', lineHeight: 1.75,
-          color: colors.textMuted, maxWidth: '34rem', margin: '0 auto 3rem',
-          fontWeight: 500, animationDelay: '0.2s',
-        }}>
-          A personalized, emotionally intelligent learning system for your child.
-          Where curiosity meets calm, and every lesson feels like a{' '}
-          <span style={{ color: colors.primary, fontWeight: 700 }}>gentle adventure</span>.
-        </p>
-        <div className="fade-in-up" style={{
-          display: 'flex', flexDirection: 'column', alignItems: 'center',
-          justifyContent: 'center', gap: '1rem', marginBottom: '4.5rem', animationDelay: '0.3s',
-        }}>
-          <Link href="/auth/register" style={{
-            ...ds.btnPrimary, width: '100%', maxWidth: '300px',
-            fontSize: '1.0625rem', padding: '1.0625rem 2.25rem',
-            gap: '0.625rem', textDecoration: 'none',
-          }}>
-            Get Started Free <ArrowRight style={{ width: '18px', height: '18px' }} />
-          </Link>
-          <Link href="/auth/login" style={{
-            ...ds.btnOutline, width: '100%', maxWidth: '300px',
-            fontSize: '1rem', padding: '1rem 2.25rem', textDecoration: 'none',
-          }}>
-            I Have an Account
-          </Link>
-        </div>
-        <div className="fade-in-up" style={{
-          display: 'flex', flexWrap: 'wrap', alignItems: 'center',
-          justifyContent: 'center', gap: '2.5rem', animationDelay: '0.4s',
-        }}>
-          {[
-            { icon: Heart, label: "Emotionally Safe", color: colors.accent },
-            { icon: Shield, label: "Privacy First", color: colors.primary },
-            { icon: Sun, label: "Joyful Learning", color: colors.warm },
-          ].map(({ icon: Icon, label, color }) => (
-            <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
-              <div style={{
-                width: '36px', height: '36px', borderRadius: '0.75rem',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                background: `${color}12`, boxShadow: `0 2px 8px ${color}10`,
+      <div style={{ position: 'relative', maxWidth: '68rem', margin: '0 auto' }}>
+        {/* Mobile: stack, Desktop: side-by-side */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '2.5rem', alignItems: 'center' }} className="hero-grid">
+          <div>
+            <h1 className="fade-in-up" style={{
+              fontSize: 'clamp(2rem, 5vw, 3.25rem)',
+              fontWeight: 900, letterSpacing: '-0.035em', lineHeight: 1.1,
+              color: colors.textHeading, marginBottom: '1.25rem', animationDelay: '0.1s',
+            }}>
+              Welcome to emotionally<br />intelligent learning
+            </h1>
+            <p className="fade-in-up" style={{
+              fontSize: 'clamp(0.9375rem, 2vw, 1.0625rem)', lineHeight: 1.7,
+              color: colors.textMuted, marginBottom: '2rem',
+              fontWeight: 500, animationDelay: '0.2s',
+            }}>
+              A personalized learning experience that helps your child build confidence, curiosity, and self-awareness while mastering core subjects.
+            </p>
+            <div className="fade-in-up" style={{
+              display: 'flex', flexWrap: 'wrap', gap: '0.75rem', animationDelay: '0.3s',
+            }}>
+              <Link href="/auth/register" style={{
+                ...ds.btnPrimary, fontSize: '1rem', padding: '0.875rem 1.75rem',
+                gap: '0.5rem', textDecoration: 'none',
               }}>
-                <Icon style={{ width: '17px', height: '17px', color }} />
-              </div>
-              <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: colors.textMuted }}>{label}</span>
+                Get Started <ArrowRight style={{ width: 16, height: 16 }} />
+              </Link>
+              <Link href="/auth/login" style={{
+                ...ds.btnOutline, fontSize: '1rem', padding: '0.875rem 1.75rem', textDecoration: 'none',
+              }}>
+                Sign In
+              </Link>
             </div>
-          ))}
+            <div style={{
+              display: 'flex', flexWrap: 'wrap', gap: '1.5rem', marginTop: '2rem',
+            }}>
+              {[
+                { icon: Heart, label: "Emotionally Safe", color: colors.accent },
+                { icon: Shield, label: "Privacy First", color: colors.primary },
+                { icon: Zap, label: "Gamified", color: colors.warm },
+              ].map(({ icon: Icon, label, color }) => (
+                <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <div style={{
+                    width: 28, height: 28, borderRadius: 8,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: `${color}12`,
+                  }}>
+                    <Icon style={{ width: 14, height: 14, color }} />
+                  </div>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 700, color: colors.textMuted }}>{label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right-side product preview card */}
+          <div className="fade-in-up" style={{
+            background: 'linear-gradient(135deg, white, #F0FDF4)',
+            borderRadius: 24, border: `1.5px solid ${colors.borderLight}`,
+            padding: '1.5rem', boxShadow: shadows.lg, animationDelay: '0.25s',
+            display: 'none',
+          }} className="hero-preview">
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+              {[
+                { emoji: '📚', label: 'Lessons', color: '#0D9488' },
+                { emoji: '⚔️', label: 'Quests', color: '#7C3AED' },
+                { emoji: '💚', label: 'EQ Check-in', color: '#059669' },
+                { emoji: '🏆', label: 'Badges', color: '#D97706' },
+                { emoji: '🪙', label: 'Spark Coins', color: '#EAB308' },
+                { emoji: '🎨', label: 'Avatars', color: '#EC4899' },
+              ].map((item) => (
+                <div key={item.label} style={{
+                  padding: '0.75rem', borderRadius: 14, background: 'white',
+                  border: `1px solid ${colors.borderLight}`, textAlign: 'center',
+                  boxShadow: shadows.xs,
+                }}>
+                  <div style={{ fontSize: '1.5rem', marginBottom: '0.25rem' }}>{item.emoji}</div>
+                  <div style={{ fontSize: '0.6875rem', fontWeight: 700, color: item.color }}>{item.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>

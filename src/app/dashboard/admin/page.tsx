@@ -2,13 +2,12 @@
 
 export const dynamic = "force-dynamic";
 
-import { useState, useEffect, useCallback } from "react";
-import { signOut } from "next-auth/react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import {
   Users, BookOpen, GraduationCap, Award, Settings, BarChart3,
   Shield, LogOut, Plus, ChevronRight, TrendingUp, Activity,
-  UserCheck, Layers, Zap, AlertCircle, Menu, X, ShoppingBag
+  UserCheck, Layers, Zap, AlertCircle, Menu, X, ShoppingBag, Bell
 } from "lucide-react";
 import { ds, colors, gradients, shadows } from "@/lib/design-system";
 
@@ -18,8 +17,19 @@ interface AdminStats {
   learners: number;
   lessons: number;
   quests: number;
+  shopItems: number;
 }
 
+const OWL_MESSAGES: Record<string, string> = {
+  happy: "Wonderful! Let's use that bright energy for today's lesson.",
+  calm: "A calm mind is ready to learn. Let's begin with something cool.",
+  curious: "Curiosity is a superpower. Let's explore something new.",
+  okay: "That's okay. One small step is enough to begin.",
+  worried: "Thank you for sharing. Let's take it slowly today.",
+  tired: "Thanks for noticing. A short lesson might be just right.",
+  frustrated: "That feeling is allowed. Let's start with something simple.",
+  sad: "I'm here with you. One small step is enough today.",
+};
 interface SeedFeedback {
   type: "success" | "error";
   message: string;
@@ -36,6 +46,16 @@ export default function AdminDashboard() {
   const [shopSeeding, setShopSeeding] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const notifRef = useRef<HTMLDivElement>(null);
+
+  const handleLogout = useCallback(async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+    } catch {}
+    window.location.href = "/";
+  }, []);
 
   // Detect desktop viewport
   useEffect(() => {
@@ -164,7 +184,7 @@ export default function AdminDashboard() {
     { icon: BarChart3, label: "Dashboard", href: "/dashboard/admin", active: true, desc: "Overview & analytics" },
     { icon: Users, label: "Users", href: "/dashboard/admin/users", desc: "Manage all users" },
     { icon: GraduationCap, label: "Learners", href: "/dashboard/admin/learners", desc: "Student profiles" },
-    { icon: BookOpen, label: "Lessons", href: "/dashboard/admin/lessons", desc: "Lesson content" },
+    { icon: GraduationCap, label: "Grades", href: "/dashboard/admin/grades", desc: "Grade levels & subjects" },
     { icon: Layers, label: "Quests", href: "/dashboard/admin/quests", desc: "Quest management" },
     { icon: Award, label: "Badges", href: "/dashboard/admin/badges", desc: "Achievement badges" },
     { icon: ShoppingBag, label: "Shop", href: "/dashboard/admin/shop", desc: "Shop items & rewards" },
@@ -238,13 +258,13 @@ export default function AdminDashboard() {
       {/* Logout */}
       {!inline ? (
         <div style={{ padding: "0 1.25rem", borderTop: `1px solid ${colors.border}`, paddingTop: "1rem" }}>
-          <button onClick={() => { signOut({ callbackUrl: "/" }); }} style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.5rem", borderRadius: 8, border: "none", background: "none", color: colors.textMuted, cursor: "pointer", fontSize: "0.875rem", fontWeight: 600, width: "100%" }}>
+          <button onClick={handleLogout} style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.5rem", borderRadius: 8, border: "none", background: "none", color: colors.textMuted, cursor: "pointer", fontSize: "0.875rem", fontWeight: 600, width: "100%" }}>
             <LogOut style={{ width: 16, height: 16 }} /> Sign Out
           </button>
         </div>
       ) : (
         <div style={{ padding: "1rem" }}>
-          <button onClick={() => { signOut({ callbackUrl: "/" }); }} style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.625rem 1rem", borderRadius: 10, border: `1px solid ${colors.border}`, background: "rgba(239,68,68,0.05)", color: colors.danger, cursor: "pointer", fontSize: "0.875rem", fontWeight: 700, width: "100%", justifyContent: "center", marginTop: "0.5rem" }}>
+          <button onClick={handleLogout} style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.625rem 1rem", borderRadius: 10, border: `1px solid ${colors.border}`, background: "rgba(239,68,68,0.05)", color: colors.danger, cursor: "pointer", fontSize: "0.875rem", fontWeight: 700, width: "100%", justifyContent: "center", marginTop: "0.5rem" }}>
             <LogOut style={{ width: 16, height: 16 }} /> Sign Out
           </button>
         </div>
@@ -401,7 +421,7 @@ export default function AdminDashboard() {
             {/* Mobile logout in top bar */}
             {!isDesktop && (
               <button
-                onClick={() => { signOut({ callbackUrl: "/" }); }}
+                onClick={handleLogout}
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -422,6 +442,41 @@ export default function AdminDashboard() {
             )}
           </div>
         </header>
+
+        {/* Notification bell for mobile */}
+        {!isDesktop && (
+          <div style={{ position: "relative" }}>
+            <button
+              onClick={() => { setNotifOpen(!notifOpen); if (!notifOpen) { fetch("/api/notifications", { credentials: "include" }).then(r => r.json()).then(d => setNotifications(d.notifications || [])).catch(() => {}); } }}
+              style={{ position: "fixed", bottom: 24, right: 24, zIndex: 70, width: 52, height: 52, borderRadius: "50%", background: gradients.primary, color: "white", border: "none", boxShadow: shadows.primary, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+            >
+              <Bell style={{ width: 22, height: 22 }} />
+              {notifications.filter((n: any) => !n.read).length > 0 && (
+                <span style={{ position: "absolute", top: -2, right: -2, width: 20, height: 20, borderRadius: "50%", background: colors.danger, color: "white", fontSize: "0.6875rem", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  {notifications.filter((n: any) => !n.read).length}
+                </span>
+              )}
+            </button>
+            {notifOpen && (
+              <div style={{ position: "fixed", bottom: 84, right: 16, width: 320, maxWidth: "95vw", background: "white", borderRadius: 16, boxShadow: shadows.xl, zIndex: 70, border: `1px solid ${colors.border}`, overflow: "hidden" }}>
+                <div style={{ padding: "0.875rem 1rem", borderBottom: `1px solid ${colors.border}`, fontWeight: 700, fontSize: "0.875rem", color: colors.text, display: "flex", justifyContent: "space-between", alignItems: "center", background: gradients.primarySoft }}>
+                  <span style={{ background: gradients.textPrimary, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Notifications</span>
+                  <button onClick={() => setNotifOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", color: colors.textMuted }}><X style={{ width: 16, height: 16 }} /></button>
+                </div>
+                <div style={{ maxHeight: 320, overflowY: "auto" }}>
+                  {notifications.length === 0 ? (
+                    <div style={{ padding: "2rem 1rem", textAlign: "center", color: colors.textMuted, fontSize: "0.8125rem" }}>No notifications yet ✨</div>
+                  ) : notifications.slice(0, 10).map((n: any) => (
+                    <div key={n.id} style={{ padding: "0.75rem 1rem", borderBottom: `1px solid ${colors.borderLight}`, fontSize: "0.8125rem" }}>
+                      <div style={{ fontWeight: 700, color: colors.text, fontSize: "0.8125rem" }}>{n.title}</div>
+                      <div style={{ color: colors.textMuted, marginTop: "0.125rem", fontSize: "0.75rem" }}>{n.message}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Page Content */}
         <div style={{ padding: isDesktop ? "2rem" : "1.25rem", flex: 1 }}>

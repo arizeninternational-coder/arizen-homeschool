@@ -1,131 +1,209 @@
-// GET/POST /api/parent/link-child
-// GET — list all children linked to the current parent
-// POST — link an existing learner to the current parent by child email
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import { withAuth, withAuthPost } from "@/lib/api-guard";
+
 export const dynamic = "force-dynamic";
 
-// GET — list linked children
-export const GET = withAuth(async (req, user) => {
+export async function POST(request: Request) {
   try {
-    console.log("[PARENT_LINK_CHILD] GET user.id:", user.id, "role:", user.role);
+    // Read parent session from cookie
+    const cookieHeader = request.headers.get("cookie") || "";
+    const cookies = Object.fromEntries(
+      cookieHeader.split(";").map((c) => {
+        const [key, ...rest] = c.trim().split("=");
+        return [key.trim(), rest.join("=")];
+      })
+    );
 
-    const { data, error } = await supabase
+    const { jwtVerify } = await import("jose");
+    const secret = process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-production";
+    const isProduction = process.env.NODE_ENV === "production";
+    const cookieName = isProduction ? "__Secure-next-auth.session-token" : "next-auth.session-token";
+    const token = cookies[cookieName] || cookies["next-auth.session-token"] || cookies["__Secure-next-auth.session-token"];
+
+    if (!token) {
+      return NextResponse.json({ error: "Unauthorized — please log in" }, { status: 401 });
+    }
+
+    let payload;
+    try {
+      const result = await jwtVerify(token, new TextEncoder().encode(secret), { algorithms: ["HS256"] });
+      payload = result.payload;
+    } catch {
+      return NextResponse.json({ error: "Invalid session — please log in again" }, { status: 401 });
+    }
+
+    const parentId = payload.sub as string;
+    const parentRole = (payload.role as string)?.toUpperCase();
+
+    if (!parentId || parentRole !== "PARENT") {
+      return NextResponse.json({ error: "Only parent accounts can link children" }, { status: 403 });
+    }
+
+    const body = await request.json();
+    const { childEmail } = body;
+
+    if (!childEmail || typeof childEmail !== "string") {
+      return NextResponse.json({ error: "Student email is required" }, { status: 400 });
+    }
+
+    const email = childEmail.trim().toLowerCase();
+
+    if (!email.includes("@")) {
+      return NextResponse.json({ error: "Please enter a valid email address" }, { status: 400 });
+    }
+
+    // Find the child user by email
+    const { data: childUser, error: childErr } = await supabase
+      .from("User")
+      .select("id, email, role, name")
+      .ilike("email", email)
+      .maybeSingle();
+
+    if (childErr) {
+      console.error("Error finding child user:", childErr);
+      return NextResponse.json({ error: "Unable to search for student. Please try again." }, { status: 500 });
+    }
+
+    if (!childUser) {
+      return NextResponse.json({ error: "No student account found with that email." }, { status: 404 });
+    }
+
+    // Check the role — only LEARNER accounts can be linked
+    if (childUser.role?.toUpperCase() !== "LEARNER") {
+      return NextResponse.json({ error: "Only student accounts can be linked as children." }, { status: 400 });
+    }
+
+    // Check if already linked to this parent
+    const { data: existingLink } = await supabase
+      .from("ParentChild")
+      .select("id")
+      .eq("parentId", parentId)
+      .eq("childUserId", childUser.id)
+      .maybeSingle();
+
+    if (existingLink) {
+      return NextResponse.json({ error: "This student is already linked to your account." }, { status: 400 });
+    }
+
+    // Check if linked to another parent
+    const { data: otherLink } = await supabase
+      .from("ParentChild")
+      .select("id")
+      .eq("childUserId", childUser.id)
+      .maybeSingle();
+
+    if (otherLink) {
+      return NextResponse.json({ error: "This student is already linked to another parent account." }, { status: 400 });
+    }
+
+    // Create the link
+    const { error: insertErr } = await supabase
+      .from("ParentChild")
+      .insert({ parentId, childUserId: childUser.id });
+
+    if (insertErr) {
+      console.error("Error creating parent-child link:", insertErr);
+
+      // Check if table doesn't exist
+      if (insertErr.code === "42P01" || insertErr.message?.includes("does not exist")) {
+        return NextResponse.json({
+          error: "Parent-child linking table does not exist yet. Please run the DB_FIX_MISSING_TABLES.sql in Supabase SQL Editor."
+        }, { status: 500 });
+      }
+
+      return NextResponse.json({ error: "Unable to link student. Please try again." }, { status: 500 });
+    }
+
+    // Get learner profile info for the response
+    const { data: learnerProfile } = await supabase
+      .from("LearnerProfile")
+      .select("id, displayName, grade, totalXp, currentStreak, avatarUrl")
+      .eq("userId", childUser.id)
+      .maybeSingle();
+
+    return NextResponse.json({
+      success: true,
+      message: `${childUser.name || childUser.email} has been linked to your account.`,
+      child: {
+        id: childUser.id,
+        name: learnerProfile?.displayName || childUser.name || childUser.email,
+        grade: learnerProfile?.grade,
+        totalXp: learnerProfile?.totalXp ?? 0,
+        currentStreak: learnerProfile?.currentStreak ?? 0,
+        avatarUrl: learnerProfile?.avatarUrl,
+      },
+    });
+  } catch (e: any) {
+    console.error("link-child unexpected error:", e);
+    return NextResponse.json({
+      error: e.message || "An unexpected error occurred. Please try again."
+    }, { status: 500 });
+  }
+}
+
+// GET — list children linked to this parent
+export async function GET(request: Request) {
+  try {
+    const cookieHeader = request.headers.get("cookie") || "";
+    const cookies = Object.fromEntries(
+      cookieHeader.split(";").map((c) => {
+        const [key, ...rest] = c.trim().split("=");
+        return [key.trim(), rest.join("=")];
+      })
+    );
+
+    const { jwtVerify } = await import("jose");
+    const secret = process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-production";
+    const isProduction = process.env.NODE_ENV === "production";
+    const cookieName = isProduction ? "__Secure-next-auth.session-token" : "next-auth.session-token";
+    const token = cookies[cookieName] || cookies["next-auth.session-token"] || cookies["__Secure-next-auth.session-token"];
+
+    if (!token) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    let payload;
+    try {
+      const result = await jwtVerify(token, new TextEncoder().encode(secret), { algorithms: ["HS256"] });
+      payload = result.payload;
+    } catch {
+      return NextResponse.json({ error: "Invalid session" }, { status: 401 });
+    }
+
+    const parentId = payload.sub as string;
+
+    const { data: links, error } = await supabase
       .from("ParentChild")
       .select(`
         id,
         childUserId,
         createdAt,
-        childUser:User!ParentChild_childUserId_fkey (
-          id,
-          name,
-          email,
-          learnerProfile:LearnerProfile (
-            grade,
-            displayName,
-            totalXp,
-            currentStreak,
-            avatarUrl
-          )
-        )
+        childUser:User!ParentChild_childUserId_fkey(id, email, name),
+        learnerProfile:LearnerProfile(userId)
       `)
-      .eq("parentId", user.id);
+      .eq("parentId", parentId);
 
     if (error) {
-      console.error("[PARENT_LINK_CHILD] GET error:", error.message);
-      return NextResponse.json({ children: [], error: error.message });
-    }
-
-    // Normalize the data — Supabase may return learnerProfile as array or object
-    const children = (data || []).map((row: any) => {
-      const childUser = row.childUser;
-      const learnerProfile = Array.isArray(childUser?.learnerProfile)
-        ? childUser?.learnerProfile[0] || null
-        : childUser?.learnerProfile || null;
-      return {
-        ...row,
-        childUser: childUser ? { ...childUser, learnerProfile } : null,
-      };
-    });
-
-    console.log("[PARENT_LINK_CHILD] GET returning", children.length, "children");
-    return NextResponse.json({ children });
-  } catch (err: any) {
-    console.error("[PARENT_LINK_CHILD] GET critical:", err);
-    return NextResponse.json({ children: [], error: err.message || "Failed to load children" });
-  }
-}, { roles: ["PARENT"] });
-
-// POST — link an existing learner by email
-export const POST = withAuthPost(async (req, user, body: any) => {
-  try {
-    const parentId = user.id;
-    const { childEmail } = body;
-
-    console.log("[PARENT_LINK_CHILD] POST parentId:", parentId, "childEmail:", childEmail);
-
-    if (!childEmail || typeof childEmail !== "string" || !childEmail.trim()) {
-      return NextResponse.json({ error: "Child email is required" }, { status: 400 });
-    }
-
-    const email = childEmail.trim().toLowerCase();
-
-    // Find the child user
-    const { data: childUser, error: findErr } = await supabase
-      .from("User")
-      .select("id, name, email, role")
-      .eq("email", email)
-      .single();
-
-    if (findErr || !childUser) {
-      console.error("[PARENT_LINK_CHILD] Child not found:", findErr?.message || "no user");
-      return NextResponse.json({ error: "No user found with that email address" }, { status: 404 });
-    }
-
-    if (childUser.role?.toUpperCase() !== "LEARNER") {
-      return NextResponse.json({ error: "The user with that email is not a learner account" }, { status: 400 });
-    }
-
-    // Check if already linked to this parent
-    const { data: existing } = await supabase
-      .from("ParentChild")
-      .select("id, parentId")
-      .eq("childUserId", childUser.id)
-      .single();
-
-    if (existing) {
-      if (existing.parentId === parentId) {
-        return NextResponse.json({ error: "This child is already linked to your account" }, { status: 409 });
+      if (error.code === "42P01" || error.message?.includes("does not exist")) {
+        return NextResponse.json({ children: [], tableMissing: true });
       }
-      return NextResponse.json({ error: "This student is already linked to a parent account" }, { status: 409 });
+      throw error;
     }
 
-    // Create the link
-    const { error: linkErr } = await supabase
-      .from("ParentChild")
-      .insert({ parentId, childUserId: childUser.id });
+    const children = (links || []).map((link: any) => ({
+      id: link.childUserId,
+      name: link.learnerProfile?.[0]?.displayName || link.childUser?.name || link.childUser?.email,
+      email: link.childUser?.email,
+      grade: link.learnerProfile?.[0]?.grade,
+      totalXp: link.learnerProfile?.[0]?.totalXp ?? 0,
+      currentStreak: link.learnerProfile?.[0]?.currentStreak ?? 0,
+      avatarUrl: link.learnerProfile?.[0]?.avatarUrl,
+      linkedAt: link.createdAt,
+    }));
 
-    if (linkErr) {
-      console.error("[PARENT_LINK_CHILD] Link insert error:", linkErr.message, linkErr.code, linkErr.details);
-      return NextResponse.json({
-        error: "Failed to link child",
-        details: linkErr.message,
-        code: linkErr.code,
-      }, { status: 500 });
-    }
-
-    console.log("[PARENT_LINK_CHILD] Successfully linked child:", childUser.id);
-    return NextResponse.json({
-      message: "Child linked successfully",
-      child: {
-        id: childUser.id,
-        name: childUser.name,
-        email: childUser.email,
-      },
-    });
-  } catch (err: any) {
-    console.error("[PARENT_LINK_CHILD] POST critical:", err);
-    return NextResponse.json({ error: err.message || "Failed to link child" }, { status: 500 });
+    return NextResponse.json({ children });
+  } catch (e: any) {
+    console.error("get children error:", e);
+    return NextResponse.json({ error: e.message || "Unable to load children" }, { status: 500 });
   }
-}, { roles: ["PARENT"] });
+}

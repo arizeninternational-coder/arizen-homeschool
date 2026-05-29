@@ -216,3 +216,20 @@ a {
     display: none !important;
   }
 }
+
+/* ── Hero desktop layout ── */
+@media (min-width: 768px) {
+  .hero-grid {
+    grid-template-columns: 1.2fr 0.8fr !important;
+  }
+  .hero-preview {
+    display: block !important;
+  }
+}
+
+/* ── Student dashboard responsive ── */
+@media (max-width: 360px) {
+  .emotion-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
