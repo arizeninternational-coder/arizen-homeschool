@@ -1,6 +1,7 @@
 // GET /api/auth/debug — Debug endpoint to check what getToken returns
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
+export const dynamic = "force-dynamic";
 
 const secret = process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-production";
 

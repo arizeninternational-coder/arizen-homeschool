@@ -7,6 +7,7 @@
 // This file remains only because NextAuth is still imported by the login page's
 // `signIn` / `signOut` from `next-auth/react`. We handle those client-side now.
 import { NextRequest, NextResponse } from "next/server";
+export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   return NextResponse.json({ error: "Not implemented. Use /api/auth/session or /api/auth/login." }, { status: 404 });

@@ -4,6 +4,7 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { withAuth, withAuthPost } from "@/lib/api-guard";
+export const dynamic = "force-dynamic";
 
 // GET — list linked children
 export const GET = withAuth(async (req, user) => {

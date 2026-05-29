@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "@/lib/api-guard";
 import { supabase } from "@/lib/supabase";
+export const dynamic = "force-dynamic";
 
 function genId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 10);

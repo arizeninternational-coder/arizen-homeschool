@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { withAuth } from "@/lib/api-guard";
+export const dynamic = "force-dynamic";
 
 export const GET = withAuth(async (req, user) => {
   try {

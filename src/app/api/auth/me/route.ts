@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { supabase } from "@/lib/supabase";
+export const dynamic = "force-dynamic";
 
 const secret = process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-production";
 

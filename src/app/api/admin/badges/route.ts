@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { requireAdmin } from "@/lib/api-guard";
+export const dynamic = "force-dynamic";
 
 // GET — list all badges with learner info
 export async function GET(req: NextRequest) {

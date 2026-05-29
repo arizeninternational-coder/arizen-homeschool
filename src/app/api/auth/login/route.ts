@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import bcrypt from "bcryptjs";
 import { SignJWT } from "jose";
+export const dynamic = "force-dynamic";
 
 const NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-production";
 

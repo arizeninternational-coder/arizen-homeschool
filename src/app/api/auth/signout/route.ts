@@ -1,6 +1,7 @@
 // POST /api/auth/signout — Handle next-auth/react signOut() requests
 // Clears the session cookie and redirects to home
 import { NextRequest, NextResponse } from "next/server";
+export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   const isProduction = process.env.NODE_ENV === "production";

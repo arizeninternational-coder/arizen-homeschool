@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { getAuthUser } from "@/lib/api-guard";
+export const dynamic = "force-dynamic";
 
 const VALID_EMOTIONS = ["HAPPY", "CALM", "CURIOUS", "OKAY", "WORRIED", "TIRED", "FRUSTRATED"];
 

@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import bcrypt from "bcryptjs";
+export const dynamic = "force-dynamic";
 
 function decodeJwtPayload(token: string): Record<string, any> | null {
   try {

@@ -1,5 +1,6 @@
 // POST /api/auth/logout — Custom logout that clears the session cookie
 import { NextRequest, NextResponse } from "next/server";
+export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   const isProduction = process.env.NODE_ENV === "production";

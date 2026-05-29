@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { requireAdmin } from "@/lib/api-guard";
+export const dynamic = "force-dynamic";
 
 // Placeholder content for all lessons
 const DEFAULT_CONTENT = {

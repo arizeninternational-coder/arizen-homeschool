@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { withAuth, withAuthPost } from "@/lib/api-guard";
+export const dynamic = "force-dynamic";
 
 export const POST = withAuthPost(async (req, user, body: any) => {
   try {

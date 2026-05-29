@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { withAuth } from "@/lib/api-guard";
+export const dynamic = "force-dynamic";
 
 function respondError(message: string, status = 400) {
   return NextResponse.json({ error: message }, { status });

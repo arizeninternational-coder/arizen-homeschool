@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "@/lib/api-guard";
 import { supabase } from "@/lib/supabase";
+export const dynamic = "force-dynamic";
 
 const EQUIP_FIELDS: Record<string, string> = {
   equippedHatId: "HATS",

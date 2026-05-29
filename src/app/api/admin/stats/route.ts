@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { requireAdmin } from "@/lib/api-guard";
+export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   const auth = await requireAdmin(req);

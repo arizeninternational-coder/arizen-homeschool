@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "@/lib/api-guard";
 import { supabase } from "@/lib/supabase";
+export const dynamic = "force-dynamic";
 
 export const GET = withAuth(async (req: NextRequest, user: any, url: URL) => {
   try {
