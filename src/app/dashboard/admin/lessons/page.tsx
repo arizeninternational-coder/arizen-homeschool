@@ -80,9 +80,14 @@ export default function AdminLessonsPage() {
             <h1 style={{ fontSize: "1.5rem", fontWeight: 800, color: colors.text, marginBottom: "0.25rem" }}>Lessons</h1>
             <p style={{ color: colors.textMuted }}>{lessons.length} lessons across all grades and subjects</p>
           </div>
-          <button style={{ ...ds.btnPrimary, fontSize: "0.875rem", padding: "0.625rem 1.25rem", cursor: "default" }}>
-            <Plus style={{ width: 14, height: 14 }} /> Create Lesson
-          </button>
+          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+            <Link href="/dashboard/admin/curriculum/import" style={{ ...ds.btnSecondary, fontSize: "0.875rem", padding: "0.625rem 1.25rem", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "0.35rem" }}>
+              📥 Import
+            </Link>
+            <Link href="/dashboard/admin/lessons/new" style={{ ...ds.btnPrimary, fontSize: "0.875rem", padding: "0.625rem 1.25rem", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "0.35rem" }}>
+              <Plus style={{ width: 14, height: 14 }} /> Create
+            </Link>
+          </div>
         </div>
 
         {error && (
