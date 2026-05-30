@@ -87,7 +87,7 @@ export default function AdminGradesPage() {
         ) : (
           <div style={{ display: "grid", gap: "0.75rem" }}>
             {grades.map((g) => (
-              <div key={g.grade} style={{ ...ds.card, padding: "1.25rem 1.5rem", display: "flex", alignItems: "center", gap: "1rem" }}>
+              <Link key={g.grade} href={`/dashboard/admin/grades/${g.grade}`} style={{ ...ds.card, padding: "1.25rem 1.5rem", display: "flex", alignItems: "center", gap: "1rem", textDecoration: "none", color: "inherit" }}>
                 <div style={{ width: 48, height: 48, borderRadius: 12, background: colors.primarySoft, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                   <GraduationCap style={{ width: 22, height: 22, color: colors.primary }} />
                 </div>
@@ -105,7 +105,7 @@ export default function AdminGradesPage() {
                   </div>
                 </div>
                 <ChevronRight style={{ width: 18, height: 18, color: colors.textMuted, flexShrink: 0 }} />
-              </div>
+              </Link>
             ))}
           </div>
         )}
