@@ -372,6 +372,17 @@ a { transition: color 0.2s ease; }
 }
 
 /* ═══════════════════════════════════════════════════════════
+   STUDENT PROFILE — Responsive
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 1023px) {
+  .sp-sidebar { display: none !important; }
+  .sp-main { padding: 16px !important; }
+}
+@media (max-width: 639px) {
+  .sp-main { padding: 12px !important; }
+}
+
+/* ═══════════════════════════════════════════════════════════
    STUDENT DASHBOARD — Responsive
    ═══════════════════════════════════════════════════════════ */
 @media (max-width: 1279px) {

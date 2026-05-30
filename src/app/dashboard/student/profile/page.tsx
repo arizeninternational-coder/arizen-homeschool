@@ -2,42 +2,30 @@
 
 export const dynamic = "force-dynamic";
 
-import { useState, useEffect, type ReactNode } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 /* ═══════════════════════════════════════════════════════════════════
-   ARIZEN SCHOOL — Student Profile & Avatar Customization
-   Three-column layout: Sidebar | Main Content | Shop Panel
+   ARIZEN SCHOOL — Student Profile
+   Identity hub: avatar, stats, progress, badges, account
+   Real data from API, honest zero states, no fake values
    ═══════════════════════════════════════════════════════════════════ */
 
-// ── Color Palette (matches homepage) ──
 const C = {
-  teal:      "#047A70",
-  tealDark:  "#005B50",
-  tealSoft:  "#E6F5F1",
-  mint:      "#EAF7F1",
-  mint2:     "#DFF4E8",
-  cream:     "#FFFDF7",
-  yellow:    "#FFF4D8",
-  gold:      "#F5B942",
-  dark:      "#0F172A",
-  body:      "#64748B",
-  border:    "#E2E8F0",
-  white:     "#FFFFFF",
-  purple:    "#8B5CF6",
-  blue:      "#3B82F6",
-  epic:      "#7C3AED",
-  legendary:"#F59E0B",
-  red:       "#EF4444",
-  green:     "#22C55E",
+  page: "#F7FBF7", teal: "#047A70", tealD: "#005B50",
+  tealSoft: "#E6F5F1", mint: "#ECFDF5", cream: "#FFFBEB",
+  dark: "#0F172A", body: "#64748B", muted: "#94A3B8",
+  white: "#FFFFFF", border: "#E2E8F0",
+  lavender: "#EDE9FE", yellow: "#FFF4D8", blue: "#EFF6FF",
+  rose: "#FFF1F2",
 };
 
-// ── Data: Navigation ──
-const NAV_ITEMS = [
-  { icon: "\uD83D\uDCCD", label: "Dashboard",    href: "/dashboard/student",        id: "dashboard" },
+/* ── Navigation ── */
+const NAV = [
+  { icon: "\uD83C\uDFE0", label: "Dashboard",    href: "/dashboard/student",        id: "dashboard" },
   { icon: "\uD83D\uDCD6", label: "My Subjects",  href: "/dashboard/student/subjects", id: "subjects" },
   { icon: "\uD83D\uDCDD", label: "Lessons",      href: "/dashboard/student/lessons",  id: "lessons" },
-  { icon: "\u2696\uFE0F", label: "Assignments",  href: "/dashboard/student/quests",   id: "quests" },
+  { icon: "\u2696\uFE0F", label: "Assignments",  href: "/dashboard/student/quests",   id: "assignments" },
   { icon: "\uD83D\uDCA1", label: "Quizzes",      href: "/dashboard/student/quests",   id: "quizzes" },
   { icon: "\uD83D\uDCC8", label: "Progress",     href: "/dashboard/student/subjects", id: "progress" },
   { icon: "\uD83D\uDCC5", label: "Calendar",     href: "/dashboard/student",          id: "calendar" },
@@ -45,665 +33,592 @@ const NAV_ITEMS = [
   { icon: "\uD83D\uDC64", label: "Profile",      href: "/dashboard/student/profile",  id: "profile" },
 ];
 
-// ── Data: Hairstyles (African hairstyles) ──
+/* ── Hairstyles ── */
 const HAIRSTYLES = [
-  { id: "short-curls",    name: "Short Curls",     emoji: "\uD83E\uDDD1\uD83C\uDFFD\u200D\uD83E\uDDB0" },
-  { id: "afro",           name: "Rounded Afro",    emoji: "\uD83E\uDDD1\uD83C\uDFFD\u200D\uD83E\uDDB0" },
-  { id: "hightop-fade",   name: "High-Top Fade",   emoji: "\uD83E\uDDD1\uD83C\uDFFD\u200D\uD83E\uDDB0" },
-  { id: "cornrows",       name: "Cornrows",         emoji: "\uD83E\uDDD1\uD83C\uDFFD\u200D\uD83E\uDDB0" },
-  { id: "twists",         name: "Twists",           emoji: "\uD83E\uDDD1\uD83C\uDFFD\u200D\uD83E\uDDB0" },
-  { id: "locs",           name: "Locs",             emoji: "\uD83E\uDDD1\uD83C\uDFFD\u200D\uD83E\uDDB0" },
-  { id: "braids",         name: "Braids",           emoji: "\uD83E\uDDD1\uD83C\uDFFD\u200D\uD83E\uDDB0" },
-  { id: "puff-buns",      name: "Puff Buns",        emoji: "\uD83E\uDDD1\uD83C\uDFFD\u200D\uD83E\uDDB0" },
-  { id: "coily-short",    name: "Coily Short",      emoji: "\uD83E\uDDD1\uD83C\uDFFD\u200D\uD83E\uDDB0" },
-  { id: "side-fade",      name: "Side Fade+Curls",  emoji: "\uD83E\uDDD1\uD83C\uDFFD\u200D\uD83E\uDDB0" },
+  { id: "short-curls",  name: "Short Curls" },
+  { id: "afro",         name: "Rounded Afro" },
+  { id: "hightop-fade", name: "High-Top Fade" },
+  { id: "cornrows",     name: "Cornrows" },
+  { id: "twists",       name: "Twists" },
+  { id: "locs",         name: "Locs" },
+  { id: "braids",       name: "Braids" },
+  { id: "puff-buns",    name: "Puff Buns" },
+  { id: "coily-short",  name: "Coily Short" },
+  { id: "side-fade",    name: "Side Fade+Curls" },
 ];
 
-// ── Data: Hair Colors ──
 const HAIR_COLORS = [
-  { id: "black",        name: "Black",        hex: "#1a1a1a" },
-  { id: "dark-brown",   name: "Dark Brown",   hex: "#3B2314" },
-  { id: "medium-brown", name: "Medium Brown", hex: "#6B3A2A" },
-  { id: "warm-brown",   name: "Warm Brown",   hex: "#8B5E3C" },
-  { id: "light-brown",  name: "Light Brown",  hex: "#A0724A" },
-  { id: "teal",         name: "Teal Fun",     hex: "#047A70" },
-  { id: "grey",         name: "Grey",         hex: "#9CA3AF" },
-  { id: "rainbow",      name: "Rainbow",      hex: "linear-gradient(90deg,#EF4444,#F59E0B,#22C55E,#3B82F6," + C.purple + ")" },
+  { id: "black",        hex: "#1a1a1a" },
+  { id: "dark-brown",   hex: "#3B2314" },
+  { id: "medium-brown", hex: "#6B3A2A" },
+  { id: "warm-brown",   hex: "#8B5E3C" },
+  { id: "light-brown",  hex: "#A0724A" },
+  { id: "teal",         hex: "#047A70" },
 ];
 
-// ── Data: Skin Tones (all brown shades) ──
 const SKIN_TONES = [
-  { id: "deep-brown",   name: "Deep Brown",   hex: "#4A2C17" },
-  { id: "dark-brown",   name: "Dark Brown",   hex: "#6B3A2A" },
-  { id: "medium-brown", name: "Medium Brown", hex: "#8B5E3C" },
-  { id: "warm-brown",   name: "Warm Brown",   hex: "#A0724A" },
-  { id: "golden-brown", name: "Golden Brown", hex: "#C49A6C" },
-  { id: "light-brown",  name: "Light Brown",  hex: "#D4A574" },
+  { id: "deep-brown",   name: "Deep",   hex: "#4A2C17" },
+  { id: "dark-brown",   name: "Dark",   hex: "#6B3A2A" },
+  { id: "medium-brown", name: "Medium", hex: "#8B5E3C" },
+  { id: "warm-brown",   name: "Warm",   hex: "#A0724A" },
+  { id: "golden-brown", name: "Golden", hex: "#C49A6C" },
+  { id: "light-brown",  name: "Light",  hex: "#D4A574" },
 ];
 
-// ── Data: Shop Items ──
-type ItemStatus = "available" | "locked" | "purchased" | "equipped";
-type Rarity = "common" | "rare" | "epic" | "legendary";
-
-interface ShopItem {
-  id: string;
-  name: string;
-  rarity: Rarity;
-  category: string;
-  cost: number;
-  icon: string;
-  status: ItemStatus;
-  requirement: string | null;
-  progress: { current: number; target: number } | null;
-}
-
-const SHOP_ITEMS: ShopItem[] = [
-  // COMMON
-  { id: "soccer-boots",          name: "Soccer Boots",           rarity: "common", category: "shoes",       cost: 30,  icon: "\uD83E\uDD7E", status: "available", requirement: null, progress: null },
-  { id: "safari-hat",            name: "Safari Explorer Hat",    rarity: "common", category: "hats",        cost: 35,  icon: "\uD83E\uDEA3", status: "available", requirement: null, progress: null },
-  { id: "artist-brush",          name: "Artist Brush",           rarity: "common", category: "accessories", cost: 40,  icon: "\uD83C\uDFA8", status: "available", requirement: null, progress: null },
-  { id: "kindness-hoodie",       name: "Kindness Hoodie",        rarity: "common", category: "clothing",    cost: 45,  icon: "\uD83D\uDC55", status: "available", requirement: null, progress: null },
-  { id: "reading-glasses",       name: "Reading Champion Glasses",rarity: "common",category: "glasses",   cost: 45,  icon: "\uD83D\uDC53", status: "locked", requirement: "Complete 3 reading lessons",  progress: { current: 0, target: 3 } },
-  // RARE
-  { id: "math-wizard-hat",       name: "Math Wizard Hat",        rarity: "rare",   category: "hats",        cost: 50,  icon: "\uD83C\uDF93", status: "locked", requirement: "Complete 5 math lessons",  progress: { current: 0, target: 5 } },
-  { id: "star-backpack",         name: "Star Backpack",          rarity: "rare",   category: "accessories", cost: 50,  icon: "\uD83C\uDF1F", status: "locked", requirement: "Complete 5 quests",  progress: { current: 0, target: 5 } },
-  { id: "music-headphones",      name: "Music Maker Headphones",  rarity: "rare",   category: "accessories", cost: 55,  icon: "\uD83C\uDFB5", status: "locked", requirement: "Complete 5 creative arts lessons",  progress: { current: 0, target: 5 } },
-  { id: "nature-backpack",       name: "Nature Guardian Backpack",rarity: "rare",   category: "accessories", cost: 55,  icon: "\uD83C\uDF3F", status: "locked", requirement: "Complete 3 environmental lessons",  progress: { current: 0, target: 3 } },
-  { id: "scientist-goggles",     name: "Scientist Goggles",      rarity: "rare",   category: "glasses",     cost: 60,  icon: "\uD83D\uDD2C", status: "locked", requirement: "Complete 3 science lessons",  progress: { current: 0, target: 3 } },
-  { id: "globe-explorer",        name: "Globe Explorer Tool",    rarity: "rare",   category: "tools",       cost: 65,  icon: "\uD83C\uDF0D", status: "locked", requirement: "Complete 5 geography lessons",  progress: { current: 0, target: 5 } },
-  { id: "library-bg",            name: "Library Background",     rarity: "rare",   category: "backgrounds", cost: 80,  icon: "\uD83D\uDCDA", status: "locked", requirement: "Complete 10 reading lessons",  progress: { current: 0, target: 10 } },
-  { id: "forest-bg",             name: "Forest Background",      rarity: "rare",   category: "backgrounds", cost: 80,  icon: "\uD83C\uDF32", status: "locked", requirement: "Complete 5 environmental lessons",  progress: { current: 0, target: 5 } },
-  { id: "explorer-telescope",    name: "Explorer Telescope",     rarity: "rare",   category: "tools",       cost: 80,  icon: "\uD83D\uDD2D", status: "locked", requirement: "Complete 3 science lessons",  progress: { current: 0, target: 3 } },
-  { id: "rabbit-pet",            name: "Rabbit Companion",       rarity: "rare",   category: "pets",        cost: 90,  icon: "\uD83D\uDC30", status: "locked", requirement: "Complete 10 lessons",  progress: { current: 0, target: 10 } },
-  // EPIC
-  { id: "storyteller-cape",      name: "Storyteller Cape",       rarity: "epic",   category: "clothing",    cost: 70,  icon: "\uD83D\uDC5E", status: "locked", requirement: "Complete 5 reading lessons",  progress: { current: 0, target: 5 } },
-  { id: "space-bg",              name: "Space Background",       rarity: "epic",   category: "backgrounds", cost: 100, icon: "\uD83C\uDF0C", status: "locked", requirement: "Earn 500 XP",  progress: { current: 0, target: 500 } },
-  { id: "science-lab-bg",        name: "Science Lab Background",  rarity: "epic",   category: "backgrounds", cost: 120, icon: "\uD83D\uDD2C", status: "locked", requirement: "Complete 10 science lessons",  progress: { current: 0, target: 10 } },
-  // LEGENDARY
-  { id: "robot-pet",             name: "Robot Companion",        rarity: "legendary", category: "pets",     cost: 150, icon: "\uD83E\uDD16", status: "locked", requirement: "Complete 20 lessons",  progress: { current: 0, target: 20 } },
-  { id: "creative-crown",        name: "Creative Crown",         rarity: "legendary", category: "hats",     cost: 200, icon: "\uD83D\uDC51", status: "locked", requirement: "Complete 50 lessons",  progress: { current: 0, target: 50 } },
+const CUSTOM_TABS = [
+  { id: "hair",        label: "Hair",        icon: "\uD83E\uDDB0" },
+  { id: "face",        label: "Face",        icon: "\uD83D\uDE0A" },
+  { id: "outfit",      label: "Outfit",      icon: "\uD83D\uDC55" },
+  { id: "accessories", label: "Accessories", icon: "\uD83D\uDC5C" },
+  { id: "shoes",       label: "Shoes",       icon: "\uD83E\uDD7E" },
+  { id: "pet",         label: "Pet",         icon: "\uD83D\uDC3E" },
 ];
 
-// ── Data: Achievements ──
-const ACHIEVEMENTS = [
-  { icon: "\uD83D\uDC9A", title: "EQ Champion",    desc: "Completed 5 EQ check-ins",  bg: C.mint },
-  { icon: "\uD83D\uDCDD", title: "Lesson Master",  desc: "Completed 20 lessons",      bg: C.yellow },
-  { icon: "\u2694\uFE0F",  title: "Quest Explorer", desc: "Completed 15 quests",       bg: "#FFF7ED" },
-  { icon: "\uD83D\uDD25", title: "Streak Keeper",  desc: "7 day learning streak",     bg: "#FEF3C7" },
+const ALL_BADGES = [
+  { name: "Math Whiz",        icon: "\uD83D\uDCCA", requirement: "Complete 5 math lessons" },
+  { name: "Reader",           icon: "\uD83D\uDCD6", requirement: "Complete 5 reading lessons" },
+  { name: "Science Explorer", icon: "\uD83D\uDD2C", requirement: "Complete 5 science lessons" },
+  { name: "Kind Heart",       icon: "\uD83D\uDC9A", requirement: "Complete 3 EQ check-ins" },
+  { name: "Quiz Master",      icon: "\uD83C\uDFAF", requirement: "Score 80%+ on 3 quizzes" },
+  { name: "Goal Getter",      icon: "\uD83C\uDFC6", requirement: "Complete daily goal 3 days" },
+  { name: "Team Player",      icon: "\uD83D\uDC65", requirement: "Complete 10 quests" },
+  { name: "Early Bird",       icon: "\uD83D\uDC24", requirement: "7-day learning streak" },
 ];
 
-// ── Data: Activity ──
-const ACTIVITIES = [
-  { icon: "\u2705", title: "Completed a lesson",     detail: "\"Understanding Feelings\"", time: "2h ago" },
-  { icon: "\uD83E\uDEE1", title: "Earned 25 Spark Coins", detail: "Daily quest reward",   time: "4h ago" },
-  { icon: "\uD83D\uDC9A", title: "EQ Check-In",           detail: "Feeling happy and ready", time: "Yesterday" },
-];
-
-// ── Rarity Config ──
-const RARITY_CFG: Record<Rarity, { color: string; bg: string; label: string }> = {
-  common:    { color: "#22C55E", bg: "#DCFCE7", label: "Common" },
-  rare:      { color: "#3B82F6", bg: "#DBEAFE", label: "Rare" },
-  epic:      { color: "#7C3AED", bg: "#EDE9FE", label: "Epic" },
-  legendary: { color: "#F59E0B", bg: "#FEF3C7", label: "Legendary" },
+const RARITY: Record<string, { color: string; bg: string }> = {
+  common:    { color: "#22C55E", bg: "#DCFCE7" },
+  rare:      { color: "#3B82F6", bg: "#DBEAFE" },
+  epic:      { color: "#7C3AED", bg: "#EDE9FE" },
+  legendary: { color: "#F59E0B", bg: "#FEF3C7" },
 };
 
-// ── Customization Tabs ──
-const CUSTOM_TABS = [
-  { id: "hair",         label: "Hair",         icon: "\uD83E\uDDB0" },
-  { id: "face",         label: "Face",         icon: "\uD83D\uDE0A" },
-  { id: "outfit",       label: "Outfit",       icon: "\uD83D\uDC55" },
-  { id: "accessories",  label: "Accessories",  icon: "\uD83D\uDC5C" },
-  { id: "pet",          label: "Pet",          icon: "\uD83D\uDC3E" },
-  { id: "background",   label: "Background",   icon: "\uD83C\uDF1F" },
+const SHOP_PREVIEW = [
+  { name: "Soccer Boots",        icon: "\uD83E\uDD7E", rarity: "common", cost: 30,  requirement: null },
+  { name: "Math Wizard Hat",     icon: "\uD83C\uDF93", rarity: "rare",   cost: 50,  requirement: "Complete 5 math lessons" },
+  { name: "Storyteller Cape",    icon: "\uD83D\uDC5E", rarity: "epic",   cost: 70,  requirement: "Complete 5 reading lessons" },
+  { name: "Creative Crown",      icon: "\uD83D\uDC51", rarity: "legendary", cost: 200, requirement: "Complete 50 lessons" },
 ];
 
-// ═══════════════════════════════════════════════════════════════════
-// PAGE COMPONENT
-// ═══════════════════════════════════════════════════════════════════
 export default function StudentProfilePage() {
+  const [loading, setLoading] = useState(true);
+  const [name, setName] = useState("Student");
+  const [grade, setGrade] = useState<number | null>(null);
+  const [sparkCoins, setSparkCoins] = useState(0);
+  const [streak, setStreak] = useState(0);
+  const [avatarLevel, setAvatarLevel] = useState(1);
+  const [currentXp, setCurrentXp] = useState(0);
+  const [nextLevelXp, setNextLevelXp] = useState(1000);
+  const [badgesEarned, setBadgesEarned] = useState<string[]>([]);
+  const [lessonsCompleted, setLessonsCompleted] = useState(0);
+  const [quizzesCompleted, setQuizzesCompleted] = useState(0);
+  const [reflectionsCompleted, setReflectionsCompleted] = useState(0);
+  const [questCompleted, setQuestCompleted] = useState(0);
+  const [questTotal, setQuestTotal] = useState(10);
+  const [subjects, setSubjects] = useState<{ name: string; progress: number; level: number; color: string; icon: string }[]>([]);
+  const [parentLinked, setParentLinked] = useState(false);
+  const [parentName, setParentName] = useState("");
+
+  // Avatar customization state
   const [activeTab, setActiveTab] = useState("hair");
   const [selectedHair, setSelectedHair] = useState("short-curls");
   const [selectedHairColor, setSelectedHairColor] = useState("black");
   const [selectedSkin, setSelectedSkin] = useState("medium-brown");
+  const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const results = await Promise.allSettled([
+          fetch("/api/learner/profile", { credentials: "include" }).then(r => r.json()),
+          fetch("/api/coins/wallet", { credentials: "include" }).then(r => r.json()),
+          fetch("/api/learner/progress", { credentials: "include" }).then(r => r.json()),
+          fetch("/api/learner/subjects", { credentials: "include" }).then(r => r.json()),
+          fetch("/api/learner/badges", { credentials: "include" }).then(r => r.json()),
+          fetch("/api/avatar", { credentials: "include" }).then(r => r.json()),
+          fetch("/api/parent/children", { credentials: "include" }).then(r => r.json()),
+        ]);
+
+        const profile = results[0].status === "fulfilled" ? results[0].value?.profile || results[0].value : {};
+        const wallet = results[1].status === "fulfilled" ? results[1].value?.wallet || results[1].value : {};
+        const progress = results[2].status === "fulfilled" ? results[2].value?.progress || results[2].value : {};
+        const subjectsRes = results[3].status === "fulfilled" ? results[3].value : {};
+        const badgesRes = results[4].status === "fulfilled" ? results[4].value : {};
+        const avatarRes = results[5].status === "fulfilled" ? results[5].value : {};
+        const parentRes = results[6].status === "fulfilled" ? results[6].value : {};
+
+        setName(profile?.name || profile?.displayName || "Student");
+        setGrade(profile?.grade || null);
+        setSparkCoins(wallet?.balance ?? 0);
+        setStreak(profile?.currentStreak ?? 0);
+        setAvatarLevel(profile?.avatarLevel ?? 1);
+        setCurrentXp(profile?.totalXp ?? 0);
+        setNextLevelXp(profile?.nextLevelXp ?? 1000);
+        setLessonsCompleted(progress?.lessonsCompleted ?? 0);
+        setQuizzesCompleted(progress?.quizzesCompleted ?? 0);
+        setReflectionsCompleted(progress?.reflectionsCompleted ?? 0);
+        setQuestCompleted(progress?.questsCompleted ?? progress?.questCompleted ?? 0);
+        setQuestTotal(progress?.questsTotal ?? 10);
+
+        const earned = (badgesRes.badges || []).filter((b: any) => b.earned).map((b: any) => b.name || b.title);
+        setBadgesEarned(earned);
+
+        const subjList = (subjectsRes.subjects || [
+          { name: "Mathematics", level: 1, progress: 0, color: "#EDE9FE", icon: "\uD83D\uDCCA" },
+          { name: "English", level: 1, progress: 0, color: "#FFF4D8", icon: "\uD83D\uDCD6" },
+          { name: "Science", level: 1, progress: 0, color: "#ECFDF5", icon: "\uD83D\uDD2C" },
+          { name: "Social Studies", level: 1, progress: 0, color: "#EFF6FF", icon: "\uD83C\uDF0D" },
+        ]);
+        setSubjects(subjList);
+
+        if (avatarRes.avatar) {
+          setSelectedHair(avatarRes.avatar.hairStyle || "short-curls");
+          setSelectedHairColor(avatarRes.avatar.hairColor || "black");
+          setSelectedSkin(avatarRes.avatar.skinTone || "medium-brown");
+        }
+
+        const children = parentRes.children || parentRes || [];
+        if (children.length > 0) {
+          setParentLinked(true);
+          setParentName(children[0]?.name || "Linked");
+        }
+      } catch (e) { console.error("[PROFILE] Load error:", e); }
+      setLoading(false);
+    };
+    load();
+  }, []);
+
+  const handleSaveAvatar = async () => {
+    setSaving(true);
+    try {
+      await fetch("/api/avatar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ hairStyle: selectedHair, hairColor: selectedHairColor, skinTone: selectedSkin }),
+      });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch (e) { console.error("[AVATAR] Save error:", e); }
+    setSaving(false);
   };
 
   const handleRandomize = () => {
-    const hair = HAIRSTYLES[Math.floor(Math.random() * HAIRSTYLES.length)];
-    const color = HAIR_COLORS[Math.floor(Math.random() * HAIR_COLORS.length)];
-    const skin = SKIN_TONES[Math.floor(Math.random() * SKIN_TONES.length)];
-    setSelectedHair(hair.id);
-    setSelectedHairColor(color.id);
-    setSelectedSkin(skin.id);
+    setSelectedHair(HAIRSTYLES[Math.floor(Math.random() * HAIRSTYLES.length)].id);
+    setSelectedHairColor(HAIR_COLORS[Math.floor(Math.random() * HAIR_COLORS.length)].id);
+    setSelectedSkin(SKIN_TONES[Math.floor(Math.random() * SKIN_TONES.length)].id);
   };
 
+  if (loading) {
+    return (
+      <div style={{ minHeight: "100vh", background: C.page, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ textAlign: "center" }}><div style={{ fontSize: "2rem", marginBottom: "1rem" }}>{"\u2728"}</div><p style={{ color: C.body, fontWeight: 600 }}>Loading your profile...</p></div>
+      </div>
+    );
+  }
+
+  const xpPercent = nextLevelXp > 0 ? Math.min(100, (currentXp / nextLevelXp) * 100) : 0;
+
   return (
-    <div style={{ minHeight: "100vh", background: "#F7FBF7", fontFamily: "'Nunito', system-ui, sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: C.page, fontFamily: "'Nunito', system-ui, sans-serif" }}>
+      <div style={{ display: "flex" }}>
 
-      {/* ═══ TOP BAR (mobile-only brand + logout) ═══ */}
-      <div style={{ display: "none" }} className="profile-mobile-topbar" />
-
-      <div style={{ display: "flex", position: "relative" }}>
-
-        {/* ═══════════════════════════════════════════════════════
-            LEFT SIDEBAR
-            ═══════════════════════════════════════════════════════ */}
-        <aside className="profile-sidebar" style={{
-          width: 240,
-          minWidth: 240,
-          height: "100vh",
-          position: "sticky",
-          top: 0,
-          background: C.white,
-          borderRight: `1px solid ${C.border}`,
-          display: "flex",
-          flexDirection: "column",
-          zIndex: 20,
-          overflowY: "auto",
+        {/* ═══════════════════════════════════════════════════
+            SIDEBAR
+            ═══════════════════════════════════════════════════ */}
+        <aside className="sp-sidebar" style={{
+          width: 260, minWidth: 260, height: "100vh", position: "sticky", top: 0,
+          background: C.white, borderRight: `1px solid ${C.border}`,
+          display: "flex", flexDirection: "column", zIndex: 20, overflowY: "auto",
         }}>
-          {/* Logo */}
-          <div style={{ padding: "20px 20px 16px", borderBottom: `1px solid ${C.border}` }}>
+          <div style={{ padding: "20px 16px 14px", borderBottom: `1px solid ${C.border}` }}>
             <Link href="/dashboard/student" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, background: C.teal, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 900, fontSize: "1.125rem" }}>A</div>
-              <span style={{ fontWeight: 800, fontSize: "1rem", color: C.teal, letterSpacing: "-0.02em" }}>Arizen School</span>
+              <div style={{ width: 36, height: 36, borderRadius: 10, background: C.teal, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 900, fontSize: "1rem" }}>A</div>
+              <span style={{ fontWeight: 900, fontSize: "1rem", color: C.teal, letterSpacing: "-0.02em" }}>Arizen School</span>
             </Link>
           </div>
-
-          {/* Nav Items */}
-          <div style={{ padding: "12px 12px 8px", flex: 1 }}>
-            {NAV_ITEMS.map((item) => {
+          <nav style={{ padding: "10px", flex: 1 }}>
+            {NAV.map(item => {
               const isActive = item.id === "profile";
               return (
                 <Link key={item.id} href={item.href} style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                  padding: "10px 12px",
-                  borderRadius: 12,
-                  textDecoration: "none",
+                  display: "flex", alignItems: "center", gap: 10, padding: "10px 12px",
+                  borderRadius: 12, textDecoration: "none", marginBottom: 2,
                   background: isActive ? C.teal : "transparent",
                   color: isActive ? "#fff" : C.dark,
-                  fontWeight: isActive ? 700 : 500,
-                  fontSize: "0.875rem",
-                  marginBottom: 2,
+                  fontWeight: isActive ? 700 : 500, fontSize: "0.875rem",
                 }}>
-                  <span style={{ fontSize: "1rem", width: 20, textAlign: "center", opacity: isActive ? 1 : 0.7 }}>{item.icon}</span>
-                  <span>{item.label}</span>
+                  <span style={{ fontSize: "1rem", width: 20, textAlign: "center", opacity: isActive ? 1 : 0.6 }}>{item.icon}</span>
+                  {item.label}
                 </Link>
               );
             })}
-          </div>
-
-          {/* Invite Friends Card */}
-          <div style={{ margin: "0 12px 12px", padding: "16px", borderRadius: 16, background: C.mint, border: `1px solid ${C.border}` }}>
-            <div style={{ fontSize: "1.5rem", marginBottom: 6 }}>{"\uD83C\uDF81"}</div>
-            <h4 style={{ fontSize: "0.875rem", fontWeight: 800, color: C.dark, margin: "0 0 4px 0" }}>Invite friends</h4>
-            <p style={{ fontSize: "0.75rem", color: C.body, margin: "0 0 12px 0", lineHeight: 1.5 }}>Learn together and earn rewards!</p>
-            <button style={{ width: "100%", padding: "8px", borderRadius: 10, background: C.teal, color: "#fff", border: "none", fontWeight: 700, fontSize: "0.8125rem", cursor: "pointer" }}>Invite Now</button>
-          </div>
-
-          {/* Help Card */}
-          <div style={{ margin: "0 12px 16px", padding: "12px 16px", borderRadius: 16, background: C.cream, border: `1px solid ${C.border}`, display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ fontSize: "1.25rem" }}>{"\uD83C\uDFA7"}</div>
-            <div style={{ flex: 1 }}>
-              <p style={{ fontSize: "0.75rem", fontWeight: 700, color: C.dark, margin: 0 }}>Need help?</p>
-              <p style={{ fontSize: "0.6875rem", color: C.body, margin: 0 }}>Contact Support</p>
+          </nav>
+          <div style={{ padding: "10px" }}>
+            <div style={{ padding: "14px", borderRadius: 14, background: C.mint, border: `1px solid ${C.border}`, marginBottom: 8 }}>
+              <div style={{ fontSize: "1.375rem", marginBottom: 4 }}>{"\uD83C\uDF81"}</div>
+              <h4 style={{ fontSize: "0.8125rem", fontWeight: 800, color: C.dark, margin: "0 0 2px 0" }}>Invite friends</h4>
+              <p style={{ fontSize: "0.6875rem", color: C.body, margin: "0 0 8px 0", lineHeight: 1.4 }}>Learn together and earn rewards!</p>
+              <button style={{ width: "100%", padding: "7px", borderRadius: 10, background: C.teal, color: "#fff", border: "none", fontWeight: 700, fontSize: "0.75rem", cursor: "pointer" }}>Invite Now</button>
+            </div>
+            <div style={{ padding: "12px 14px", borderRadius: 14, background: C.cream, border: `1px solid ${C.border}`, display: "flex", alignItems: "center", gap: 10 }}>
+              <span style={{ fontSize: "1.125rem" }}>{"\uD83C\uDFA7"}</span>
+              <div><p style={{ fontSize: "0.75rem", fontWeight: 700, color: C.dark, margin: 0 }}>Need help?</p><p style={{ fontSize: "0.6875rem", color: C.body, margin: 0 }}>Contact Support</p></div>
             </div>
           </div>
         </aside>
 
-        {/* ═══════════════════════════════════════════════════════
+        {/* ═══════════════════════════════════════════════════
             MAIN CONTENT
-            ═══════════════════════════════════════════════════════ */}
-        <main className="profile-main" style={{ flex: 1, minWidth: 0, padding: "24px 24px 32px", maxWidth: "100%" }}>
+            ═══════════════════════════════════════════════════ */}
+        <main className="sp-main" style={{ flex: 1, minWidth: 0, padding: "28px 32px 40px" }}>
 
-          {/* Header: Greeting + Stat Pills */}
-          <div className="profile-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, marginBottom: 20, flexWrap: "wrap" }}>
+          {/* Page Header */}
+          <div style={{ marginBottom: "24px" }}>
+            <h1 style={{ fontSize: "1.75rem", fontWeight: 900, color: C.dark, margin: "0 0 4px 0" }}>My Profile</h1>
+            <p style={{ color: C.body, fontSize: "0.9375rem", margin: 0 }}>Manage your learning identity, avatar, and progress.</p>
+          </div>
+
+          {/* ═══════════════════════════════════════════════════
+              PROFILE HERO CARD
+              ═══════════════════════════════════════════════════ */}
+          <div style={{
+            background: "linear-gradient(135deg, #ECFDF5 0%, #E6F5F1 60%, #EFF6FF 100%)",
+            borderRadius: 24, padding: "28px 32px", marginBottom: 24,
+            border: `1px solid ${C.border}`, display: "flex", alignItems: "center", gap: 28, flexWrap: "wrap",
+          }}>
+            {/* Avatar circle */}
+            <div style={{
+              width: 120, height: 120, borderRadius: "50%", background: "linear-gradient(135deg, #A7F3D0, #6EE7B7)",
+              display: "flex", alignItems: "center", justifyContent: "center", fontSize: "4rem", flexShrink: 0,
+              border: "3px solid #6EE7B7", position: "relative",
+            }}>
+              {"\uD83E\uDDD2\uD83C\uDFFD"}
+              <span style={{ position: "absolute", bottom: 2, right: 2, background: C.white, borderRadius: "50%", width: 24, height: 24, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.75rem", border: `2px solid ${C.teal}` }}>{avatarLevel}</span>
+            </div>
+            <div style={{ flex: 1, minWidth: 200 }}>
+              <h2 style={{ fontSize: "1.5rem", fontWeight: 900, color: C.dark, margin: "0 0 2px 0" }}>{name}</h2>
+              <p style={{ fontSize: "0.875rem", color: C.body, margin: "0 0 10px 0" }}>
+                {grade ? `Grade ${grade}` : "Grade not set"} {"\u00B7"} Level {avatarLevel} {"\u00B7"} {sparkCoins} {"\uD83E\uDEE1"} Spark Coins
+              </p>
+              {/* XP bar */}
+              <div style={{ marginBottom: 6 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
+                  <span style={{ fontSize: "0.6875rem", fontWeight: 700, color: C.muted }}>XP Progress</span>
+                  <span style={{ fontSize: "0.6875rem", fontWeight: 700, color: C.teal }}>{currentXp} / {nextLevelXp} XP</span>
+                </div>
+                <div style={{ height: 8, borderRadius: 4, background: "rgba(255,255,255,0.7)", overflow: "hidden" }}>
+                  <div style={{ height: "100%", width: `${xpPercent}%`, borderRadius: 4, background: "linear-gradient(90deg, #047A70, #34D399)" }} />
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 8 }}>
+                <Link href="/dashboard/student/profile?tab=avatar" style={{
+                  padding: "7px 16px", borderRadius: 10, background: C.teal, color: "#fff",
+                  fontWeight: 700, fontSize: "0.8125rem", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 4,
+                }}>{"\uD83C\uDFA8"} Customize Avatar</Link>
+                <Link href="/dashboard/student/shop" style={{
+                  padding: "7px 16px", borderRadius: 10, background: "rgba(255,255,255,0.8)", color: C.teal,
+                  fontWeight: 700, fontSize: "0.8125rem", textDecoration: "none", border: `1.5px solid ${C.teal}`, display: "inline-flex", alignItems: "center", gap: 4,
+                }}>{"\uD83D\uDED2"} Visit Shop</Link>
+              </div>
+            </div>
+          </div>
+
+          {/* ═══════════════════════════════════════════════════
+              STATS ROW
+              ═══════════════════════════════════════════════════ */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 24 }}>
+            <StatCard icon={"$\uD83E\uDEE1"} value={String(sparkCoins)} label="Spark Coins"
+              note={sparkCoins > 0 ? "Keep learning to unlock more rewards!" : "Complete your first lesson to earn coins."}
+              bg={C.cream} accent="#D97706" />
+            <StatCard icon={"$\uD83D\uDD25"} value={`${streak} ${streak === 1 ? "day" : "days"}`} label="Streak"
+              note={streak > 0 ? "You're on fire! \uD83D\uDD25" : "Start today to build your learning streak."}
+              bg={C.rose} accent="#E11D48" />
+            <StatCard icon={"$\uD83C\uDFC6"} value={String(badgesEarned.length)} label="Badges Earned"
+              note={badgesEarned.length > 0 ? `${badgesEarned.length} badge${badgesEarned.length !== 1 ? "s" : ""} unlocked` : "Complete lessons and quests to unlock badges."}
+              bg={C.lavender} accent="#6D28D9" />
+            <StatCard icon={"$\uD83D\uDCDD"} value={String(lessonsCompleted)} label="Lessons Completed"
+              note={lessonsCompleted > 0 ? "Great progress!" : "Start your first lesson today."}
+              bg={C.blue} accent="#2563EB" />
+            <StatCard icon={"$\uD83C\uDFAF"} value={String(quizzesCompleted)} label="Quizzes Completed"
+              note={quizzesCompleted > 0 ? "Keep it up!" : "Complete your first quiz."}
+              bg={C.yellow} accent="#D97706" />
+            <StatCard icon={"$\uD83D\uDC9A"} value={String(reflectionsCompleted)} label="Reflections"
+              note={reflectionsCompleted > 0 ? "Thoughtful learner!" : "Complete your first reflection."}
+              bg={C.mint} accent="#059669" />
+          </div>
+
+          {/* ═══════════════════════════════════════════════════
+              TWO COLUMNS: Avatar Customization + Right Panel
+              ═══════════════════════════════════════════════════ */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
+
+            {/* ── LEFT: Avatar Customization ── */}
             <div>
-              <h1 style={{ fontSize: "1.75rem", fontWeight: 800, color: C.dark, margin: "0 0 4px 0" }}>Good morning, Alex! {"\uD83D\uDC4B"}</h1>
-              <p style={{ fontSize: "0.9375rem", color: C.body, margin: 0 }}>Ready to learn something amazing today?</p>
-            </div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-              <StatPill icon="\uD83D\uDD25" value="7" label="Streak" bg="#FEF3C7" color="#D97706" />
-              <StatPill icon="\uD83E\uDEE1" value="450" label="Coins" bg="#FEF9C3" color="#B45309" />
-              <div style={{ width: 40, height: 40, borderRadius: 12, background: C.white, border: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.125rem", position: "relative", cursor: "pointer" }}>
-                {"\uD83D\uDD14"}
-                <span style={{ position: "absolute", top: 6, right: 6, width: 8, height: 8, borderRadius: "50%", background: C.red }} />
+              <h3 style={{ fontSize: "1.125rem", fontWeight: 800, color: C.dark, margin: "0 0 14px 0" }}>
+                {"\uD83C\uDFA8"} Customize Avatar
+              </h3>
+              <div style={{ background: C.white, borderRadius: 20, border: `1px solid ${C.border}`, padding: "20px" }}>
+                {/* Tabs */}
+                <div style={{ display: "flex", gap: 2, marginBottom: 16, borderBottom: `1px solid ${C.border}`, paddingBottom: 10, overflowX: "auto" }}>
+                  {CUSTOM_TABS.map(tab => {
+                    const isActive = activeTab === tab.id;
+                    return (
+                      <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{
+                        display: "flex", alignItems: "center", gap: 4, padding: "6px 12px",
+                        borderRadius: 8, border: "none", background: isActive ? C.mint : "transparent",
+                        color: isActive ? C.tealD : C.body, fontWeight: isActive ? 700 : 500,
+                        fontSize: "0.75rem", cursor: "pointer", whiteSpace: "nowrap",
+                      }}>
+                        <span>{tab.icon}</span> {tab.label}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Hair tab */}
+                {activeTab === "hair" && (
+                  <div>
+                    <h4 style={{ fontSize: "0.875rem", fontWeight: 800, color: C.dark, margin: "0 0 10px 0" }}>Choose a hairstyle</h4>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 8, marginBottom: 14 }}>
+                      {HAIRSTYLES.map(hair => {
+                        const isSel = selectedHair === hair.id;
+                        return (
+                          <button key={hair.id} onClick={() => setSelectedHair(hair.id)} style={{
+                            display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
+                            padding: "10px 6px", borderRadius: 12,
+                            border: isSel ? `2px solid ${C.teal}` : `1px solid ${C.border}`,
+                            background: isSel ? C.mint : C.white, cursor: "pointer", position: "relative",
+                          }}>
+                            {isSel && <span style={{ position: "absolute", top: 2, right: 2, width: 16, height: 16, borderRadius: "50%", background: C.teal, color: "#fff", fontSize: "0.5625rem", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800 }}>{"\u2713"}</span>}
+                            <div style={{ width: 40, height: 40, borderRadius: "50%", background: isSel ? "#A7F3D0" : "#F1F5F9", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.5rem" }}>{"\uD83E\uDDD1\uD83C\uDFFD"}</div>
+                            <span style={{ fontSize: "0.625rem", fontWeight: 700, color: isSel ? C.tealD : C.body, textAlign: "center", lineHeight: 1.2 }}>{hair.name}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <h4 style={{ fontSize: "0.8125rem", fontWeight: 800, color: C.dark, margin: "0 0 8px 0" }}>Hair Color</h4>
+                    <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
+                      {HAIR_COLORS.map(c => {
+                        const isSel = selectedHairColor === c.id;
+                        return (
+                          <button key={c.id} onClick={() => setSelectedHairColor(c.id)} style={{
+                            width: 32, height: 32, borderRadius: "50%", background: c.hex,
+                            border: isSel ? `3px solid ${C.teal}` : "2px solid #E5E7EB", cursor: "pointer",
+                            position: "relative", display: "flex", alignItems: "center", justifyContent: "center",
+                          }}>
+                            {isSel && <span style={{ color: "#fff", fontSize: "0.625rem", fontWeight: 800 }}>{"\u2713"}</span>}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <h4 style={{ fontSize: "0.8125rem", fontWeight: 800, color: C.dark, margin: "0 0 8px 0" }}>Skin Tone</h4>
+                    <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
+                      {SKIN_TONES.map(t => {
+                        const isSel = selectedSkin === t.id;
+                        return (
+                          <button key={t.id} onClick={() => setSelectedSkin(t.id)} style={{
+                            width: 36, height: 36, borderRadius: "50%", background: t.hex,
+                            border: isSel ? `3px solid ${C.teal}` : "2px solid #E5E7EB", cursor: "pointer",
+                            position: "relative", display: "flex", alignItems: "center", justifyContent: "center",
+                          }}>
+                            {isSel && <span style={{ color: "#fff", fontSize: "0.625rem", fontWeight: 800, textShadow: "0 1px 2px rgba(0,0,0,0.3)" }}>{"\u2713"}</span>}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <button onClick={handleRandomize} style={{
+                        flex: 1, padding: "10px", borderRadius: 10, border: `1px solid ${C.border}`,
+                        background: C.white, color: C.dark, fontWeight: 700, fontSize: "0.8125rem", cursor: "pointer",
+                      }}>{"\uD83C\uDFB2"} Randomize</button>
+                      <button onClick={handleSaveAvatar} disabled={saving} style={{
+                        flex: 2, padding: "10px", borderRadius: 10, border: "none",
+                        background: saved ? "#22C55E" : C.teal, color: "#fff",
+                        fontWeight: 700, fontSize: "0.8125rem", cursor: "pointer",
+                      }}>{saving ? "Saving..." : saved ? "Saved! \u2705" : "Save Avatar"}</button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Other tabs placeholder */}
+                {activeTab !== "hair" && (
+                  <div style={{ textAlign: "center", padding: "30px 20px" }}>
+                    <div style={{ fontSize: "2rem", marginBottom: 10 }}>{CUSTOM_TABS.find(t => t.id === activeTab)?.icon}</div>
+                    <p style={{ fontSize: "0.8125rem", color: C.body, fontWeight: 600 }}>More {activeTab} options coming soon!</p>
+                    <p style={{ fontSize: "0.6875rem", color: C.body, marginTop: 4 }}>Complete lessons to unlock new items.</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Subject Progress */}
+              <h3 style={{ fontSize: "1.125rem", fontWeight: 800, color: C.dark, margin: "24px 0 14px 0" }}>
+                {"\uD83D\uDCC8"} Subject Progress
+              </h3>
+              <div style={{ display: "grid", gap: 10 }}>
+                {subjects.map(s => (
+                  <div key={s.name} style={{
+                    padding: "14px 16px", borderRadius: 14, background: s.color,
+                    border: `1px solid ${C.border}`, display: "flex", alignItems: "center", gap: 12,
+                  }}>
+                    <span style={{ fontSize: "1.25rem" }}>{s.icon}</span>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                        <span style={{ fontSize: "0.8125rem", fontWeight: 800, color: C.dark }}>{s.name}</span>
+                        <span style={{ fontSize: "0.6875rem", fontWeight: 700, color: C.muted }}>Level {s.level}</span>
+                      </div>
+                      <div style={{ height: 5, borderRadius: 3, background: "rgba(0,0,0,0.06)", overflow: "hidden" }}>
+                        <div style={{ height: "100%", width: `${s.progress}%`, borderRadius: 3, background: C.teal }} />
+                      </div>
+                      <span style={{ fontSize: "0.625rem", fontWeight: 700, color: C.muted, marginTop: 2, display: "inline-block" }}>
+                        {s.progress > 0 ? `${s.progress}% complete` : "Start learning"}
+                      </span>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
 
-          {/* Stats Row */}
-          <div className="profile-stats-row" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 24 }}>
-            <StatCard icon="\uD83E\uDEE1" title="Spark Coins" value="450" note="Keep learning to earn more!" bg="#FFFDF7" borderColor="#FDE68A" />
-            <StatCard icon="\uD83C\uDFC6" title="Avatar Level" value="7" note="680 / 1,000 XP" bg={C.mint} borderColor="#A7F3D0" progress={68} />
-            <StatCard icon="\uD83C\uDFC5" title="Badges Earned" value="12" note="View all badges" bg="#FFF7ED" borderColor="#FED7AA" />
-          </div>
+            {/* ── RIGHT COLUMN ── */}
+            <div>
 
-          {/* ═══════════════════════════════════════════════════
-              AVATAR CUSTOMIZATION SECTION
-              ═══════════════════════════════════════════════════ */}
-          <div className="profile-avatar-section" style={{ display: "flex", gap: 20, marginBottom: 24 }}>
-
-            {/* Avatar Preview Card */}
-            <div className="profile-avatar-preview" style={{
-              width: "35%",
-              minWidth: 220,
-              borderRadius: 20,
-              border: `1px solid ${C.border}`,
-              background: C.white,
-              padding: "20px",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-            }}>
-              <h3 style={{ fontSize: "1rem", fontWeight: 800, color: C.dark, margin: "0 0 4px 0", alignSelf: "flex-start" }}>Your Avatar</h3>
-              <p style={{ fontSize: "0.75rem", color: C.body, margin: "0 0 16px 0", alignSelf: "flex-start" }}>This is how you look in the game!</p>
-
-              {/* Avatar Visual */}
-              <div style={{
-                width: 140,
-                height: 140,
-                borderRadius: "50%",
-                background: `radial-gradient(circle at 50% 40%, #D1FAE5, #A7F3D0)`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: "5rem",
-                marginBottom: 16,
-                position: "relative",
-                border: "3px solid #A7F3D0",
-              }}>
-                {"\uD83E\uDDD2\uD83C\uDFFD"}
-                {/* Sparkle decorations */}
-                <span style={{ position: "absolute", top: 8, right: 12, fontSize: "0.875rem" }}>{"\u2728"}</span>
-                <span style={{ position: "absolute", bottom: 12, left: 8, fontSize: "0.75rem" }}>{"\uD83C\uDF1F"}</span>
+              {/* Badges */}
+              <h3 style={{ fontSize: "1.125rem", fontWeight: 800, color: C.dark, margin: "0 0 14px 0" }}>
+                {"\uD83C\uDFC6"} Badges
+              </h3>
+              <div style={{ background: C.white, borderRadius: 20, border: `1px solid ${C.border}`, padding: "20px", marginBottom: 20 }}>
+                {badgesEarned.length === 0 ? (
+                  <>
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
+                      {ALL_BADGES.map((b, i) => (
+                        <div key={i} style={{
+                          width: 48, height: 48, borderRadius: 12, background: "#F8FAFC",
+                          border: `1px solid ${C.border}`, display: "flex", alignItems: "center",
+                          justifyContent: "center", fontSize: "1.25rem", position: "relative",
+                        }}>
+                          {b.icon}
+                          <span style={{ position: "absolute", bottom: -3, right: -3, fontSize: "0.625rem" }}>{"\uD83D\uDD12"}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <p style={{ fontSize: "0.75rem", color: C.body, margin: 0 }}>
+                      Complete lessons, quests, and check-ins to unlock badges.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
+                      {ALL_BADGES.filter(b => badgesEarned.includes(b.name)).map((b, i) => (
+                        <div key={i} style={{
+                          width: 48, height: 48, borderRadius: 12, background: C.mint,
+                          border: "1px solid #A7F3D0", display: "flex", alignItems: "center",
+                          justifyContent: "center", fontSize: "1.25rem", position: "relative",
+                        }} title={b.name}>
+                          {b.icon}
+                          <span style={{ position: "absolute", top: -2, right: -2, width: 16, height: 16, borderRadius: "50%", background: C.teal, color: "#fff", fontSize: "0.5rem", display: "flex", alignItems: "center", justifyContent: "center" }}>{"\u2713"}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <p style={{ fontSize: "0.75rem", color: C.body, margin: 0 }}>{badgesEarned.length} badge{badgesEarned.length !== 1 ? "s" : ""} unlocked</p>
+                  </>
+                )}
+                <Link href="/dashboard/student/badges" style={{ fontSize: "0.75rem", fontWeight: 700, color: C.teal, textDecoration: "none", display: "inline-block", marginTop: 10 }}>
+                  View All Badges {"\u2192"}
+                </Link>
               </div>
 
-              {/* Action Buttons */}
-              <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 8 }}>
-                <button onClick={handleRandomize} style={{ width: "100%", padding: "10px", borderRadius: 12, border: `1px solid ${C.border}`, background: C.white, color: C.dark, fontWeight: 700, fontSize: "0.8125rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-                  {"\uD83C\uDFB2"} Randomize
-                </button>
-                <button onClick={handleSave} style={{ width: "100%", padding: "12px", borderRadius: 12, border: "none", background: saved ? "#22C55E" : C.teal, color: "#fff", fontWeight: 700, fontSize: "0.875rem", cursor: "pointer", transition: "background 0.2s" }}>
-                  {saved ? "Saved! \u2705" : "Save Avatar"}
-                </button>
-                <button style={{ width: "100%", padding: "6px", background: "none", border: "none", color: C.body, fontWeight: 600, fontSize: "0.75rem", cursor: "pointer" }}>
-                  Reset to Default
-                </button>
-              </div>
-            </div>
-
-            {/* Customization Controls Card */}
-            <div className="profile-customizer" style={{
-              flex: 1,
-              minWidth: 0,
-              borderRadius: 20,
-              border: `1px solid ${C.border}`,
-              background: C.white,
-              padding: "20px",
-            }}>
-              {/* Tabs */}
-              <div className="profile-custom-tabs" style={{ display: "flex", gap: 4, marginBottom: 20, borderBottom: `1px solid ${C.border}`, paddingBottom: 12, overflowX: "auto" }}>
-                {CUSTOM_TABS.map((tab) => {
-                  const isActive = activeTab === tab.id;
-                  return (
-                    <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 6,
-                      padding: "8px 14px",
-                      borderRadius: 10,
-                      border: "none",
-                      background: isActive ? C.mint : "transparent",
-                      color: isActive ? C.tealDark : C.body,
-                      fontWeight: isActive ? 700 : 500,
-                      fontSize: "0.8125rem",
-                      cursor: "pointer",
-                      whiteSpace: "nowrap",
-                      borderBottom: isActive ? `2px solid ${C.teal}` : "2px solid transparent",
-                    }}>
-                      <span>{tab.icon}</span> {tab.label}
-                    </button>
-                  );
-                })}
+              {/* Avatar Shop Summary */}
+              <h3 style={{ fontSize: "1.125rem", fontWeight: 800, color: C.dark, margin: "0 0 14px 0" }}>
+                {"\uD83D\uDED2"} Avatar Shop
+              </h3>
+              <div style={{ background: C.white, borderRadius: 20, border: `1px solid ${C.border}`, padding: "20px", marginBottom: 20 }}>
+                <p style={{ fontSize: "0.75rem", color: C.body, margin: "0 0 10px 0" }}>
+                  Use Spark Coins to unlock outfits, tools, pets, and accessories.
+                </p>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 10 }}>
+                  {SHOP_PREVIEW.map((item, i) => {
+                    const r = RARITY[item.rarity];
+                    return (
+                      <div key={i} style={{
+                        padding: "10px", borderRadius: 12, background: "#FAFAFA",
+                        border: `1px solid ${C.border}`, textAlign: "center", position: "relative",
+                      }}>
+                        <span style={{ position: "absolute", top: 4, right: 4, fontSize: "0.5625rem", fontWeight: 800, color: r.color, textTransform: "uppercase" }}>{item.rarity}</span>
+                        <div style={{ fontSize: "1.5rem", marginBottom: 4, opacity: 0.6 }}>{item.icon}</div>
+                        <p style={{ fontSize: "0.6875rem", fontWeight: 700, color: C.dark, margin: "0 0 2px 0" }}>{item.name}</p>
+                        <p style={{ fontSize: "0.625rem", color: C.muted, margin: 0 }}>
+                          {"\uD83E\uDEE1"} {item.cost} {"\u00B7"} {item.requirement ? "Locked" : sparkCoins >= item.cost ? "Buy" : "Need more"}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+                <Link href="/dashboard/student/shop" style={{
+                  display: "block", width: "100%", padding: "10px", borderRadius: 10,
+                  background: C.teal, color: "#fff", fontWeight: 700, fontSize: "0.8125rem",
+                  textDecoration: "none", textAlign: "center",
+                }}>Visit Shop {"\u2192"}</Link>
               </div>
 
-              {/* Hair Content (default tab) */}
-              {activeTab === "hair" && (
+              {/* Account Details */}
+              <h3 style={{ fontSize: "1.125rem", fontWeight: 800, color: C.dark, margin: "0 0 14px 0" }}>
+                {"\uD83D\uDC64"} Account
+              </h3>
+              <div style={{ background: C.white, borderRadius: 20, border: `1px solid ${C.border}`, padding: "20px", marginBottom: 20 }}>
+                <div style={{ marginBottom: 12 }}>
+                  <span style={{ fontSize: "0.6875rem", fontWeight: 700, color: C.muted, textTransform: "uppercase", letterSpacing: "0.04em" }}>Student Name</span>
+                  <p style={{ fontSize: "0.875rem", fontWeight: 700, color: C.dark, margin: "2px 0 0 0" }}>{name}</p>
+                </div>
+                <div style={{ marginBottom: 12 }}>
+                  <span style={{ fontSize: "0.6875rem", fontWeight: 700, color: C.muted, textTransform: "uppercase", letterSpacing: "0.04em" }}>Grade</span>
+                  <p style={{ fontSize: "0.875rem", fontWeight: 700, color: C.dark, margin: "2px 0 0 0" }}>{grade ? `Grade ${grade}` : "Not set"}</p>
+                </div>
                 <div>
-                  <h4 style={{ fontSize: "0.9375rem", fontWeight: 800, color: C.dark, margin: "0 0 12px 0" }}>Choose a hairstyle</h4>
-                  <div className="profile-hair-grid" style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 10, marginBottom: 20 }}>
-                    {HAIRSTYLES.map((hair) => {
-                      const isSelected = selectedHair === hair.id;
-                      return (
-                        <button key={hair.id} onClick={() => setSelectedHair(hair.id)} style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          gap: 6,
-                          padding: "12px 8px",
-                          borderRadius: 14,
-                          border: isSelected ? `2px solid ${C.teal}` : `1px solid ${C.border}`,
-                          background: isSelected ? C.mint : C.white,
-                          cursor: "pointer",
-                          position: "relative",
-                          transition: "all 0.15s",
-                        }}>
-                          {isSelected && (
-                            <span style={{ position: "absolute", top: 4, right: 4, width: 18, height: 18, borderRadius: "50%", background: C.teal, color: "#fff", fontSize: "0.625rem", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800 }}>{"\u2713"}</span>
-                          )}
-                          <div style={{ width: 48, height: 48, borderRadius: "50%", background: isSelected ? "#A7F3D0" : "#F1F5F9", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.75rem" }}>
-                            {hair.emoji}
-                          </div>
-                          <span style={{ fontSize: "0.6875rem", fontWeight: 700, color: isSelected ? C.tealDark : C.body, textAlign: "center", lineHeight: 1.2 }}>{hair.name}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  {/* Hair Color */}
-                  <h4 style={{ fontSize: "0.875rem", fontWeight: 800, color: C.dark, margin: "0 0 10px 0" }}>Hair Color</h4>
-                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 20 }}>
-                    {HAIR_COLORS.map((c) => {
-                      const isSelected = selectedHairColor === c.id;
-                      return (
-                        <button key={c.id} onClick={() => setSelectedHairColor(c.id)} style={{
-                          width: 36,
-                          height: 36,
-                          borderRadius: "50%",
-                          background: c.hex,
-                          border: isSelected ? `3px solid ${C.teal}` : "2px solid #E5E7EB",
-                          cursor: "pointer",
-                          position: "relative",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}>
-                          {isSelected && <span style={{ color: "#fff", fontSize: "0.75rem", fontWeight: 800 }}>{"\u2713"}</span>}
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  {/* Skin Tone */}
-                  <h4 style={{ fontSize: "0.875rem", fontWeight: 800, color: C.dark, margin: "0 0 10px 0" }}>Skin Tone</h4>
-                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
-                    {SKIN_TONES.map((t) => {
-                      const isSelected = selectedSkin === t.id;
-                      return (
-                        <button key={t.id} onClick={() => setSelectedSkin(t.id)} style={{
-                          width: 40,
-                          height: 40,
-                          borderRadius: "50%",
-                          background: t.hex,
-                          border: isSelected ? `3px solid ${C.teal}` : "2px solid #E5E7EB",
-                          cursor: "pointer",
-                          position: "relative",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}>
-                          {isSelected && <span style={{ color: "#fff", fontSize: "0.75rem", fontWeight: 800, textShadow: "0 1px 2px rgba(0,0,0,0.3)" }}>{"\u2713"}</span>}
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  {/* Tip Banner */}
-                  <div style={{ padding: "12px 16px", borderRadius: 14, background: C.mint, display: "flex", alignItems: "center", gap: 10 }}>
-                    <span style={{ fontSize: "1.25rem" }}>{"\uD83D\uDCA1"}</span>
-                    <p style={{ fontSize: "0.8125rem", color: C.tealDark, fontWeight: 600, margin: 0, flex: 1 }}>Complete lessons and quests to unlock more awesome items!</p>
-                    <span style={{ fontSize: "1.5rem" }}>{"\uD83C\uDF31"}</span>
-                  </div>
+                  <span style={{ fontSize: "0.6875rem", fontWeight: 700, color: C.muted, textTransform: "uppercase", letterSpacing: "0.04em" }}>Parent / Guardian</span>
+                  <p style={{ fontSize: "0.875rem", fontWeight: 700, color: C.dark, margin: "2px 0 0 0" }}>
+                    {parentLinked ? parentName : "Not linked"}
+                  </p>
+                  {!parentLinked && (
+                    <span style={{ fontSize: "0.6875rem", color: C.body }}>Link a parent account to track progress.</span>
+                  )}
                 </div>
-              )}
+              </div>
 
-              {/* Other tabs placeholder */}
-              {activeTab !== "hair" && (
-                <div style={{ textAlign: "center", padding: "40px 20px" }}>
-                  <div style={{ fontSize: "2.5rem", marginBottom: 12 }}>
-                    {CUSTOM_TABS.find(t => t.id === activeTab)?.icon}
-                  </div>
-                  <p style={{ fontSize: "0.875rem", color: C.body, fontWeight: 600 }}>More customization options coming soon!</p>
-                  <p style={{ fontSize: "0.75rem", color: C.body, marginTop: 4 }}>Complete lessons to unlock new items.</p>
+              {/* Quest Progress */}
+              <div style={{ background: C.white, borderRadius: 20, border: `1px solid ${C.border}`, padding: "20px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                  <h4 style={{ fontSize: "0.875rem", fontWeight: 800, color: C.dark, margin: 0 }}>Quest Progress</h4>
+                  <Link href="/dashboard/student/quests" style={{ fontSize: "0.6875rem", fontWeight: 700, color: C.teal, textDecoration: "none" }}>View Quests</Link>
                 </div>
-              )}
-            </div>
-          </div>
-
-          {/* ═══════════════════════════════════════════════════
-              BOTTOM: Achievements + Activity
-              ═══════════════════════════════════════════════════ */}
-          <div className="profile-bottom-row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-
-            {/* Recent Achievements */}
-            <div style={{ borderRadius: 20, border: `1px solid ${C.border}`, background: C.white, padding: "20px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-                <h3 style={{ fontSize: "1rem", fontWeight: 800, color: C.dark, margin: 0 }}>Recent Achievements</h3>
-                <Link href="/dashboard/student/badges" style={{ fontSize: "0.75rem", fontWeight: 700, color: C.teal, textDecoration: "none" }}>View All</Link>
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-                {ACHIEVEMENTS.map((a) => (
-                  <div key={a.title} style={{ padding: "12px", borderRadius: 14, background: a.bg, display: "flex", alignItems: "center", gap: 10 }}>
-                    <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(255,255,255,0.8)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.125rem", flexShrink: 0 }}>{a.icon}</div>
-                    <div>
-                      <p style={{ fontSize: "0.75rem", fontWeight: 800, color: C.dark, margin: "0 0 2px 0" }}>{a.title}</p>
-                      <p style={{ fontSize: "0.625rem", color: C.body, margin: 0 }}>{a.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Recent Activity */}
-            <div style={{ borderRadius: 20, border: `1px solid ${C.border}`, background: C.white, padding: "20px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-                <h3 style={{ fontSize: "1rem", fontWeight: 800, color: C.dark, margin: 0 }}>Recent Activity</h3>
-                <span style={{ fontSize: "0.75rem", fontWeight: 700, color: C.teal, cursor: "pointer" }}>View All</span>
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {ACTIVITIES.map((a, i) => (
-                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <div style={{ width: 32, height: 32, borderRadius: 8, background: C.mint, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.875rem", flexShrink: 0 }}>{a.icon}</div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontSize: "0.8125rem", fontWeight: 700, color: C.dark, margin: "0 0 2px 0" }}>{a.title}</p>
-                      <p style={{ fontSize: "0.6875rem", color: C.body, margin: 0 }}>{a.detail}</p>
-                    </div>
-                    <span style={{ fontSize: "0.6875rem", color: C.body, flexShrink: 0 }}>{a.time}</span>
-                  </div>
-                ))}
+                <div style={{ height: 6, borderRadius: 3, background: "#F1F5F9", overflow: "hidden", marginBottom: 4 }}>
+                  <div style={{ height: "100%", width: `${questTotal > 0 ? (questCompleted / questTotal) * 100 : 0}%`, borderRadius: 3, background: "#E11D48" }} />
+                </div>
+                <span style={{ fontSize: "0.6875rem", fontWeight: 700, color: C.muted }}>{questCompleted} / {questTotal} quests</span>
               </div>
             </div>
           </div>
         </main>
-
-        {/* ═══════════════════════════════════════════════════════
-            RIGHT SHOP PANEL
-            ═══════════════════════════════════════════════════════ */}
-        <aside className="profile-shop-panel" style={{
-          width: 420,
-          minWidth: 420,
-          height: "100vh",
-          position: "sticky",
-          top: 0,
-          background: C.white,
-          borderLeft: `1px solid ${C.border}`,
-          display: "flex",
-          flexDirection: "column",
-          zIndex: 20,
-          overflowY: "auto",
-        }}>
-          {/* Shop Header */}
-          <div style={{ padding: "20px 20px 12px", borderBottom: `1px solid ${C.border}` }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-              <h2 style={{ fontSize: "1.25rem", fontWeight: 800, color: C.dark, margin: 0 }}>Shop</h2>
-              <select style={{ padding: "6px 10px", borderRadius: 8, border: `1px solid ${C.border}`, fontSize: "0.75rem", fontWeight: 600, color: C.body, background: C.white, cursor: "pointer" }}>
-                <option>All Items</option>
-                <option>Common</option>
-                <option>Rare</option>
-                <option>Epic</option>
-                <option>Legendary</option>
-              </select>
-            </div>
-            <p style={{ fontSize: "0.75rem", color: C.body, margin: "0 0 10px 0" }}>Available ({SHOP_ITEMS.length})</p>
-
-            {/* Rarity Legend */}
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {(Object.entries(RARITY_CFG) as [Rarity, typeof RARITY_CFG[Rarity]][]).map(([key, cfg]) => (
-                <span key={key} style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: "0.6875rem", fontWeight: 700, color: cfg.color }}>
-                  <span style={{ width: 8, height: 8, borderRadius: "50%", background: cfg.color, display: "inline-block" }} />
-                  {cfg.label}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* Shop Grid */}
-          <div style={{ flex: 1, padding: "12px 16px", overflowY: "auto" }}>
-            <div className="profile-shop-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10 }}>
-              {SHOP_ITEMS.map((item) => {
-                const rarity = RARITY_CFG[item.rarity];
-                const isLocked = item.status === "locked";
-                const isAvailable = item.status === "available";
-                const canAfford = item.cost <= 450;
-
-                return (
-                  <div key={item.id} style={{
-                    borderRadius: 14,
-                    border: `1px solid ${isLocked ? C.border : rarity.color + "40"}`,
-                    background: isLocked ? "#FAFAFA" : C.white,
-                    padding: "12px",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 6,
-                    opacity: isLocked ? 0.85 : 1,
-                    position: "relative",
-                    overflow: "hidden",
-                  }}>
-                    {/* Rarity label */}
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <span style={{ fontSize: "0.625rem", fontWeight: 800, color: rarity.color, textTransform: "uppercase", letterSpacing: "0.04em" }}>{rarity.label}</span>
-                      {isLocked && <span style={{ fontSize: "0.75rem" }}>{"\uD83D\uDD12"}</span>}
-                    </div>
-
-                    {/* Item icon */}
-                    <div style={{
-                      width: 44,
-                      height: 44,
-                      borderRadius: 12,
-                      background: isLocked ? "#F1F5F9" : rarity.bg,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "1.5rem",
-                      alignSelf: "center",
-                    }}>
-                      {item.icon}
-                    </div>
-
-                    {/* Item name */}
-                    <p style={{ fontSize: "0.8125rem", fontWeight: 700, color: C.dark, margin: 0, textAlign: "center" }}>{item.name}</p>
-
-                    {/* Cost */}
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>
-                      <span style={{ fontSize: "0.875rem" }}>{"\uD83E\uDEE1"}</span>
-                      <span style={{ fontSize: "0.875rem", fontWeight: 800, color: canAfford ? C.gold : C.red }}>{item.cost}</span>
-                    </div>
-
-                    {/* Status / Requirement */}
-                    {isLocked && item.requirement && (
-                      <div>
-                        <p style={{ fontSize: "0.625rem", color: C.body, margin: "0 0 4px 0", textAlign: "center" }}>{item.requirement}</p>
-                        {item.progress && (
-                          <>
-                            <div style={{ height: 4, borderRadius: 2, background: "#F1F5F9", overflow: "hidden" }}>
-                              <div style={{ height: "100%", width: (item.progress.current / item.progress.target * 100) + "%", borderRadius: 2, background: rarity.color }} />
-                            </div>
-                            <p style={{ fontSize: "0.625rem", fontWeight: 700, color: C.body, margin: "2px 0 0 0", textAlign: "center" }}>{item.progress.current}/{item.progress.target}</p>
-                          </>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Status Badge */}
-                    {isAvailable && (
-                      <div style={{
-                        padding: "4px 8px",
-                        borderRadius: 8,
-                        background: canAfford ? C.mint : "#FEF3C7",
-                        color: canAfford ? C.tealDark : "#92400E",
-                        fontSize: "0.6875rem",
-                        fontWeight: 700,
-                        textAlign: "center",
-                      }}>
-                        {canAfford ? "Buy" : "Not enough coins"}
-                      </div>
-                    )}
-                    {isLocked && (
-                      <div style={{
-                        padding: "4px 8px",
-                        borderRadius: 8,
-                        background: "#F1F5F9",
-                        color: C.body,
-                        fontSize: "0.6875rem",
-                        fontWeight: 700,
-                        textAlign: "center",
-                      }}>
-                        Locked
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Shop Footer */}
-            <div style={{ padding: "12px 0", textAlign: "center", borderTop: `1px solid ${C.border}`, marginTop: 12 }}>
-              <p style={{ fontSize: "0.75rem", color: C.body, fontWeight: 600, margin: 0 }}>New items and exclusives coming soon!</p>
-            </div>
-          </div>
-        </aside>
       </div>
 
     </div>
   );
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// SMALL COMPONENTS
-// ═══════════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════════
+   SMALL COMPONENTS
+   ═══════════════════════════════════════════════════════════════════ */
 
-function StatPill({ icon, value, label, bg, color }: { icon: string; value: string; label: string; bg: string; color: string }) {
-  return (
-    <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 12px", borderRadius: 12, background: bg, color, fontWeight: 700, fontSize: "0.8125rem", whiteSpace: "nowrap" }}>
-      <span style={{ fontSize: "0.875rem" }}>{icon}</span>
-      <span>{value}</span>
-      <span style={{ fontWeight: 500, opacity: 0.8 }}>{label}</span>
-    </div>
-  );
-}
-
-function StatCard({ icon, title, value, note, bg, borderColor, progress }: {
-  icon: string; title: string; value: string; note: string; bg: string; borderColor: string; progress?: number;
+function StatCard({ icon, value, label, note, bg, accent }: {
+  icon: string; value: string; label: string; note: string; bg: string; accent: string;
 }) {
   return (
-    <div style={{ padding: "16px", borderRadius: 16, border: `1px solid ${borderColor}`, background: bg }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-        <span style={{ fontSize: "1.25rem" }}>{icon}</span>
-        <span style={{ fontSize: "0.8125rem", fontWeight: 700, color: C.body }}>{title}</span>
+    <div style={{ padding: "16px", borderRadius: 16, border: "1px solid " + C.border, background: bg }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+        <span style={{ fontSize: "1rem" }}>{icon}</span>
+        <span style={{ fontSize: "0.6875rem", fontWeight: 700, color: C.body, textTransform: "uppercase", letterSpacing: "0.04em" }}>{label}</span>
       </div>
-      <div style={{ fontSize: "1.75rem", fontWeight: 900, color: C.dark, marginBottom: 4 }}>{value}</div>
-      <div style={{ fontSize: "0.75rem", color: C.body, fontWeight: 600 }}>{note}</div>
-      {progress !== undefined && (
-        <div style={{ marginTop: 8, height: 6, borderRadius: 3, background: "#E5E7EB", overflow: "hidden" }}>
-          <div style={{ height: "100%", width: progress + "%", borderRadius: 3, background: C.teal }} />
-        </div>
-      )}
+      <div style={{ fontSize: "1.5rem", fontWeight: 900, color: accent, marginBottom: 2 }}>{value}</div>
+      <div style={{ fontSize: "0.6875rem", color: C.body, lineHeight: 1.4 }}>{note}</div>
     </div>
   );
 }
