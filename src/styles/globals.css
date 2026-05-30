@@ -4,77 +4,60 @@
 @tailwind utilities;
 
 /* ═══════════════════════════════════════════
-   ARIZEN SCHOOL — Design System v4
-   Soft Mint/Teal • Warm • Premium • Child-friendly
+   ARIZEN SCHOOL — Design System v5
+   Desktop-first premium landing page
    ═══════════════════════════════════════════ */
 
 @layer base {
   :root {
-    /* ── Core Backgrounds ── */
-    --color-bg:           253 253 251;   /* near-white with warmth */
-    --color-bg-soft:      247 248 246;   /* soft neutral */
-    --color-bg-warm:      255 247 237;   /* peach tint */
-    --color-bg-blue:      236 254 255;   /* sky tint */
-    --color-bg-green:     236 253 245;   /* mint tint */
-    --color-bg-pink:      252 231 243;   /* blush tint */
-    --color-bg-purple:    245 243 255;   /* lavender tint */
+    --color-bg:           253 253 251;
+    --color-bg-soft:      247 248 246;
+    --color-bg-warm:      255 247 237;
+    --color-bg-blue:      236 254 255;
+    --color-bg-green:     236 253 245;
+    --color-bg-pink:      252 231 243;
+    --color-bg-purple:    245 243 255;
 
-    /* ── Primary — Soft Teal/Mint ── */
-    --color-primary:      13 148 136;    /* teal-600 */
-    --color-primary-light: 153 246 228;  /* teal-200 */
-    --color-primary-soft: 204 251 241;   /* teal-100 */
-    --color-primary-dark: 17 94 89;      /* teal-800 */
-    --color-primary-glow: 20 184 166;    /* for shadows */
+    --color-primary:      13 148 136;
+    --color-primary-light: 153 246 228;
+    --color-primary-soft: 204 251 241;
+    --color-primary-dark: 17 94 89;
+    --color-primary-glow: 20 184 166;
 
-    /* ── Accent — Warm Coral ── */
-    --color-accent:       251 113 133;   /* coral pink */
+    --color-accent:       251 113 133;
     --color-accent-light: 253 164 175;
     --color-accent-soft: 255 228 230;
     --color-accent-dark: 244 63 94;
 
-    /* ── Warm Gold ── */
-    --color-warm:         245 158 11;    /* amber */
+    --color-warm:         245 158 11;
     --color-warm-light:   252 211 177;
     --color-warm-soft:    254 243 199;
     --color-warm-dark:    217 119 6;
 
-    /* ── Text ── */
-    --color-text:         30 41 59;      /* slate-800 */
-    --color-text-heading: 15 23 42;      /* slate-900 */
-    --color-text-muted:   100 116 139;   /* slate-500 */
+    --color-text:         30 41 59;
+    --color-text-heading: 15 23 42;
+    --color-text-muted:   100 116 139;
     --color-text-inverse: 255 255 255;
 
-    /* ── Borders ── */
     --color-border:       226 232 240;
     --color-border-light: 241 245 249;
 
-    /* ── Semantic ── */
     --color-success:      34 197 94;
     --color-danger:       239 68 68;
     --color-warning:      245 158 11;
     --color-info:         59 130 246;
   }
 
-  * {
-    border-color: rgb(var(--color-border));
-  }
-
-  html {
-    scroll-behavior: smooth;
-  }
-
+  * { border-color: rgb(var(--color-border)); }
+  html { scroll-behavior: smooth; }
   body {
     font-family: 'Nunito', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     color: rgb(var(--color-text));
-    background: rgb(var(--color-bg));
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-
-  ::selection {
-    background: rgba(13, 148, 136, 0.12);
-  }
+  ::selection { background: rgba(13, 148, 136, 0.12); }
 }
 
 /* ── Keyframes ── */
@@ -87,7 +70,7 @@
   50%      { transform: translateX(10px); }
 }
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(24px); }
+  from { opacity: 0; transform: translateY(28px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 @keyframes fadeIn {
@@ -134,7 +117,7 @@
 .float-fast    { animation: floatY 3.5s ease-in-out infinite; }
 .float-x       { animation: floatX 6s ease-in-out infinite; }
 .fade-in-up    { animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.fade-in       { animation: fadeIn 0.5s ease-out both; }
+.fade-in       { animation: fadeIn 0.6s ease-out both; }
 .scale-in      { animation: scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
 .spinner       { animation: spin 1s linear infinite; }
 .pulse-soft    { animation: pulse-soft 2.5s ease-in-out infinite; }
@@ -151,33 +134,18 @@
 /* ── Scrollbar ── */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb {
-  background: rgba(13, 148, 136, 0.2);
-  border-radius: 999px;
-}
+::-webkit-scrollbar-thumb { background: rgba(13, 148, 136, 0.2); border-radius: 999px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(13, 148, 136, 0.4); }
 
-/* ── Focus Styles ── */
+/* ── Focus ── */
 *:focus-visible {
   outline: 2px solid rgb(var(--color-primary));
   outline-offset: 2px;
   border-radius: 0.5rem;
 }
-
-/* ── Link Hover ── */
-a {
-  transition: color 0.2s ease;
-}
+a { transition: color 0.2s ease; }
 
 /* ── Card Hover Effects ── */
-.cta-card-hover {
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.cta-card-hover:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.08), 0 16px 64px rgba(0,0,0,0.04);
-}
-
 .feature-card-hover {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -186,7 +154,6 @@ a {
   box-shadow: 0 4px 16px rgba(0,0,0,0.06), 0 8px 32px rgba(0,0,0,0.03);
 }
 
-/* ── Dashboard Nav Hover ── */
 .nav-item:hover {
   background: rgb(var(--color-bg-soft)) !important;
   color: rgb(var(--color-text)) !important;
@@ -194,30 +161,200 @@ a {
 .nav-item-active:hover {
   background: rgba(20, 184, 166, 0.12) !important;
 }
-
-.logout-btn {
-  transition: all 0.15s ease;
-}
+.logout-btn { transition: all 0.15s ease; }
 .logout-btn:hover {
   color: #ef4444 !important;
   background: rgba(239, 68, 68, 0.06) !important;
 }
 
-/* ── Responsive ── */
+/* ═══════════════════════════════════════════════════════════
+   HOMEPAGE v3 — Responsive Breakpoints
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Hero grid: mobile stacks, desktop two-column ── */
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+  align-items: center;
+}
+
+/* ── Dashboard preview: full width on mobile, capped on desktop ── */
+.hero-dashboard-wrapper {
+  width: 100%;
+}
+
+.dashboard-preview-card {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* ── Hero heading ── */
+.hero-heading {
+  font-size: 2.25rem;
+  line-height: 1.08;
+}
+
+/* ── Hero subtitle ── */
+.hero-subtitle {
+  font-size: 0.9375rem;
+  max-width: 100%;
+}
+
+/* ── Value items grid inside strip ── */
+.hero-value-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+/* ── Join grid ── */
+.hero-join-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+/* ── Join heading ── */
+.hero-join-heading {
+  font-size: 1.5rem;
+}
+
+/* ── Join cards hover ── */
+.hero-join-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.03);
+}
+
+/* ──────────────────────────────────────────────
+   TABLET ≥ 768px
+   ────────────────────────────────────────────── */
+@media (min-width: 768px) {
+  .hero-heading {
+    font-size: 2.75rem;
+    line-height: 1.06;
+  }
+  .hero-subtitle {
+    font-size: 1rem;
+    max-width: 480px;
+  }
+  .hero-value-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+  .hero-join-heading {
+    font-size: 1.75rem;
+  }
+  .hero-join-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+  }
+  .dashboard-preview-card {
+    padding: 24px;
+  }
+}
+
+/* ──────────────────────────────────────────────
+   DESKTOP ≥ 1024px — full two-column hero
+   ────────────────────────────────────────────── */
+@media (min-width: 1024px) {
+  .hero-grid {
+    grid-template-columns: 0.45fr 0.55fr;
+    gap: 3.5rem;
+    min-height: 620px;
+  }
+  .hero-dashboard-wrapper {
+    display: flex;
+    justify-content: flex-end;
+  }
+  .dashboard-preview-card {
+    max-width: 680px;
+    width: 100%;
+    padding: 28px;
+  }
+  .hero-heading {
+    font-size: 3.5rem;   /* 56px */
+    line-height: 1.05;
+    max-width: 560px;
+  }
+  .hero-subtitle {
+    font-size: 1.0625rem;
+    max-width: 540px;
+  }
+}
+
+/* ──────────────────────────────────────────────
+   LARGE DESKTOP ≥ 1280px — maximum impact
+   ────────────────────────────────────────────── */
+@media (min-width: 1280px) {
+  .hero-grid {
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: 4rem;
+    min-height: 640px;
+  }
+  .dashboard-preview-card {
+    max-width: 720px;
+    padding: 32px;
+  }
+  .hero-heading {
+    font-size: 4rem;     /* 64px */
+    line-height: 1.02;
+    max-width: 620px;
+  }
+  .hero-subtitle {
+    font-size: 1.125rem;
+    max-width: 580px;
+  }
+}
+
+/* ──────────────────────────────────────────────
+   MOBILE ≤ 640px — compact overrides
+   ────────────────────────────────────────────── */
 @media (max-width: 640px) {
-  .fade-in-up {
-    animation-duration: 0.5s;
+  .fade-in-up { animation-duration: 0.5s; }
+
+  /* Stack dashboard greeting row vertically */
+  .dash-greeting-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* Stack two-col rows to single column */
+  .dash-two-col {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Compact trust badges */
+  .hero-trust-badge {
+    padding: 0.35rem 0.75rem !important;
+    font-size: 0.8rem !important;
+  }
+
+  /* Compact CTA buttons */
+  .hero-cta-primary,
+  .hero-cta-secondary {
+    padding: 0 1.25rem !important;
+    height: 48px !important;
+    font-size: 0.9375rem !important;
+  }
+
+  /* Compact join cards */
+  .hero-join-card {
+    min-height: 100px !important;
+    padding: 1.25rem !important;
   }
 }
 
-/* ── Admin sidebar responsive ── */
+/* ──────────────────────────────────────────────
+   Admin sidebar responsive
+   ────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .admin-sidebar {
-    display: none !important;
-  }
+  .admin-sidebar { display: none !important; }
 }
 
-/* ── Student dashboard responsive ── */
+/* ──────────────────────────────────────────────
+   Student dashboard responsive
+   ────────────────────────────────────────────── */
 @media (min-width: 768px) {
   .student-grid {
     grid-template-columns: repeat(2, 1fr) !important;
@@ -242,31 +379,6 @@ a {
   }
 }
 
-/* ── Value strip responsive ── */
-@media (min-width: 768px) {
-  .value-strip {
-    grid-template-columns: repeat(4, 1fr) !important;
-  }
-}
-
-/* ── Join section responsive ── */
-@media (min-width: 768px) {
-  .join-grid {
-    grid-template-columns: repeat(3, 1fr) !important;
-  }
-}
-
-/* ── Hero desktop layout ── */
-@media (min-width: 768px) {
-  .hero-grid {
-    grid-template-columns: 1.2fr 0.8fr !important;
-  }
-  .hero-preview {
-    display: block !important;
-  }
-}
-
-/* ── Student dashboard responsive ── */
 @media (max-width: 360px) {
   .emotion-grid {
     grid-template-columns: repeat(3, 1fr) !important;
