@@ -168,59 +168,53 @@ a { transition: color 0.2s ease; }
 }
 
 /* ═══════════════════════════════════════════════════════════
-   HOMEPAGE v3 — Responsive Breakpoints
+   HOMEPAGE v4 — Responsive Breakpoints (compact desktop-first)
    ═══════════════════════════════════════════════════════════ */
 
-/* ── Hero grid: mobile stacks, desktop two-column ── */
+/* ── Mobile-first defaults ── */
 .hero-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 2.5rem;
+  gap: 2rem;
   align-items: center;
 }
 
-/* ── Dashboard preview: full width on mobile, capped on desktop ── */
-.hero-dashboard-wrapper {
-  width: 100%;
-}
+.hero-dashboard-wrapper { width: 100%; }
+.dashboard-preview-card  { width: 100%; max-width: 100%; }
 
-.dashboard-preview-card {
-  width: 100%;
-  max-width: 100%;
-}
-
-/* ── Hero heading ── */
+/* ── Mobile heading ── */
 .hero-heading {
-  font-size: 2.25rem;
-  line-height: 1.08;
+  font-size: 2rem;
+  line-height: 1.1;
 }
-
-/* ── Hero subtitle ── */
 .hero-subtitle {
   font-size: 0.9375rem;
   max-width: 100%;
 }
 
-/* ── Value items grid inside strip ── */
-.hero-value-grid {
+/* ── Dashboard grid: stack on mobile ── */
+.dash-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.25rem;
+  gap: 12px;
 }
 
-/* ── Join grid ── */
-.hero-join-grid {
+/* ── Value strip grid ── */
+.hero-value-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 1rem;
 }
 
-/* ── Join heading ── */
-.hero-join-heading {
-  font-size: 1.5rem;
+/* ── Join section ── */
+.hero-join-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.875rem;
 }
-
-/* ── Join cards hover ── */
+.hero-join-heading {
+  font-size: 1.375rem;
+}
 .hero-join-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 32px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.03);
@@ -231,8 +225,8 @@ a { transition: color 0.2s ease; }
    ────────────────────────────────────────────── */
 @media (min-width: 768px) {
   .hero-heading {
-    font-size: 2.75rem;
-    line-height: 1.06;
+    font-size: 2.5rem;
+    line-height: 1.08;
   }
   .hero-subtitle {
     font-size: 1rem;
@@ -240,108 +234,100 @@ a { transition: color 0.2s ease; }
   }
   .hero-value-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
+    gap: 1.25rem;
   }
   .hero-join-heading {
-    font-size: 1.75rem;
+    font-size: 1.625rem;
   }
   .hero-join-grid {
     grid-template-columns: repeat(3, 1fr);
-    gap: 1.25rem;
+    gap: 1rem;
   }
-  .dashboard-preview-card {
-    padding: 24px;
+  /* Dashboard: 2-col on tablet */
+  .dash-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .dash-grid > div[style*="gridColumn: span 2"] {
+    grid-column: span 2 !important;
   }
 }
 
 /* ──────────────────────────────────────────────
-   DESKTOP ≥ 1024px — full two-column hero
+   DESKTOP ≥ 1024px — two-column hero, compact
    ────────────────────────────────────────────── */
 @media (min-width: 1024px) {
   .hero-grid {
-    grid-template-columns: 0.45fr 0.55fr;
-    gap: 3.5rem;
-    min-height: 620px;
+    grid-template-columns: 0.44fr 0.56fr;
+    gap: 3rem;
   }
   .hero-dashboard-wrapper {
     display: flex;
     justify-content: flex-end;
   }
   .dashboard-preview-card {
-    max-width: 680px;
+    max-width: 740px;
     width: 100%;
-    padding: 28px;
+    padding: 24px;
   }
   .hero-heading {
-    font-size: 3.5rem;   /* 56px */
-    line-height: 1.05;
-    max-width: 560px;
+    font-size: 3.25rem;   /* 52px */
+    line-height: 1.06;
+    max-width: 520px;
   }
   .hero-subtitle {
-    font-size: 1.0625rem;
-    max-width: 540px;
+    font-size: 1rem;
+    max-width: 480px;
+  }
+  /* Dashboard: 3-col on desktop */
+  .dash-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 12px !important;
   }
 }
 
 /* ──────────────────────────────────────────────
-   LARGE DESKTOP ≥ 1280px — maximum impact
+   LARGE DESKTOP ≥ 1280px
    ────────────────────────────────────────────── */
 @media (min-width: 1280px) {
   .hero-grid {
-    grid-template-columns: 0.9fr 1.1fr;
-    gap: 4rem;
-    min-height: 640px;
+    grid-template-columns: 0.43fr 0.57fr;
+    gap: 3.5rem;
   }
   .dashboard-preview-card {
-    max-width: 720px;
-    padding: 32px;
+    max-width: 780px;
+    padding: 26px;
   }
   .hero-heading {
-    font-size: 4rem;     /* 64px */
-    line-height: 1.02;
-    max-width: 620px;
+    font-size: 3.75rem;   /* 60px */
+    line-height: 1.04;
+    max-width: 580px;
   }
   .hero-subtitle {
-    font-size: 1.125rem;
-    max-width: 580px;
+    font-size: 1.0625rem;
+    max-width: 520px;
+  }
+  .hero-value-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
   }
 }
 
 /* ──────────────────────────────────────────────
-   MOBILE ≤ 640px — compact overrides
+   MOBILE ≤ 640px
    ────────────────────────────────────────────── */
 @media (max-width: 640px) {
   .fade-in-up { animation-duration: 0.5s; }
-
-  /* Stack dashboard greeting row vertically */
   .dash-greeting-row {
     flex-direction: column;
     align-items: flex-start;
   }
-
-  /* Stack two-col rows to single column */
-  .dash-two-col {
-    grid-template-columns: 1fr !important;
-  }
-
-  /* Compact trust badges */
   .hero-trust-badge {
     padding: 0.35rem 0.75rem !important;
-    font-size: 0.8rem !important;
+    font-size: 0.75rem !important;
   }
-
-  /* Compact CTA buttons */
-  .hero-cta-primary,
-  .hero-cta-secondary {
-    padding: 0 1.25rem !important;
-    height: 48px !important;
-    font-size: 0.9375rem !important;
-  }
-
-  /* Compact join cards */
   .hero-join-card {
-    min-height: 100px !important;
-    padding: 1.25rem !important;
+    min-height: 90px !important;
+    padding: 1rem !important;
   }
 }
 
