@@ -384,3 +384,51 @@ a { transition: color 0.2s ease; }
     grid-template-columns: repeat(3, 1fr) !important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   STUDENT PROFILE PAGE v2 — Responsive
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 1279px) {
+  .profile-shop-panel {
+    display: none !important;
+  }
+}
+@media (max-width: 1023px) {
+  .profile-sidebar {
+    display: none !important;
+  }
+  .profile-main {
+    padding: 16px !important;
+  }
+  .profile-avatar-section {
+    flex-direction: column !important;
+  }
+  .profile-avatar-preview {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+  .profile-stats-row {
+    grid-template-columns: 1fr !important;
+  }
+  .profile-bottom-row {
+    grid-template-columns: 1fr !important;
+  }
+  .profile-hair-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+  .profile-header {
+    flex-direction: column !important;
+  }
+}
+@media (max-width: 639px) {
+  .profile-hair-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .profile-custom-tabs {
+    gap: 2px !important;
+  }
+  .profile-custom-tabs button {
+    padding: 6px 10px !important;
+    font-size: 0.75rem !important;
+  }
+}
