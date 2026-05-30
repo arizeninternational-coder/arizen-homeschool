@@ -11,7 +11,7 @@ export async function GET(request: Request) {
 
     const [usersRes, parentsRes, learnersRes, lessonsRes, questsRes, badgesRes, shopItemsRes] = await Promise.all([
       supabase.from("User").select("id", { count: "exact", head: true }),
-      supabase.from("User").select("id", { count: "exact", head: true }).ilike("role", "parent"),
+      supabase.from("User").select("id", { count: "exact", head: true }).or("role.eq.PARENT,role.eq.parent,role.eq.Parent"),
       supabase.from("LearnerProfile").select("id", { count: "exact", head: true }),
       supabase.from("Lesson").select("id", { count: "exact", head: true }),
       supabase.from("Quest").select("id", { count: "exact", head: true }),
