@@ -218,7 +218,6 @@ export async function POST(req: NextRequest) {
       if (filename.endsWith(".csv") || filename.endsWith(".txt")) {
         text = await file.text();
       } else if (filename.endsWith(".xlsx") || filename.endsWith(".xls")) {
-        // Parse Excel file using xlsx library
         const buffer = await file.arrayBuffer();
         const XLSX = await import("xlsx");
         const workbook = XLSX.read(new Uint8Array(buffer), { type: "array" });
