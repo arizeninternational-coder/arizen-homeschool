@@ -38,7 +38,7 @@ interface ParsedRow {
   questTitle: string; questInstructions: string;
   reflectionPrompt: string; rewardCoins: string; rewardStars: string;
   estimatedDuration: string; difficulty: string;
-  valid: boolean; errors: string[]; warnings: string[];
+  valid: boolean; errors: string[]; warnings: string[]; isDuplicate: boolean;
 }
 
 interface Toast {
@@ -141,12 +141,15 @@ export default function SubjectCurriculumPage() {
       const fd = new FormData();
       fd.append("file", file);
       fd.append("action", "preview");
+      fd.append("gradeId", String(gradeId));
+      fd.append("subjectSlug", subjectSlug);
       const res = await fetch("/api/admin/curriculum/upload", { method: "POST", body: fd, credentials: "include" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Preview failed");
       setPreviewRows(data.rows);
       setStep("preview");
       if (data.invalidRows > 0) addToast("warning", `${data.invalidRows} rows have errors`);
+      if (data.duplicateRows > 0) addToast("warning", `${data.duplicateRows} rows are duplicates (already imported)`);
     } catch (e: any) { addToast("error", e.message); }
     setPreviewLoading(false);
   };
@@ -157,6 +160,8 @@ export default function SubjectCurriculumPage() {
     try {
       const fd = new FormData();
       fd.append("action", "confirm");
+      fd.append("gradeId", String(gradeId));
+      fd.append("subjectSlug", subjectSlug);
       fd.append("previewData", JSON.stringify(previewRows));
       const res = await fetch("/api/admin/curriculum/upload", { method: "POST", body: fd, credentials: "include" });
       const data = await res.json();
@@ -164,7 +169,7 @@ export default function SubjectCurriculumPage() {
       setImportResult(data);
       setStep("result");
       addToast("success", data.message || "Import successful!");
-      loadLessons(); // Reload
+      loadLessons();
     } catch (e: any) { addToast("error", e.message); }
     setImporting(false);
   };
@@ -245,7 +250,7 @@ export default function SubjectCurriculumPage() {
             background: colors.primary, color: "#fff", fontWeight: 700, fontSize: "0.8125rem",
             cursor: "pointer", display: "flex", alignItems: "center", gap: 6,
           }}>
-            <Upload size={15} /> Upload Excel
+            <Upload size={15} /> Upload CSV
           </button>
         </div>
       </div>
@@ -421,7 +426,7 @@ export default function SubjectCurriculumPage() {
                     padding: "2.5rem 2rem", textAlign: "center", marginBottom: 20,
                     background: file ? "#ECFDF5" : "#FAFAFA",
                   }}>
-                    <input ref={fileInputRef} type="file" accept=".csv,.xlsx,.xls"
+                    <input ref={fileInputRef} type="file" accept=".csv"
                       onChange={handleFileSelect} style={{ display: "none" }} />
                     {file ? (
                       <>
@@ -485,16 +490,21 @@ export default function SubjectCurriculumPage() {
                       Preview — {previewRows.length} rows
                     </h3>
                     <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#059669", background: "#ECFDF5", padding: "2px 8px", borderRadius: 6 }}>
-                      {previewRows.filter(r => r.valid).length} valid
+                      {previewRows.filter(r => r.valid && !r.isDuplicate).length} valid
                     </span>
                     {previewRows.filter(r => !r.valid).length > 0 && (
                       <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#DC2626", background: "#FEF2F2", padding: "2px 8px", borderRadius: 6 }}>
                         {previewRows.filter(r => !r.valid).length} errors
                       </span>
                     )}
-                    {previewRows.filter(r => r.warnings.length > 0).length > 0 && (
+                    {previewRows.filter(r => r.isDuplicate).length > 0 && (
                       <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#D97706", background: "#FEF3C7", padding: "2px 8px", borderRadius: 6 }}>
-                        {previewRows.filter(r => r.warnings.length > 0).length} warnings
+                        {previewRows.filter(r => r.isDuplicate).length} duplicates
+                      </span>
+                    )}
+                    {previewRows.filter(r => r.warnings.length > 0 && r.valid && !r.isDuplicate).length > 0 && (
+                      <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#D97706", background: "#FEF3C7", padding: "2px 8px", borderRadius: 6 }}>
+                        {previewRows.filter(r => r.warnings.length > 0 && r.valid && !r.isDuplicate).length} warnings
                       </span>
                     )}
                   </div>
@@ -515,7 +525,7 @@ export default function SubjectCurriculumPage() {
                       <tbody>
                         {previewRows.map((row, i) => (
                           <tr key={i} style={{
-                            background: !row.valid ? "#FEF2F2" : row.warnings.length > 0 ? "#FFFBEB" : "white",
+                            background: !row.valid ? "#FEF2F2" : row.isDuplicate ? "#FEF3C7" : row.warnings.length > 0 ? "#FFFBEB" : "white",
                             borderBottom: "1px solid #F1F5F9",
                           }}>
                             <td style={{ padding: "8px 12px", color: colors.textMuted }}>{i + 1}</td>
@@ -529,7 +539,13 @@ export default function SubjectCurriculumPage() {
                             <td style={{ padding: "8px 12px", color: colors.textMuted }}>{row.questTitle || "—"}</td>
                             <td style={{ padding: "8px 12px" }}>
                               {row.valid ? (
-                                <span style={{ color: "#059669", fontWeight: 700 }}>✓ Valid</span>
+                                row.isDuplicate ? (
+                                  <span style={{ color: "#D97706", fontWeight: 700 }} title={row.warnings.join(", ")}>
+                                    🔄 Duplicate
+                                  </span>
+                                ) : (
+                                  <span style={{ color: "#059669", fontWeight: 700 }}>✓ Valid</span>
+                                )
                               ) : (
                                 <span style={{ color: "#DC2626", fontWeight: 700 }} title={row.errors.join(", ")}>
                                   ⚠ {row.errors[0]}
@@ -620,13 +636,13 @@ export default function SubjectCurriculumPage() {
                     padding: "10px 20px", borderRadius: 10, border: `1px solid ${colors.border}`,
                     background: "white", color: colors.text, fontWeight: 700, fontSize: "0.8125rem", cursor: "pointer",
                   }}>← Back</button>
-                  <button onClick={handleConfirmImport} disabled={importing || previewRows!.filter(r => r.valid).length === 0} style={{
+                  <button onClick={handleConfirmImport} disabled={importing || previewRows!.filter(r => r.valid && !r.isDuplicate).length === 0} style={{
                     padding: "10px 20px", borderRadius: 10, border: "none",
                     background: colors.primary, color: "#fff", fontWeight: 700,
-                    fontSize: "0.8125rem", cursor: !importing && previewRows!.filter(r => r.valid).length > 0 ? "pointer" : "default",
-                    opacity: importing || previewRows!.filter(r => r.valid).length === 0 ? 0.5 : 1, display: "flex", alignItems: "center", gap: 6,
+                    fontSize: "0.8125rem", cursor: !importing && previewRows!.filter(r => r.valid && !r.isDuplicate).length > 0 ? "pointer" : "default",
+                    opacity: importing || previewRows!.filter(r => r.valid && !r.isDuplicate).length === 0 ? 0.5 : 1, display: "flex", alignItems: "center", gap: 6,
                   }}>
-                    {importing ? "Importing..." : <><CheckCircle2 size={14} /> Import {previewRows!.filter(r => r.valid).length} Rows</>}
+                    {importing ? "Importing..." : <><CheckCircle2 size={14} /> Import {previewRows!.filter(r => r.valid && !r.isDuplicate).length} Rows</>}
                   </button>
                 </>
               )}

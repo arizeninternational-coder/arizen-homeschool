@@ -156,9 +156,76 @@ function mapRow(raw: string[], headers: string[]): ParsedRow {
   return row;
 }
 
+// ── Validate row against route context ──────────────────────────
+function validateRowAgainstContext(
+  row: ParsedRow,
+  routeGradeId: number,
+  routeSubjectSlug: string,
+  subjectNameMap: Record<string, string>,
+): void {
+  // Validate grade — extract the first number from the grade string
+  // Supports: "2", "Grade 2", "grade 2", "G2", "Grade-2", etc.
+  if (row.grade) {
+    const match = row.grade.match(/\d+/);
+    const rowGrade = match ? Number(match[0]) : NaN;
+    if (!isNaN(rowGrade) && rowGrade !== routeGradeId) {
+      row.errors.push(`Grade mismatch: file has grade ${row.grade} (parsed as ${rowGrade}), but this page is for grade ${routeGradeId}`);
+      row.valid = false;
+    }
+  }
+
+  // Validate subject (case-insensitive slug comparison)
+  if (row.subject) {
+    const rowSubjectSlug = row.subject.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+    // Check if the row subject matches the route subject slug
+    // Support: "Mathematics" → "mathematics", "Grade 2 Mathematics" → "mathematics", etc.
+    const normalizedInput = row.subject.toLowerCase().trim();
+    const routeSlugLower = routeSubjectSlug.toLowerCase();
+    // Direct match by slug or by display name
+    const matches = rowSubjectSlug === routeSlugLower
+      || normalizedInput === routeSlugLower
+      || normalizedInput === subjectNameMap[routeSlugLower]
+      || Object.entries(subjectNameMap).some(
+        ([slug, name]) => slug === routeSlugLower && (name.toLowerCase() === normalizedInput || rowSubjectSlug === slug)
+      );
+    if (!matches) {
+      row.errors.push(`Subject mismatch: file has subject "${row.subject}", but this page is for ${subjectNameMap[routeSlugLower] || routeSubjectSlug}`);
+      row.valid = false;
+    }
+  }
+}
+
+// ── Subject slug→name reverse map ───────────────────────────────
+const SUBJECT_NAME_MAP: Record<string, string> = {
+  mathematics: "Mathematics",
+  english: "English",
+  kiswahili: "Kiswahili",
+  science: "Science",
+  "social-studies": "Social Studies",
+  environmental: "Environmental",
+  movement: "Movement",
+  hygiene: "Hygiene & Nutrition",
+  "hygiene-nutrition": "Hygiene & Nutrition",
+  agriculture: "Agriculture",
+  "creative-arts": "Creative Arts",
+  "religious-education": "IRE / CRE",
+  business: "Business Studies",
+  computing: "Computing",
+  literacy: "Literacy",
+  "movement-creative": "Movement & Creative",
+  ire: "IRE",
+  hpe: "HPE",
+  "pre-technical": "Pre-Technical Studies",
+  "science-tech": "Science & Technology",
+};
+
 // ── Helpers ─────────────────────────────────────────────────────
 function slugify(text: string): string {
   return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 60).replace(/-+$/, "");
+}
+
+function buildThemeSlug(gradeNum: number, subjectName: string): string {
+  return `g${gradeNum}-${slugify(subjectName)}`;
 }
 
 async function getOrCreateGuild(): Promise<string | null> {
@@ -171,11 +238,18 @@ async function getOrCreateGuild(): Promise<string | null> {
 }
 
 async function getOrCreateTheme(guildId: string, gradeNum: number, subjectName: string): Promise<string | null> {
-  const slug = `g${gradeNum}-${slugify(subjectName)}`;
-  const { data: existing } = await supabase.from("Theme").select("id").eq("slug", slug).single();
+  const themeSlug = buildThemeSlug(gradeNum, subjectName);
+  // Fix: scope lookup by guildId + slug (exact match, no loose ilike)
+  const { data: existing } = await supabase
+    .from("Theme")
+    .select("id")
+    .eq("guildId", guildId)
+    .eq("slug", themeSlug)
+    .eq("grade", gradeNum)
+    .single();
   if (existing) return existing.id;
   const { data: created } = await supabase.from("Theme").insert({
-    guildId, title: `Grade ${gradeNum} ${subjectName}`, slug,
+    guildId, title: `Grade ${gradeNum} ${subjectName}`, slug: themeSlug,
     description: `Grade ${gradeNum} ${subjectName} curriculum`,
     grade: gradeNum, status: "DRAFT", durationWeeks: 4,
   }).select("id").single();
@@ -184,7 +258,13 @@ async function getOrCreateTheme(guildId: string, gradeNum: number, subjectName: 
 
 async function getOrCreateQuest(themeId: string, questTitle: string, index: number): Promise<string | null> {
   const slug = `${slugify(questTitle)}-q${index}`;
-  const { data: existing } = await supabase.from("Quest").select("id").eq("slug").eq(slug).single();
+  // Fix: scope lookup by themeId + slug (not global slug)
+  const { data: existing } = await supabase
+    .from("Quest")
+    .select("id")
+    .eq("themeId", themeId)
+    .eq("slug", slug)
+    .single();
   if (existing) return existing.id;
   const { data: created } = await supabase.from("Quest").insert({
     themeId, title: questTitle, slug,
@@ -205,30 +285,23 @@ export async function POST(req: NextRequest) {
     const action = (formData.get("action") as string) || "preview";
     const previewDataRaw = formData.get("previewData") as string | null;
 
+    // Extract page context from FormData (sent by the page on both preview and confirm)
+    const routeGradeId = Number(formData.get("gradeId")) || 0;
+    const routeSubjectSlug = (formData.get("subjectSlug") as string) || "";
+    const routeSubjectName = SUBJECT_NAME_MAP[routeSubjectSlug.toLowerCase()] || routeSubjectSlug;
+
     // ── PREVIEW ──
     if (action === "preview") {
       if (!file) return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
 
       const filename = file.name.toLowerCase();
-      if (!filename.endsWith(".csv") && !filename.endsWith(".xlsx") && !filename.endsWith(".xls")) {
-        return NextResponse.json({ error: "Only .csv, .xlsx, and .xls files are accepted" }, { status: 400 });
+      if (!filename.endsWith(".csv")) {
+        return NextResponse.json({
+          error: "Excel files are not supported yet. Please upload CSV.",
+        }, { status: 400 });
       }
 
-      let text: string;
-      if (filename.endsWith(".csv")) {
-        text = await file.text();
-      } else {
-        // For xlsx, we expect the client to convert to CSV first
-        // Or we try to read as text (may produce garbage for real xlsx)
-        text = await file.text();
-        // Check if it looks like binary (xlsx starts with PK)
-        if (text.startsWith("PK") || text.charCodeAt(0) === 0) {
-          return NextResponse.json({
-            error: "Excel (.xlsx) files are not supported directly. Please save your file as CSV (Comma Separated Values) and upload that instead. In Excel: File → Save As → CSV UTF-8."
-          }, { status: 400 });
-        }
-      }
-
+      const text = await file.text();
       const rows = parseCSV(text);
       if (rows.length < 2) {
         return NextResponse.json({ error: "File must have a header row and at least one data row" }, { status: 400 });
@@ -249,15 +322,67 @@ export async function POST(req: NextRequest) {
       const dataRows = rows.slice(1);
       const parsed: ParsedRow[] = dataRows.map(r => mapRow(r, headers));
 
-      const validCount = parsed.filter(r => r.valid).length;
-      const warningCount = parsed.filter(r => r.warnings.length > 0).length;
+      // Validate each row against the route context (grade + subject)
+      for (const row of parsed) {
+        validateRowAgainstContext(row, routeGradeId, routeSubjectSlug, SUBJECT_NAME_MAP);
+      }
+
+      // Check for duplicates: query existing lessons for this grade+subject
+      // Build the theme slug to find existing lessons
+      const themeSlug = buildThemeSlug(routeGradeId, routeSubjectName);
+      const guildId = await getOrCreateGuild();
+      let duplicateCount = 0;
+
+      if (guildId) {
+        const { data: existingTheme } = await supabase
+          .from("Theme")
+          .select("id")
+          .eq("guildId", guildId)
+          .eq("slug", themeSlug)
+          .eq("grade", routeGradeId)
+          .single();
+
+        if (existingTheme) {
+          const { data: existingQuests } = await supabase
+            .from("Quest")
+            .select("id")
+            .eq("themeId", existingTheme.id);
+
+          if (existingQuests && existingQuests.length > 0) {
+            const questIds = existingQuests.map(q => q.id);
+            const { data: existingLessons } = await supabase
+              .from("Lesson")
+              .select("slug")
+              .in("questId", questIds);
+
+            if (existingLessons) {
+              const existingSlugs = new Set(existingLessons.map(l => l.slug));
+              for (const row of parsed) {
+                if (row.valid) {
+                  const lessonSlug = `g${routeGradeId}-${slugify(routeSubjectName)}-${slugify(row.lessonTitle)}`;
+                  if (existingSlugs.has(lessonSlug)) {
+                    row.isDuplicate = true;
+                    row.warnings.push("This lesson already exists (duplicate)");
+                    duplicateCount++;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      const validCount = parsed.filter(r => r.valid && !r.isDuplicate).length;
+      const invalidCount = parsed.filter(r => !r.valid).length;
+      const warningCount = parsed.filter(r => r.warnings.length > 0 && r.valid).length;
 
       return NextResponse.json({
         success: true,
         action: "preview",
         totalRows: parsed.length,
         validRows: validCount,
-        invalidRows: parsed.length - validCount,
+        invalidRows: invalidCount,
+        duplicateRows: duplicateCount,
         warningRows: warningCount,
         headers,
         rows: parsed,
@@ -271,7 +396,8 @@ export async function POST(req: NextRequest) {
       }
 
       const rows: ParsedRow[] = JSON.parse(previewDataRaw);
-      const toImport = rows.filter(r => r.valid);
+      // Only import valid, non-duplicate rows
+      const toImport = rows.filter(r => r.valid && !r.isDuplicate);
       if (toImport.length === 0) {
         return NextResponse.json({ error: "No valid rows to import" }, { status: 400 });
       }
@@ -285,82 +411,81 @@ export async function POST(req: NextRequest) {
       const guildId = await getOrCreateGuild();
       if (!guildId) return NextResponse.json({ error: "Could not find or create guild" }, { status: 500 });
 
-      // Group rows by subject to create themes
-      const subjectGroups = new Map<string, ParsedRow[]>();
+      // Use the route context for theme creation (not CSV row data)
+      const themeId = await getOrCreateTheme(guildId, routeGradeId, routeSubjectName);
+      if (!themeId) {
+        return NextResponse.json({ error: `Could not create theme for Grade ${routeGradeId} ${routeSubjectName}` }, { status: 500 });
+      }
+      themesCreated++;
+
+      // Group by quest within this theme
+      const questGroups = new Map<string, ParsedRow[]>();
       for (const row of toImport) {
-        const subj = row.subject || toImport[0].subject || "General";
-        if (!subjectGroups.has(subj)) subjectGroups.set(subj, []);
-        subjectGroups.get(subj)!.push(row);
+        const qTitle = row.questTitle || "Default Quest";
+        if (!questGroups.has(qTitle)) questGroups.set(qTitle, []);
+        questGroups.get(qTitle)!.push(row);
       }
 
-      for (const [subjectName, subjectRows] of subjectGroups) {
-        const gradeNum = parseInt(subjectRows[0].grade) || 0;
-        const themeId = await getOrCreateTheme(guildId, gradeNum, subjectName);
-        if (!themeId) { errors.push(`Could not create theme for ${subjectName}`); continue; }
-        themesCreated++;
+      let questIndex = 0;
+      for (const [questTitle, questRows] of questGroups) {
+        questIndex++;
+        const questId = await getOrCreateQuest(themeId, questTitle, questIndex);
+        if (!questId) { errors.push(`Could not create quest: ${questTitle}`); continue; }
+        questsCreated++;
 
-        // Group by quest
-        const questGroups = new Map<string, ParsedRow[]>();
-        for (const row of subjectRows) {
-          const qTitle = row.questTitle || "Default Quest";
-          if (!questGroups.has(qTitle)) questGroups.set(qTitle, []);
-          questGroups.get(qTitle)!.push(row);
-        }
+        for (const row of questRows) {
+          const lessonSlug = `g${routeGradeId}-${slugify(routeSubjectName)}-${slugify(row.lessonTitle)}`;
 
-        let questIndex = 0;
-        for (const [questTitle, questRows] of questGroups) {
-          questIndex++;
-          const questId = await getOrCreateQuest(themeId, questTitle, questIndex);
-          if (!questId) { errors.push(`Could not create quest: ${questTitle}`); continue; }
-          questsCreated++;
+          // Fix: scope duplicate check to questId + slug (not global)
+          const { data: existingLesson } = await supabase
+            .from("Lesson")
+            .select("id")
+            .eq("questId", questId)
+            .eq("slug", lessonSlug)
+            .single();
 
-          for (const row of questRows) {
-            const lessonSlug = `g${gradeNum}-${slugify(subjectName)}-${slugify(row.lessonTitle)}`;
-            // Check for duplicate
-            const { data: existingLesson } = await supabase.from("Lesson").select("id").eq("slug", lessonSlug).single();
-            if (existingLesson) {
-              lessonsSkipped++;
-              continue;
-            }
+          if (existingLesson) {
+            lessonsSkipped++;
+            continue;
+          }
 
-            const contentBlocks = JSON.stringify({
-              grade: row.grade,
-              subject: row.subject,
-              strand: row.strand,
-              subStrand: row.subStrand,
-              learningOutcome: row.learningOutcome,
-              term: row.term,
-              week: row.week,
-              activityTitle: row.activityTitle,
-              activityInstructions: row.activityInstructions,
-              questTitle: row.questTitle,
-              questInstructions: row.questInstructions,
-              reflectionPrompt: row.reflectionPrompt,
-              rewardCoins: parseInt(row.rewardCoins) || 10,
-              rewardStars: parseInt(row.rewardStars) || 0,
-              estimatedDuration: parseInt(row.estimatedDuration) || null,
-              difficulty: row.difficulty || "medium",
-              importSource: "excel",
-            });
+          const contentBlocks = JSON.stringify({
+            grade: String(routeGradeId),
+            subject: routeSubjectName,
+            strand: row.strand,
+            subStrand: row.subStrand,
+            learningOutcome: row.learningOutcome,
+            term: row.term,
+            week: row.week,
+            activityTitle: row.activityTitle,
+            activityInstructions: row.activityInstructions,
+            questTitle: row.questTitle,
+            questInstructions: row.questInstructions,
+            reflectionPrompt: row.reflectionPrompt,
+            rewardCoins: parseInt(row.rewardCoins) || 10,
+            rewardStars: parseInt(row.rewardStars) || 0,
+            estimatedDuration: parseInt(row.estimatedDuration) || null,
+            difficulty: row.difficulty || "medium",
+            importSource: "csv",
+          });
 
-            const { error: lessonErr } = await supabase.from("Lesson").insert({
-              questId,
-              title: row.lessonTitle,
-              slug: lessonSlug,
-              description: row.learningOutcome || row.lessonTitle,
-              contentBlocks,
-              xpReward: JSON.stringify({ base: parseInt(row.rewardCoins) || 10 }),
-              difficulty: JSON.stringify({ level: row.difficulty || "medium", complexityScore: row.difficulty === "hard" ? 3 : row.difficulty === "easy" ? 1 : 2 }),
-              estimatedDurationMinutes: parseInt(row.estimatedDuration) || null,
-              orderIndex: lessonsCreated + 1,
-              status: "DRAFT",
-            });
+          const { error: lessonErr } = await supabase.from("Lesson").insert({
+            questId,
+            title: row.lessonTitle,
+            slug: lessonSlug,
+            description: row.learningOutcome || row.lessonTitle,
+            contentBlocks,
+            xpReward: JSON.stringify({ base: parseInt(row.rewardCoins) || 10 }),
+            difficulty: JSON.stringify({ level: row.difficulty || "medium", complexityScore: row.difficulty === "hard" ? 3 : row.difficulty === "easy" ? 1 : 2 }),
+            estimatedDurationMinutes: parseInt(row.estimatedDuration) || null,
+            orderIndex: lessonsCreated + 1,
+            status: "DRAFT",
+          });
 
-            if (lessonErr) {
-              errors.push(`Lesson "${row.lessonTitle}": ${lessonErr.message}`);
-            } else {
-              lessonsCreated++;
-            }
+          if (lessonErr) {
+            errors.push(`Lesson "${row.lessonTitle}": ${lessonErr.message}`);
+          } else {
+            lessonsCreated++;
           }
         }
       }

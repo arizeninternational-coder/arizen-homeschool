@@ -4,6 +4,33 @@ import { supabase } from "@/lib/supabase";
 import { requireAdmin } from "@/lib/api-guard";
 export const dynamic = "force-dynamic";
 
+const SUBJECT_NAME_MAP: Record<string, string> = {
+  mathematics: "Mathematics",
+  english: "English",
+  kiswahili: "Kiswahili",
+  science: "Science",
+  "social-studies": "Social Studies",
+  environmental: "Environmental",
+  movement: "Movement",
+  hygiene: "Hygiene & Nutrition",
+  "hygiene-nutrition": "Hygiene & Nutrition",
+  agriculture: "Agriculture",
+  "creative-arts": "Creative Arts",
+  "religious-education": "IRE / CRE",
+  business: "Business Studies",
+  computing: "Computing",
+  literacy: "Literacy",
+  "movement-creative": "Movement & Creative",
+  ire: "IRE",
+  hpe: "HPE",
+  "pre-technical": "Pre-Technical Studies",
+  "science-tech": "Science & Technology",
+};
+
+function slugify(text: string): string {
+  return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 60).replace(/-+$/, "");
+}
+
 export async function GET(req: NextRequest) {
   const auth = await requireAdmin(req);
   if (auth instanceof NextResponse) return auth;
@@ -17,12 +44,15 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "gradeId and subjectSlug are required" }, { status: 400 });
     }
 
-    // Find the theme for this grade+subject
+    const subjectName = SUBJECT_NAME_MAP[subjectSlug.toLowerCase()] || subjectSlug;
+    const themeSlug = `g${gradeId}-${slugify(subjectName)}`;
+
+    // Fix: use exact match on slug + grade instead of loose ilike
     const { data: themes } = await supabase
       .from("Theme")
       .select("id, title, slug")
       .eq("grade", gradeId)
-      .ilike("slug", `%${subjectSlug}%`)
+      .eq("slug", themeSlug)
       .limit(1);
 
     if (!themes || themes.length === 0) {
