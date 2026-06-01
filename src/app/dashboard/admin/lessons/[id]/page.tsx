@@ -4,8 +4,7 @@ export const dynamic = "force-dynamic";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { signOut } from "next-auth/react";
-import { BookOpen, ArrowLeft, AlertCircle, GraduationCap, Layers, Clock, CheckCircle, Edit } from "lucide-react";
+import { ArrowLeft, AlertCircle, Save, BookOpen } from "lucide-react";
 import { ds, colors } from "@/lib/design-system";
 
 interface LessonDetail {
@@ -13,34 +12,64 @@ interface LessonDetail {
   title: string;
   slug: string;
   description: string | null;
-  content: string | null;
   status: string;
   orderIndex: number;
-  xpReward: number;
-  activityInstructions: string | null;
-  question1: string | null;
-  answer1: string | null;
-  question2: string | null;
-  answer2: string | null;
-  question3: string | null;
-  answer3: string | null;
+  xpReward: any;
+  contentBlocks: any;
+  difficulty: any;
+  estimatedDurationMinutes: number | null;
   createdAt: string;
   updatedAt: string;
-  quest?: {
-    id: string;
-    title: string;
-    theme?: {
-      id: string;
-      title: string;
-      grade: number;
-    };
-  };
+  quest?: { id: string; title: string; theme?: { id: string; title: string; grade: number } };
+  // CSV-imported meta fields
+  strand: string;
+  subStrand: string;
+  learningOutcome: string;
+  term: string;
+  week: string;
+  activityTitle: string;
+  activityInstructions: string;
+  questTitle: string;
+  questInstructions: string;
+  reflectionPrompt: string;
+  rewardCoins: number;
+  rewardStars: number;
 }
 
-export default function AdminLessonDetailPage({ params }: { params: { id: string } }) {
+const STATUS_OPTIONS = [
+  { value: "DRAFT", label: "Content Missing (Draft)" },
+  { value: "REVIEW", label: "In Review" },
+  { value: "PUBLISHED", label: "Published" },
+];
+
+export default function AdminLessonEditPage({ params }: { params: { id: string } }) {
   const [lesson, setLesson] = useState<LessonDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
+  // Form state
+  const [form, setForm] = useState({
+    title: "",
+    description: "",
+    status: "DRAFT",
+    strand: "",
+    subStrand: "",
+    learningOutcome: "",
+    term: "",
+    week: "",
+    activityTitle: "",
+    activityInstructions: "",
+    questTitle: "",
+    questInstructions: "",
+    reflectionPrompt: "",
+    rewardCoins: 10,
+    rewardStars: 0,
+    estimatedDurationMinutes: 30,
+    difficulty: "medium",
+    xpReward: 50,
+  });
 
   useEffect(() => {
     async function load() {
@@ -48,7 +77,28 @@ export default function AdminLessonDetailPage({ params }: { params: { id: string
         const res = await fetch(`/api/admin/lessons/${params.id}`, { credentials: "include" });
         if (res.ok) {
           const data = await res.json();
-          setLesson(data.lesson);
+          const l = data.lesson;
+          setLesson(l);
+          setForm({
+            title: l.title || "",
+            description: l.description || "",
+            status: l.status || "DRAFT",
+            strand: l.strand || "",
+            subStrand: l.subStrand || "",
+            learningOutcome: l.learningOutcome || "",
+            term: l.term || "",
+            week: l.week || "",
+            activityTitle: l.activityTitle || "",
+            activityInstructions: l.activityInstructions || "",
+            questTitle: l.questTitle || "",
+            questInstructions: l.questInstructions || "",
+            reflectionPrompt: l.reflectionPrompt || "",
+            rewardCoins: l.rewardCoins || 10,
+            rewardStars: l.rewardStars || 0,
+            estimatedDurationMinutes: l.estimatedDurationMinutes || 30,
+            difficulty: (typeof l.difficulty === "object" ? l.difficulty?.level : l.difficulty) || "medium",
+            xpReward: (typeof l.xpReward === "object" ? l.xpReward?.base : l.xpReward) || 50,
+          });
         } else {
           const errBody = await res.json().catch(() => ({}));
           setError(errBody.error || "Failed to load lesson");
@@ -62,6 +112,33 @@ export default function AdminLessonDetailPage({ params }: { params: { id: string
     load();
   }, [params.id]);
 
+  const updateField = (field: string, value: any) => {
+    setForm(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    setSaveSuccess(false);
+    setError(null);
+    try {
+      const res = await fetch(`/api/admin/lessons/${params.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Save failed");
+      setSaveSuccess(true);
+      setLesson(data.lesson);
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } catch (err: any) {
+      setError(err.message || "Failed to save");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   if (loading) {
     return (
       <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: colors.bg }}>
@@ -70,7 +147,7 @@ export default function AdminLessonDetailPage({ params }: { params: { id: string
     );
   }
 
-  if (error || !lesson) {
+  if (error && !lesson) {
     return (
       <div style={{ minHeight: "100vh", background: colors.bg }}>
         <div style={{ maxWidth: 800, margin: "0 auto", padding: "2rem 1.5rem" }}>
@@ -86,91 +163,206 @@ export default function AdminLessonDetailPage({ params }: { params: { id: string
     );
   }
 
+  const inputStyle: React.CSSProperties = {
+    width: "100%", padding: "10px 14px", borderRadius: 10,
+    border: `1.5px solid ${colors.border}`, fontSize: "0.875rem", color: colors.text,
+    outline: "none", fontFamily: "inherit", background: "#fff",
+  };
+
+  const labelStyle: React.CSSProperties = {
+    fontSize: "0.8125rem", fontWeight: 700, color: colors.text,
+    marginBottom: 4, display: "block",
+  };
+
   return (
     <div style={{ minHeight: "100vh", background: colors.bg }}>
       <div style={{ maxWidth: 900, margin: "0 auto", padding: "2rem 1.5rem" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
+        {/* Top bar */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", flexWrap: "wrap", gap: 8 }}>
           <Link href="/dashboard/admin/lessons" style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", color: colors.textMuted, textDecoration: "none", fontSize: "0.875rem", fontWeight: 600 }}>
             <ArrowLeft style={{ width: 16, height: 16 }} /> Back to Lessons
           </Link>
-          <button onClick={() => signOut({ callbackUrl: "/" })} style={{ display: "flex", alignItems: "center", gap: "0.375rem", padding: "0.375rem 0.75rem", borderRadius: 8, border: `1px solid ${colors.border}`, background: "none", color: colors.textMuted, cursor: "pointer", fontSize: "0.8125rem", fontWeight: 600 }}>
-            Sign Out
+          <button onClick={handleSave} disabled={saving} style={{
+            display: "inline-flex", alignItems: "center", gap: "0.5rem",
+            padding: "10px 22px", borderRadius: 10, border: "none",
+            background: saveSuccess ? "#22C55E" : colors.primary,
+            color: "#fff", fontWeight: 700, fontSize: "0.875rem",
+            cursor: "pointer",
+          }}>
+            <Save style={{ width: 16, height: 16 }} />
+            {saving ? "Saving..." : saveSuccess ? "Saved ✓" : "Save Changes"}
           </button>
         </div>
 
-        {/* Header */}
-        <div style={{ ...ds.card, padding: "1.5rem", marginBottom: "1.5rem" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "1rem" }}>
-            <div>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem", flexWrap: "wrap" }}>
-                <span style={{ fontSize: "0.6875rem", fontWeight: 700, color: lesson.status === "PUBLISHED" ? colors.success : colors.warning, background: lesson.status === "PUBLISHED" ? `${colors.success}15` : `${colors.warning}15`, padding: "0.2rem 0.5rem", borderRadius: 6 }}>
-                  {lesson.status}
-                </span>
-                {lesson.quest?.theme && (
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", fontSize: "0.6875rem", color: colors.textMuted, background: colors.bgSoft, padding: "0.2rem 0.5rem", borderRadius: 6 }}>
-                    <GraduationCap style={{ width: 10, height: 10 }} /> Grade {lesson.quest.theme.grade} · {lesson.quest.theme.title}
-                  </span>
-                )}
-                {lesson.quest && (
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", fontSize: "0.6875rem", color: colors.textMuted, background: colors.bgSoft, padding: "0.2rem 0.5rem", borderRadius: 6 }}>
-                    <Layers style={{ width: 10, height: 10 }} /> {lesson.quest.title}
-                  </span>
-                )}
-              </div>
-              <h1 style={{ fontSize: "1.5rem", fontWeight: 800, color: colors.text, marginBottom: "0.5rem" }}>{lesson.title}</h1>
-              {lesson.description && <p style={{ color: colors.textMuted, fontSize: "0.9375rem" }}>{lesson.description}</p>}
-            </div>
-            <div style={{ display: "flex", gap: "0.5rem", flexShrink: 0 }}>
-              <div style={{ padding: "0.5rem 1rem", borderRadius: 10, background: colors.primarySoft, color: colors.primary, fontWeight: 700, fontSize: "0.875rem" }}>
-                {lesson.xpReward || 0} XP
-              </div>
-            </div>
+        {error && (
+          <div style={{ ...ds.alertError, marginBottom: "1rem" }}>
+            <AlertCircle style={{ width: 16, height: 16, flexShrink: 0 }} />
+            <span>{error}</span>
           </div>
+        )}
+        {saveSuccess && (
+          <div style={{ ...ds.alertSuccess, marginBottom: "1rem" }}>
+            ✓ Lesson saved successfully!
+          </div>
+        )}
+
+        {/* Header card */}
+        <div style={{ ...ds.card, padding: "1.5rem", marginBottom: "1.5rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.75rem", flexWrap: "wrap" }}>
+            <span style={{
+              fontSize: "0.6875rem", fontWeight: 700, color: form.status === "PUBLISHED" ? colors.success : colors.warning,
+              background: form.status === "PUBLISHED" ? `${colors.success}15` : `${colors.warning}15`,
+              padding: "0.2rem 0.5rem", borderRadius: 6,
+            }}>
+              {form.status}
+            </span>
+            {lesson?.quest?.theme && (
+              <span style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", fontSize: "0.6875rem", color: colors.textMuted, background: colors.bgSoft, padding: "0.2rem 0.5rem", borderRadius: 6 }}>
+                <BookOpen style={{ width: 10, height: 10 }} /> Grade {lesson.quest.theme.grade} · {lesson.quest.theme.title}
+              </span>
+            )}
+          </div>
+          <h1 style={{ fontSize: "1.5rem", fontWeight: 800, color: colors.text, marginBottom: "0.5rem" }}>
+            Edit Lesson: {form.title}
+          </h1>
+          <p style={{ color: colors.textMuted, fontSize: "0.875rem" }}>Slug: {lesson?.slug}</p>
         </div>
 
-        {/* Content */}
-        {lesson.content && (
-          <div style={{ ...ds.card, padding: "1.5rem", marginBottom: "1.5rem" }}>
-            <h2 style={{ fontSize: "1.125rem", fontWeight: 700, color: colors.text, marginBottom: "1rem" }}>Lesson Content</h2>
-            <div style={{ color: colors.textMuted, fontSize: "0.9375rem", lineHeight: 1.8, whiteSpace: "pre-wrap" }}>{lesson.content}</div>
-          </div>
-        )}
-
-        {/* Activities */}
-        {lesson.activityInstructions && (
-          <div style={{ ...ds.card, padding: "1.5rem", marginBottom: "1.5rem" }}>
-            <h2 style={{ fontSize: "1.125rem", fontWeight: 700, color: colors.text, marginBottom: "1rem" }}>Activity Instructions</h2>
-            <div style={{ color: colors.textMuted, fontSize: "0.9375rem", lineHeight: 1.8, whiteSpace: "pre-wrap" }}>{lesson.activityInstructions}</div>
-          </div>
-        )}
-
-        {/* Questions */}
-        {(lesson.question1 || lesson.question2 || lesson.question3) && (
-          <div style={{ ...ds.card, padding: "1.5rem", marginBottom: "1.5rem" }}>
-            <h2 style={{ fontSize: "1.125rem", fontWeight: 700, color: colors.text, marginBottom: "1rem" }}>Questions</h2>
+        {/* Edit form */}
+        <div style={{ display: "grid", gap: "1.5rem" }}>
+          {/* Basic Info */}
+          <div style={{ ...ds.card, padding: "1.5rem" }}>
+            <h2 style={{ fontSize: "1.125rem", fontWeight: 800, color: colors.text, marginBottom: "1rem" }}>Basic Information</h2>
             <div style={{ display: "grid", gap: "1rem" }}>
-              {[lesson.question1, lesson.question2, lesson.question3].filter(Boolean).map((q, i) => (
-                <div key={i} style={{ padding: "1rem", borderRadius: 12, background: colors.bgSoft }}>
-                  <div style={{ fontWeight: 700, color: colors.text, fontSize: "0.875rem", marginBottom: "0.5rem" }}>Q{i + 1}: {q}</div>
-                  <div style={{ fontSize: "0.8125rem", color: colors.textMuted }}>
-                    Answer: {[lesson.answer1, lesson.answer2, lesson.answer3][i] || "—"}
-                  </div>
+              <div>
+                <label style={labelStyle}>Lesson Title *</label>
+                <input style={inputStyle} value={form.title} onChange={e => updateField("title", e.target.value)} />
+              </div>
+              <div>
+                <label style={labelStyle}>Description</label>
+                <textarea style={{ ...inputStyle, minHeight: 80, resize: "vertical" }} value={form.description} onChange={e => updateField("description", e.target.value)} />
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                <div>
+                  <label style={labelStyle}>Status</label>
+                  <select style={inputStyle} value={form.status} onChange={e => updateField("status", e.target.value)}>
+                    {STATUS_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+                  </select>
                 </div>
-              ))}
+                <div>
+                  <label style={labelStyle}>XP Reward</label>
+                  <input type="number" style={inputStyle} value={form.xpReward} onChange={e => updateField("xpReward", Number(e.target.value))} />
+                </div>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
+                <div>
+                  <label style={labelStyle}>Difficulty</label>
+                  <select style={inputStyle} value={form.difficulty} onChange={e => updateField("difficulty", e.target.value)}>
+                    <option value="easy">Easy</option>
+                    <option value="medium">Medium</option>
+                    <option value="hard">Hard</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={labelStyle}>Estimated Duration (min)</label>
+                  <input type="number" style={inputStyle} value={form.estimatedDurationMinutes} onChange={e => updateField("estimatedDurationMinutes", Number(e.target.value))} />
+                </div>
+                <div style={{ display: "none" }} />
+              </div>
             </div>
           </div>
-        )}
 
-        {/* Meta */}
-        <div style={{ ...ds.card, padding: "1rem 1.5rem", display: "flex", gap: "1.5rem", flexWrap: "wrap", fontSize: "0.75rem", color: colors.textMuted }}>
-          <span style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem" }}>
-            <Clock style={{ width: 12, height: 12 }} /> Created: {new Date(lesson.createdAt).toLocaleDateString()}
-          </span>
-          <span style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem" }}>
-            <CheckCircle style={{ width: 12, height: 12 }} /> Updated: {new Date(lesson.updatedAt).toLocaleDateString()}
-          </span>
-          <span>Order: #{lesson.orderIndex}</span>
-          <span>Slug: {lesson.slug}</span>
+          {/* Curriculum Details */}
+          <div style={{ ...ds.card, padding: "1.5rem" }}>
+            <h2 style={{ fontSize: "1.125rem", fontWeight: 800, color: colors.text, marginBottom: "1rem" }}>Curriculum Details</h2>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+              <div>
+                <label style={labelStyle}>Strand</label>
+                <input style={inputStyle} value={form.strand} onChange={e => updateField("strand", e.target.value)} />
+              </div>
+              <div>
+                <label style={labelStyle}>Sub-Strand</label>
+                <input style={inputStyle} value={form.subStrand} onChange={e => updateField("subStrand", e.target.value)} />
+              </div>
+              <div style={{ gridColumn: "1 / -1" }}>
+                <label style={labelStyle}>Learning Outcome</label>
+                <textarea style={{ ...inputStyle, minHeight: 60, resize: "vertical" }} value={form.learningOutcome} onChange={e => updateField("learningOutcome", e.target.value)} />
+              </div>
+              <div>
+                <label style={labelStyle}>Term</label>
+                <input style={inputStyle} value={form.term} onChange={e => updateField("term", e.target.value)} placeholder="Term 1" />
+              </div>
+              <div>
+                <label style={labelStyle}>Week</label>
+                <input style={inputStyle} value={form.week} onChange={e => updateField("week", e.target.value)} placeholder="Week 1" />
+              </div>
+            </div>
+          </div>
+
+          {/* Activity */}
+          <div style={{ ...ds.card, padding: "1.5rem" }}>
+            <h2 style={{ fontSize: "1.125rem", fontWeight: 800, color: colors.text, marginBottom: "1rem" }}>Activity</h2>
+            <div style={{ display: "grid", gap: "1rem" }}>
+              <div>
+                <label style={labelStyle}>Activity Title</label>
+                <input style={inputStyle} value={form.activityTitle} onChange={e => updateField("activityTitle", e.target.value)} />
+              </div>
+              <div>
+                <label style={labelStyle}>Activity Instructions</label>
+                <textarea style={{ ...inputStyle, minHeight: 100, resize: "vertical" }} value={form.activityInstructions} onChange={e => updateField("activityInstructions", e.target.value)} />
+              </div>
+            </div>
+          </div>
+
+          {/* Quest */}
+          <div style={{ ...ds.card, padding: "1.5rem" }}>
+            <h2 style={{ fontSize: "1.125rem", fontWeight: 800, color: colors.text, marginBottom: "1rem" }}>Quest</h2>
+            <div style={{ display: "grid", gap: "1rem" }}>
+              <div>
+                <label style={labelStyle}>Quest Title</label>
+                <input style={inputStyle} value={form.questTitle} onChange={e => updateField("questTitle", e.target.value)} />
+              </div>
+              <div>
+                <label style={labelStyle}>Quest Instructions</label>
+                <textarea style={{ ...inputStyle, minHeight: 100, resize: "vertical" }} value={form.questInstructions} onChange={e => updateField("questInstructions", e.target.value)} />
+              </div>
+            </div>
+          </div>
+
+          {/* Reflection & Rewards */}
+          <div style={{ ...ds.card, padding: "1.5rem" }}>
+            <h2 style={{ fontSize: "1.125rem", fontWeight: 800, color: colors.text, marginBottom: "1rem" }}>Reflection & Rewards</h2>
+            <div style={{ display: "grid", gap: "1rem" }}>
+              <div>
+                <label style={labelStyle}>Reflection Prompt</label>
+                <textarea style={{ ...inputStyle, minHeight: 80, resize: "vertical" }} value={form.reflectionPrompt} onChange={e => updateField("reflectionPrompt", e.target.value)} />
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                <div>
+                  <label style={labelStyle}>Reward Coins</label>
+                  <input type="number" style={inputStyle} value={form.rewardCoins} onChange={e => updateField("rewardCoins", Number(e.target.value))} />
+                </div>
+                <div>
+                  <label style={labelStyle}>Reward Stars</label>
+                  <input type="number" style={inputStyle} value={form.rewardStars} onChange={e => updateField("rewardStars", Number(e.target.value))} />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Save button at bottom too */}
+          <div style={{ display: "flex", justifyContent: "flex-end", paddingBottom: "2rem" }}>
+            <button onClick={handleSave} disabled={saving} style={{
+              display: "inline-flex", alignItems: "center", gap: "0.5rem",
+              padding: "12px 28px", borderRadius: 12, border: "none",
+              background: saveSuccess ? "#22C55E" : colors.primary,
+              color: "#fff", fontWeight: 700, fontSize: "0.9375rem",
+              cursor: "pointer",
+            }}>
+              <Save style={{ width: 18, height: 18 }} />
+              {saving ? "Saving..." : saveSuccess ? "Saved ✓" : "Save Changes"}
+            </button>
+          </div>
         </div>
       </div>
     </div>

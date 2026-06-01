@@ -362,11 +362,11 @@ export default function SubjectCurriculumPage() {
                       <td style={{ padding: "10px 14px" }}>{getStatusBadge(l.status)}</td>
                       <td style={{ padding: "10px 14px", color: colors.textMuted, fontWeight: 600 }}>🪙 {l.rewardCoins}</td>
                       <td style={{ padding: "10px 14px" }}>
-                        <button style={{
+                        <Link href={`/dashboard/admin/lessons/${l.id}`} style={{
                           padding: "4px 10px", borderRadius: 6, border: `1px solid ${colors.border}`,
                           background: "white", color: colors.textMuted, fontSize: "0.75rem",
-                          cursor: "pointer", fontWeight: 600,
-                        }}>Edit</button>
+                          cursor: "pointer", fontWeight: 600, textDecoration: "none", display: "inline-block",
+                        }}>Edit</Link>
                       </td>
                     </tr>
                   ))}

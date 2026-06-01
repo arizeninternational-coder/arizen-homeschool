@@ -51,12 +51,7 @@ const DEFAULT: DashData = {
     { name: "Quiz Master", earned: false }, { name: "Goal Getter", earned: false },
     { name: "Team Player", earned: false }, { name: "Early Bird", earned: false },
   ],
-  subjects: [
-    { name: "Mathematics", level: 1, progress: 0, color: "#EDE9FE", icon: BookOpen },
-    { name: "English", level: 1, progress: 0, color: "#FFF4D8", icon: BookMarked },
-    { name: "Science", level: 1, progress: 0, color: "#ECFDF5", icon: Beaker },
-    { name: "Social Studies", level: 1, progress: 0, color: "#EFF6FF", icon: Globe },
-  ],
+  subjects: [],
   eqCheckedIn: false,
 };
 
@@ -81,15 +76,25 @@ export default function StudentDashboard() {
           fetch("/api/learner/progress", { credentials: "include" }).then(r => r.json()),
           fetch("/api/learner/lessons?limit=1", { credentials: "include" }).then(r => r.json()),
           fetch("/api/learner/checkin?today=true", { credentials: "include" }).then(r => r.json()),
+          fetch("/api/learner/subjects", { credentials: "include" }).then(r => r.json()),
         ]);
         const profile = results[0].status === "fulfilled" ? results[0].value?.profile || results[0].value : {};
         const wallet = results[1].status === "fulfilled" ? results[1].value?.wallet || results[1].value : {};
         const progress = results[2].status === "fulfilled" ? results[2].value?.progress || results[2].value : {};
         const lessonsRes = results[3].status === "fulfilled" ? results[3].value : {};
         const checkin = results[4].status === "fulfilled" ? results[4].value : {};
+        const subjectsRes = results[5].status === "fulfilled" ? results[5].value : {};
 
         const lessonList = lessonsRes.lessons || lessonsRes || [];
         const earnedBadges = (progress.badges || []).filter((b: any) => b.earned).map((b: any) => b.name);
+
+        const apiSubjects = (subjectsRes.subjects || []).map((s: any) => ({
+          name: s.name,
+          level: 1,
+          progress: 0,
+          color: s.color + "22" || "#F1F5F9",
+          icon: BookOpen,
+        }));
 
         setData({
           name: profile?.name || profile?.displayName || "Learner",
@@ -110,7 +115,7 @@ export default function StudentDashboard() {
             duration: lessonList[0].durationMinutes || 12,
           } : null,
           badges: DEFAULT.badges.map(b => ({ ...b, earned: earnedBadges.includes(b.name) })),
-          subjects: DEFAULT.subjects,
+          subjects: apiSubjects,
           eqCheckedIn: !!checkin?.checkedIn,
         });
       } catch (e) { console.error("[DASHBOARD] Load error:", e); }

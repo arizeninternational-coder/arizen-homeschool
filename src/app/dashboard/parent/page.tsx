@@ -500,9 +500,9 @@ export default function ParentDashboard() {
             {/* Stats */}
             {[
               { icon: Users, label: "Children", value: String(children.length), color: colors.primary, bgColor: colors.primarySoft },
-              { icon: Flame, label: "Streaks", value: String(children.filter((c: any) => c.childUser?.learnerProfile?.currentStreak > 0).length), color: colors.warm, bgColor: colors.warmSoft },
-              { icon: Award, label: "Total XP", value: String(children.reduce((sum: number, c: any) => sum + (c.childUser?.learnerProfile?.totalXp || 0), 0)), color: colors.accent, bgColor: colors.accentSoft },
-              { icon: BookOpen, label: "Done", value: "0", color: colors.info, bgColor: colors.bgBlue },
+              { icon: Flame, label: "Streaks", value: String(children.filter((c: any) => (c.currentStreak ?? 0) > 0).length), color: colors.warm, bgColor: colors.warmSoft },
+              { icon: Award, label: "Total XP", value: String(children.reduce((sum: number, c: any) => sum + (c.totalXp || 0), 0)), color: colors.accent, bgColor: colors.accentSoft },
+              { icon: BookOpen, label: "Done", value: String(children.reduce((sum: number, c: any) => sum + (c.completedLessons || 0), 0)), color: colors.info, bgColor: colors.bgBlue },
             ].map((stat) => (
               <div key={stat.label} style={{
                 background: "white",
@@ -723,15 +723,17 @@ export default function ParentDashboard() {
               </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: "0.875rem" }}>
-                {children.map((link: any) => {
-                  const profile = link.childUser?.learnerProfile;
-                  const childDisplayName = profile?.displayName || link.childUser?.name || "Learner";
-                  const childId = link.childUser?.id;
+                {children.map((child: any) => {
+                  const childId = child.id;
+                  const childDisplayName = child.name || "Learner";
+                  const childGrade = child.grade;
+                  const childXp = child.totalXp || 0;
+                  const childStreak = child.currentStreak || 0;
                   const ci = childCheckins.find((c: any) => c.childId === childId);
                   const eq = ci?.checkedIn && ci?.emotion ? eqColors[ci.emotion] : null;
                   const hwList = childHomework[childId] || [];
                   return (
-                    <div key={link.id} style={{
+                    <div key={child.id} style={{
                       background: "white",
                       borderRadius: "1.25rem",
                       border: `1px solid ${colors.borderLight}`,
@@ -745,28 +747,26 @@ export default function ParentDashboard() {
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ fontWeight: 700, color: colors.text, fontSize: "0.875rem" }}>{childDisplayName}</div>
-                          {profile && <div style={{ fontSize: "0.6875rem", color: colors.textMuted }}>Grade {profile.grade}</div>}
+                          {childGrade != null && <div style={{ fontSize: "0.6875rem", color: colors.textMuted }}>Grade {childGrade}</div>}
                         </div>
                       </div>
 
                       {/* Stats Row */}
-                      {profile && (
-                        <div style={{ display: "flex", gap: "0.75rem", fontSize: "0.6875rem", alignItems: "center", marginBottom: "0.625rem", flexWrap: "wrap" }}>
-                          <span style={{ color: colors.primary, fontWeight: 700 }}>{profile.totalXp} XP</span>
-                          <span style={{ color: colors.warm, fontWeight: 700 }}>{profile.currentStreak}d streak</span>
-                          {eq && (
-                            <span style={{
-                              display: "inline-flex", alignItems: "center", gap: "0.2rem",
-                              padding: "0.125rem 0.5rem", borderRadius: 999,
-                              background: eq.bg, border: `1px solid ${eq.border}`,
-                              fontSize: "0.625rem", fontWeight: 700, color: "#44403c",
-                              marginLeft: "auto",
-                            }}>
-                              {eq.emoji} {eq.label}
-                            </span>
-                          )}
-                        </div>
-                      )}
+                      <div style={{ display: "flex", gap: "0.75rem", fontSize: "0.6875rem", alignItems: "center", marginBottom: "0.625rem", flexWrap: "wrap" }}>
+                        <span style={{ color: colors.primary, fontWeight: 700 }}>{childXp} XP</span>
+                        <span style={{ color: colors.warm, fontWeight: 700 }}>{childStreak}d streak</span>
+                        {eq && (
+                          <span style={{
+                            display: "inline-flex", alignItems: "center", gap: "0.2rem",
+                            padding: "0.125rem 0.5rem", borderRadius: 999,
+                            background: eq.bg, border: `1px solid ${eq.border}`,
+                            fontSize: "0.625rem", fontWeight: 700, color: "#44403c",
+                            marginLeft: "auto",
+                          }}>
+                            {eq.emoji} {eq.label}
+                          </span>
+                        )}
+                      </div>
 
                       {/* Assign Homework Button */}
                       <button
