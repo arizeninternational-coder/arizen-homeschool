@@ -272,7 +272,7 @@ export default function SubjectCurriculumPage() {
             No lessons imported yet
           </h3>
           <p style={{ color: colors.textMuted, fontSize: "0.875rem", maxWidth: 420, margin: "0 auto 1.5rem" }}>
-            Upload a CSV file to create lesson shells for {subjectName}. You can add content to each lesson after import.
+            Upload a CSV or Excel (.xlsx) file to create lesson shells for {subjectName}. You can add content to each lesson after import.
           </p>
           <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
             <button onClick={() => { setShowModal(true); setStep("upload"); }} style={{
@@ -437,10 +437,10 @@ export default function SubjectCurriculumPage() {
                       <>
                         <Upload size={36} style={{ color: colors.textMuted, margin: "0 auto 10px", opacity: 0.4 }} />
                         <p style={{ fontSize: "0.9375rem", fontWeight: 700, color: colors.text, margin: "0 0 4px" }}>
-                          Drop your CSV file here
+                          Drop your CSV or Excel file here
                         </p>
                         <p style={{ fontSize: "0.8125rem", color: colors.textMuted, margin: "0 0 14px" }}>
-                          or click to browse · .csv files only
+                          or click to browse · .csv, .xlsx supported
                         </p>
                         <button onClick={() => fileInputRef.current?.click()} style={{
                           padding: "9px 24px", borderRadius: 10, border: "none",

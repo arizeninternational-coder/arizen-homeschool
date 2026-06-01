@@ -1,0 +1,148 @@
+"use client";
+
+export const dynamic = "force-dynamic";
+
+import { useState, useEffect, useRef } from "react";
+import { Send, MessageCircle } from "lucide-react";
+import Link from "next/link";
+
+const C = {
+  page: "#F7FBF7", teal: "#047A70", dark: "#0F172A", body: "#64748B",
+  white: "#FFFFFF", border: "#E2E8F0",
+};
+
+interface Message {
+  id: string; senderId: string; recipientId: string;
+  content: string; createdAt: string; read: boolean;
+}
+
+export default function StudentMessagesPage() {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [newMsg, setNewMsg] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+  const [userId, setUserId] = useState("");
+  const [parentId, setParentId] = useState("");
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const sessionRes = await fetch("/api/auth/session", { credentials: "include" });
+        const session = await sessionRes.json();
+        const uid = session?.user?.id || "";
+        setUserId(uid);
+
+        // Get linked parent
+        const linkRes = await fetch("/api/parent/link-child", { credentials: "include" });
+        if (linkRes.ok) {
+          const linkData = await linkRes.json();
+          const parent = linkData.parents?.[0] || linkData.parent;
+          if (parent) setParentId(parent.id || parent.parentId);
+        }
+
+        // Load messages
+        const res = await fetch("/api/messages", { credentials: "include" });
+        if (res.ok) {
+          const data = await res.json();
+          setMessages(data.messages || []);
+        }
+      } catch (e) { console.error("[STUDENT_MSGS] Load error:", e); }
+      setLoading(false);
+    };
+    load();
+  }, []);
+
+  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
+
+  const handleSend = async () => {
+    if (!newMsg.trim() || !parentId) return;
+    setSending(true);
+    try {
+      const res = await fetch("/api/messages", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ recipientId: parentId, content: newMsg.trim() }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setMessages(prev => [...prev, data.message]);
+        setNewMsg("");
+      }
+    } catch (e) { console.error("[STUDENT_MSGS] Send error:", e); }
+    setSending(false);
+  };
+
+  if (loading) return null;
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 60px)", background: C.page }}>
+      <div style={{
+        padding: "16px 24px", background: C.white, borderBottom: "1px solid " + C.border,
+        display: "flex", alignItems: "center", gap: 12,
+      }}>
+        <Link href="/dashboard/student" style={{ color: C.body }}>
+          <MessageCircle size={20} />
+        </Link>
+        <h2 style={{ fontSize: "1rem", fontWeight: 800, color: C.dark, margin: 0 }}>Messages</h2>
+      </div>
+
+      <div style={{ flex: 1, overflowY: "auto", padding: "16px 24px" }}>
+        {messages.length === 0 ? (
+          <div style={{ textAlign: "center", padding: "3rem 1rem" }}>
+            <MessageCircle size={40} style={{ color: C.body, margin: "0 auto 12px", opacity: 0.3 }} />
+            <p style={{ fontSize: "0.875rem", color: C.body }}>
+              {parentId ? "No messages yet. Say hello to your parent!" : "No parent linked yet."}
+            </p>
+          </div>
+        ) : (
+          messages.map(msg => {
+            const isMine = msg.senderId === userId;
+            return (
+              <div key={msg.id} style={{ display: "flex", justifyContent: isMine ? "flex-end" : "flex-start", marginBottom: 10 }}>
+                <div style={{
+                  maxWidth: "70%", padding: "10px 16px", borderRadius: 18,
+                  background: isMine ? C.teal : C.white,
+                  color: isMine ? "#fff" : C.dark,
+                  border: isMine ? "none" : "1px solid " + C.border,
+                  fontSize: "0.875rem", lineHeight: 1.5,
+                }}>
+                  <p style={{ margin: "0 0 4px" }}>{msg.content}</p>
+                  <span style={{ fontSize: "0.625rem", opacity: 0.6 }}>
+                    {new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                  </span>
+                </div>
+              </div>
+            );
+          })
+        )}
+        <div ref={bottomRef} />
+      </div>
+
+      <div style={{
+        padding: "12px 16px", background: C.white, borderTop: "1px solid " + C.border,
+        display: "flex", gap: 8,
+      }}>
+        <input
+          value={newMsg}
+          onChange={e => setNewMsg(e.target.value)}
+          onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+          placeholder={parentId ? "Type a message..." : "Link with a parent first..."}
+          disabled={!parentId}
+          style={{
+            flex: 1, padding: "10px 16px", borderRadius: 24, border: "1px solid " + C.border,
+            fontSize: "0.875rem", outline: "none", color: C.dark,
+          }}
+        />
+        <button onClick={handleSend} disabled={sending || !newMsg.trim() || !parentId} style={{
+          width: 44, height: 44, borderRadius: "50%", border: "none", background: C.teal,
+          color: "#fff", display: "flex", alignItems: "center", justifyContent: "center",
+          cursor: sending || !newMsg.trim() || !parentId ? "default" : "pointer",
+          opacity: sending || !newMsg.trim() || !parentId ? 0.5 : 1,
+        }}>
+          <Send size={16} />
+        </button>
+      </div>
+    </div>
+  );
+}

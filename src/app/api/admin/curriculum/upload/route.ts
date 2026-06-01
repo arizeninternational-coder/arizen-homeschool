@@ -215,18 +215,17 @@ export async function POST(req: NextRequest) {
       }
 
       let text: string;
-      if (filename.endsWith(".csv")) {
+      if (filename.endsWith(".csv") || filename.endsWith(".txt")) {
         text = await file.text();
+      } else if (filename.endsWith(".xlsx") || filename.endsWith(".xls")) {
+        // Parse Excel file using xlsx library
+        const buffer = await file.arrayBuffer();
+        const XLSX = await import("xlsx");
+        const workbook = XLSX.read(new Uint8Array(buffer), { type: "array" });
+        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+        text = XLSX.utils.sheet_to_csv(firstSheet);
       } else {
-        // For xlsx, we expect the client to convert to CSV first
-        // Or we try to read as text (may produce garbage for real xlsx)
-        text = await file.text();
-        // Check if it looks like binary (xlsx starts with PK)
-        if (text.startsWith("PK") || text.charCodeAt(0) === 0) {
-          return NextResponse.json({
-            error: "Excel (.xlsx) files are not supported directly. Please save your file as CSV (Comma Separated Values) and upload that instead. In Excel: File → Save As → CSV UTF-8."
-          }, { status: 400 });
-        }
+        return NextResponse.json({ error: "Only .csv, .xlsx, and .xls files are accepted" }, { status: 400 });
       }
 
       const rows = parseCSV(text);
