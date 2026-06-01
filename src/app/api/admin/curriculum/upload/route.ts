@@ -308,14 +308,28 @@ export async function POST(req: NextRequest) {
       }
 
       const headers = rows[0];
-      const normalizedHeaders = headers.map(h => h.toLowerCase().trim());
 
-      // Check for required columns
+      // Normalize headers: remove BOM, trim, lowercase, replace spaces/hyphens with underscores
+      const normalizedHeaders = headers.map(h =>
+        h.replace(/^\uFEFF/, "").trim().toLowerCase().replace(/[\s-]+/g, "_")
+      );
+
+      // Check for required columns — normalize the same way for comparison
       const requiredCols = ["lesson_title", "lesson"];
-      const hasLessonCol = requiredCols.some(rc => normalizedHeaders.some(h => h.replace(/[\s_-]/g, "") === rc));
-      if (!hasLessonCol) {
+      const missingRequired = requiredCols.filter(rc => {
+        const rcNorm = rc.replace(/[_\s-]/g, "");
+        return !normalizedHeaders.some(h => h.replace(/[_\s-]/g, "") === rcNorm);
+      });
+      // "lesson" alone is a fallback alias; if lesson_title exists, "lesson" is not missing
+      const trulyMissing = missingRequired.length > 0
+        ? missingRequired.filter(rc => {
+            if (rc === "lesson") return !normalizedHeaders.some(h => h.replace(/[_\s-]/g, "").includes("lesson"));
+            return true;
+          })
+        : [];
+      if (trulyMissing.length > 0) {
         return NextResponse.json({
-          error: `Missing required column: lesson_title. Found columns: ${headers.join(", ")}`,
+          error: `Missing required column: ${trulyMissing.join(", ")}. Found columns: ${normalizedHeaders.join(", ")}`,
         }, { status: 400 });
       }
 
