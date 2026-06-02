@@ -135,21 +135,25 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
     if (!slugs || completing) return;
     setCompleting(true);
     try {
-      const res = await fetch(`/api/lessons/${slugs.lessonSlug}?slug=${slugs.lessonSlug}`, {
+      const res = await fetch("/api/learner/progress", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug: slugs.lessonSlug, masteryPercent: 100 }),
+        credentials: "include",
+        body: JSON.stringify({
+          lessonId: lesson?.id,
+          questId: slugs.questSlug || null,
+          action: "complete",
+        }),
       });
       const data = await res.json();
-      if (data.success) {
-        const xp = data.xpAwarded || 0;
-        const streak = data.streakBonus || 0;
-        const badges = data.newBadges || [];
+      if (data.success || data.completed) {
+        const xp = data.rewards?.xp || 0;
+        const coins = data.rewards?.coins || 0;
+        const streak = data.streak || 0;
 
         setCompleted(true);
         setXpEarned(xp);
         setStreakBonus(streak);
-        setNewBadges(badges);
         setShowCelebration(true);
 
         // Fire confetti
@@ -157,13 +161,16 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
 
         // Animate XP counter
         animateXpCounter(xp, streak);
+      } else if (data.alreadyCompleted) {
+        setCompleted(true);
+        setShowCelebration(false);
       }
     } catch (err) {
       console.error("Complete lesson error:", err);
     } finally {
       setCompleting(false);
     }
-  }, [slugs, completing, fireConfetti, animateXpCounter]);
+  }, [slugs, completing, lesson?.id, fireConfetti, animateXpCounter]);
 
   const totalXpWithBonus = xpEarned + streakBonus;
 
@@ -381,8 +388,21 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
         )}
 
         {/* Start/Continue button */}
-        <button onClick={() => setViewing(true)} style={{ ...ds.btnPrimary, width: "100%", padding: "1rem", fontSize: "1rem" }}>
-          {completed ? "Review Lesson" : lesson.progress > 0 ? "Continue Lesson" : "Start Lesson"}
+        <button onClick={async () => {
+          // Track lesson start
+          if (lesson?.id) {
+            try {
+              await fetch("/api/learner/progress", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ lessonId: lesson.id, action: "start" }),
+              });
+            } catch (e) { /* non-blocking */ }
+          }
+          setViewing(true);
+        }} style={{ ...ds.btnPrimary, width: "100%", padding: "1rem", fontSize: "1rem" }}>
+          {completed ? "Review Lesson" : "Start Lesson"}
         </button>
       </main>
     </div>

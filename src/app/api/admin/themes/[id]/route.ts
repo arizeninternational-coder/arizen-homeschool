@@ -1,4 +1,4 @@
-// PATCH /api/admin/quests/[id] — Update quest status (ADMIN only)
+// PATCH /api/admin/themes/[id] — Update theme status (ADMIN only)
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { requireAdmin } from "@/lib/api-guard";
@@ -18,20 +18,20 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     }
 
     const { data, error } = await supabase
-      .from("Quest")
+      .from("Theme")
       .update({ status, updatedAt: new Date().toISOString() })
       .eq("id", id)
       .select()
       .single();
 
     if (error) {
-      console.error("[ADMIN_QUEST_UPDATE] Error:", error.message);
+      console.error("[ADMIN_THEME_UPDATE] Error:", error.message);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ quest: data, success: true });
+    return NextResponse.json({ theme: data, success: true });
   } catch (err: any) {
-    console.error("[ADMIN_QUEST_UPDATE] Critical error:", err);
-    return NextResponse.json({ error: err.message || "Failed to update quest" }, { status: 500 });
+    console.error("[ADMIN_THEME_UPDATE] Critical error:", err);
+    return NextResponse.json({ error: err.message || "Failed to update theme" }, { status: 500 });
   }
 }

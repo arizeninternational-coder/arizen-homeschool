@@ -22,6 +22,8 @@ const C = {
   blue: "#EFF6FF", rose: "#FFF1F2",
 };
 
+const SUBJECT_COLORS = ["#0D9488", "#059669", "#7C3AED", "#2563EB", "#D97706", "#DC2626", "#0891B2", "#E11D48", "#4F46E5", "#0F766E"];
+
 interface DashData {
   name: string;
   sparkCoins: number;
@@ -74,50 +76,45 @@ export default function StudentDashboard() {
     const load = async () => {
       try {
         const results = await Promise.allSettled([
-          fetch("/api/learner/profile", { credentials: "include" }).then(r => r.json()),
-          fetch("/api/coins/wallet", { credentials: "include" }).then(r => r.json()),
-          fetch("/api/learner/progress", { credentials: "include" }).then(r => r.json()),
-          fetch("/api/learner/lessons?limit=1", { credentials: "include" }).then(r => r.json()),
+          fetch("/api/learner/progress/summary", { credentials: "include" }).then(r => r.json()),
           fetch("/api/learner/checkin?today=true", { credentials: "include" }).then(r => r.json()),
           fetch("/api/learner/subjects", { credentials: "include" }).then(r => r.json()),
+          fetch("/api/learner/badges", { credentials: "include" }).then(r => r.json()),
         ]);
-        const profile = results[0].status === "fulfilled" ? results[0].value?.profile || results[0].value : {};
-        const wallet = results[1].status === "fulfilled" ? results[1].value?.wallet || results[1].value : {};
-        const progress = results[2].status === "fulfilled" ? results[2].value?.progress || results[2].value : {};
-        const lessonsRes = results[3].status === "fulfilled" ? results[3].value : {};
-        const checkin = results[4].status === "fulfilled" ? results[4].value : {};
-        const subjectsRes = results[5].status === "fulfilled" ? results[5].value : {};
+        const summary = results[0].status === "fulfilled" ? results[0].value : {};
+        const checkin = results[1].status === "fulfilled" ? results[1].value : {};
+        const subjectsRes = results[2].status === "fulfilled" ? results[2].value : {};
+        const badgesRes = results[3].status === "fulfilled" ? results[3].value : {};
 
-        const lessonList = lessonsRes.lessons || lessonsRes || [];
-        const earnedBadges = (progress.badges || []).filter((b: any) => b.earned).map((b: any) => b.name);
-
-        const apiSubjects = (subjectsRes.subjects || []).map((s: any) => ({
+        const apiSubjects = (subjectsRes.subjects || []).map((s: any, i: number) => ({
           name: s.name,
           level: 1,
           progress: 0,
-          color: s.color + "22" || "#F1F5F9",
+          color: SUBJECT_COLORS[i % SUBJECT_COLORS.length] + "22",
           icon: BookOpen,
         }));
 
+        const earnedBadges = (badgesRes.badges || []).filter((b: any) => b.awardedAt);
+
         setData({
-          name: profile?.name || profile?.displayName || "Learner",
-          sparkCoins: wallet?.balance ?? 0,
-          streak: profile?.currentStreak ?? 0,
-          avatarLevel: profile?.avatarLevel ?? 1,
-          currentXp: profile?.totalXp ?? 0,
-          nextLevelXp: profile?.nextLevelXp ?? 100,
-          questCompleted: progress?.questsCompleted ?? progress?.questCompleted ?? 0,
-          questTotal: progress?.questsTotal ?? 10,
-          dailyGoalCompleted: progress?.dailyGoalCompleted ?? 0,
-          dailyGoalTarget: progress?.dailyGoalTarget ?? 3,
-          lessonsCompleted: progress?.lessonsCompleted ?? 0,
-          currentLesson: lessonList.length > 0 ? {
-            title: lessonList[0].title || "Counting by Ones",
-            subject: lessonList[0].subject || "Mathematics",
-            description: lessonList[0].description || "Count from 1 to 100 by ones using simple patterns.",
-            duration: lessonList[0].durationMinutes || 12,
+          name: summary.displayName || "Learner",
+          sparkCoins: summary.coins || 0,
+          streak: summary.streak || 0,
+          avatarLevel: summary.avatarLevel || 1,
+          currentXp: summary.xp || 0,
+          nextLevelXp: summary.nextLevelXp || 100,
+          questCompleted: summary.lessonsCompleted || 0,
+          questTotal: summary.totalLessons || 0,
+          dailyGoalCompleted: 0,
+          dailyGoalTarget: 3,
+          lessonsCompleted: summary.lessonsCompleted || 0,
+          currentLesson: summary.recentActivity?.[0] ? {
+            title: summary.recentActivity[0].lessonTitle || "Lesson",
+            subject: "",
+            description: summary.recentActivity[0].completedAt ? "Completed" : "In progress",
+            duration: 0,
           } : null,
-          badges: DEFAULT.badges.map(b => ({ ...b, earned: earnedBadges.includes(b.name) })),
+          badges: DEFAULT.badges.map(b => ({ ...b, earned: earnedBadges.some((eb: any) => eb.name === b.name || eb.badgeType === b.name.toLowerCase().replace(/\s+/g, "_")) })),
           subjects: apiSubjects,
           eqCheckedIn: !!checkin?.checkedIn,
         });

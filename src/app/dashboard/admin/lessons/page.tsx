@@ -19,7 +19,7 @@ interface LessonRecord {
   quest?: {
     id: string;
     title: string;
-    theme?: { id: string; title: string; grade: number };
+    theme?: { id: string; title: string; grade: number; status: string };
   };
 }
 
@@ -67,6 +67,7 @@ export default function AdminLessonsPage() {
     if (publishing) return;
     setPublishing(lesson.id);
     try {
+      // First publish the lesson itself
       const res = await fetch(`/api/admin/lessons/${lesson.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -74,6 +75,23 @@ export default function AdminLessonsPage() {
         body: JSON.stringify({ status: "PUBLISHED" }),
       });
       if (res.ok) {
+        // Also ensure parent Quest and Theme are published
+        if (lesson.quest?.id) {
+          await fetch(`/api/admin/quests/${lesson.quest.id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ status: "PUBLISHED" }),
+          }).catch(() => {}); // Non-blocking
+        }
+        if (lesson.quest?.theme?.id) {
+          await fetch(`/api/admin/themes/${lesson.quest.theme.id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ status: "PUBLISHED" }),
+          }).catch(() => {}); // Non-blocking
+        }
         setLessons(prev => prev.map(l => l.id === lesson.id ? { ...l, status: "PUBLISHED" } : l));
       }
     } catch (e) {

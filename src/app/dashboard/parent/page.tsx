@@ -130,7 +130,32 @@ export default function ParentDashboard() {
           const childrenRes = await fetch("/api/parent/link-child", { credentials: "include" });
           if (childrenRes.ok) {
             const childrenData = await childrenRes.json();
-            setChildren(childrenData.children || []);
+            const linkedChildren = childrenData.children || [];
+
+            // Fetch detailed progress for each child
+            try {
+              const progressRes = await fetch("/api/parent/progress", { credentials: "include" });
+              if (progressRes.ok) {
+                const progressData = await progressRes.json();
+                // Merge progress data with linked children
+                const mergedChildren = linkedChildren.map((child: any) => {
+                  const progress = (progressData.children || []).find((p: any) => p.id === child.id);
+                  return {
+                    ...child,
+                    totalXp: progress?.xp || child.totalXp || 0,
+                    currentStreak: progress?.streak || child.currentStreak || 0,
+                    lessonsCompleted: progress?.lessonsCompleted || 0,
+                    coins: progress?.coins || 0,
+                    recentActivity: progress?.recentActivity || [],
+                  };
+                });
+                setChildren(mergedChildren);
+              } else {
+                setChildren(linkedChildren);
+              }
+            } catch {
+              setChildren(linkedChildren);
+            }
           }
         } catch { /* ignore children load error */ }
       } catch { window.location.replace("/auth/login"); }

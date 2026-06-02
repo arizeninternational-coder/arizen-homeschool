@@ -33,6 +33,27 @@ export async function GET(req: NextRequest) {
       supabase.from("AvatarItem").select("id", { count: "exact", head: true }).eq("isActive", true),
     ]);
 
+    // Progress stats
+    const { count: completedLessons } = await supabase
+      .from("Progress")
+      .select("id", { count: "exact", head: true })
+      .not("completedAt", "is", null);
+
+    const { count: activeLearners } = await supabase
+      .from("Progress")
+      .select("learnerId", { count: "exact", head: true })
+      .not("completedAt", "is", null);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const { count: activeToday } = await supabase
+      .from("Progress")
+      .select("learnerId", { count: "exact", head: true })
+      .gte("lastAccessed", today.toISOString());
+
+    const { data: xpSum } = await supabase.from("XpRecord").select("amount");
+    const totalXp = (xpSum || []).reduce((sum, r) => sum + (r.amount || 0), 0);
+
     return NextResponse.json({
       users: totalUsers,
       parents,
@@ -45,6 +66,10 @@ export async function GET(req: NextRequest) {
       quests: questsRes.count ?? 0,
       badges: badgesRes.count ?? 0,
       shopItems: shopItemsRes.count ?? 0,
+      completedLessons: completedLessons || 0,
+      activeLearners: activeLearners || 0,
+      activeToday: activeToday || 0,
+      totalXpAwarded: totalXp,
     });
   } catch (e: any) {
     console.error("[ADMIN_STATS] Error:", e);

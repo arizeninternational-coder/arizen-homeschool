@@ -7,7 +7,7 @@ import Link from "next/link";
 import {
   Users, BookOpen, GraduationCap, Award, Settings, BarChart3,
   Shield, LogOut, Plus, ChevronRight, TrendingUp, Activity,
-  UserCheck, Layers, Zap, AlertCircle, Menu, X, ShoppingBag, Bell
+  UserCheck, Layers, Zap, AlertCircle, Menu, X, ShoppingBag, Bell, Flame, CheckCircle
 } from "lucide-react";
 import { ds, colors, gradients, shadows } from "@/lib/design-system";
 
@@ -201,6 +201,10 @@ export default function AdminDashboard() {
     { label: "Lessons", value: stats.lessons, icon: BookOpen, color: colors.warning },
     { label: "Published Lessons", value: stats.publishedLessons || 0, icon: BookOpen, color: colors.success },
     { label: "Draft Lessons", value: stats.draftLessons || 0, icon: BookOpen, color: colors.warning },
+    { label: "Completed Lessons", value: stats.completedLessons || 0, icon: CheckCircle, color: "#059669" },
+    { label: "Active Learners", value: stats.activeLearners || 0, icon: Flame, color: "#D97706" },
+    { label: "Active Today", value: stats.activeToday || 0, icon: Activity, color: "#2563EB" },
+    { label: "Total XP Awarded", value: stats.totalXpAwarded || 0, icon: Zap, color: "#7C3AED" },
     { label: "Quests", value: stats.quests, icon: Layers, color: colors.primary },
     { label: "Shop Items", value: stats.shopItems, icon: ShoppingBag, color: colors.accent },
   ];
