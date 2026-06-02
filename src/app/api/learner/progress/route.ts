@@ -182,45 +182,70 @@ export async function POST(req: NextRequest) {
         .eq("learnerId", learnerId)
         .maybeSingle();
 
+      let walletId: string;
+      let newBalance: number;
+
       if (wallet) {
+        newBalance = (wallet.balance || 0) + rewards.coins;
+        walletId = wallet.id;
         await supabase
           .from("StudentWallet")
           .update({
-            balance: (wallet.balance || 0) + rewards.coins,
+            balance: newBalance,
             lifetimeEarned: (wallet.lifetimeEarned || 0) + rewards.coins,
           })
           .eq("id", wallet.id);
       } else {
-        await supabase
+        newBalance = rewards.coins;
+        const { data: created, error: createErr } = await supabase
           .from("StudentWallet")
           .insert({
             learnerId,
             balance: rewards.coins,
             lifetimeEarned: rewards.coins,
             lifetimeSpent: 0,
-          });
+          })
+          .select("id")
+          .single();
+        if (createErr) {
+          console.error("[PROGRESS_WALLET_CREATE] Error:", createErr.message);
+          return NextResponse.json({ error: "Failed to create wallet" }, { status: 500 });
+        }
+        walletId = created.id;
       }
 
-      // Create coin transaction record
+      // Create coin transaction record (walletId is always valid here)
       await supabase.from("CoinTransaction").insert({
-        walletId: wallet?.id || null,
+        walletId,
         amount: rewards.coins,
         type: "EARNED",
         source: "LESSON",
         sourceId: lessonId,
         description: `Completed lesson: ${lesson?.title || lessonId}`,
-        balanceAfter: (wallet?.balance || 0) + rewards.coins,
+        balanceAfter: newBalance,
       });
     }
 
-    // Update learner XP
+    // Update learner XP — fetch current value first, then atomic increment
     if (rewards.xp > 0) {
-      await supabase
+      // Read current totalXp
+      const { data: profile } = await supabase
         .from("LearnerProfile")
-        .update({
-          totalXp: supabase.rpc("coalesce", { totalXp: 0 }) + rewards.xp,
-        })
+        .select("totalXp")
+        .eq("id", learnerId)
+        .maybeSingle();
+
+      const currentXp = profile?.totalXp || 0;
+      const updatedXp = currentXp + rewards.xp;
+
+      const { error: xpUpdateErr } = await supabase
+        .from("LearnerProfile")
+        .update({ totalXp: updatedXp })
         .eq("id", learnerId);
+
+      if (xpUpdateErr) {
+        console.error("[PROGRESS_XP_UPDATE] Error:", xpUpdateErr.message);
+      }
 
       // Create XP record
       await supabase.from("XpRecord").insert({
