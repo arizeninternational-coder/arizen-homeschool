@@ -56,9 +56,12 @@ const DEFAULT: DashData = {
 };
 
 const MOODS = [
-  { emoji: "😊", label: "Happy" },
-  { emoji: "😌", label: "Calm" },
-  { emoji: "🤩", label: "Curious" },
+  { emoji: "😊", label: "Happy", value: "HAPPY" },
+  { emoji: "😌", label: "Calm", value: "CALM" },
+  { emoji: "😢", label: "Sad", value: "SAD" },
+  { emoji: "😤", label: "Angry", value: "FRUSTRATED" },
+  { emoji: "😟", label: "Worried", value: "WORRIED" },
+  { emoji: "🤩", label: "Curious", value: "CURIOUS" },
 ];
 
 export default function StudentDashboard() {
@@ -131,7 +134,7 @@ export default function StudentDashboard() {
       await fetch("/api/learner/checkin", {
         method: "POST", headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ emotion: MOODS[selectedMood].label.toUpperCase() }),
+        body: JSON.stringify({ emotion: MOODS[selectedMood].value }),
       });
       setData(prev => ({ ...prev, eqCheckedIn: true }));
     } catch (e) { console.error("[EQ] Check-in error:", e); }

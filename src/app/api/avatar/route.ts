@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
     if (!learnerId) return NextResponse.json({ error: "No learner profile" }, { status: 404 });
 
     const body = await req.json();
-    const { hairStyle, hairColor, skinTone, outfitId, accessoryId, petId, backgroundId, shoesId } = body;
+    const { hairStyle, hairColor, skinTone, outfitColor, shoeColor, accessoryId, petId, backgroundId, shoesId } = body;
 
     // Check if avatar exists
     const { data: existing } = await supabase
@@ -67,7 +67,8 @@ export async function POST(req: NextRequest) {
       if (hairStyle !== undefined) upsertData.hairStyle = hairStyle;
       if (hairColor !== undefined) upsertData.hairColor = hairColor;
       if (skinTone !== undefined) upsertData.skinTone = skinTone;
-      if (outfitId !== undefined) upsertData.equippedTopId = outfitId;
+      if (outfitColor !== undefined) upsertData.outfitColor = outfitColor;
+      if (shoeColor !== undefined) upsertData.shoeColor = shoeColor;
       if (accessoryId !== undefined) upsertData.equippedAccessoryId = accessoryId;
       if (petId !== undefined) upsertData.equippedPetId = petId;
       if (backgroundId !== undefined) upsertData.equippedBackgroundId = backgroundId;

@@ -80,7 +80,9 @@ export default function QuestsPage() {
             {theme.quests.map((quest: any, i: number) => {
               const typeColor = quest.questType === "MAIN" ? C.teal : quest.questType === "SIDE" ? "#D97706" : "#7C3AED";
               const lessonCount = quest.lessons?.length || 0;
-              const xpReward = typeof quest.xpReward === "object" ? quest.xpReward?.base : quest.xpReward;
+              const xpReward = quest.xpReward
+                ? (typeof quest.xpReward === "object" ? (quest.xpReward?.base || 0) : (quest.xpReward || 0))
+                : 0;
               return (
                 <Link
                   key={quest.id}
@@ -113,7 +115,7 @@ export default function QuestsPage() {
                   <span style={{ fontSize: "0.625rem", fontWeight: 700, color: typeColor, background: `${typeColor}15`, padding: "2px 8px", borderRadius: 6, flexShrink: 0 }}>
                     {quest.questType || "MAIN"}
                   </span>
-                  <ChevronRight size={16} style={{ color: colors.textMuted, flexShrink: 0 }} />
+                  <ChevronRight size={16} style={{ color: C.body, flexShrink: 0 }} />
                 </Link>
               );
             })}

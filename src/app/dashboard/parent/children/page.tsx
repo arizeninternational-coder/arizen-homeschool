@@ -202,7 +202,7 @@ export default function ParentChildrenPage() {
         ) : (
           <div style={{ display: "grid", gap: "0.75rem" }}>
             {children.map((child: any) => {
-              const displayName = child.name || child.email || "Learner";
+              const displayName = child.name || "Unnamed child";
               const childGrade = child.grade;
               const childXp = child.totalXp || 0;
               const childStreak = child.currentStreak || 0;

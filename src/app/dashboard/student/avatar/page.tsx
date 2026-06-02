@@ -12,8 +12,7 @@ const TABS = [
   { id: "face", label: "Face" },
   { id: "outfit", label: "Outfit" },
   { id: "shoes", label: "Shoes" },
-  { id: "pet", label: "Pet" },
-  { id: "bg", label: "Background" },
+  { id: "accessories", label: "Items" },
 ];
 
 const HAIRSTYLES = [
@@ -36,16 +35,30 @@ const HAIR_COLORS = [
   { id: "teal", hex: "#047A70" },
 ];
 
+const OUTFIT_COLORS = [
+  { id: "blue", hex: "#4FC3F7" }, { id: "red", hex: "#EF5350" },
+  { id: "green", hex: "#66BB6A" }, { id: "purple", hex: "#AB47BC" },
+  { id: "orange", hex: "#FFA726" }, { id: "pink", hex: "#F06292" },
+  { id: "teal", hex: "#26C6DA" }, { id: "yellow", hex: "#FFEE58" },
+];
+
+const SHOE_COLORS = [
+  { id: "black", hex: "#37474F" }, { id: "white", hex: "#ECEFF1" },
+  { id: "red", hex: "#C62828" }, { id: "blue", hex: "#1565C0" },
+  { id: "brown", hex: "#6D4C41" }, { id: "pink", hex: "#E91E63" },
+];
+
 export default function AvatarPage() {
   const [activeTab, setActiveTab] = useState("hair");
   const [hair, setHair] = useState("short-curls");
   const [hairColor, setHairColor] = useState("black");
   const [skin, setSkin] = useState("medium-brown");
+  const [outfitColor, setOutfitColor] = useState("blue");
+  const [shoeColor, setShoeColor] = useState("black");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Load current avatar from API
   useEffect(() => {
     async function loadAvatar() {
       try {
@@ -56,11 +69,11 @@ export default function AvatarPage() {
             setHair(data.avatar.hairStyle || "short-curls");
             setHairColor(data.avatar.hairColor || "black");
             setSkin(data.avatar.skinTone || "medium-brown");
+            setOutfitColor(data.avatar.outfitColor || "blue");
+            setShoeColor(data.avatar.shoeColor || "black");
           }
         }
-      } catch (e) {
-        console.error("[AVATAR] Load error:", e);
-      }
+      } catch (e) { console.error("[AVATAR] Load error:", e); }
       setLoading(false);
     }
     loadAvatar();
@@ -70,21 +83,14 @@ export default function AvatarPage() {
     setSaving(true);
     try {
       const res = await fetch("/api/avatar", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ hairStyle: hair, hairColor, skinTone: skin }),
+        method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include",
+        body: JSON.stringify({ hairStyle: hair, hairColor, skinTone: skin, outfitColor, shoeColor }),
       });
       if (res.ok) {
         setSaved(true);
         setTimeout(() => setSaved(false), 2000);
-      } else {
-        const data = await res.json().catch(() => ({}));
-        console.error("[AVATAR] Save failed:", data.error);
       }
-    } catch (e) {
-      console.error("[AVATAR] Save error:", e);
-    }
+    } catch (e) { console.error("[AVATAR] Save error:", e); }
     setSaving(false);
   };
 
@@ -92,10 +98,14 @@ export default function AvatarPage() {
     setHair(HAIRSTYLES[Math.floor(Math.random() * HAIRSTYLES.length)].id);
     setHairColor(HAIR_COLORS[Math.floor(Math.random() * HAIR_COLORS.length)].id);
     setSkin(SKIN_TONES[Math.floor(Math.random() * SKIN_TONES.length)].id);
+    setOutfitColor(OUTFIT_COLORS[Math.floor(Math.random() * OUTFIT_COLORS.length)].id);
+    setShoeColor(SHOE_COLORS[Math.floor(Math.random() * SHOE_COLORS.length)].id);
   };
 
   const currentSkinHex = SKIN_TONES.find(t => t.id === skin)?.hex || "#8B5E3C";
   const currentHairColorHex = HAIR_COLORS.find(c => c.id === hairColor)?.hex || "#1a1a1a";
+  const currentOutfitHex = OUTFIT_COLORS.find(c => c.id === outfitColor)?.hex || "#4FC3F7";
+  const currentShoeHex = SHOE_COLORS.find(c => c.id === shoeColor)?.hex || "#37474F";
 
   if (loading) {
     return (
@@ -112,66 +122,111 @@ export default function AvatarPage() {
       </h1>
       <p style={{ color: C.body, fontSize: "0.875rem", margin: "0 0 24px 0" }}>Personalize your learning identity.</p>
 
-      <div style={{ display: "grid", gridTemplateColumns: "320px 1fr", gap: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "300px 1fr", gap: 24 }}>
         {/* Preview */}
         <div style={{ background: C.white, borderRadius: 20, border: "1px solid " + C.border, padding: "24px", textAlign: "center", position: "sticky", top: 80, height: "fit-content" }}>
-          {/* Full body avatar preview */}
-          <div style={{
-            width: 180, height: 220, borderRadius: 20, margin: "0 auto 16px",
-            background: "linear-gradient(180deg, #E6F5F1 0%, #D1FAE5 100%)",
-            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end",
-            paddingBottom: 16, border: "2px solid #A7F3D0", overflow: "hidden", position: "relative",
-          }}>
-            {/* Background */}
-            <div style={{
-              position: "absolute", top: 0, left: 0, right: 0, height: 80,
-              background: "linear-gradient(180deg, #87CEEB 0%, #B0E0B0 100%)",
-            }} />
-            {/* Ground */}
-            <div style={{
-              position: "absolute", bottom: 0, left: 0, right: 0, height: 40,
-              background: "linear-gradient(180deg, #8FBC8F 0%, #6B8E23 100%)",
-            }} />
-            {/* Head */}
-            <div style={{
-              width: 56, height: 56, borderRadius: "50%",
-              background: currentSkinHex,
-              border: "3px solid rgba(255,255,255,0.3)",
-              zIndex: 1, marginBottom: 2,
-              position: "relative",
-            }}>
-              {/* Hair */}
-              <div style={{
-                position: "absolute", top: -8, left: -6, right: -6, height: 36,
-                background: currentHairColorHex,
-                borderRadius: "50% 50% 30% 30%",
-                zIndex: 2,
-              }} />
-              {/* Face */}
-              <div style={{ position: "absolute", top: 22, left: 14, width: 6, height: 6, borderRadius: "50%", background: "#333" }} />
-              <div style={{ position: "absolute", top: 22, right: 14, width: 6, height: 6, borderRadius: "50%", background: "#333" }} />
-              <div style={{ position: "absolute", top: 34, left: "50%", transform: "translateX(-50%)", width: 12, height: 4, borderRadius: 2, background: "#E57373" }} />
-            </div>
-            {/* Body */}
-            <div style={{
-              width: 60, height: 70, borderRadius: "20px 20px 10px 10px",
-              background: "#4FC3F7", zIndex: 1, marginBottom: 8,
-              border: "2px solid rgba(255,255,255,0.2)",
-            }} />
+          {/* Full-body SVG avatar */}
+          <svg viewBox="0 0 120 180" width="160" height="220" style={{ margin: "0 auto 16px" }}>
+            {/* Background circle */}
+            <rect x="10" y="10" width="100" height="160" rx="16" fill="#E6F5F1" stroke="#A7F3D0" strokeWidth="2" />
+
             {/* Legs */}
-            <div style={{ display: "flex", gap: 4, zIndex: 1 }}>
-              <div style={{ width: 20, height: 30, borderRadius: 6, background: "#37474F" }} />
-              <div style={{ width: 20, height: 30, borderRadius: 6, background: "#37474F" }} />
-            </div>
-          </div>
-          <div style={{ fontSize: "0.8125rem", fontWeight: 700, color: C.dark, marginBottom: 12 }}>
-            {HAIRSTYLES.find(h => h.id === hair)?.name || "Custom"} · {SKIN_TONES.find(t => t.id === skin)?.id.replace("-", " ") || "medium brown"}
-          </div>
+            <rect x="38" y="118" width="16" height="40" rx="6" fill="#37474F" />
+            <rect x="66" y="118" width="16" height="40" rx="6" fill="#37474F" />
+
+            {/* Shoes */}
+            <ellipse cx="46" cy="162" rx="12" ry="6" fill={currentShoeHex} />
+            <ellipse cx="74" cy="162" rx="12" ry="6" fill={currentShoeHex} />
+
+            {/* Body / Torso */}
+            <rect x="32" y="72" width="56" height="50" rx="12" fill={currentOutfitHex} />
+            {/* Collar */}
+            <ellipse cx="60" cy="74" rx="10" ry="4" fill={currentSkinHex} />
+
+            {/* Arms */}
+            <rect x="18" y="76" width="14" height="36" rx="7" fill={currentOutfitHex} />
+            <rect x="88" y="76" width="14" height="36" rx="7" fill={currentOutfitHex} />
+            {/* Hands */}
+            <circle cx="25" cy="114" r="6" fill={currentSkinHex} />
+            <circle cx="95" cy="114" r="6" fill={currentSkinHex} />
+
+            {/* Neck */}
+            <rect x="52" y="60" width="16" height="14" rx="4" fill={currentSkinHex} />
+
+            {/* Head */}
+            <ellipse cx="60" cy="42" rx="24" ry="26" fill={currentSkinHex} />
+
+            {/* Hair (varies by style) */}
+            {hair === "afro" && (
+              <ellipse cx="60" cy="28" rx="30" ry="22" fill={currentHairColorHex} />
+            )}
+            {hair === "short-curls" && (
+              <>
+                <ellipse cx="60" cy="30" rx="26" ry="18" fill={currentHairColorHex} />
+                <circle cx="40" cy="24" r="4" fill={currentHairColorHex} />
+                <circle cx="80" cy="24" r="4" fill={currentHairColorHex} />
+                <circle cx="50" cy="18" r="3" fill={currentHairColorHex} />
+                <circle cx="70" cy="18" r="3" fill={currentHairColorHex} />
+              </>
+            )}
+            {hair === "hightop-fade" && (
+              <>
+                <rect x="42" y="14" width="36" height="20" rx="8" fill={currentHairColorHex} />
+                <rect x="46" y="10" width="28" height="12" rx="6" fill={currentHairColorHex} />
+              </>
+            )}
+            {hair === "cornrows" && (
+              <>
+                <ellipse cx="60" cy="30" rx="26" ry="16" fill={currentHairColorHex} />
+                {[38, 46, 54, 62, 70, 78].map((x, i) => (
+                  <rect key={i} x={x - 2} y="14" width="4" height="20" rx="2" fill={currentHairColorHex} />
+                ))}
+              </>
+            )}
+            {hair === "braids" && (
+              <>
+                <ellipse cx="60" cy="30" rx="26" ry="16" fill={currentHairColorHex} />
+                <rect x="30" y="28" width="6" height="30" rx="3" fill={currentHairColorHex} />
+                <rect x="84" y="28" width="6" height="30" rx="3" fill={currentHairColorHex} />
+              </>
+            )}
+            {!["afro", "short-curls", "hightop-fade", "cornrows", "braids"].includes(hair) && (
+              <ellipse cx="60" cy="30" rx="26" ry="16" fill={currentHairColorHex} />
+            )}
+
+            {/* Face */}
+            {/* Eyes */}
+            <ellipse cx="50" cy="40" rx="4" ry="4.5" fill="white" />
+            <ellipse cx="70" cy="40" rx="4" ry="4.5" fill="white" />
+            <circle cx="51" cy="40" r="2.5" fill="#333" />
+            <circle cx="71" cy="40" r="2.5" fill="#333" />
+            <circle cx="52" cy="39" r="1" fill="white" />
+            <circle cx="72" cy="39" r="1" fill="white" />
+
+            {/* Eyebrows */}
+            <path d="M45 35 Q50 33 55 35" stroke={currentHairColorHex} strokeWidth="1.5" fill="none" />
+            <path d="M65 35 Q70 33 75 35" stroke={currentHairColorHex} strokeWidth="1.5" fill="none" />
+
+            {/* Nose */}
+            <ellipse cx="60" cy="47" rx="3" ry="2" fill={currentSkinHex} opacity="0.6" />
+
+            {/* Mouth - smile */}
+            <path d="M52 54 Q60 60 68 54" stroke="#E57373" strokeWidth="2" fill="none" strokeLinecap="round" />
+
+            {/* Cheeks */}
+            <circle cx="44" cy="48" r="4" fill="#FFCDD2" opacity="0.3" />
+            <circle cx="76" cy="48" r="4" fill="#FFCDD2" opacity="0.3" />
+
+            {/* Backpack */}
+            <rect x="88" y="78" width="18" height="28" rx="4" fill="#78909C" />
+            <rect x="90" y="82" width="14" height="8" rx="2" fill="#90A4AE" />
+          </svg>
+
           <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
             <button onClick={handleRandomize} style={{ display: "flex", alignItems: "center", gap: 4, padding: "8px 14px", borderRadius: 10, border: "1px solid " + C.border, background: "#F8FAFC", color: C.dark, fontWeight: 700, fontSize: "0.75rem", cursor: "pointer" }}>
               <Shuffle size={12} /> Randomize
             </button>
-            <button onClick={() => { setHair("short-curls"); setHairColor("black"); setSkin("medium-brown"); }} style={{ display: "flex", alignItems: "center", gap: 4, padding: "8px 14px", borderRadius: 10, border: "1px solid " + C.border, background: "#F8FAFC", color: C.dark, fontWeight: 700, fontSize: "0.75rem", cursor: "pointer" }}>
+            <button onClick={() => { setHair("short-curls"); setHairColor("black"); setSkin("medium-brown"); setOutfitColor("blue"); setShoeColor("black"); }} style={{ display: "flex", alignItems: "center", gap: 4, padding: "8px 14px", borderRadius: 10, border: "1px solid " + C.border, background: "#F8FAFC", color: C.dark, fontWeight: 700, fontSize: "0.75rem", cursor: "pointer" }}>
               <RotateCcw size={12} /> Reset
             </button>
           </div>
@@ -197,16 +252,20 @@ export default function AvatarPage() {
               <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 8, marginBottom: 20 }}>
                 {HAIRSTYLES.map(h => {
                   const isSel = hair === h.id;
+                  const borderStyle = isSel ? "2px solid #047A70" : "1px solid #E2E8F0";
+                  const bgStyle = isSel ? "#E6F5F1" : "#FFFFFF";
+                  const checkBg = "#047A70";
+                  const divBg = isSel ? "#A7F3D0" : "#F1F5F9";
+                  const textColor = isSel ? "#047A70" : "#64748B";
                   return (
                     <button key={h.id} onClick={() => setHair(h.id)} style={{
                       display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
                       padding: "10px 6px", borderRadius: 12,
-                      border: isSel ? "2px solid " + C.teal : "1px solid " + C.border,
-                      background: isSel ? "#E6F5F1" : C.white, cursor: "pointer", position: "relative",
+                      border: borderStyle, background: bgStyle, cursor: "pointer", position: "relative",
                     }}>
-                      {isSel && <span style={{ position: "absolute", top: 2, right: 2, width: 16, height: 16, borderRadius: "50%", background: C.teal, color: "#fff", fontSize: "0.5625rem", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, zIndex: 1 }}>✓</span>}
-                      <div style={{ width: 36, height: 36, borderRadius: "50%", background: isSel ? "#A7F3D0" : "#F1F5F9", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.25rem" }}>🧑🏽</div>
-                      <span style={{ fontSize: "0.625rem", fontWeight: 700, color: isSel ? C.teal : C.body, textAlign: "center" }}>{h.name}</span>
+                      {isSel && <span style={{ position: "absolute", top: 2, right: 2, width: 16, height: 16, borderRadius: "50%", background: checkBg, color: "#fff", fontSize: "0.5625rem", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800 }}>✓</span>}
+                      <div style={{ width: 36, height: 36, borderRadius: "50%", background: divBg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.25rem" }}>🧑🏽</div>
+                      <span style={{ fontSize: "0.625rem", fontWeight: 700, color: textColor, textAlign: "center" }}>{h.name}</span>
                     </button>
                   );
                 })}
@@ -228,9 +287,53 @@ export default function AvatarPage() {
             </div>
           )}
 
-          {activeTab !== "hair" && (
+          {activeTab === "outfit" && (
+            <div>
+              <h4 style={{ fontSize: "0.875rem", fontWeight: 800, color: C.dark, margin: "0 0 12px 0" }}>Outfit Color</h4>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
+                {OUTFIT_COLORS.map(c => {
+                  const isSel = outfitColor === c.id;
+                  return (
+                    <button key={c.id} onClick={() => setOutfitColor(c.id)} style={{
+                      display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
+                      padding: "12px", borderRadius: 12,
+                      border: isSel ? "2px solid " + C.teal : "1px solid " + C.border,
+                      background: isSel ? "#E6F5F1" : C.white, cursor: "pointer",
+                    }}>
+                      <div style={{ width: 40, height: 40, borderRadius: 10, background: c.hex, border: "2px solid rgba(0,0,0,0.1)" }} />
+                      <span style={{ fontSize: "0.6875rem", fontWeight: 600, color: isSel ? C.teal : C.body }}>{c.id}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {activeTab === "shoes" && (
+            <div>
+              <h4 style={{ fontSize: "0.875rem", fontWeight: 800, color: C.dark, margin: "0 0 12px 0" }}>Shoe Color</h4>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
+                {SHOE_COLORS.map(c => {
+                  const isSel = shoeColor === c.id;
+                  return (
+                    <button key={c.id} onClick={() => setShoeColor(c.id)} style={{
+                      display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
+                      padding: "12px", borderRadius: 12,
+                      border: isSel ? "2px solid " + C.teal : "1px solid " + C.border,
+                      background: isSel ? "#E6F5F1" : C.white, cursor: "pointer",
+                    }}>
+                      <div style={{ width: 40, height: 24, borderRadius: 6, background: c.hex, border: "2px solid rgba(0,0,0,0.1)" }} />
+                      <span style={{ fontSize: "0.6875rem", fontWeight: 600, color: isSel ? C.teal : C.body }}>{c.id}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {(activeTab === "face" || activeTab === "accessories") && (
             <div style={{ textAlign: "center", padding: "40px 20px" }}>
-              <div style={{ fontSize: "2.5rem", marginBottom: 12 }}>{TABS.find(t => t.id === activeTab)?.label === "Face" ? "😊" : TABS.find(t => t.id === activeTab)?.label === "Outfit" ? "👕" : TABS.find(t => t.id === activeTab)?.label === "Shoes" ? "👟" : TABS.find(t => t.id === activeTab)?.label === "Pet" ? "🐾" : "🖼️"}</div>
+              <div style={{ fontSize: "2.5rem", marginBottom: 12 }}>{activeTab === "face" ? "😊" : "🎒"}</div>
               <p style={{ fontSize: "0.875rem", color: C.body, fontWeight: 600 }}>More {activeTab} options coming soon!</p>
               <p style={{ fontSize: "0.75rem", color: C.body, marginTop: 4 }}>Complete lessons to unlock new items.</p>
             </div>

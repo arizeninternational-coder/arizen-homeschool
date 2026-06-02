@@ -10,80 +10,91 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const slug = searchParams.get("slug");
-    const grade = searchParams.get("grade");
+    const gradeFilter = searchParams.get("grade");
 
-    // Build query for published themes only
-    let query = supabase
+    // Fetch published themes
+    let themeQuery = supabase
       .from("Theme")
-      .select(`
-        id,
-        title,
-        slug,
-        description,
-        grade,
-        status,
-        drivingQuestion,
-        durationWeeks,
-        coverImage,
-        quests:Quest(
-          id,
-          title,
-          slug,
-          description,
-          questType,
-          status,
-          xpReward,
-          lessons:Lesson(
-            id,
-            title,
-            slug,
-            description,
-            status,
-            orderIndex,
-            xpReward,
-            estimatedDurationMinutes,
-            difficulty
-          )
-        )
-      `)
+      .select("id, title, slug, description, grade, status, drivingQuestion, durationWeeks, coverImage")
       .eq("status", "PUBLISHED")
       .order("grade", { ascending: true });
 
-    if (slug) {
-      query = query.eq("slug", slug);
-    }
-    if (grade) {
-      query = query.eq("grade", Number(grade));
-    }
+    if (slug) themeQuery = themeQuery.eq("slug", slug);
+    if (gradeFilter) themeQuery = themeQuery.eq("grade", Number(gradeFilter));
 
-    const { data: themes, error } = await query;
+    const { data: themes, error: themeErr } = await themeQuery;
 
-    if (error) {
-      console.error("[THEMES] Error:", error.message);
-      // Fallback: return themes without nested relations
-      const { data: simple } = await supabase
-        .from("Theme")
-        .select("id, title, slug, description, grade, status, drivingQuestion")
-        .eq("status", "PUBLISHED")
-        .limit(50);
-      return NextResponse.json({ themes: simple || [] });
+    if (themeErr) {
+      console.error("[THEMES] Theme fetch error:", themeErr.message);
+      return NextResponse.json({ themes: [] });
     }
 
-    // Filter to only PUBLISHED quests and PUBLISHED lessons within them
-    const filtered = (themes || []).map((theme: any) => ({
-      ...theme,
-      quests: (theme.quests || [])
-        .filter((q: any) => q.status === "PUBLISHED")
+    if (!themes || themes.length === 0) {
+      return NextResponse.json({ themes: [], theme: slug ? null : undefined });
+    }
+
+    const themeIds = themes.map(t => t.id);
+
+    // Fetch published quests for these themes
+    const { data: quests } = await supabase
+      .from("Quest")
+      .select("id, title, slug, description, questType, status, xpReward, themeId")
+      .in("themeId", themeIds)
+      .eq("status", "PUBLISHED")
+      .order("orderIndex", { ascending: true });
+
+    const questIds = (quests || []).map(q => q.id);
+
+    // Fetch published lessons for these quests
+    const { data: lessons } = await supabase
+      .from("Lesson")
+      .select("id, title, slug, description, status, orderIndex, xpReward, estimatedDurationMinutes, difficulty, questId")
+      .in("questId", questIds)
+      .eq("status", "PUBLISHED")
+      .order("orderIndex", { ascending: true });
+
+    // Fetch theme subjects
+    const { data: themeSubjects } = await supabase
+      .from("ThemeSubject")
+      .select("themeId, subject")
+      .in("themeId", themeIds);
+
+    // Build lookup maps
+    const questsByTheme = new Map<string, any[]>();
+    for (const q of (quests || [])) {
+      if (!questsByTheme.has(q.themeId)) questsByTheme.set(q.themeId, []);
+      questsByTheme.get(q.themeId)!.push(q);
+    }
+
+    const lessonsByQuest = new Map<string, any[]>();
+    for (const l of (lessons || [])) {
+      if (!lessonsByQuest.has(l.questId)) lessonsByQuest.set(l.questId, []);
+      lessonsByQuest.get(l.questId)!.push(l);
+    }
+
+    const subjectsByTheme = new Map<string, string[]>();
+    for (const ts of (themeSubjects || [])) {
+      if (!subjectsByTheme.has(ts.themeId)) subjectsByTheme.set(ts.themeId, []);
+      subjectsByTheme.get(ts.themeId)!.push(ts.subject);
+    }
+
+    // Assemble the response
+    const filtered = themes.map((theme: any) => {
+      const themeQuests = (questsByTheme.get(theme.id) || [])
         .map((q: any) => ({
           ...q,
-          lessons: (q.lessons || [])
-            .filter((l: any) => l.status === "PUBLISHED")
+          lessons: (lessonsByQuest.get(q.id) || [])
             .sort((a: any, b: any) => (a.orderIndex || 0) - (b.orderIndex || 0)),
         }))
-        .filter((q: any) => q.lessons.length > 0), // Only show quests that have published lessons
-    }));
+        .filter((q: any) => q.lessons.length > 0);
 
-    // If a specific slug was requested, return single theme
+      return {
+        ...theme,
+        subjects: subjectsByTheme.get(theme.id) || [],
+        quests: themeQuests,
+      };
+    });
+
     if (slug) {
       const theme = filtered[0];
       if (!theme) return NextResponse.json({ error: "Theme not found" }, { status: 404 });

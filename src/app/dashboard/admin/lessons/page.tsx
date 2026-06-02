@@ -82,6 +82,25 @@ export default function AdminLessonsPage() {
     setPublishing(null);
   };
 
+  const handleUnpublish = async (lesson: LessonRecord) => {
+    if (publishing) return;
+    setPublishing(lesson.id);
+    try {
+      const res = await fetch(`/api/admin/lessons/${lesson.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ status: "DRAFT" }),
+      });
+      if (res.ok) {
+        setLessons(prev => prev.map(l => l.id === lesson.id ? { ...l, status: "DRAFT" } : l));
+      }
+    } catch (e) {
+      console.error("[UNPUBLISH] Error:", e);
+    }
+    setPublishing(null);
+  };
+
   const grades = [...new Set(lessons.map(l => l.quest?.theme?.grade).filter(Boolean))].sort();
 
   const filtered = lessons.filter(l => {
@@ -194,7 +213,7 @@ export default function AdminLessonsPage() {
                   </span>
                   {/* Actions */}
                   <div style={{ display: "flex", gap: "0.375rem", flexShrink: 0 }}>
-                    {lesson.status !== "PUBLISHED" && (
+                    {lesson.status !== "PUBLISHED" ? (
                       <button
                         onClick={(e) => { e.preventDefault(); handlePublish(lesson); }}
                         disabled={publishing === lesson.id}
@@ -206,6 +225,19 @@ export default function AdminLessonsPage() {
                         }}
                       >
                         {publishing === lesson.id ? "Publishing..." : <><CheckCircle size={12} /> Publish</>}
+                      </button>
+                    ) : (
+                      <button
+                        onClick={(e) => { e.preventDefault(); handleUnpublish(lesson); }}
+                        disabled={publishing === lesson.id}
+                        style={{
+                          display: "inline-flex", alignItems: "center", gap: "0.25rem",
+                          padding: "4px 10px", borderRadius: 6, border: "1px solid #FEE2E2",
+                          background: "#FEF2F2", color: "#991B1B", fontSize: "0.6875rem",
+                          fontWeight: 700, cursor: publishing === lesson.id ? "default" : "pointer",
+                        }}
+                      >
+                        {publishing === lesson.id ? "Unpublishing..." : "Unpublish"}
                       </button>
                     )}
                     <Link href={`/dashboard/admin/lessons/${lesson.id}`} style={{

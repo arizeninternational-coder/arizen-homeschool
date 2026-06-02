@@ -725,7 +725,7 @@ export default function ParentDashboard() {
               <div style={{ display: "flex", flexDirection: "column", gap: "0.875rem" }}>
                 {children.map((child: any) => {
                   const childId = child.id;
-                  const childDisplayName = child.name || "Learner";
+                  const childDisplayName = child.name || "Unnamed child";
                   const childGrade = child.grade;
                   const childXp = child.totalXp || 0;
                   const childStreak = child.currentStreak || 0;
