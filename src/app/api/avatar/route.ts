@@ -35,6 +35,10 @@ export async function GET(req: NextRequest) {
 }
 
 // POST /api/avatar — save avatar config
+// Only persists fields that exist on the StudentAvatar model:
+//   skinTone, hairStyle, hairColor, faceExpression,
+//   equippedTopId, equippedBottomId, equippedShoesId,
+//   equippedAccessoryId, equippedPetId, equippedBackgroundId
 export async function POST(req: NextRequest) {
   try {
     const user = await getAuthUser(req);
@@ -51,7 +55,7 @@ export async function POST(req: NextRequest) {
     if (!learnerId) return NextResponse.json({ error: "No learner profile" }, { status: 404 });
 
     const body = await req.json();
-    const { hairStyle, hairColor, skinTone, outfitColor, shoeColor, accessoryId, petId, backgroundId, shoesId } = body;
+    const { hairStyle, hairColor, skinTone, faceExpression, accessoryId, petId, backgroundId, shoesId, topId, bottomId } = body;
 
     // Check if avatar exists
     const { data: existing } = await supabase
@@ -63,16 +67,17 @@ export async function POST(req: NextRequest) {
     const upsertData: any = { learnerId };
 
     if (existing) {
-      // Update only provided fields
+      // Update only provided fields — only valid StudentAvatar columns
       if (hairStyle !== undefined) upsertData.hairStyle = hairStyle;
       if (hairColor !== undefined) upsertData.hairColor = hairColor;
       if (skinTone !== undefined) upsertData.skinTone = skinTone;
-      if (outfitColor !== undefined) upsertData.outfitColor = outfitColor;
-      if (shoeColor !== undefined) upsertData.shoeColor = shoeColor;
+      if (faceExpression !== undefined) upsertData.faceExpression = faceExpression;
       if (accessoryId !== undefined) upsertData.equippedAccessoryId = accessoryId;
       if (petId !== undefined) upsertData.equippedPetId = petId;
       if (backgroundId !== undefined) upsertData.equippedBackgroundId = backgroundId;
       if (shoesId !== undefined) upsertData.equippedShoesId = shoesId;
+      if (topId !== undefined) upsertData.equippedTopId = topId;
+      if (bottomId !== undefined) upsertData.equippedBottomId = bottomId;
 
       const { data, error } = await supabase
         .from("StudentAvatar")
@@ -84,7 +89,7 @@ export async function POST(req: NextRequest) {
       if (error) throw error;
       return NextResponse.json({ success: true, avatar: data });
     } else {
-      // Create new
+      // Create new with defaults
       upsertData.hairStyle = hairStyle || "short-curls";
       upsertData.hairColor = hairColor || "black";
       upsertData.skinTone = skinTone || "medium-brown";

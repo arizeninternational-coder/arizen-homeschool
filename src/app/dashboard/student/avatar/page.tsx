@@ -35,6 +35,7 @@ const HAIR_COLORS = [
   { id: "teal", hex: "#047A70" },
 ];
 
+// Frontend-only visual colors (NOT persisted to DB — outfitColor/shoeColor don't exist on StudentAvatar)
 const OUTFIT_COLORS = [
   { id: "blue", hex: "#4FC3F7" }, { id: "red", hex: "#EF5350" },
   { id: "green", hex: "#66BB6A" }, { id: "purple", hex: "#AB47BC" },
@@ -53,8 +54,8 @@ export default function AvatarPage() {
   const [hair, setHair] = useState("short-curls");
   const [hairColor, setHairColor] = useState("black");
   const [skin, setSkin] = useState("medium-brown");
-  const [outfitColor, setOutfitColor] = useState("blue");
-  const [shoeColor, setShoeColor] = useState("black");
+  const [outfitColor, setOutfitColor] = useState("blue"); // frontend-only, not persisted
+  const [shoeColor, setShoeColor] = useState("black");     // frontend-only, not persisted
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -69,8 +70,8 @@ export default function AvatarPage() {
             setHair(data.avatar.hairStyle || "short-curls");
             setHairColor(data.avatar.hairColor || "black");
             setSkin(data.avatar.skinTone || "medium-brown");
-            setOutfitColor(data.avatar.outfitColor || "blue");
-            setShoeColor(data.avatar.shoeColor || "black");
+            // outfitColor and shoeColor are NOT loaded from DB — they don't exist on StudentAvatar
+            // They reset to defaults on each page load
           }
         }
       } catch (e) { console.error("[AVATAR] Load error:", e); }
@@ -82,9 +83,11 @@ export default function AvatarPage() {
   const handleSave = async () => {
     setSaving(true);
     try {
+      // Only send fields that exist on the StudentAvatar model.
+      // outfitColor and shoeColor are intentionally excluded.
       const res = await fetch("/api/avatar", {
         method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include",
-        body: JSON.stringify({ hairStyle: hair, hairColor, skinTone: skin, outfitColor, shoeColor }),
+        body: JSON.stringify({ hairStyle: hair, hairColor, skinTone: skin }),
       });
       if (res.ok) {
         setSaved(true);
@@ -190,7 +193,38 @@ export default function AvatarPage() {
                 <rect x="84" y="28" width="6" height="30" rx="3" fill={currentHairColorHex} />
               </>
             )}
-            {!["afro", "short-curls", "hightop-fade", "cornrows", "braids"].includes(hair) && (
+            {hair === "twists" && (
+              <>
+                <ellipse cx="60" cy="30" rx="26" ry="16" fill={currentHairColorHex} />
+                <rect x="34" y="26" width="5" height="22" rx="2.5" fill={currentHairColorHex} />
+                <rect x="81" y="26" width="5" height="22" rx="2.5" fill={currentHairColorHex} />
+              </>
+            )}
+            {hair === "locs" && (
+              <>
+                <ellipse cx="60" cy="28" rx="24" ry="14" fill={currentHairColorHex} />
+                {[40, 48, 56, 64, 72, 80].map((x, i) => (
+                  <rect key={i} x={x - 2} y="18" width="4" height="26" rx="2" fill={currentHairColorHex} />
+                ))}
+              </>
+            )}
+            {hair === "puff-buns" && (
+              <>
+                <ellipse cx="60" cy="32" rx="26" ry="16" fill={currentHairColorHex} />
+                <circle cx="36" cy="20" r="10" fill={currentHairColorHex} />
+                <circle cx="84" cy="20" r="10" fill={currentHairColorHex} />
+              </>
+            )}
+            {hair === "coily-short" && (
+              <ellipse cx="60" cy="28" rx="25" ry="15" fill={currentHairColorHex} />
+            )}
+            {hair === "side-fade" && (
+              <>
+                <ellipse cx="62" cy="32" rx="24" ry="16" fill={currentHairColorHex} opacity="0.85" />
+                <ellipse cx="60" cy="26" rx="18" ry="10" fill={currentHairColorHex} />
+              </>
+            )}
+            {!["afro", "short-curls", "hightop-fade", "cornrows", "braids", "twists", "locs", "puff-buns", "coily-short", "side-fade"].includes(hair) && (
               <ellipse cx="60" cy="30" rx="26" ry="16" fill={currentHairColorHex} />
             )}
 
@@ -248,7 +282,9 @@ export default function AvatarPage() {
 
           {activeTab === "hair" && (
             <div>
-              <h4 style={{ fontSize: "0.875rem", fontWeight: 800, color: C.dark, margin: "0 0 12px 0" }}>Hairstyle</h4>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", margin: "0 0 12px 0" }}>
+                <h4 style={{ fontSize: "0.875rem", fontWeight: 800, color: C.dark, margin: 0 }}>Hairstyle</h4>
+              </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 8, marginBottom: 20 }}>
                 {HAIRSTYLES.map(h => {
                   const isSel = hair === h.id;
@@ -289,7 +325,8 @@ export default function AvatarPage() {
 
           {activeTab === "outfit" && (
             <div>
-              <h4 style={{ fontSize: "0.875rem", fontWeight: 800, color: C.dark, margin: "0 0 12px 0" }}>Outfit Color</h4>
+              <h4 style={{ fontSize: "0.875rem", fontWeight: 800, color: C.dark, margin: "0 0 4px 0" }}>Outfit Color</h4>
+              <p style={{ fontSize: "0.75rem", color: "#94A3B8", margin: "0 0 12px 0" }}>Preview only — saved with hair, color & skin.</p>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
                 {OUTFIT_COLORS.map(c => {
                   const isSel = outfitColor === c.id;
@@ -311,7 +348,8 @@ export default function AvatarPage() {
 
           {activeTab === "shoes" && (
             <div>
-              <h4 style={{ fontSize: "0.875rem", fontWeight: 800, color: C.dark, margin: "0 0 12px 0" }}>Shoe Color</h4>
+              <h4 style={{ fontSize: "0.875rem", fontWeight: 800, color: C.dark, margin: "0 0 4px 0" }}>Shoe Color</h4>
+              <p style={{ fontSize: "0.75rem", color: "#94A3B8", margin: "0 0 12px 0" }}>Preview only — saved with hair, color & skin.</p>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
                 {SHOE_COLORS.map(c => {
                   const isSel = shoeColor === c.id;
