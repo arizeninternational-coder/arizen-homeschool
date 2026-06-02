@@ -10,20 +10,11 @@ import { ds, colors } from "@/lib/design-system";
 
 interface LinkedChild {
   id: string;
-  childUserId: string;
-  createdAt: string;
-  childUser: {
-    id: string;
-    name: string | null;
-    email: string;
-    learnerProfile: {
-      grade: number;
-      displayName: string;
-      totalXp: number;
-      currentStreak: number;
-      avatarUrl: string | null;
-    } | null;
-  };
+  name: string;
+  email: string;
+  grade: number | null;
+  totalXp: number;
+  currentStreak: number;
 }
 
 export default function ParentChildrenPage() {
@@ -210,26 +201,28 @@ export default function ParentChildrenPage() {
           </div>
         ) : (
           <div style={{ display: "grid", gap: "0.75rem" }}>
-            {children.map((link) => {
-              const profile = link.childUser?.learnerProfile;
-              const displayName = profile?.displayName || link.childUser?.name || "Learner";
+            {children.map((child: any) => {
+              const displayName = child.name || child.email || "Learner";
+              const childGrade = child.grade;
+              const childXp = child.totalXp || 0;
+              const childStreak = child.currentStreak || 0;
               return (
-                <div key={link.id} style={{ ...ds.card, padding: "1.25rem", display: "flex", alignItems: "center", gap: "1rem" }}>
+                <div key={child.id} style={{ ...ds.card, padding: "1.25rem", display: "flex", alignItems: "center", gap: "1rem" }}>
                   <div style={{ width: 44, height: 44, borderRadius: "50%", background: colors.primarySoft, display: "flex", alignItems: "center", justifyContent: "center", color: colors.primary, fontSize: "1rem", fontWeight: 800, flexShrink: 0 }}>
                     {displayName.charAt(0).toUpperCase()}
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 700, color: colors.text, fontSize: "0.9375rem" }}>{displayName}</div>
-                    <div style={{ fontSize: "0.8125rem", color: colors.textMuted }}>{link.childUser?.email}</div>
-                    {profile && (
-                      <div style={{ display: "flex", gap: "1rem", marginTop: "0.375rem" }}>
+                    <div style={{ fontSize: "0.8125rem", color: colors.textMuted }}>{child.email}</div>
+                    <div style={{ display: "flex", gap: "1rem", marginTop: "0.375rem" }}>
+                      {childGrade != null && (
                         <span style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", fontSize: "0.75rem", color: colors.textMuted }}>
-                          <GraduationCap style={{ width: 12, height: 12 }} /> Grade {profile.grade}
+                          <GraduationCap style={{ width: 12, height: 12 }} /> Grade {childGrade}
                         </span>
-                        <span style={{ fontSize: "0.75rem", color: colors.primary, fontWeight: 600 }}>{profile.totalXp} XP</span>
-                        <span style={{ fontSize: "0.75rem", color: colors.warm, fontWeight: 600 }}>{profile.currentStreak}d streak</span>
-                      </div>
-                    )}
+                      )}
+                      <span style={{ fontSize: "0.75rem", color: colors.primary, fontWeight: 600 }}>{childXp} XP</span>
+                      <span style={{ fontSize: "0.75rem", color: colors.warm, fontWeight: 600 }}>{childStreak}d streak</span>
+                    </div>
                   </div>
                 </div>
               );

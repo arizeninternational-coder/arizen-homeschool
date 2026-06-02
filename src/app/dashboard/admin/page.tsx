@@ -196,7 +196,11 @@ export default function AdminDashboard() {
     { label: "Total Users", value: stats.users, icon: Users, color: colors.primary },
     { label: "Parents", value: stats.parents, icon: UserCheck, color: colors.accent },
     { label: "Learners", value: stats.learners, icon: GraduationCap, color: colors.success },
+    { label: "Teachers", value: stats.teachers || 0, icon: GraduationCap, color: "#7C3AED" },
+    { label: "Admins", value: stats.admins || 0, icon: Shield, color: "#DC2626" },
     { label: "Lessons", value: stats.lessons, icon: BookOpen, color: colors.warning },
+    { label: "Published Lessons", value: stats.publishedLessons || 0, icon: BookOpen, color: colors.success },
+    { label: "Draft Lessons", value: stats.draftLessons || 0, icon: BookOpen, color: colors.warning },
     { label: "Quests", value: stats.quests, icon: Layers, color: colors.primary },
     { label: "Shop Items", value: stats.shopItems, icon: ShoppingBag, color: colors.accent },
   ];

@@ -265,27 +265,34 @@ export default function StudentDashboard() {
             <Link href="/dashboard/student/subjects" style={{ fontSize: "0.75rem", fontWeight: 700, color: C.teal, textDecoration: "none" }}>View All →</Link>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 12 }}>
-            {data.subjects.map(s => {
-              const Icon = s.icon;
-              return (
-                <Link key={s.name} href="/dashboard/student/subjects" style={{
-                  padding: "16px", borderRadius: 14, background: s.color,
-                  border: `1px solid ${C.border}`, textDecoration: "none", color: "inherit", display: "block",
-                }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                    <Icon size={18} style={{ color: C.dark, opacity: 0.7 }} />
-                    <span style={{ fontSize: "0.8125rem", fontWeight: 800, color: C.dark }}>{s.name}</span>
-                  </div>
-                  <div style={{ fontSize: "0.6875rem", color: C.body, marginBottom: 6 }}>Level {s.level}</div>
-                  <div style={{ height: 5, borderRadius: 3, background: "rgba(0,0,0,0.06)", overflow: "hidden" }}>
-                    <div style={{ height: "100%", width: `${s.progress}%`, borderRadius: 3, background: C.teal }} />
-                  </div>
-                  <div style={{ fontSize: "0.625rem", fontWeight: 700, color: C.muted, marginTop: 4 }}>
-                    {s.progress > 0 ? `${s.progress}% complete` : "Start learning"}
-                  </div>
-                </Link>
-              );
-            })}
+            {data.subjects.length === 0 ? (
+              <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "2rem", background: "white", borderRadius: 16, border: `1px solid ${C.border}` }}>
+                <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>📚</div>
+                <p style={{ fontSize: "0.875rem", color: C.body }}>No subjects yet. Ask your admin to publish curriculum.</p>
+              </div>
+            ) : (
+              data.subjects.map(s => {
+                const Icon = s.icon;
+                return (
+                  <Link key={s.name} href="/dashboard/student/subjects" style={{
+                    padding: "16px", borderRadius: 14, background: s.color,
+                    border: `1px solid ${C.border}`, textDecoration: "none", color: "inherit", display: "block",
+                  }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                      <Icon size={18} style={{ color: C.dark, opacity: 0.7 }} />
+                      <span style={{ fontSize: "0.8125rem", fontWeight: 800, color: C.dark }}>{s.name}</span>
+                    </div>
+                    <div style={{ fontSize: "0.6875rem", color: C.body, marginBottom: 6 }}>Level {s.level}</div>
+                    <div style={{ height: 5, borderRadius: 3, background: "rgba(0,0,0,0.06)", overflow: "hidden" }}>
+                      <div style={{ height: "100%", width: `${s.progress}%`, borderRadius: 3, background: C.teal }} />
+                    </div>
+                    <div style={{ fontSize: "0.625rem", fontWeight: 700, color: C.muted, marginTop: 4 }}>
+                      {s.progress > 0 ? `${s.progress}% complete` : "Start learning"}
+                    </div>
+                  </Link>
+                );
+              })
+            )}
           </div>
         </div>
 
