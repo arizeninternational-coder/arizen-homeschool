@@ -61,7 +61,7 @@ const MOODS = [
   { emoji: "😢", label: "Sad", value: "SAD" },
   { emoji: "😤", label: "Angry", value: "FRUSTRATED" },
   { emoji: "😟", label: "Worried", value: "WORRIED" },
-  { emoji: "🤩", label: "Curious", value: "CURIOUS" },
+  { emoji: "🤩", label: "Excited", value: "CURIOUS" },
 ];
 
 export default function StudentDashboard() {
@@ -311,14 +311,18 @@ export default function StudentDashboard() {
             <p style={{ fontSize: "0.6875rem", color: C.body, margin: "0 0 10px 0" }}>How are you feeling before today's lesson?</p>
             {!data.eqCheckedIn ? (
               <>
-                <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }}>
                   {MOODS.map((mood, i) => (
                     <button key={i} onClick={() => setSelectedMood(i)} style={{
-                      padding: "4px 10px", borderRadius: 8,
+                      display: "flex", alignItems: "center", gap: 4,
+                      padding: "6px 12px", borderRadius: 10,
                       border: selectedMood === i ? `2px solid ${C.teal}` : "1px solid #E2E8F0",
                       background: selectedMood === i ? C.tealSoft : "#F8FAFC",
-                      fontSize: "0.6875rem", fontWeight: 600, color: C.dark, cursor: "pointer",
-                    }}>{mood.label}</button>
+                      fontSize: "0.75rem", fontWeight: 600, color: C.dark, cursor: "pointer",
+                    }}>
+                      <span style={{ fontSize: "1rem" }}>{mood.emoji}</span>
+                      {mood.label}
+                    </button>
                   ))}
                 </div>
                 <button onClick={handleEqCheckin} disabled={selectedMood === null || eqSaving} style={{

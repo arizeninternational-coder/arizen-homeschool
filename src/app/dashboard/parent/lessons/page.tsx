@@ -1,10 +1,12 @@
 "use client";
 export const dynamic = "force-dynamic";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { BookOpen, ArrowLeft, Loader2, GraduationCap } from "lucide-react";
-import { ds, colors } from "@/lib/design-system";
 
-// Helper to safely extract reward value
+const C = { page: "#F7FBF7", teal: "#047A70", dark: "#0F172A", body: "#64748B", white: "#FFFFFF", border: "#E2E8F0" };
+
+// Helper to safely extract reward value from various shapes
 function getRewardValue(xpReward: any): number {
   if (!xpReward) return 0;
   if (typeof xpReward === "number") return xpReward;
@@ -37,8 +39,8 @@ export default function ParentLessonsPage() {
 
   if (loading) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: colors.bg }}>
-        <Loader2 size={32} style={{ color: colors.primary }} />
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: C.page }}>
+        <Loader2 size={32} style={{ color: C.teal }} />
       </div>
     );
   }
@@ -52,19 +54,19 @@ export default function ParentLessonsPage() {
   const hasContent = children.length > 0 && relevantThemes.length > 0;
 
   return (
-    <div style={{ minHeight: "100vh", background: colors.bg }}>
+    <div style={{ minHeight: "100vh", background: C.page }}>
       <div style={{ maxWidth: 1000, margin: "0 auto", padding: "2rem 1.5rem" }}>
-        <Link href="/dashboard/parent" style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", color: colors.textMuted, textDecoration: "none", fontSize: "0.875rem", fontWeight: 600, marginBottom: "1.5rem" }}>
-          <ArrowLeft style={{ width: 16, height: 16 }} /> Back to Dashboard
+        <Link href="/dashboard/parent" style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", color: C.body, textDecoration: "none", fontSize: "0.875rem", fontWeight: 600, marginBottom: "1.5rem" }}>
+          <ArrowLeft size={16} /> Back to Dashboard
         </Link>
-        <h1 style={{ fontSize: "1.5rem", fontWeight: 800, color: colors.text, marginBottom: "0.5rem" }}>Lessons</h1>
-        <p style={{ color: colors.textMuted, marginBottom: "2rem" }}>Published lessons for your children.</p>
+        <h1 style={{ fontSize: "1.5rem", fontWeight: 800, color: C.dark, marginBottom: "0.5rem" }}>Lessons</h1>
+        <p style={{ color: C.body, marginBottom: "2rem" }}>Published lessons for your children.</p>
 
         {!hasContent ? (
-          <div style={{ ...ds.card, textAlign: "center", padding: "3rem 2rem" }}>
-            <BookOpen style={{ width: 48, height: 48, color: colors.primary, margin: "0 auto 1rem", opacity: 0.4 }} />
-            <h3 style={{ fontSize: "1.125rem", fontWeight: 700, color: colors.text, marginBottom: "0.5rem" }}>No lessons yet</h3>
-            <p style={{ color: colors.textMuted, fontSize: "0.9375rem" }}>
+          <div style={{ textAlign: "center", padding: "3rem 2rem", background: C.white, borderRadius: 16, border: `1px solid ${C.border}` }}>
+            <BookOpen size={48} style={{ color: C.teal, margin: "0 auto 1rem", opacity: 0.4 }} />
+            <h3 style={{ fontSize: "1.125rem", fontWeight: 700, color: C.dark, marginBottom: "0.5rem" }}>No lessons yet</h3>
+            <p style={{ color: C.body, fontSize: "0.9375rem" }}>
               {children.length === 0
                 ? "Link a child account first, then lessons will appear here when published by the admin."
                 : "Lessons will appear here when the admin publishes curriculum for your child's grade."}
@@ -80,19 +82,19 @@ export default function ParentLessonsPage() {
                 : relevantThemes;
 
               return (
-                <div key={child.id || childName} style={{ ...ds.card, padding: "1.5rem" }}>
+                <div key={child.id || childName} style={{ background: C.white, borderRadius: 16, border: `1px solid ${C.border}`, padding: "1.5rem" }}>
                   {/* Child header */}
-                  <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16, paddingBottom: 12, borderBottom: `1px solid ${colors.border}` }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16, paddingBottom: 12, borderBottom: `1px solid ${C.border}` }}>
                     <div style={{
-                      width: 44, height: 44, borderRadius: "50%", background: `linear-gradient(135deg, ${colors.primary}, ${colors.primaryDark})`,
+                      width: 44, height: 44, borderRadius: "50%", background: `linear-gradient(135deg, ${C.teal}, #065F46)`,
                       display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: "1rem", flexShrink: 0,
                     }}>
                       {childName.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <div style={{ fontWeight: 700, color: colors.text, fontSize: "1rem" }}>{childName}</div>
+                      <div style={{ fontWeight: 700, color: C.dark, fontSize: "1rem" }}>{childName}</div>
                       {childGrade != null && (
-                        <div style={{ fontSize: "0.75rem", color: colors.textMuted, display: "flex", alignItems: "center", gap: 4 }}>
+                        <div style={{ fontSize: "0.75rem", color: C.body, display: "flex", alignItems: "center", gap: 4 }}>
                           <GraduationCap size={12} /> Grade {childGrade}
                         </div>
                       )}
@@ -100,8 +102,8 @@ export default function ParentLessonsPage() {
                   </div>
 
                   {childThemes.length === 0 ? (
-                    <div style={{ textAlign: "center", padding: "1.5rem 1rem", background: colors.bgSoft, borderRadius: 12 }}>
-                      <p style={{ fontSize: "0.8125rem", color: colors.textMuted }}>No published lessons for Grade {childGrade} yet.</p>
+                    <div style={{ textAlign: "center", padding: "1.5rem 1rem", background: C.page, borderRadius: 12 }}>
+                      <p style={{ fontSize: "0.8125rem", color: C.body }}>No published lessons for Grade {childGrade} yet.</p>
                     </div>
                   ) : (
                     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -110,26 +112,28 @@ export default function ParentLessonsPage() {
                         if (quests.length === 0) return null;
                         return (
                           <div key={theme.id}>
-                            <h3 style={{ fontSize: "0.9375rem", fontWeight: 700, color: colors.text, marginBottom: 6 }}>{theme.title}</h3>
+                            <h3 style={{ fontSize: "0.9375rem", fontWeight: 700, color: C.dark, marginBottom: 6 }}>{theme.title}</h3>
                             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                               {quests.map((quest: any) => (
-                                <div key={quest.id} style={{ padding: "10px 12px", borderRadius: 10, background: colors.bgSoft, border: `1px solid ${colors.border}` }}>
+                                <div key={quest.id} style={{ padding: "10px 12px", borderRadius: 10, background: C.page, border: `1px solid ${C.border}` }}>
                                   <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
-                                    <span style={{ fontSize: "0.625rem", fontWeight: 700, color: colors.primary, background: colors.primarySoft, padding: "1px 6px", borderRadius: 4 }}>
+                                    <span style={{ fontSize: "0.625rem", fontWeight: 700, color: C.teal, background: `${C.teal}15`, padding: "1px 6px", borderRadius: 4 }}>
                                       {quest.questType || "MAIN"}
                                     </span>
-                                    <span style={{ fontSize: "0.8125rem", fontWeight: 600, color: colors.text }}>{quest.title}</span>
+                                    <span style={{ fontSize: "0.8125rem", fontWeight: 600, color: C.dark }}>{quest.title}</span>
                                   </div>
                                   {quest.lessons && quest.lessons.length > 0 && (
                                     <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                                       {quest.lessons.map((lesson: any) => (
-                                        <div key={lesson.id} style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 8px", borderRadius: 6, background: "#fff", border: `1px solid ${colors.borderLight}` }}>
-                                          <BookOpen size={12} style={{ color: colors.primary, flexShrink: 0 }} />
-                                          <span style={{ fontSize: "0.75rem", fontWeight: 500, color: colors.text, flex: 1 }}>{lesson.title}</span>
+                                        <div key={lesson.id} style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 8px", borderRadius: 6, background: "#fff", border: `1px solid ${C.border}` }}>
+                                          <BookOpen size={12} style={{ color: C.teal, flexShrink: 0 }} />
+                                          <span style={{ fontSize: "0.75rem", fontWeight: 500, color: C.dark, flex: 1 }}>{lesson.title}</span>
                                           {lesson.estimatedDurationMinutes && (
-                                            <span style={{ fontSize: "0.625rem", color: colors.textMuted }}>{lesson.estimatedDurationMinutes}m</span>
+                                            <span style={{ fontSize: "0.625rem", color: C.body }}>{lesson.estimatedDurationMinutes}m</span>
                                           )}
-                                          <span style={{ fontSize: "0.625rem", color: "#D97706", fontWeight: 600 }}>🪙 {getRewardValue(lesson.xpReward)}</span>
+                                          <span style={{ fontSize: "0.625rem", color: "#D97706", fontWeight: 600 }}>
+                                            🪙 {getRewardValue(lesson.xpReward)}
+                                          </span>
                                         </div>
                                       ))}
                                     </div>
