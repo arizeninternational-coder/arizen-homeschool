@@ -4,8 +4,9 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   BookOpen, Swords, Heart, Trophy, Star, ArrowRight, Flame,
-  Target, Clock, GraduationCap, Sparkles, ChevronRight
+  Target, Clock, GraduationCap, Sparkles, ChevronRight, Gift, Shield, Footprints, type LucideIcon
 } from "lucide-react";
+import { cn } from "@/lib/utils/cn";
 import { CoinPill, StreakPill, XpPill, StatCard, SectionHeader, ProgressBar } from "@/components/ui/Pill";
 import { StarIcon, TrophyIcon, HeartIcon, BookIcon, FractionIllustration, SparkleDecoration } from "@/components/ui/Illustrations";
 import { GradientButton } from "@/components/ui/Pill";
@@ -262,9 +263,14 @@ export default function StudentDashboard() {
           <div className="hidden xl:flex flex-col gap-3 p-4 rounded-2xl bg-white/60 border border-primary/10">
             <p className="text-xs font-bold text-text-muted uppercase tracking-wider">Latest Rewards</p>
             <div className="flex gap-2">
-              {["Hat", "Cape", "Boots", "Shield"].map((item, i) => (
-                <div key={item} className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-soft to-accent-purple-soft border border-primary/10 flex items-center justify-center">
-                  <GiftEmoji index={i} />
+              {[
+                { Icon: Gift, color: "text-gold" },
+                { Icon: Shield, color: "text-accent-blue" },
+                { Icon: Footprints, color: "text-secondary" },
+                { Icon: Trophy, color: "text-accent-purple" },
+              ].map(({ Icon, color }, i) => (
+                <div key={i} className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-soft to-accent-purple-soft border border-primary/10 flex items-center justify-center">
+                  <Icon className={`w-5 h-5 ${color}`} />
                 </div>
               ))}
             </div>
@@ -275,8 +281,4 @@ export default function StudentDashboard() {
   );
 }
 
-// Tiny gift emoji helper for reward preview
-function GiftEmoji({ index }: { index: number }) {
-  const emojis = ["🧢", "🦸", "👟", "🛡️"];
-  return <span className="text-lg">{emojis[index]}</span>;
-}
+

@@ -23,14 +23,29 @@ export default function ParentDashboard() {
 
   async function loadChildren() {
     try {
+      // GET /api/parent/link-child lists children linked to this parent
       const [childrenRes, progressRes] = await Promise.all([
-        fetch("/api/parent/children", { credentials: "include" }),
+        fetch("/api/parent/link-child", { credentials: "include" }),
         fetch("/api/parent/progress", { credentials: "include" }),
       ]);
-      const cData = await childrenRes.json();
-      const pData = await progressRes.json();
-      const childList = cData.children || cData || [];
-      const progressData = pData?.progress || [];
+
+      // Defensive: check res.ok before parsing JSON
+      let childList: any[] = [];
+      if (childrenRes.ok) {
+        const cData = await childrenRes.json();
+        childList = cData.children || cData || [];
+      } else {
+        console.warn("[PARENT_DASHBOARD] link-child returned", childrenRes.status);
+      }
+
+      let progressData: any[] = [];
+      if (progressRes.ok) {
+        const pData = await progressRes.json();
+        progressData = pData?.progress || [];
+      } else {
+        console.warn("[PARENT_DASHBOARD] progress returned", progressRes.status);
+      }
+
       const merged = childList.map((child: any) => ({
         ...child,
         progress: progressData.find((p: any) => p.childId === child.id || p.learnerProfileId === child.learnerProfileId) || {},
