@@ -8,8 +8,8 @@ import {
 } from "lucide-react";
 
 /* ═══════════════════════════════════════════════════════════════════
-   ARIZEN SCHOOL — Landing Page v6.1
-   Richer, warmer, more alive — emotional product showcase
+   ARIZEN SCHOOL — Landing Page v7.0
+   Premium floating cards • Soft gradients • No harsh lines
    ═══════════════════════════════════════════════════════════════════ */
 
 export const dynamic = "force-dynamic";
@@ -75,29 +75,31 @@ export default async function HomePage() {
       {/* ── Background: Warm gradient + floating shapes ── */}
       <div aria-hidden="true" className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         {/* Large warm blobs */}
-        <div className="absolute -top-[10%] -right-[5%] w-[700px] h-[700px] rounded-full bg-[radial-gradient(circle,rgba(79,70,229,0.12)_0%,transparent_65%)]" />
-        <div className="absolute top-[15%] -left-[8%] w-[500px] h-[500px] rounded-full bg-[radial-gradient(circle,rgba(0,168,132,0.10)_0%,transparent_65%)]" />
-        <div className="absolute bottom-[0%] right-[20%] w-[450px] h-[450px] rounded-full bg-[radial-gradient(circle,rgba(245,165,36,0.10)_0%,transparent_65%)]" />
-        <div className="absolute top-[50%] left-[10%] w-[350px] h-[350px] rounded-full bg-[radial-gradient(circle,rgba(255,92,138,0.08)_0%,transparent_65%)]" />
+        <div className="absolute -top-[15%] -right-[8%] w-[900px] h-[900px] rounded-full bg-[radial-gradient(circle,rgba(79,70,229,0.14)_0%,transparent_60%)]" />
+        <div className="absolute top-[10%] -left-[10%] w-[600px] h-[600px] rounded-full bg-[radial-gradient(circle,rgba(139,92,246,0.12)_0%,transparent_60%)]" />
+        <div className="absolute bottom-[-5%] right-[15%] w-[550px] h-[550px] rounded-full bg-[radial-gradient(circle,rgba(245,165,36,0.10)_0%,transparent_60%)]" />
+        <div className="absolute top-[45%] left-[5%] w-[400px] h-[400px] rounded-full bg-[radial-gradient(circle,rgba(255,92,138,0.10)_0%,transparent_60%)]" />
+        <div className="absolute top-[70%] right-[40%] w-[500px] h-[500px] rounded-full bg-[radial-gradient(circle,rgba(0,168,132,0.08)_0%,transparent_60%)]" />
+        <div className="absolute top-[25%] right-[50%] w-[350px] h-[350px] rounded-full bg-[radial-gradient(circle,rgba(59,167,255,0.08)_0%,transparent_60%)]" />
 
         {/* Floating learning icons (decorative) */}
-        <div className="absolute top-[12%] right-[30%] float-slow opacity-[0.07]"><Coins className="w-16 h-16 text-gold" /></div>
-        <div className="absolute top-[45%] right-[8%] float-medium opacity-[0.06]"><Trophy className="w-12 h-12 text-accent-purple" /></div>
-        <div className="absolute bottom-[20%] left-[5%] float-fast opacity-[0.06]"><Star className="w-10 h-10 text-gold" /></div>
-        <div className="absolute top-[70%] right-[45%] float-slow opacity-[0.05]"><BookOpen className="w-14 h-14 text-accent-blue" /></div>
-        <div className="absolute top-[25%] left-[20%] float-medium opacity-[0.05]"><Heart className="w-10 h-10 text-pink" /></div>
-        <div className="absolute bottom-[35%] right-[15%] float-fast opacity-[0.04]"><Swords className="w-11 h-11 text-primary" /></div>
+        <div className="absolute top-[12%] right-[30%] float-slow opacity-[0.08]"><Coins className="w-16 h-16 text-gold" /></div>
+        <div className="absolute top-[45%] right-[8%] float-medium opacity-[0.07]"><Trophy className="w-12 h-12 text-accent-purple" /></div>
+        <div className="absolute bottom-[20%] left-[5%] float-fast opacity-[0.07]"><Star className="w-10 h-10 text-gold" /></div>
+        <div className="absolute top-[70%] right-[45%] float-slow opacity-[0.06]"><BookOpen className="w-14 h-14 text-accent-blue" /></div>
+        <div className="absolute top-[25%] left-[20%] float-medium opacity-[0.06]"><Heart className="w-10 h-10 text-pink" /></div>
+        <div className="absolute bottom-[35%] right-[15%] float-fast opacity-[0.05]"><Swords className="w-11 h-11 text-primary" /></div>
       </div>
 
       {/* ── Background overlay ── */}
-      <div aria-hidden="true" className="fixed inset-0 pointer-events-none z-0 bg-[radial-gradient(circle_at_top_right,rgba(79,70,229,0.06),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(0,168,132,0.06),transparent_35%),linear-gradient(180deg,rgba(247,249,255,0.9)_0%,rgba(247,249,255,0.98)_100%)]" />
+      <div aria-hidden="true" className="fixed inset-0 pointer-events-none z-0 bg-[radial-gradient(circle_at_top_right,rgba(79,70,229,0.04),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(139,92,246,0.04),transparent_35%),linear-gradient(180deg,rgba(247,249,255,0.88)_0%,rgba(247,249,255,0.96)_100%)]" />
 
       {/* ── Navbar ── */}
       <div className="relative z-10">
-        <nav className="h-[72px] border-b border-border-soft bg-white/80 backdrop-blur-xl sticky top-0 z-50">
+        <nav className="h-[72px] bg-white/70 backdrop-blur-2xl sticky top-0 z-50 shadow-[0_1px_0_rgb(var(--color-border),0.5)]">
           <div className="max-w-[1380px] mx-auto px-6 lg:px-10 flex items-center justify-between h-full">
             <Link href="/" className="flex items-center gap-2.5 no-underline">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent-purple text-white flex items-center justify-center font-black text-lg shadow-glow-soft">A</div>
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent-purple text-white flex items-center justify-center font-black text-lg shadow-[0_0_20px_rgba(79,70,229,0.25)]">A</div>
               <span className="text-lg font-black tracking-tight bg-gradient-to-r from-primary to-accent-purple bg-clip-text text-transparent">Arizen School</span>
             </Link>
             <div className="flex items-center gap-3">
@@ -110,82 +112,90 @@ export default async function HomePage() {
 
       {/* ═══════════════════════════════════════════════════════════
           HERO SECTION
-          ═══════════════════════════════════════════════════════════ */}
-      <section className="relative z-10 max-w-[1380px] mx-auto px-6 lg:px-10 pt-10 pb-6 lg:pt-14 lg:pb-8">
-        <div className="flex flex-col lg:flex-row gap-8 lg:gap-14 items-center">
+          ═══════════════════════════════════════════════════════════════════ */}
+      <section className="relative z-10 max-w-[1380px] mx-auto px-6 lg:px-10 pt-8 pb-4 lg:pt-12 lg:pb-6">
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-12 items-center">
 
           {/* ── Left: Hero Copy ── */}
-          <div className="flex-1 fade-in-up min-w-0 lg:max-w-[560px]">
+          <div className="flex-1 fade-in-up min-w-0 lg:max-w-[580px]">
             <div className="inline-flex items-center gap-2 bg-gradient-to-r from-accent-purple-soft to-primary-soft rounded-full py-2 px-4 mb-6 text-xs font-bold text-accent-purple border border-accent-purple/10">
               <Heart className="w-3.5 h-3.5" />
               Learning that understands every child
             </div>
 
-            <h1 className="font-black text-text tracking-tight leading-[1.1] mb-5 text-[2rem] sm:text-5xl lg:text-[3.5rem]">
-              Welcome to emotionally<br />
-              <span className="bg-gradient-to-r from-primary via-accent-purple to-pink bg-clip-text text-transparent">intelligent learning</span>
+            <h1 className="font-black text-text tracking-tight leading-[1.08] mb-5 text-[2.25rem] sm:text-5xl lg:text-[3.75rem]">
+              Where Learning Feels<br />
+              <span className="bg-gradient-to-r from-primary via-accent-purple to-pink bg-clip-text text-transparent">Like an Adventure</span>
             </h1>
 
-            <p className="text-text-muted text-base lg:text-lg leading-relaxed max-w-lg">
-              A personalized CBC learning experience that helps your child build confidence, curiosity, emotional awareness, and mastery of core subjects — all in a safe, gamified environment parents trust.
+            <p className="text-text-muted text-base lg:text-lg leading-relaxed max-w-xl">
+              A personalized CBC learning experience that builds confidence, curiosity, and emotional mastery — all in a safe, gamified world your child loves and parents trust.
             </p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-wrap gap-3 mt-8">
+            <div className="flex flex-wrap gap-3 mt-7">
               <Link
                 href="/auth/register"
-                className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-primary-light text-white font-bold text-base lg:text-lg py-3.5 lg:py-4 px-7 lg:px-8 rounded-2xl no-underline shadow-pill hover:shadow-glow hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+                className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-primary-light text-white font-bold text-base lg:text-lg py-3.5 lg:py-4 px-7 lg:px-8 rounded-2xl no-underline shadow-[0_4px_20px_rgba(79,70,229,0.25)] hover:shadow-[0_8px_30px_rgba(79,70,229,0.35)] hover:scale-[1.03] active:scale-[0.98] transition-all duration-200"
               >
                 Get Started
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
               </Link>
               <Link
                 href="/auth/login"
-                className="inline-flex items-center justify-center gap-2 bg-white text-primary font-bold text-base lg:text-lg py-3.5 lg:py-4 px-7 lg:px-8 rounded-2xl no-underline border-2 border-primary/20 hover:border-primary/40 hover:bg-primary-soft transition-all duration-200"
+                className="inline-flex items-center justify-center gap-2 bg-white/80 backdrop-blur-sm text-primary font-bold text-base lg:text-lg py-3.5 lg:py-4 px-7 lg:px-8 rounded-2xl no-underline shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_20px_rgba(79,70,229,0.12)] hover:bg-white transition-all duration-200"
               >
                 Sign In
               </Link>
             </div>
 
             {/* Trust Badges */}
-            <div className="flex flex-wrap gap-2.5 mt-7">
-              <TrustBadge icon={ShieldCheck} text="CBC-Aligned" bg="bg-accent-blue-soft" color="text-accent-blue" />
-              <TrustBadge icon={Heart} text="Emotionally Safe" bg="bg-pink-soft" color="text-pink" />
-              <TrustBadge icon={Eye} text="Parent Visibility" bg="bg-accent-purple-soft" color="text-accent-purple" />
-              <TrustBadge icon={Gamepad2} text="Gamified Learning" bg="bg-gold-soft" color="text-gold" />
+            <div className="flex flex-wrap gap-2 mt-6">
+              <TrustBadge icon={ShieldCheck} text="CBC-Aligned" bg="bg-white/80" color="text-accent-blue" />
+              <TrustBadge icon={Heart} text="Emotionally Safe" bg="bg-white/80" color="text-pink" />
+              <TrustBadge icon={Eye} text="Parent Visibility" bg="bg-white/80" color="text-accent-purple" />
+              <TrustBadge icon={Gamepad2} text="Gamified" bg="bg-white/80" color="text-gold" />
             </div>
           </div>
 
           {/* ── Right: Rich Dashboard Preview ── */}
-          <div className="flex-1 w-full max-w-[620px] lg:max-w-none fade-in" style={{ animationDelay: "0.2s" }}>
+          <div className="flex-1 w-full max-w-[640px] lg:max-w-none fade-in" style={{ animationDelay: "0.15s" }}>
             <DashboardPreview />
           </div>
         </div>
+
+        {/* ── Floating Stat Chips below hero ── */}
+        <div className="flex flex-wrap items-center justify-center gap-3 lg:gap-4 mt-10 lg:mt-14">
+          <FloatingStat icon={GraduationCap} value="3K+" label="Active Students" gradient="from-primary-soft to-accent-purple-soft" iconColor="text-primary" delay={0.3} />
+          <FloatingStat icon={Target} value="500+" label="Lessons & Quests" gradient="from-secondary-soft to-accent-blue-soft" iconColor="text-secondary" delay={0.4} />
+          <FloatingStat icon={Heart} value="98%" label="Parent Satisfaction" gradient="from-pink-soft to-gold-soft" iconColor="text-pink" delay={0.5} />
+          <FloatingStat icon={BookOpen} value="12" label="Grade Levels" gradient="from-accent-blue-soft to-primary-soft" iconColor="text-accent-blue" delay={0.6} />
+        </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════════════
+      {/* ═══════════════════════════════════════════════════════════════════
           REWARD OBJECTS STRIP
           Floating coins, badges, stars — visual proof of gamification
-          ═══════════════════════════════════════════════════════════ */}
-      <section className="relative z-10 max-w-[1380px] mx-auto px-6 lg:px-10 py-4 lg:py-6">
-        <div className="flex items-center justify-center gap-3 lg:gap-5 flex-wrap">
+          ═══════════════════════════════════════════════════════════════════ */}
+      <section className="relative z-10 max-w-[1380px] mx-auto px-6 lg:px-10 py-6 lg:py-8">
+        <div className="flex items-center justify-center gap-3 lg:gap-4 flex-wrap">
           {[
-            { icon: Coins, label: "Earn Coins", color: "text-gold", bg: "bg-gold-soft", border: "border-gold/15", glow: "shadow-[0_2px_12px_rgba(245,165,36,0.15)]" },
-            { icon: Trophy, label: "Unlock Badges", color: "text-accent-purple", bg: "bg-accent-purple-soft", border: "border-accent-purple/15", glow: "shadow-[0_2px_12px_rgba(139,92,246,0.15)]" },
-            { icon: GraduationCap, level: true, label: "Level Up", color: "text-primary", bg: "bg-primary-soft", border: "border-primary/15", glow: "shadow-[0_2px_12px_rgba(79,70,229,0.15)]" },
-            { icon: Flame, label: "Build Streaks", color: "text-pink", bg: "bg-pink-soft", border: "border-pink/15", glow: "shadow-[0_2px_12px_rgba(255,92,138,0.15)]" },
-            { icon: Gift, label: "Shop Rewards", color: "text-secondary", bg: "bg-secondary-soft", border: "border-secondary/15", glow: "shadow-[0_2px_12px_rgba(0,168,132,0.15)]" },
-            { icon: SmilePlus, label: "EQ Check-ins", color: "text-secondary-dark", bg: "bg-gold-soft/50", border: "border-secondary/10", glow: "shadow-[0_2px_12px_rgba(4,120,87,0.10)]" },
+            { icon: Coins, label: "Earn Coins", color: "text-gold", bg: "bg-white/90", shadow: "shadow-[0_2px_16px_rgba(245,165,36,0.10)]" },
+            { icon: Trophy, label: "Unlock Badges", color: "text-accent-purple", bg: "bg-white/90", shadow: "shadow-[0_2px_16px_rgba(139,92,246,0.10)]" },
+            { icon: GraduationCap, level: true, label: "Level Up", color: "text-primary", bg: "bg-white/90", shadow: "shadow-[0_2px_16px_rgba(79,70,229,0.10)]" },
+            { icon: Flame, label: "Build Streaks", color: "text-pink", bg: "bg-white/90", shadow: "shadow-[0_2px_16px_rgba(255,92,138,0.10)]" },
+            { icon: Gift, label: "Shop Rewards", color: "text-secondary", bg: "bg-white/90", shadow: "shadow-[0_2px_16px_rgba(0,168,132,0.10)]" },
+            { icon: SmilePlus, label: "EQ Check-ins", color: "text-secondary-dark", bg: "bg-white/90", shadow: "shadow-[0_2px_16px_rgba(4,120,87,0.08)]" },
           ].map((item, i) => (
             <div
               key={i}
-              className={`inline-flex items-center gap-2 ${item.bg} border ${item.border} ${item.glow} rounded-2xl py-2.5 px-4 lg:px-5 fade-in-up hover:-translate-y-0.5 transition-all duration-200`}
+              className={`inline-flex items-center gap-2.5 ${item.bg} backdrop-blur-sm ${item.shadow} rounded-2xl py-2.5 px-4 lg:px-5 fade-in-up hover:-translate-y-1 transition-all duration-300`}
               style={{ animationDelay: `${0.3 + i * 0.08}s` }}
             >
-              <div className={`w-9 h-9 rounded-xl bg-white/70 flex items-center justify-center ${item.color} ${item.level ? "ring-2 ring-primary/20" : ""}`}>
+              <div className={`w-9 h-9 rounded-xl bg-white flex items-center justify-center ${item.color} ${item.level ? "ring-2 ring-primary/15" : ""} shadow-sm`}>
                 <item.icon className="w-4.5 h-4.5" />
               </div>
-              <span className="text-xs font-bold text-text whitespace-nowrap">{item.label}</span>
+              <span className="text-xs font-bold text-text-muted whitespace-nowrap">{item.label}</span>
             </div>
           ))}
         </div>
@@ -196,7 +206,7 @@ export default async function HomePage() {
           ═══════════════════════════════════════════════════════════ */}
       <section className="relative z-10 max-w-[1380px] mx-auto px-6 lg:px-10 py-10 lg:py-16">
         <div className="text-center mb-10 fade-in-up">
-          <div className="inline-flex items-center gap-2 bg-primary-soft rounded-full py-2 px-4 mb-4 text-xs font-bold text-primary">
+          <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-full py-2 px-4 mb-4 text-xs font-bold text-primary shadow-[0_2px_12px_rgba(79,70,229,0.08)]">
             <Star className="w-3.5 h-3.5" />
             Why Arizen School
           </div>
@@ -210,40 +220,28 @@ export default async function HomePage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
-          <FeatureCard icon={Heart} title="EQ Check-ins" description="Daily emotional check-ins help students build self-awareness, express feelings, and start each day with confidence." gradient="bg-card-gradient-pink" iconBg="bg-pink/10" iconColor="text-pink" accentBorder="border-pink/15" delay={0} />
-          <FeatureCard icon={Coins} title="Gamified Rewards" description="Earn Spark Coins, unlock badges, and level up an avatar. Every lesson completed is a step toward mastery." gradient="bg-card-gradient-gold" iconBg="bg-gold/10" iconColor="text-gold" accentBorder="border-gold/15" delay={0.1} />
-          <FeatureCard icon={LayoutDashboard} title="Parent Dashboard" description="Track your child's progress in real time — from EQ check-ins to lesson completion and XP earned." gradient="bg-card-gradient-purple" iconBg="bg-accent-purple/10" iconColor="text-accent-purple" accentBorder="border-accent-purple/15" delay={0.2} />
-          <FeatureCard icon={BookOpen} title="CBC-Aligned" description="Full Competency Based Curriculum coverage for all grades, designed by Kenyan educators for Kenyan learners." gradient="bg-card-gradient-green" iconBg="bg-secondary/10" iconColor="text-secondary" accentBorder="border-secondary/15" delay={0.3} />
+          <FeatureCard icon={Heart} title="EQ Check-ins" description="Daily emotional check-ins help students build self-awareness, express feelings, and start each day with confidence." gradient="bg-card-gradient-pink" iconBg="bg-pink/10" iconColor="text-pink" delay={0} />
+          <FeatureCard icon={Coins} title="Gamified Rewards" description="Earn Spark Coins, unlock badges, and level up an avatar. Every lesson completed is a step toward mastery." gradient="bg-card-gradient-gold" iconBg="bg-gold/10" iconColor="text-gold" delay={0.1} />
+          <FeatureCard icon={LayoutDashboard} title="Parent Dashboard" description="Track your child's progress in real time — from EQ check-ins to lesson completion and XP earned." gradient="bg-card-gradient-purple" iconBg="bg-accent-purple/10" iconColor="text-accent-purple" delay={0.2} />
+          <FeatureCard icon={BookOpen} title="CBC-Aligned" description="Full Competency Based Curriculum coverage for all grades, designed by Kenyan educators for Kenyan learners." gradient="bg-card-gradient-green" iconBg="bg-secondary/10" iconColor="text-secondary" delay={0.3} />
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════════════
-          STATS STRIP
-          ═══════════════════════════════════════════════════════════ */}
-      <section className="relative z-10 max-w-[1380px] mx-auto px-6 lg:px-10 pb-10 lg:pb-14">
-        <div className="bg-white rounded-3xl border border-border-soft shadow-card overflow-hidden">
-          <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-y lg:divide-y-0 divide-border-soft">
-            <StatItem value="3" suffix="K+" label="Active Students" icon={GraduationCap} color="text-primary" />
-            <StatItem value="500" suffix="+" label="Lessons & Quests" icon={Target} color="text-secondary" />
-            <StatItem value="98" suffix="%" label="Parent Satisfaction" icon={Heart} color="text-pink" />
-            <StatItem value="12" label="Grade Levels" icon={BookOpen} color="text-accent-blue" />
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════════
+      {/* ═══════════════════════════════════════════════════════════════════
           CTA BANNER
-          ═══════════════════════════════════════════════════════════ */}
-      <section className="relative z-10 max-w-[1380px] mx-auto px-6 lg:px-10 pb-14 lg:pb-18">
-        <div className="relative bg-gradient-to-br from-primary via-primary-dark to-accent-purple rounded-3xl p-8 lg:p-14 overflow-hidden">
-          <div aria-hidden="true" className="absolute -top-20 -right-20 w-72 h-72 rounded-full bg-white/5" />
-          <div aria-hidden="true" className="absolute -bottom-10 -left-10 w-56 h-56 rounded-full bg-white/5" />
-          <div aria-hidden="true" className="absolute top-[40%] left-[40%] w-40 h-40 rounded-full bg-white/3" />
+          ═══════════════════════════════════════════════════════════════════ */}
+      <section className="relative z-10 max-w-[1380px] mx-auto px-6 lg:px-10 pb-14 lg:pb-20">
+        <div className="relative bg-gradient-to-br from-primary via-primary-dark to-accent-purple rounded-[2rem] p-8 lg:p-14 overflow-hidden">
+          <div aria-hidden="true" className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-white/[0.06]" />
+          <div aria-hidden="true" className="absolute -bottom-10 -left-10 w-64 h-64 rounded-full bg-white/[0.06]" />
+          <div aria-hidden="true" className="absolute top-[40%] left-[40%] w-48 h-48 rounded-full bg-white/[0.04]" />
+          <div aria-hidden="true" className="absolute top-[20%] right-[25%] w-32 h-32 rounded-full bg-white/[0.03]" />
 
           {/* Floating reward decorations */}
           <div aria-hidden="true" className="absolute top-6 right-12 float-slow opacity-20"><Trophy className="w-10 h-10 text-white" /></div>
           <div aria-hidden="true" className="absolute bottom-8 right-[30%] float-medium opacity-15"><Star className="w-8 h-8 text-gold-light" /></div>
           <div aria-hidden="true" className="absolute top-[50%] right-8 float-fast opacity-15"><Coins className="w-7 h-7 text-gold-light" /></div>
+          <div aria-hidden="true" className="absolute bottom-12 left-[20%] float-slow opacity-10"><Heart className="w-9 h-9 text-white" /></div>
 
           <div className="relative z-10 flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
             <div className="flex-1 text-center lg:text-left">
@@ -255,11 +253,11 @@ export default async function HomePage() {
               </p>
             </div>
             <div className="flex flex-wrap gap-3 justify-center">
-              <Link href="/auth/register" className="inline-flex items-center gap-2 bg-white text-primary font-bold text-base lg:text-lg py-3.5 px-8 rounded-2xl no-underline shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200">
+              <Link href="/auth/register" className="inline-flex items-center gap-2 bg-white text-primary font-bold text-base lg:text-lg py-3.5 px-8 rounded-2xl no-underline shadow-[0_4px_24px_rgba(0,0,0,0.15)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.25)] hover:scale-[1.03] active:scale-[0.98] transition-all duration-200">
                 Get Started Free
                 <ArrowRight className="w-5 h-5" />
               </Link>
-              <Link href="/auth/login" className="inline-flex items-center gap-2 bg-white/10 text-white font-bold text-base lg:text-lg py-3.5 px-8 rounded-2xl no-underline border border-white/20 hover:bg-white/20 transition-all duration-200">
+              <Link href="/auth/login" className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white font-bold text-base lg:text-lg py-3.5 px-8 rounded-2xl no-underline border border-white/20 hover:bg-white/20 hover:border-white/30 transition-all duration-200">
                 Sign In
               </Link>
             </div>
@@ -269,8 +267,8 @@ export default async function HomePage() {
 
       {/* ═══════════════════════════════════════════════════════════
           FOOTER
-          ═══════════════════════════════════════════════════════════ */}
-      <footer className="relative z-10 border-t border-border-soft bg-white/60 backdrop-blur-sm">
+          ═══════════════════════════════════════════════════════════════════ */}
+      <footer className="relative z-10 bg-white/50 backdrop-blur-sm">
         <div className="max-w-[1380px] mx-auto px-6 lg:px-10 py-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2.5">
@@ -295,18 +293,18 @@ export default async function HomePage() {
 
 function TrustBadge({ icon: Icon, text, bg, color }: { icon: React.ComponentType<{ className?: string }>; text: string; bg: string; color: string }) {
   return (
-    <span className={`inline-flex items-center gap-1.5 ${bg} border border-current/10 rounded-full py-1.5 px-3.5 text-xs font-bold text-text shadow-sm`}>
+    <span className={`inline-flex items-center gap-1.5 ${bg} backdrop-blur-sm rounded-full py-1.5 px-3.5 text-xs font-bold text-text-muted shadow-[0_2px_8px_rgba(0,0,0,0.04)]`}>
       <Icon className={`w-3.5 h-3.5 ${color}`} />
       {text}
     </span>
   );
 }
 
-function FeatureCard({ icon: Icon, title, description, gradient, iconBg, iconColor, accentBorder, delay }: {
-  icon: React.ComponentType<{ className?: string }>; title: string; description: string; gradient: string; iconBg: string; iconColor: string; accentBorder: string; delay: number;
+function FeatureCard({ icon: Icon, title, description, gradient, iconBg, iconColor, delay }: {
+  icon: React.ComponentType<{ className?: string }>; title: string; description: string; gradient: string; iconBg: string; iconColor: string; delay: number;
 }) {
   return (
-    <div className={`group ${gradient} rounded-2xl lg:rounded-3xl p-6 lg:p-7 border ${accentBorder} hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 fade-in-up`} style={{ animationDelay: `${delay}s` }}>
+    <div className={`group ${gradient} rounded-[1.5rem] lg:rounded-[2rem] p-6 lg:p-7 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 fade-in-up`} style={{ animationDelay: `${delay}s` }}>
       <div className={`w-12 h-12 rounded-2xl ${iconBg} flex items-center justify-center mb-4`}>
         <Icon className={`w-6 h-6 ${iconColor}`} />
       </div>
@@ -316,15 +314,20 @@ function FeatureCard({ icon: Icon, title, description, gradient, iconBg, iconCol
   );
 }
 
-function StatItem({ value, suffix, label, icon: Icon, color }: { value: string; suffix?: string; label: string; icon: React.ComponentType<{ className?: string }>; color: string }) {
+function FloatingStat({ icon: Icon, value, label, gradient, iconColor, delay }: {
+  icon: React.ComponentType<{ className?: string }>; value: string; label: string; gradient: string; iconColor: string; delay: number;
+}) {
   return (
-    <div className="flex items-center gap-3 px-6 py-7 justify-center">
-      <div className="w-10 h-10 rounded-xl bg-bg-main flex items-center justify-center">
-        <Icon className={`w-5 h-5 ${color}`} />
+    <div
+      className={`flex items-center gap-3 bg-white/90 backdrop-blur-sm rounded-2xl py-3 px-5 shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 fade-in-up`}
+      style={{ animationDelay: `${delay}s` }}
+    >
+      <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center ${iconColor} shadow-sm`}>
+        <Icon className="w-5 h-5" />
       </div>
       <div>
-        <div className="font-black text-text text-xl lg:text-2xl">{value}{suffix && <span className="text-base">{suffix}</span>}</div>
-        <div className="text-xs font-bold text-text-muted">{label}</div>
+        <div className="font-black text-text text-lg lg:text-xl leading-tight">{value}</div>
+        <div className="text-[11px] font-bold text-text-muted">{label}</div>
       </div>
     </div>
   );
@@ -335,30 +338,30 @@ function DashboardPreview() {
   return (
     <div className="relative">
       {/* Outer glow layers */}
-      <div className="absolute -inset-4 bg-gradient-to-br from-primary/8 via-accent-purple/5 to-secondary/5 rounded-[36px] blur-2xl" />
-      <div className="absolute -inset-2 bg-gradient-to-tr from-gold/5 to-pink/5 rounded-[28px] blur-xl" />
+      <div className="absolute -inset-6 bg-gradient-to-br from-primary/10 via-accent-purple/8 to-secondary/5 rounded-[40px] blur-3xl" />
+      <div className="absolute -inset-3 bg-gradient-to-tr from-gold/8 to-pink/5 rounded-[32px] blur-2xl" />
 
-      <div className="relative bg-white rounded-3xl border border-border-soft shadow-card-hover overflow-hidden">
+      <div className="relative bg-white rounded-[2rem] shadow-[0_8px_40px_rgba(0,0,0,0.06),0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden">
         {/* macOS-style title bar */}
-        <div className="bg-bg-main/80 border-b border-border-soft px-4 py-2.5 flex items-center gap-2">
+        <div className="bg-bg-main/60 px-4 py-2.5 flex items-center gap-2">
           <div className="flex gap-1.5">
             <div className="w-3 h-3 rounded-full bg-pink/50" />
             <div className="w-3 h-3 rounded-full bg-gold/50" />
             <div className="w-3 h-3 rounded-full bg-secondary/50" />
           </div>
           <div className="flex-1 flex justify-center">
-            <div className="w-28 h-2 rounded-full bg-border-soft" />
+            <div className="w-28 h-2 rounded-full bg-border-soft/60" />
           </div>
           <div className="flex gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-border-soft" />
-            <div className="w-3 h-3 rounded-full bg-border-soft" />
+            <div className="w-3 h-3 rounded-full bg-border-soft/60" />
+            <div className="w-3 h-3 rounded-full bg-border-soft/60" />
           </div>
         </div>
 
         <div className="flex">
           {/* Sidebar */}
-          <div className="hidden sm:flex flex-col items-center gap-2.5 py-4 px-2.5 border-r border-border-soft bg-bg-main/50 w-[52px]">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-accent-purple flex items-center justify-center text-white font-black text-sm mb-1 shadow-glow-soft">A</div>
+          <div className="hidden sm:flex flex-col items-center gap-2.5 py-4 px-2.5 bg-bg-main/40 w-[52px]">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-accent-purple flex items-center justify-center text-white font-black text-sm mb-1 shadow-[0_0_16px_rgba(79,70,229,0.2)]">A</div>
             {[
               { icon: LayoutDashboard, active: false },
               { icon: Swords, active: true },
@@ -366,7 +369,7 @@ function DashboardPreview() {
               { icon: Trophy, active: false },
               { icon: UsersRound, active: false },
             ].map((item, i) => (
-              <div key={i} className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${item.active ? "bg-primary/10 text-primary shadow-[0_0_8px_rgba(79,70,229,0.12)]" : "text-text-muted hover:bg-white"}`}>
+              <div key={i} className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${item.active ? "bg-primary/10 text-primary shadow-[0_0_12px_rgba(79,70,229,0.10)]" : "text-text-muted hover:bg-white/80"}`}>
                 <item.icon className="w-4 h-4" />
               </div>
             ))}
@@ -383,15 +386,15 @@ function DashboardPreview() {
             {/* Greeting row */}
             <div className="flex items-center justify-between gap-2 mb-4">
               <div className="min-w-0">
-                <h3 className="font-extrabold text-text text-sm lg:text-base leading-tight truncate">Good morning, Ariyana! 👋</h3>
+                <h3 className="font-extrabold text-text text-sm lg:text-base leading-tight truncate">Good morning, Ari! 👋</h3>
                 <p className="text-text-muted text-[11px] mt-0.5">Let&apos;s make today amazing.</p>
               </div>
               <div className="flex items-center gap-1.5 flex-shrink-0">
-                <div className="bg-gold-soft rounded-xl py-1 px-2.5 text-center border border-gold/10">
+                <div className="bg-gold-soft/80 rounded-xl py-1 px-2.5 text-center shadow-[0_2px_8px_rgba(245,165,36,0.08)]">
                   <div className="font-black text-gold text-xs leading-none flex items-center gap-1"><Coins className="w-3 h-3" /> 1,240</div>
                   <div className="text-[9px] font-bold text-gold/60 mt-0.5">Coins</div>
                 </div>
-                <div className="bg-pink-soft rounded-xl py-1 px-2.5 text-center border border-pink/10">
+                <div className="bg-pink-soft/80 rounded-xl py-1 px-2.5 text-center shadow-[0_2px_8px_rgba(255,92,138,0.08)]">
                   <div className="font-black text-pink text-xs leading-none flex items-center gap-1"><Flame className="w-3 h-3" /> 7d</div>
                   <div className="text-[9px] font-bold text-pink/60 mt-0.5">Streak</div>
                 </div>
@@ -402,7 +405,7 @@ function DashboardPreview() {
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5">
 
               {/* Today's Lesson — spans 2 */}
-              <div className="col-span-2 bg-card-gradient-blue rounded-2xl p-3 border border-accent-blue/12 relative overflow-hidden">
+              <div className="col-span-2 bg-card-gradient-blue rounded-2xl p-3 relative overflow-hidden">
                 <div className="absolute top-2 right-2 opacity-[0.06]"><TrendingUp className="w-16 h-16 text-accent-blue" /></div>
                 <div className="relative">
                   <p className="text-[9px] font-extrabold text-accent-blue uppercase tracking-wider mb-1 flex items-center gap-1">
@@ -423,7 +426,7 @@ function DashboardPreview() {
               </div>
 
               {/* Child Avatar + Level */}
-              <div className="bg-card-gradient-green rounded-2xl p-3 border border-secondary/12 flex flex-col">
+              <div className="bg-card-gradient-green rounded-2xl p-3 flex flex-col">
                 <div className="flex items-center gap-2.5 mb-2">
                   <div className="w-11 h-11 rounded-full bg-gradient-to-br from-secondary-light to-secondary flex items-center justify-center flex-shrink-0 border-2 border-white shadow-sm relative">
                     <GraduationCap className="w-5 h-5 text-white" />
@@ -445,7 +448,7 @@ function DashboardPreview() {
               </div>
 
               {/* EQ Check-in */}
-              <div className="bg-card-gradient-pink rounded-2xl p-3 border border-pink/12 flex flex-col">
+              <div className="bg-card-gradient-pink rounded-2xl p-3 flex flex-col">
                 <div className="w-7 h-7 rounded-lg bg-pink/10 flex items-center justify-center mb-1.5">
                   <Heart className="w-3.5 h-3.5 text-pink" />
                 </div>
@@ -455,7 +458,7 @@ function DashboardPreview() {
                   {[
                     { bg: "bg-secondary/10", icon: CheckCircle2, color: "text-secondary", label: "Good" },
                     { bg: "bg-accent-blue/10", icon: Zap, color: "text-accent-blue", label: "Great" },
-                    { bg: "bg-gold/10", icon: Star, color: "text-gold", label: "Amazing" },
+                    { bg: "bg-gold/10", icon: Star, color: "text-gold", label: "Amazing" }
                   ].map((m, i) => (
                     <div key={i} className={`flex-1 ${m.bg} rounded-lg py-1.5 flex flex-col items-center gap-0.5 border border-white/40`}>
                       <m.icon className={`w-3 h-3 ${m.color}`} />
@@ -466,7 +469,7 @@ function DashboardPreview() {
               </div>
 
               {/* Badges earned */}
-              <div className="bg-white rounded-2xl p-3 border border-border-soft flex flex-col">
+              <div className="bg-white rounded-2xl p-3 flex flex-col">
                 <div className="flex items-center justify-between mb-1.5">
                   <div className="w-7 h-7 rounded-lg bg-accent-purple/10 flex items-center justify-center">
                     <Award className="w-3.5 h-3.5 text-accent-purple" />
@@ -489,7 +492,7 @@ function DashboardPreview() {
               </div>
 
               {/* Quest Progress */}
-              <div className="bg-gradient-to-br from-primary-soft/60 to-accent-purple-soft/40 rounded-2xl p-3 border border-primary/10 flex flex-col">
+              <div className="bg-gradient-to-br from-primary-soft/60 to-accent-purple-soft/40 rounded-2xl p-3 flex flex-col">
                 <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center mb-1.5">
                   <Target className="w-3.5 h-3.5 text-primary" />
                 </div>
@@ -504,7 +507,7 @@ function DashboardPreview() {
               </div>
 
               {/* Parent visibility hint */}
-              <div className="col-span-2 lg:col-span-1 bg-card-gradient-gold rounded-2xl p-3 border border-gold/12 flex items-center gap-3">
+              <div className="col-span-2 lg:col-span-1 bg-card-gradient-gold rounded-2xl p-3 flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-gold/10 flex items-center justify-center flex-shrink-0">
                   <Eye className="w-5 h-5 text-gold" />
                 </div>

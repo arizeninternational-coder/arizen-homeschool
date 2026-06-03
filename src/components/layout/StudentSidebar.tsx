@@ -6,10 +6,11 @@ import { usePathname } from "next/navigation";
 import {
   Home, BookOpen, Swords, Heart, Trophy, ShoppingBag,
   UserRound, BarChart3, Star, LogOut, Sparkles, Menu, X,
-  Library, CalendarDays, MessageCircle, Settings, ChevronDown
+  Library, CalendarDays, MessageCircle, Settings
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { CoinIcon, StreakIcon } from "@/components/ui/Illustrations";
+import AvatarRenderer from "@/components/AvatarRenderer";
 
 const NAV_ITEMS = [
   { icon: Home, label: "Dashboard", href: "/dashboard/student" },
@@ -54,9 +55,9 @@ export function StudentSidebar({ children }: { children: React.ReactNode }) {
   const avatarLevel = Math.floor(totalXp / 100) + 1;
 
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-white border-r border-border-soft">
+    <div className="flex flex-col h-full bg-white/90 backdrop-blur-xl">
       {/* Logo */}
-      <div className="flex items-center gap-3 px-5 py-5 border-b border-border-soft">
+      <div className="flex items-center gap-3 px-5 py-4">
         <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center shadow-[0_4px_15px_rgba(79,70,229,0.25)]">
           <Sparkles className="w-5 h-5 text-white" />
         </div>
@@ -64,19 +65,19 @@ export function StudentSidebar({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* Stats pills */}
-      <div className="px-4 py-3 border-b border-border-soft flex gap-2">
-        <div className="flex-1 flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gold-soft/50 border border-gold/15">
+      <div className="px-4 pb-3 flex gap-2">
+        <div className="flex-1 flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gold-soft/50 border border-gold/10">
           <CoinIcon size={16} />
           <span className="text-xs font-extrabold text-amber-800">{coins}</span>
         </div>
-        <div className="flex-1 flex items-center gap-1.5 px-3 py-2 rounded-xl bg-pink-soft/50 border border-pink/15">
+        <div className="flex-1 flex items-center gap-1.5 px-3 py-2 rounded-xl bg-pink-soft/50 border border-pink/10">
           <StreakIcon size={16} />
           <span className="text-xs font-extrabold text-pink-700">{currentStreak}d</span>
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-0.5">
+      <nav className="flex-1 overflow-y-auto px-3 py-2 space-y-0.5">
         {NAV_ITEMS.map((item) => {
           const isActive = pathname === item.href || (item.href !== "/dashboard/student" && pathname.startsWith(item.href));
           return (
@@ -99,10 +100,10 @@ export function StudentSidebar({ children }: { children: React.ReactNode }) {
       </nav>
 
       {/* Student Profile Card */}
-      <div className="px-3 py-3 border-t border-border-soft">
-        <div className="flex items-center gap-3 px-3 py-3 rounded-2xl bg-gradient-to-r from-primary-soft/50 to-accent-purple-soft/40 border border-primary/10 mb-2">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-400 to-violet-500 flex items-center justify-center text-white font-extrabold text-sm shadow-md flex-shrink-0">
-            {studentName.charAt(0).toUpperCase()}
+      <div className="px-3 py-3">
+        <div className="flex items-center gap-3 px-3 py-3 rounded-2xl bg-gradient-to-r from-primary-soft/40 to-accent-purple-soft/30 mb-2">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-50 to-violet-50 flex items-center justify-center flex-shrink-0 overflow-hidden">
+            <AvatarRenderer size="xs" skinHex="#C68642" hairColorHex="#1a1a1a" hairStyle="short-curls" outfitHex="#4F46E5" shoeHex="#37474F" expression="happy" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-bold text-text truncate">{studentName}</p>
@@ -125,19 +126,19 @@ export function StudentSidebar({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen bg-bg-main">
-      {/* Desktop sidebar */}
-      <aside className="hidden lg:flex lg:w-[260px] lg:flex-col lg:fixed lg:inset-y-0 z-40">
+      {/* Desktop sidebar — floating panel with shadow, no hard border */}
+      <aside className="hidden lg:flex lg:w-[260px] lg:flex-col lg:fixed lg:inset-y-0 z-40 shadow-[4px_0_24px_rgba(0,0,0,0.03)]">
         {sidebarContent}
       </aside>
 
       {/* Mobile overlay */}
       {mobileOpen && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 lg:hidden" onClick={() => setMobileOpen(false)} />
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden fade-in" onClick={() => setMobileOpen(false)} />
       )}
 
       {/* Mobile sidebar */}
       <aside className={cn(
-        "fixed inset-y-0 left-0 z-50 w-[260px] transform transition-transform duration-250 lg:hidden",
+        "fixed inset-y-0 left-0 z-50 w-[260px] transform transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] lg:hidden shadow-xl",
         mobileOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         {sidebarContent}
@@ -145,8 +146,8 @@ export function StudentSidebar({ children }: { children: React.ReactNode }) {
 
       {/* Main content */}
       <div className="flex-1 lg:ml-[260px] flex flex-col min-h-screen">
-        {/* Top bar */}
-        <header className="sticky top-0 z-30 h-16 bg-white/80 backdrop-blur-xl border-b border-border-soft flex items-center justify-between px-4 lg:px-8 gap-4">
+        {/* Top bar — light, clean, no hard border */}
+        <header className="sticky top-0 z-30 h-14 bg-white/70 backdrop-blur-xl flex items-center justify-between px-4 lg:px-6 gap-4">
           <div className="flex items-center gap-3">
             <button onClick={() => setMobileOpen(true)} className="lg:hidden p-2 rounded-xl hover:bg-bg-main text-text-muted">
               <Menu className="w-5 h-5" />
@@ -157,11 +158,11 @@ export function StudentSidebar({ children }: { children: React.ReactNode }) {
             </Link>
           </div>
           <div className="flex items-center gap-2">
-            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gold-soft/50 border border-gold/15">
+            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gold-soft/50 border border-gold/10">
               <CoinIcon size={14} />
               <span className="text-xs font-extrabold text-amber-800">{coins}</span>
             </div>
-            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-pink-soft/50 border border-pink/15">
+            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-pink-soft/50 border border-pink/10">
               <StreakIcon size={14} />
               <span className="text-xs font-extrabold text-pink-700">{currentStreak}d</span>
             </div>
@@ -174,7 +175,7 @@ export function StudentSidebar({ children }: { children: React.ReactNode }) {
             </button>
           </div>
         </header>
-        <main className="flex-1 p-4 lg:p-8 max-w-[1400px] w-full">
+        <main className="flex-1 p-4 lg:p-6 max-w-[1400px] w-full">
           {children}
         </main>
       </div>

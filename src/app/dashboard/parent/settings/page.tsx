@@ -2,54 +2,81 @@
 export const dynamic = "force-dynamic";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Settings, ArrowLeft } from "lucide-react";
-import { ds, colors } from "@/lib/design-system";
+import { Settings, ArrowLeft, Bell, Shield, User, Mail, Eye } from "lucide-react";
+
 export default function ParentSettingsPage() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   useEffect(() => { fetch("/api/auth/session").then(r=>r.json()).then(d=>{if(d?.user)setUser(d.user);}).catch(()=>{}).finally(()=>setLoading(false)); }, []);
-  if (loading) return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: colors.bg }}><p style={{ color: colors.textMuted }}>Loading...</p></div>;
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center bg-bg-main">
+      <div className="flex flex-col items-center gap-4">
+        <div className="relative w-10 h-10">
+          <div className="absolute inset-0 rounded-full border-[3px] border-secondary/15" />
+          <div className="absolute inset-0 rounded-full border-[3px] border-transparent border-t-secondary animate-spin" />
+        </div>
+        <p className="text-sm font-bold text-text-muted">Loading...</p>
+      </div>
+    </div>
+  );
   return (
-    <div style={{ minHeight: '100vh', background: colors.bg }}>
-      <div style={{ maxWidth: 600, margin: '0 auto', padding: '2rem 1.5rem' }}>
-        <Link href="/dashboard/parent" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: colors.textMuted, textDecoration: 'none', fontSize: '0.875rem', fontWeight: 600, marginBottom: '1.5rem' }}><ArrowLeft style={{ width: 16, height: 16 }} /> Back to Dashboard</Link>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: colors.text, marginBottom: '2rem' }}>Settings</h1>
-        <div style={{ ...ds.card, padding: '2rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem', paddingBottom: '1.5rem', borderBottom: `1px solid ${colors.border}` }}>
-            <div style={{ width: 56, height: 56, borderRadius: '50%', background: `linear-gradient(135deg, ${colors.primary}, ${colors.primaryDark})`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '1.25rem', fontWeight: 800 }}>
+    <div className="min-h-screen bg-bg-main">
+      <div className="max-w-[600px] mx-auto px-4 lg:px-8 py-8">
+        <Link href="/dashboard/parent" className="inline-flex items-center gap-2 text-text-muted text-sm font-semibold mb-6 hover:text-text transition-colors">
+          <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+        </Link>
+        <h1 className="text-2xl font-extrabold text-text mb-8">Settings</h1>
+        <div className="rounded-2xl border border-border-soft bg-white p-6 lg:p-8 shadow-[0_1px_3px_rgba(0,0,0,0.03),0_4px_12px_rgba(0,0,0,0.02)]">
+          <div className="flex items-center gap-4 mb-6 pb-6 border-b border-border-soft">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-secondary to-secondary-dark flex items-center justify-center text-white text-xl font-extrabold shadow-[0_4px_15px_rgba(0,168,132,0.2)]">
               {(user?.name || "P").charAt(0).toUpperCase()}
             </div>
             <div>
-              <div style={{ fontWeight: 700, color: colors.text }}>{user?.name || "Parent"}</div>
-              <div style={{ fontSize: '0.875rem', color: colors.textMuted }}>{user?.email}</div>
+              <div className="font-bold text-text">{user?.name || "Parent"}</div>
+              <div className="text-sm text-text-muted">{user?.email}</div>
             </div>
           </div>
-          <div style={{ space: '1rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 0', borderBottom: `1px solid ${colors.borderLight}` }}>
-              <div>
-                <div style={{ fontWeight: 600, color: colors.text, fontSize: '0.9375rem' }}>Email Notifications</div>
-                <div style={{ fontSize: '0.8125rem', color: colors.textMuted }}>Receive updates about your children&apos;s progress</div>
+          <div className="space-y-0">
+            <div className="flex justify-between items-center py-4 border-b border-border-soft/50">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-accent-blue-soft flex items-center justify-center">
+                  <Mail className="w-4 h-4 text-accent-blue" />
+                </div>
+                <div>
+                  <div className="font-semibold text-text text-sm">Email Notifications</div>
+                  <div className="text-xs text-text-muted">Receive updates about your children&apos;s progress</div>
+                </div>
               </div>
-              <div style={{ width: 44, height: 24, borderRadius: 12, background: colors.border, position: 'relative', cursor: 'default' }}>
-                <div style={{ width: 20, height: 20, borderRadius: '50%', background: 'white', position: 'absolute', top: 2, left: 2, boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }} />
-              </div>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 0', borderBottom: `1px solid ${colors.borderLight}` }}>
-              <div>
-                <div style={{ fontWeight: 600, color: colors.text, fontSize: '0.9375rem' }}>Weekly Summary</div>
-                <div style={{ fontSize: '0.8125rem', color: colors.textMuted }}>Get a weekly activity report</div>
-              </div>
-              <div style={{ width: 44, height: 24, borderRadius: 12, background: colors.primary, position: 'relative', cursor: 'default' }}>
-                <div style={{ width: 20, height: 20, borderRadius: '50%', background: 'white', position: 'absolute', top: 2, right: 2, boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }} />
+              <div className="w-11 h-6 rounded-full bg-border-soft relative cursor-default">
+                <div className="absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow-sm" />
               </div>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 0' }}>
-              <div>
-                <div style={{ fontWeight: 600, color: colors.text, fontSize: '0.9375rem' }}>Profile Visibility</div>
-                <div style={{ fontSize: '0.8125rem', color: colors.textMuted }}>Visible to your guild</div>
+            <div className="flex justify-between items-center py-4 border-b border-border-soft/50">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-gold-soft/50 flex items-center justify-center">
+                  <Bell className="w-4 h-4 text-gold" />
+                </div>
+                <div>
+                  <div className="font-semibold text-text text-sm">Weekly Summary</div>
+                  <div className="text-xs text-text-muted">Get a weekly activity report</div>
+                </div>
               </div>
-              <div style={{ width: 44, height: 24, borderRadius: 12, background: colors.primary, position: 'relative', cursor: 'default' }}>
-                <div style={{ width: 20, height: 20, borderRadius: '50%', background: 'white', position: 'absolute', top: 2, right: 2, boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }} />
+              <div className="w-11 h-6 rounded-full bg-secondary relative cursor-default">
+                <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-white shadow-sm" />
+              </div>
+            </div>
+            <div className="flex justify-between items-center py-4">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-accent-purple-soft flex items-center justify-center">
+                  <Eye className="w-4 h-4 text-accent-purple" />
+                </div>
+                <div>
+                  <div className="font-semibold text-text text-sm">Profile Visibility</div>
+                  <div className="text-xs text-text-muted">Visible to your guild</div>
+                </div>
+              </div>
+              <div className="w-11 h-6 rounded-full bg-secondary relative cursor-default">
+                <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-white shadow-sm" />
               </div>
             </div>
           </div>

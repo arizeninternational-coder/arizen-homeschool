@@ -4,78 +4,60 @@
 @tailwind utilities;
 
 /* ═══════════════════════════════════════════
-   ARIZEN SCHOOL — Design System v6
-   Premium • Colorful • Child-friendly • African
+   ARIZEN SCHOOL — Design System v7
+   Premium • Soft • Floating • Child-friendly
    ═══════════════════════════════════════════ */
 
 @layer base {
   :root {
     /* ── Core Brand ── */
-    --color-primary:       79 70 229;    /* #4F46E5 rich indigo/purple */
-    --color-primary-light: 129 140 248;  /* #818CF8 */
-    --color-primary-soft:  238 242 255;  /* #EEF2FF */
-    --color-primary-dark:  55 48 163;    /* #3730A3 */
+    --color-primary:       79 70 229;
+    --color-primary-light: 129 140 248;
+    --color-primary-soft:  238 242 255;
+    --color-primary-dark:  55 48 163;
 
-    --color-secondary:       0 168 132;   /* #00A884 Arizen green */
-    --color-secondary-light: 52 211 153;  /* #34D399 */
-    --color-secondary-soft:  236 253 245; /* #ECFDF5 */
-    --color-secondary-dark:  4 120 87;    /* #047857 */
+    --color-secondary:       0 168 132;
+    --color-secondary-light: 52 211 153;
+    --color-secondary-soft:  236 253 245;
+    --color-secondary-dark:  4 120 87;
 
     /* ── Accent Palette ── */
-    --color-gold:          245 165 36;   /* #F5A524 coins/rewards */
-    --color-gold-light:    252 211 177;  /* #FCD3B1 */
-    --color-gold-soft:     255 251 235;  /* #FFFBEB */
+    --color-gold:          245 165 36;
+    --color-gold-light:    252 211 177;
+    --color-gold-soft:     255 251 235;
 
-    --color-pink:          255 92 138;   /* #FF5C8A streaks/energy */
-    --color-pink-light:    251 207 232;  /* #FBCFE8 */
-    --color-pink-soft:     255 241 242;  /* #FFF1F2 */
+    --color-pink:          255 92 138;
+    --color-pink-light:    251 207 232;
+    --color-pink-soft:     255 241 242;
 
-    --color-accent-blue:   59 167 255;   /* #3BA7FF learning/tools */
-    --color-accent-blue-light: 186 230 253; /* #BAE6FD */
-    --color-accent-blue-soft:  239 246 255; /* #EFF6FF */
+    --color-accent-blue:   59 167 255;
+    --color-accent-blue-light: 186 230 253;
+    --color-accent-blue-soft:  239 246 255;
 
-    --color-accent-purple: 139 92 246;   /* #8B5CF6 quests/badges */
-    --color-accent-purple-light: 196 181 253; /* #C4B5FD */
-    --color-accent-purple-soft:  245 243 255; /* #F5F3FF */
+    --color-accent-purple: 139 92 246;
+    --color-accent-purple-light: 196 181 253;
+    --color-accent-purple-soft:  245 243 255;
 
     /* ── Semantic ── */
-    --color-success: 34 197 94;   /* #22C55E */
-    --color-warning: 245 158 11;  /* #F59E0B */
-    --color-danger:  239 68 68;   /* #EF4444 */
+    --color-success: 34 197 94;
+    --color-warning: 245 158 11;
+    --color-danger:  239 68 68;
 
     /* ── Neutrals ── */
-    --color-bg-main:  247 249 255; /* #F7F9FF */
-    --color-bg-card:  255 255 255; /* #FFFFFF */
-    --color-text:     17 24 39;    /* #111827 */
-    --color-text-muted: 100 116 143; /* #64748B */
-    --color-border:   229 234 243; /* #E5EAF3 */
-    --color-border-light: 241 245 249; /* #F1F5F9 */
+    --color-bg-main:  247 249 255;
+    --color-bg-card:  255 255 255;
+    --color-text:     17 24 39;
+    --color-text-muted: 100 116 143;
 
-    /* ── Alias for backwards compat ── */
-    --color-cream:        253 253 251;
-    --color-lavender:     238 242 255;
-    --color-lavender-light: 224 231 255;
-    --color-lavender-soft: 238 242 255;
-    --color-blue:         59 167 255;
-    --color-blue-light:   186 230 253;
-    --color-blue-soft:    239 246 255;
-    --color-green:        0 168 132;
-    --color-green-light:  52 211 153;
-    --color-green-soft:   236 253 245;
-    --color-peach:        251 182 124;
-    --color-peach-light:  253 200 160;
-    --color-peach-soft:   254 228 200;
-    --color-surface:      255 255 255;
-    --color-surface-soft: 247 249 255;
-    --color-surface-raised: 255 255 255;
-    --color-text-heading: 17 24 39;
-    --color-text-inverse: 255 255 255;
-    --color-xp:           79 70 229;
-    --color-streak:       255 92 138;
-    --color-badge:        139 92 246;
+    /* ── Borders ── */
+    /* Softer, more transparent borders — no harsh black lines */
+    --color-border:   226 232 240;
+    --color-border-soft: 239 243 250;
+    --color-border-light: 241 245 249;
+    --color-border-faint: 245 247 252;
   }
 
-  * { border-color: rgb(var(--color-border)); }
+  * { border-color: rgb(var(--color-border-soft)); }
   html { scroll-behavior: smooth; }
   body {
     font-family: 'Nunito', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -85,6 +67,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+  h1, h2, h3, h4, h5, h6 { color: rgb(var(--color-text)); }
   ::selection { background: rgba(79, 70, 229, 0.12); }
 }
 
@@ -130,18 +113,8 @@
   0%, 100% { transform: scale(1); }
   50%      { transform: scale(1.03); }
 }
-@keyframes coinSparkle {
-  0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
-  25%      { transform: scale(1.15) rotate(-5deg); opacity: 0.9; }
-  50%      { transform: scale(1.25) rotate(5deg); }
-  75%      { transform: scale(1.1) rotate(-3deg); }
-}
 @keyframes progressFill {
   from { width: 0%; }
-}
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ── Animation Classes ── */
@@ -156,12 +129,10 @@
 .pulse-soft    { animation: pulse-soft 2.5s ease-in-out infinite; }
 .wiggle        { animation: wiggle 2.5s ease-in-out infinite; }
 .breathe       { animation: breathe 4s ease-in-out infinite; }
-.coin-sparkle  { animation: coinSparkle 0.6s ease-in-out; }
 .progress-fill { animation: progressFill 1s ease-out both; }
-.slide-up      { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
 
 /* ── Scrollbar ── */
-::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(79, 70, 229, 0.15); border-radius: 999px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(79, 70, 229, 0.3); }
@@ -173,11 +144,42 @@
   border-radius: 0.5rem;
 }
 
+/* ── Glass morphism utility ── */
+.glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* ── Soft glow effects ── */
+.glow-primary { box-shadow: 0 0 30px rgba(79, 70, 229, 0.12); }
+.glow-gold { box-shadow: 0 0 30px rgba(245, 165, 36, 0.15); }
+.glow-pink { box-shadow: 0 0 30px rgba(255, 92, 138, 0.12); }
+.glow-green { box-shadow: 0 0 30px rgba(0, 168, 132, 0.12); }
+
+/* ── Text gradient utility ── */
+.text-gradient-primary {
+  background: linear-gradient(135deg, #4F46E5, #7C3AED);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Card hover lift ── */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
 /* ── Gradient Backgrounds ── */
 .bg-app {
   background:
-    radial-gradient(circle at top right, rgba(79, 70, 225, 0.10), transparent 30%),
-    radial-gradient(circle at bottom left, rgba(0, 168, 132, 0.10), transparent 28%),
+    radial-gradient(circle at top right, rgba(79, 70, 225, 0.06), transparent 35%),
+    radial-gradient(circle at bottom left, rgba(0, 168, 132, 0.04), transparent 30%),
+    radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.03), transparent 25%),
     linear-gradient(180deg, #ffffff 0%, #f7f9ff 100%);
 }
 .bg-card-gradient-purple {
@@ -194,4 +196,30 @@
 }
 .bg-card-gradient-gold {
   background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+}
+
+/* ── Shimmer skeleton loading ── */
+.skeleton {
+  background: linear-gradient(90deg, rgba(241,245,249,0.6) 25%, rgba(226,232,240,0.8) 50%, rgba(241,245,249,0.6) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 0.75rem;
+}
+
+/* ── Subtle card glow on hover ── */
+.card-glow {
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+.card-glow:hover {
+  box-shadow: 0 0 30px rgba(79, 70, 229, 0.06), 0 8px 30px rgba(0, 0, 0, 0.06);
+}
+
+/* ── Soft focus ring for form elements ── */
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.08);
+  border-color: rgba(79, 70, 229, 0.4);
+  border-radius: 1rem;
 }

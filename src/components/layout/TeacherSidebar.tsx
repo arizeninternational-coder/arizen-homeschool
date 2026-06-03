@@ -33,9 +33,9 @@ export function TeacherSidebar({ children }: { children: React.ReactNode }) {
   }, [mobileOpen]);
 
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-white border-r border-border-soft">
+    <div className="flex flex-col h-full bg-white/90 backdrop-blur-xl">
       {/* Logo */}
-      <div className="flex items-center gap-3 px-5 py-5 border-b border-border-soft">
+      <div className="flex items-center gap-3 px-5 py-4">
         <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center shadow-[0_4px_15px_rgba(79,70,229,0.25)]">
           <Sparkles className="w-5 h-5 text-white" />
         </div>
@@ -46,7 +46,7 @@ export function TeacherSidebar({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-0.5">
+      <nav className="flex-1 overflow-y-auto px-3 py-2 space-y-0.5">
         {NAV_ITEMS.map((item) => {
           const isActive = pathname === item.href || (item.href !== "/dashboard/admin" && pathname.startsWith(item.href));
           return (
@@ -69,7 +69,7 @@ export function TeacherSidebar({ children }: { children: React.ReactNode }) {
       </nav>
 
       {/* Logout */}
-      <div className="px-3 py-3 border-t border-border-soft">
+      <div className="px-3 py-3">
         <button
           onClick={() => fetch("/api/auth/logout", { method: "POST", credentials: "include" }).then(() => window.location.href = "/")}
           className="flex items-center gap-3 px-4 py-2.5 rounded-2xl text-sm font-semibold text-text-muted hover:bg-red-50 hover:text-danger w-full transition-colors"
@@ -83,20 +83,20 @@ export function TeacherSidebar({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen bg-bg-main">
-      <aside className="hidden lg:flex lg:w-[260px] lg:flex-col lg:fixed lg:inset-y-0 z-40">
+      <aside className="hidden lg:flex lg:w-[260px] lg:flex-col lg:fixed lg:inset-y-0 z-40 shadow-[4px_0_24px_rgba(0,0,0,0.03)]">
         {sidebarContent}
       </aside>
       {mobileOpen && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 lg:hidden" onClick={() => setMobileOpen(false)} />
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden fade-in" onClick={() => setMobileOpen(false)} />
       )}
       <aside className={cn(
-        "fixed inset-y-0 left-0 z-50 w-[260px] transform transition-transform duration-250 lg:hidden",
+        "fixed inset-y-0 left-0 z-50 w-[260px] transform transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] lg:hidden shadow-xl",
         mobileOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         {sidebarContent}
       </aside>
       <div className="flex-1 lg:ml-[260px] flex flex-col min-h-screen">
-        <header className="sticky top-0 z-30 h-16 bg-white/80 backdrop-blur-xl border-b border-border-soft flex items-center justify-between px-4 lg:px-8">
+        <header className="sticky top-0 z-30 h-14 bg-white/70 backdrop-blur-xl flex items-center justify-between px-4 lg:px-6">
           <button onClick={() => setMobileOpen(true)} className="lg:hidden p-2 rounded-xl hover:bg-bg-main text-text-muted">
             <Menu className="w-5 h-5" />
           </button>
@@ -112,7 +112,7 @@ export function TeacherSidebar({ children }: { children: React.ReactNode }) {
             <LogOut className="w-4 h-4" />
           </button>
         </header>
-        <main className="flex-1 p-4 lg:p-8 max-w-[1400px] w-full">
+        <main className="flex-1 p-4 lg:p-6 max-w-[1400px] w-full">
           {children}
         </main>
       </div>

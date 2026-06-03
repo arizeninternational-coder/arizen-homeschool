@@ -638,6 +638,52 @@ model EmotionalCheckin {
   @@index([createdAt])
 }
 
+model Conversation {
+  id            String    @id @default(cuid())
+  title         String?
+  isGroup       Boolean   @default(false)
+  createdBy     String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  messages      Message[]
+  participants  ConversationParticipant[]
+
+  @@index([createdBy])
+  @@index([createdAt])
+}
+
+model ConversationParticipant {
+  id              String   @id @default(cuid())
+  conversationId  String
+  userId          String
+  role            String   @default("member") // "admin" or "member"
+  joinedAt        DateTime @default(now())
+  
+  conversation    Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, userId])
+  @@index([userId])
+  @@index([conversationId])
+}
+
+model Message {
+  id              String    @id @default(cuid())
+  conversationId  String
+  senderId        String
+  body            String
+  messageType     String    @default("text") // "text" | "system"
+  readAt          DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  conversation    Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@index([createdAt])
+}
+
 model Homework {
   id              String   @id @default(uuid())
   parentId        String

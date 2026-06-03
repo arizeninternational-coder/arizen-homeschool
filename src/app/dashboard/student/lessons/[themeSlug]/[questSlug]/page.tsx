@@ -7,7 +7,6 @@ import Link from "next/link";
 import {
   ChevronRight, CheckCircle2, Zap, ArrowLeft, Target
 } from "lucide-react";
-import { ds, colors, gradients } from "@/lib/design-system";
 
 interface Lesson {
   id: string;
@@ -36,13 +35,25 @@ export default function QuestDetailPage({ params }: { params: Promise<{ themeSlu
     });
   }, [params]);
 
-  if (loading) return <div style={{ ...ds.card, padding: "2rem", textAlign: "center", color: colors.textMuted }}>Loading quest...</div>;
+  if (loading) return (
+    <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="flex flex-col items-center gap-3">
+        <div className="relative w-10 h-10">
+          <div className="absolute inset-0 rounded-full border-[3px] border-primary/15" />
+          <div className="absolute inset-0 rounded-full border-[3px] border-transparent border-t-primary animate-spin" />
+        </div>
+        <p className="text-sm font-bold text-text-muted">Loading quest...</p>
+      </div>
+    </div>
+  );
   if (!quest) return (
-    <div style={{ ...ds.card, padding: "2rem", textAlign: "center" }}>
-      <Target style={{ width: 36, height: 36, color: colors.textMuted, margin: "0 auto 0.75rem" }} />
-      <h3 style={{ fontWeight: 700, color: colors.text, marginBottom: "0.375rem" }}>Quest not found</h3>
-      <p style={{ color: colors.textMuted, fontSize: "0.875rem" }}>This quest may not exist or isn't published yet.</p>
-      <Link href="/dashboard/student/lessons" style={{ ...ds.btnPrimary, display: "inline-flex", textDecoration: "none", marginTop: "1rem" }}>Back to Themes</Link>
+    <div className="text-center py-12">
+      <Target className="w-9 h-9 text-text-muted mx-auto mb-3 opacity-40" />
+      <h3 className="text-lg font-extrabold text-text mb-1">Quest not found</h3>
+      <p className="text-sm text-text-muted mb-4">This quest may not exist or isn't published yet.</p>
+      <Link href="/dashboard/student/lessons" className="inline-flex items-center gap-1.5 text-sm font-bold text-primary hover:text-primary-dark transition-colors">
+        ← Back to Themes
+      </Link>
     </div>
   );
 
@@ -52,37 +63,45 @@ export default function QuestDetailPage({ params }: { params: Promise<{ themeSlu
 
   return (
     <>
-      <Link href={slugs ? `/dashboard/student/lessons/${slugs.themeSlug}` : "/dashboard/student/lessons"} style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", color: colors.textMuted, fontSize: "0.8125rem", fontWeight: 600, textDecoration: "none", marginBottom: "0.75rem" }}>
-        <ArrowLeft style={{ width: 14, height: 14 }} /> Back to Theme
+      <Link href={slugs ? `/dashboard/student/lessons/${slugs.themeSlug}` : "/dashboard/student/lessons"} className="inline-flex items-center gap-1.5 text-sm font-semibold text-text-muted hover:text-text mb-3 transition-colors">
+        <ArrowLeft className="w-4 h-4" /> Back to Theme
       </Link>
 
-      <div style={{ padding: "1.25rem", borderRadius: 16, background: gradients.primary, color: "white", marginBottom: "1.25rem" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", marginBottom: "0.375rem", flexWrap: "wrap" }}>
-          {quest.questType && <span style={{ fontSize: "0.625rem", fontWeight: 700, background: "rgba(255,255,255,0.2)", padding: "0.1rem 0.375rem", borderRadius: 5 }}>{quest.questType}</span>}
-          {quest.isCompleted && <span style={{ fontSize: "0.625rem", fontWeight: 700, background: "rgba(255,255,255,0.2)", padding: "0.1rem 0.375rem", borderRadius: 5 }}>✓ COMPLETED</span>}
+      <div className="rounded-2xl p-5 lg:p-6 mb-6 bg-gradient-to-br from-primary to-accent-purple text-white shadow-[0_12px_35px_rgba(79,70,229,0.15)]">
+        <div className="flex items-center gap-1.5 mb-2 flex-wrap">
+          {quest.questType && (
+            <span className="text-[10px] font-extrabold bg-white/20 px-2.5 py-0.5 rounded-full">{quest.questType}</span>
+          )}
+          {quest.isCompleted && (
+            <span className="text-[10px] font-extrabold bg-white/20 px-2.5 py-0.5 rounded-full">✓ COMPLETED</span>
+          )}
         </div>
-        <h1 style={{ fontSize: "1.25rem", fontWeight: 800, marginBottom: "0.375rem" }}>{quest.title}</h1>
-        {quest.description && <p style={{ opacity: 0.9, fontSize: "0.875rem", marginBottom: "0.75rem" }}>{quest.description}</p>}
-        <div style={{ display: "flex", gap: "1rem", fontSize: "0.75rem", opacity: 0.85, flexWrap: "wrap" }}>
+        <h1 className="text-xl lg:text-2xl font-extrabold mb-2">{quest.title}</h1>
+        {quest.description && <p className="text-white/90 text-sm mb-3 leading-relaxed">{quest.description}</p>}
+        <div className="flex gap-4 text-xs text-white/85 flex-wrap font-semibold">
           <span>{lessons.length} lessons</span>
           <span>{completedCount}/{lessons.length} completed</span>
-          {xpReward && <span style={{ display: "flex", alignItems: "center", gap: "0.125rem" }}><Zap style={{ width: 12, height: 12 }} /> +{xpReward} XP</span>}
+          {xpReward > 0 && (
+            <span className="inline-flex items-center gap-1">
+              <Zap className="w-3 h-3" /> +{xpReward} XP
+            </span>
+          )}
         </div>
         {quest.progress !== undefined && (
-          <div style={{ marginTop: "0.75rem", height: 6, borderRadius: 3, background: "rgba(255,255,255,0.2)" }}>
-            <div style={{ height: "100%", borderRadius: 3, background: "white", width: `${quest.progress}%`, transition: "width 0.3s" }} />
+          <div className="mt-3 h-1.5 rounded-full bg-white/20 overflow-hidden">
+            <div className="h-full rounded-full bg-white/90 transition-all duration-500" style={{ width: `${quest.progress}%` }} />
           </div>
         )}
       </div>
 
-      <h2 style={{ fontSize: "1rem", fontWeight: 700, color: colors.text, marginBottom: "0.75rem" }}>Lessons</h2>
+      <h2 className="text-lg font-extrabold text-text mb-4">Lessons</h2>
 
       {lessons.length === 0 ? (
-        <div style={{ ...ds.card, textAlign: "center", padding: "1.5rem" }}>
-          <p style={{ color: colors.textMuted, fontSize: "0.875rem" }}>No lessons available in this quest yet.</p>
+        <div className="rounded-2xl border border-border-soft bg-white text-center p-8">
+          <p className="text-sm text-text-muted">No lessons available in this quest yet.</p>
         </div>
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.375rem" }}>
+        <div className="flex flex-col gap-1.5">
           {lessons.map((lesson: Lesson, i: number) => (
             <LessonCard key={lesson.id} lesson={lesson} index={i} themeSlug={slugs?.themeSlug || ""} questSlug={slugs?.questSlug || ""} />
           ))}
@@ -96,23 +115,29 @@ function LessonCard({ lesson, index, themeSlug, questSlug }: { lesson: Lesson; i
   const xp = typeof lesson.xpReward === "object" ? (lesson.xpReward as any)?.base : lesson.xpReward;
 
   return (
-    <Link href={`/dashboard/student/lessons/${themeSlug}/${questSlug}/${lesson.slug}`} style={{ ...ds.card, padding: "0.875rem 1rem", textDecoration: "none", display: "flex", alignItems: "center", gap: "0.75rem" }}>
-      <div style={{ width: 32, height: 32, borderRadius: 8, background: lesson.isCompleted ? `${colors.success}15` : lesson.progress > 0 ? colors.primarySoft : colors.bgAlt, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-        {lesson.isCompleted ? <CheckCircle2 style={{ width: 18, height: 18, color: colors.success }} /> : <span style={{ fontWeight: 800, color: colors.textMuted, fontSize: "0.75rem" }}>{index + 1}</span>}
+    <Link href={`/dashboard/student/lessons/${themeSlug}/${questSlug}/${lesson.slug}`} className="rounded-2xl border border-border-soft bg-white p-4 flex items-center gap-3 hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(0,0,0,0.06)] transition-all duration-200 no-underline group">
+      <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 ${
+        lesson.isCompleted ? "bg-secondary-soft" : lesson.progress > 0 ? "bg-primary-soft" : "bg-bg-main"
+      }`}>
+        {lesson.isCompleted ? (
+          <CheckCircle2 className="w-[18px] h-[18px] text-secondary" />
+        ) : (
+          <span className="text-xs font-extrabold text-text-muted">{index + 1}</span>
+        )}
       </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <span style={{ fontWeight: 700, color: colors.text, fontSize: "0.875rem" }}>{lesson.title}</span>
-        {lesson.description && <p style={{ fontSize: "0.6875rem", color: colors.textMuted, marginTop: "0.125rem" }}>{lesson.description}</p>}
+      <div className="flex-1 min-w-0">
+        <span className="font-bold text-text text-sm group-hover:text-primary transition-colors">{lesson.title}</span>
+        {lesson.description && <p className="text-xs text-text-muted mt-0.5 truncate">{lesson.description}</p>}
       </div>
       {lesson.progress > 0 && !lesson.isCompleted && (
-        <span style={{ fontSize: "0.625rem", fontWeight: 700, color: colors.primary }}>{lesson.progress}%</span>
+        <span className="text-[10px] font-bold text-primary flex-shrink-0">{lesson.progress}%</span>
       )}
-      {xp && (
-        <span style={{ display: "flex", alignItems: "center", gap: "0.125rem", fontSize: "0.6875rem", fontWeight: 700, color: colors.warm, background: colors.warmSoft, padding: "0.125rem 0.375rem", borderRadius: 6 }}>
-          <Zap style={{ width: 10, height: 10 }} /> +{xp}
+      {xp ? (
+        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-gold bg-gold-soft/50 px-2 py-0.5 rounded-lg flex-shrink-0">
+          <Zap className="w-2.5 h-2.5" /> +{xp}
         </span>
-      )}
-      <ChevronRight style={{ width: 16, height: 16, color: colors.textMuted, flexShrink: 0 }} />
+      ) : null}
+      <ChevronRight className="w-4 h-4 text-text-muted flex-shrink-0 group-hover:text-primary transition-colors" />
     </Link>
   );
 }
