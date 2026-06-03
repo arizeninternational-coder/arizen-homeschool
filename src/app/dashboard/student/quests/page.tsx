@@ -4,9 +4,9 @@ export const dynamic = "force-dynamic";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ChevronRight, Lock, Trophy, Loader2 } from "lucide-react";
+import { ChevronRight, Lock, Trophy, Loader2, Swords } from "lucide-react";
 import { PageHeader, SectionHeader, GradientButton, ProgressBar, EmptyStateCard } from "@/components/ui/Pill";
-import { QuestIcon } from "@/components/ui/Illustrations";
+import { QuestIcon, CoinIcon } from "@/components/ui/Illustrations";
 import { cn } from "@/lib/utils/cn";
 
 export default function QuestsPage() {
@@ -54,12 +54,12 @@ export default function QuestsPage() {
         >
           <div className="flex items-center gap-2 mt-3">
             <div className="w-9 h-9 rounded-2xl bg-accent-purple-soft flex items-center justify-center">
-              <SwordsIcon size={18} />
+              <Swords size={18} />
             </div>
           </div>
         </PageHeader>
         <EmptyStateCard
-          icon={<div className="text-3xl">⚔️</div>}
+          icon={<Swords className="w-8 h-8" />}
           title="No quests yet"
           description="Quests will appear here when your admin publishes lessons. Check back soon or ask your admin to publish curriculum."
         />
@@ -75,7 +75,7 @@ export default function QuestsPage() {
       >
         <div className="flex items-center gap-3 mt-4 flex-wrap">
           <div className="w-9 h-9 rounded-2xl bg-accent-purple-soft flex items-center justify-center">
-            <SwordsIcon size={18} />
+            <Swords size={18} />
           </div>
           <div className="flex items-center gap-2 text-xs font-bold text-text-muted">
             <span className="px-3 py-1.5 rounded-full bg-accent-purple-soft text-accent-purple">
@@ -140,11 +140,9 @@ export default function QuestsPage() {
                 )}
                 <div className="flex items-center gap-3 text-xs font-semibold text-text-muted mb-3">
                   <span>{lessonCount} lesson{lessonCount !== 1 ? "s" : ""}</span>
-                  {xpReward > 0 && <span className="flex items-center gap-1">🪙 {xpReward} XP</span>}
+                  {xpReward > 0 && <span className="flex items-center gap-1"><CoinIcon size={12} /> {xpReward} XP</span>}
                 </div>
-                {progress > 0 && (
-                  <ProgressBar value={progress} max={100} color="bg-primary" height="h-2" />
-                )}
+                <ProgressBar value={progress} max={100} color="bg-primary" height="h-2" />
                 <div className="flex items-center justify-between mt-3">
                   <span className="text-xs font-bold text-primary flex items-center gap-1 group-hover:gap-2 transition-all">
                     Continue <ChevronRight className="w-3.5 h-3.5" />
@@ -197,7 +195,7 @@ export default function QuestsPage() {
                 )}
                 <div className="flex items-center gap-3 text-xs font-semibold text-text-muted">
                   <span>{lessonCount} lesson{lessonCount !== 1 ? "s" : ""}</span>
-                  {xpReward > 0 && <span>🪙 {xpReward} XP earned</span>}
+                  {xpReward > 0 && <span className="flex items-center gap-1"><CoinIcon size={12} /> {xpReward} XP earned</span>}
                 </div>
                 <div className="flex items-center justify-between mt-3">
                   <span className="text-xs font-bold text-secondary flex items-center gap-1">
@@ -211,55 +209,6 @@ export default function QuestsPage() {
       )}
 
       {/* ── Legacy grouped-by-themes view ── */}
-      {themes.length > 0 && themes.some((t: any) => t.quests.length > 0) && (
-        <SectionHeader title="All Themes" subtitle="Browse quests by theme" />
-      )}
-      {themes.map((theme: any) => (
-        <div key={theme.id} className="mb-8">
-          <h3 className="text-lg font-extrabold text-text mb-4">{theme.title}</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-            {theme.quests.map((quest: any, i: number) => {
-              const typeColor = quest.questType === "MAIN" ? "text-primary" : quest.questType === "SIDE" ? "text-gold" : "text-accent-purple";
-              const lessonCount = quest.lessons?.length || 0;
-              const xpReward = quest.xpReward
-                ? (typeof quest.xpReward === "object" ? (quest.xpReward?.base || 0) : (quest.xpReward || 0))
-                : 0;
-
-              return (
-                <Link
-                  key={quest.id}
-                  href={`/dashboard/student/lessons/${theme.slug}/${quest.slug}`}
-                  className={cn(
-                    "group flex items-center gap-4 rounded-2xl border border-border-soft bg-white p-4",
-                    "transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(15,23,42,0.06)]"
-                  )}
-                >
-                  <div className={cn(
-                    "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 font-extrabold text-sm",
-                    quest.isCompleted ? "bg-secondary-soft text-secondary" : "bg-primary-soft text-primary"
-                  )}>
-                    {quest.isCompleted ? "✓" : i + 1}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-bold text-text text-sm truncate">{quest.title}</div>
-                    {quest.description && (
-                      <div className="text-xs text-text-muted truncate mt-0.5">{quest.description}</div>
-                    )}
-                    <div className="text-[11px] font-semibold text-text-muted mt-1 flex gap-2">
-                      <span>{lessonCount} lesson{lessonCount !== 1 ? "s" : ""}</span>
-                      {xpReward > 0 && <span>🪙 {xpReward} XP</span>}
-                    </div>
-                  </div>
-                  <span className={cn("text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full flex-shrink-0", typeColor, "bg-bg-main")}>
-                    {quest.questType || "MAIN"}
-                  </span>
-                  <ChevronRight className="w-4 h-4 text-text-muted flex-shrink-0" />
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      ))}
     </div>
   );
 }

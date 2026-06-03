@@ -2,18 +2,18 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import {
   Users, Flame, Star, BookOpen, GraduationCap, LogOut, Link2,
-  CalendarCheck, ChevronRight, Award
+  CalendarCheck, ChevronRight, Award, Heart, Trophy, Target, Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { PageHeader, SectionHeader, GradientButton, StatCard, EmptyStateCard } from "@/components/ui/Pill";
 import { CoinIcon, StreakIcon, BookIcon } from "@/components/ui/Illustrations";
+import AvatarRenderer from "@/components/AvatarRenderer";
 
 export default function ParentDashboard() {
-  const pathname = usePathname();
   const [children, setChildren] = useState<any[]>([]);
+  const [checkins, setCheckins] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
@@ -24,33 +24,51 @@ export default function ParentDashboard() {
   async function loadChildren() {
     try {
       // GET /api/parent/link-child lists children linked to this parent
-      const [childrenRes, progressRes] = await Promise.all([
-        fetch("/api/parent/link-child", { credentials: "include" }),
-        fetch("/api/parent/progress", { credentials: "include" }),
-      ]);
-
-      // Defensive: check res.ok before parsing JSON
+      const childrenRes = await fetch("/api/parent/link-child", { credentials: "include" });
       let childList: any[] = [];
       if (childrenRes.ok) {
         const cData = await childrenRes.json();
         childList = cData.children || cData || [];
-      } else {
-        console.warn("[PARENT_DASHBOARD] link-child returned", childrenRes.status);
       }
 
+      // GET /api/parent/progress gets progress summaries
+      const progressRes = await fetch("/api/parent/progress", { credentials: "include" });
       let progressData: any[] = [];
       if (progressRes.ok) {
         const pData = await progressRes.json();
-        progressData = pData?.progress || [];
-      } else {
-        console.warn("[PARENT_DASHBOARD] progress returned", progressRes.status);
+        progressData = pData?.children || [];
       }
 
-      const merged = childList.map((child: any) => ({
-        ...child,
-        progress: progressData.find((p: any) => p.childId === child.id || p.learnerProfileId === child.learnerProfileId) || {},
-      }));
+      // Merge progress into children by matching child id
+      const merged = childList.map((child: any) => {
+        const progress = progressData.find(
+          (p: any) => p.id === child.id || p.learnerProfileId === child.learnerProfileId
+        ) || {};
+        return { ...child, ...progress, learnerProfileId: progress.learnerProfileId || child.learnerProfileId || child.id };
+      });
+
+      // Also include children from progress API
+      for (const p of progressData) {
+        if (!merged.find((m: any) => m.id === p.id || m.learnerProfileId === p.learnerProfileId)) {
+          merged.push(p);
+        }
+      }
+
       setChildren(merged);
+
+      // Fetch today's emotional check-ins for all linked children
+      try {
+        const checkinRes = await fetch("/api/parent/child-checkins", { credentials: "include" });
+        if (checkinRes.ok) {
+          const cData = await checkinRes.json();
+          const checkinMap: Record<string, any> = {};
+          for (const c of (cData.checkins || [])) {
+            const learnerId = c.learnerProfileId || c.learner?.id || c.learnerId;
+            if (learnerId) checkinMap[learnerId] = c;
+          }
+          setCheckins(checkinMap);
+        }
+      } catch {}
     } catch (e) {
       console.error("[PARENT_DASHBOARD] Error:", e);
       setError(true);
@@ -59,15 +77,18 @@ export default function ParentDashboard() {
     }
   }
 
-  const totalXp = children.reduce((sum, c) => sum + (c.progress?.totalXp || 0), 0);
-  const totalStreaks = children.reduce((sum, c) => sum + (c.progress?.currentStreak || 0), 0);
-  const totalLessons = children.reduce((sum, c) => sum + (c.progress?.completedLessons || 0), 0);
+  const totalXp = children.reduce((sum, c) => sum + (c.xp || c.totalXp || 0), 0);
+  const totalStreaks = children.reduce((sum, c) => sum + (c.streak || c.currentStreak || 0), 0);
+  const totalLessons = children.reduce((sum, c) => sum + (c.lessonsCompleted || 0), 0);
 
   if (loading) {
     return (
       <div className="min-h-screen bg-bg-main flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-4 border-secondary/20 border-t-secondary rounded-full spinner" />
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative w-12 h-12">
+            <div className="absolute inset-0 rounded-full border-[3px] border-secondary/15" />
+            <div className="absolute inset-0 rounded-full border-[3px] border-transparent border-t-secondary animate-spin" />
+          </div>
           <p className="text-sm font-bold text-text-muted">Loading your dashboard...</p>
         </div>
       </div>
@@ -111,7 +132,7 @@ export default function ParentDashboard() {
               href={tab.href}
               className={cn(
                 "px-4 py-3 text-sm font-bold border-b-2 transition-colors whitespace-nowrap",
-                pathname === tab.href
+                tab.href === "/dashboard/parent"
                   ? "border-secondary text-secondary-dark"
                   : "border-transparent text-text-muted hover:text-text"
               )}
@@ -129,44 +150,16 @@ export default function ParentDashboard() {
               <LogOut className="w-8 h-8 text-red-500" />
             </div>
             <h3 className="text-lg font-bold text-text mb-2">Failed to load data</h3>
-            <GradientButton variant="primary" onClick={loadChildren}>Try Again</GradientButton>
+            <GradientButton variant="primary" onClick={() => { setError(false); setLoading(true); loadChildren(); }}>Try Again</GradientButton>
           </div>
         ) : (
           <>
             {/* Stat Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <StatCard
-                label="Children"
-                value={children.length}
-                icon={<Users className="w-5 h-5 text-secondary" />}
-                gradient="bg-card-gradient-green"
-                borderColor="border-secondary/15"
-                textColor="text-secondary-dark"
-              />
-              <StatCard
-                label="Active Streaks"
-                value={`${totalStreaks}d`}
-                icon={<Flame className="w-5 h-5 text-pink" />}
-                gradient="bg-card-gradient-pink"
-                borderColor="border-pink/15"
-                textColor="text-pink"
-              />
-              <StatCard
-                label="Total XP"
-                value={totalXp.toLocaleString()}
-                icon={<Star className="w-5 h-5 text-gold" />}
-                gradient="bg-card-gradient-gold"
-                borderColor="border-gold/15"
-                textColor="text-amber-700"
-              />
-              <StatCard
-                label="Lessons Done"
-                value={totalLessons}
-                icon={<BookIcon size={20} className="text-accent-blue" />}
-                gradient="bg-card-gradient-blue"
-                borderColor="border-accent-blue/15"
-                textColor="text-accent-blue"
-              />
+              <StatCard label="Children" value={children.length} icon={<Users className="w-5 h-5 text-secondary" />} gradient="bg-card-gradient-green" borderColor="border-secondary/15" textColor="text-secondary-dark" />
+              <StatCard label="Active Streaks" value={`${totalStreaks}d`} icon={<Flame className="w-5 h-5 text-pink" />} gradient="bg-card-gradient-pink" borderColor="border-pink/15" textColor="text-pink" />
+              <StatCard label="Total XP" value={totalXp.toLocaleString()} icon={<Star className="w-5 h-5 text-gold" />} gradient="bg-card-gradient-gold" borderColor="border-gold/15" textColor="text-amber-700" />
+              <StatCard label="Lessons Done" value={totalLessons} icon={<BookIcon size={20} className="text-accent-blue" />} gradient="bg-card-gradient-blue" borderColor="border-accent-blue/15" textColor="text-accent-blue" />
             </div>
 
             {/* My Children */}
@@ -197,57 +190,101 @@ export default function ParentDashboard() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {children.map((child) => {
-                  const p = child.progress || {};
-                  return (
-                    <div
-                      key={child.id || child.email}
-                      className="rounded-[1.5rem] border border-border-soft bg-white p-5 hover:shadow-[0_8px_25px_rgba(0,0,0,0.06)] transition-all duration-200"
-                    >
-                      <div className="flex items-start gap-4 mb-4">
-                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-accent-purple flex items-center justify-center text-white text-lg font-extrabold shadow-md flex-shrink-0">
-                          {(child.name || child.displayName || "C").charAt(0).toUpperCase()}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="text-base font-bold text-text truncate">{child.name || child.displayName || "Student"}</h3>
-                          <p className="text-xs text-text-muted">Grade {child.grade || "—"}</p>
-                        </div>
-                        <span className="px-2.5 py-1 rounded-full bg-accent-purple-soft text-accent-purple text-[10px] font-extrabold uppercase tracking-wider">
-                          Level {Math.floor((p.totalXp || 0) / 100) + 1}
-                        </span>
+                {children.map((child) => (
+                  <div
+                    key={child.id || child.learnerProfileId}
+                    className="rounded-[1.5rem] border border-border-soft bg-white p-5 hover:shadow-[0_8px_25px_rgba(0,0,0,0.06)] transition-all duration-200"
+                  >
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/10 to-accent-purple/10 flex items-center justify-center shadow-md flex-shrink-0 overflow-hidden">
+                        <AvatarRenderer size="xs" skinHex="#C68642" hairColorHex="#1a1a1a" hairStyle="short-curls" outfitHex="#4F46E5" shoeHex="#37474F" expression="happy" />
                       </div>
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gold-soft/50 border border-gold/15">
-                          <CoinIcon size={12} />
-                          <span className="text-[11px] font-extrabold text-amber-800">{p.coins || 0}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-pink-soft/50 border border-pink/15">
-                          <StreakIcon size={12} />
-                          <span className="text-[11px] font-extrabold text-pink-700">{p.currentStreak || 0}d</span>
-                        </div>
-                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-accent-blue-soft/50 border border-accent-blue/15">
-                          <BookOpen className="w-3 h-3 text-accent-blue" />
-                          <span className="text-[11px] font-extrabold text-accent-blue">{p.completedLessons || 0} lessons</span>
-                        </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-base font-bold text-text truncate">{child.name || child.displayName || "Student"}</h3>
+                        <p className="text-xs text-text-muted">Grade {child.grade || "—"}</p>
                       </div>
-                      <Link href="/dashboard/parent/progress" className="block">
+                      <span className="px-2.5 py-1 rounded-full bg-accent-purple-soft text-accent-purple text-[10px] font-extrabold uppercase tracking-wider">
+                        Level {Math.floor((child.xp || child.totalXp || 0) / 100) + 1}
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5 mb-4">
+                      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gold-soft/50 border border-gold/15">
+                        <CoinIcon size={12} />
+                        <span className="text-[11px] font-extrabold text-amber-800">{child.coins || 0}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-pink-soft/50 border border-pink/15">
+                        <StreakIcon size={12} />
+                        <span className="text-[11px] font-extrabold text-pink-700">{child.streak || child.currentStreak || 0}d</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-accent-blue-soft/50 border border-accent-blue/15">
+                        <BookOpen className="w-3 h-3 text-accent-blue" />
+                        <span className="text-[11px] font-extrabold text-accent-blue">{child.lessonsCompleted || 0} lessons</span>
+                      </div>
+                    </div>
+                    {/* Emotional check-in */}
+                    <div className="px-3 py-2 rounded-xl bg-bg-main/80 border border-border-soft/50">
+                      {checkins[child.learnerProfileId || child.id] ? (
+                        <div className="flex items-center gap-2">
+                          <Heart className="w-3.5 h-3.5 text-secondary flex-shrink-0" />
+                          <span className="text-[11px] font-bold text-text">
+                            Feeling <span className="text-secondary-dark">{checkins[child.learnerProfileId || child.id].emotionLabel || "good"}</span> today
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <Heart className="w-3.5 h-3.5 text-text-muted flex-shrink-0" />
+                          <span className="text-[11px] text-text-muted italic">No check-in yet today</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex gap-2">
+                      <Link href="/dashboard/parent/progress" className="flex-1">
                         <GradientButton variant="outline" size="sm" className="w-full" icon={<Award className="w-4 h-4" />}>
                           View Progress
                         </GradientButton>
                       </Link>
+                      <Link href="/dashboard/parent/lessons" className="flex-1">
+                        <GradientButton variant="secondary" size="sm" className="w-full" icon={<BookOpen className="w-4 h-4" />}>
+                          Lessons
+                        </GradientButton>
+                      </Link>
                     </div>
-                  );
-                })}
+                  </div>
+                ))}
               </div>
             )}
 
             {/* Recent Activity */}
             <SectionHeader title="Recent Activity" subtitle="Latest progress across your children" />
-            <div className="rounded-[1.75rem] border border-border-soft bg-white p-8 text-center">
-              <CalendarCheck className="w-8 h-8 text-text-muted mx-auto mb-3" />
-              <h3 className="text-sm font-bold text-text mb-1">Activity feed coming soon</h3>
-              <p className="text-xs text-text-muted">You&apos;ll see your children&apos;s latest learning activity here.</p>
-            </div>
+            {children.some(c => c.recentActivity && c.recentActivity.length > 0) ? (
+              <div className="space-y-3">
+                {children.map((child) => (
+                  (child.recentActivity || []).slice(0, 3).map((activity: any, i: number) => (
+                    <div key={`${child.id}-${i}`} className="rounded-[1.25rem] border border-border-soft bg-white p-4 flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-xl bg-primary-soft flex items-center justify-center flex-shrink-0">
+                        <BookOpen className="w-5 h-5 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-text truncate">{child.name || child.displayName}</p>
+                        <p className="text-xs text-text-muted">
+                          {activity.completedAt ? "Completed" : "Worked on"} a lesson
+                          {activity.lastAccessed && ` • ${new Date(activity.lastAccessed).toLocaleDateString()}`}
+                        </p>
+                      </div>
+                      {activity.completedAt && (
+                        <span className="px-2.5 py-1 rounded-full bg-secondary-soft text-secondary-dark text-[10px] font-extrabold">Done</span>
+                      )}
+                    </div>
+                  ))
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-[1.75rem] border border-border-soft bg-white p-8 text-center">
+                <CalendarCheck className="w-8 h-8 text-text-muted mx-auto mb-3" />
+                <h3 className="text-sm font-bold text-text mb-1">No recent activity yet</h3>
+                <p className="text-xs text-text-muted">Activity will appear here as your children complete lessons.</p>
+              </div>
+            )}
           </>
         )}
       </main>

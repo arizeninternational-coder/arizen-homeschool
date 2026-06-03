@@ -71,9 +71,9 @@ export async function GET(req: NextRequest) {
     if (profile?.id && filtered.length > 0) {
       const lessonIds = filtered.map((l: any) => l.id);
       const { data: progress } = await supabase
-        .from("LessonProgress")
-        .select("lessonId, status, completedAt")
-        .eq("learnerProfileId", profile.id)
+        .from("Progress")
+        .select("lessonId, completedAt")
+        .eq("learnerId", profile.id)
         .in("lessonId", lessonIds);
 
       const progressMap = new Map((progress || []).map((p: any) => [p.lessonId, p]));

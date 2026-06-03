@@ -23,12 +23,12 @@ const SUBJECT_ICONS: Record<string, React.ElementType> = {
 };
 
 const CARD_COLORS = [
-  { bg: "bg-accent-blue/10", border: "border-accent-blue/25", iconBg: "bg-accent-blue/20", iconColor: "text-accent-blue", accent: "#3BA7FF" },
-  { bg: "bg-primary/10", border: "border-primary/25", iconBg: "bg-primary/20", iconColor: "text-primary", accent: "#4F46E5" },
-  { bg: "bg-secondary/10", border: "border-secondary/25", iconBg: "bg-secondary/20", iconColor: "text-secondary", accent: "#00A884" },
-  { bg: "bg-accent-purple/10", border: "border-accent-purple/25", iconBg: "bg-accent-purple/20", iconColor: "text-accent-purple", accent: "#8B5CF6" },
-  { bg: "bg-gold/10", border: "border-gold/25", iconBg: "bg-gold/20", iconColor: "text-gold", accent: "#F5A524" },
-  { bg: "bg-pink/10", border: "border-pink/25", iconBg: "bg-pink/20", iconColor: "text-pink", accent: "#FF5C8A" },
+  { bg: "bg-accent-blue/10", border: "border-accent-blue/25", iconBg: "bg-accent-blue/20", iconColor: "text-accent-blue", gradient: "bg-gradient-to-r from-accent-blue to-accent-blue/80" },
+  { bg: "bg-primary/10", border: "border-primary/25", iconBg: "bg-primary/20", iconColor: "text-primary", gradient: "bg-gradient-to-r from-primary to-primary/80" },
+  { bg: "bg-secondary/10", border: "border-secondary/25", iconBg: "bg-secondary/20", iconColor: "text-secondary", gradient: "bg-gradient-to-r from-secondary to-secondary/80" },
+  { bg: "bg-accent-purple/10", border: "border-accent-purple/25", iconBg: "bg-accent-purple/20", iconColor: "text-accent-purple", gradient: "bg-gradient-to-r from-accent-purple to-accent-purple/80" },
+  { bg: "bg-gold/10", border: "border-gold/25", iconBg: "bg-gold/20", iconColor: "text-gold", gradient: "bg-gradient-to-r from-gold to-gold/80" },
+  { bg: "bg-pink/10", border: "border-pink/25", iconBg: "bg-pink/20", iconColor: "text-pink", gradient: "bg-gradient-to-r from-pink to-pink/80" },
 ];
 
 interface SubjectData {
@@ -147,10 +147,7 @@ export default function SubjectsPage() {
           const cardContent = (
             <>
               {/* Color banner at top */}
-              <div
-                className="h-2 rounded-t-[1.4rem] -mx-5 -mt-5 mb-4"
-                style={{ background: `linear-gradient(135deg, ${color.accent}, ${color.accent}aa)` }}
-              />
+              <div className={`h-2 rounded-t-[1.4rem] -mx-5 -mt-5 mb-4 ${color.gradient}`} />
 
               {/* Icon */}
               <div className={`w-14 h-14 rounded-2xl ${color.iconBg} flex items-center justify-center mb-4`}>
@@ -169,7 +166,7 @@ export default function SubjectsPage() {
 
               {/* Action */}
               {hasLessons ? (
-                <div className="flex items-center gap-1.5 text-xs font-bold" style={{ color: color.accent }}>
+                <div className={`flex items-center gap-1.5 text-xs font-bold ${color.iconColor}`}>
                   <GraduationCap size={14} />
                   Open subject →
                 </div>

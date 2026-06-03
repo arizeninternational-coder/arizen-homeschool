@@ -73,7 +73,10 @@ export default function LeaderboardPage() {
     return (
       <div className="flex items-center justify-center min-h-[60vh] animate-fade-in">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+          <div className="relative w-10 h-10">
+            <div className="absolute inset-0 rounded-full border-[3px] border-primary/15" />
+            <div className="absolute inset-0 rounded-full border-[3px] border-transparent border-t-primary animate-spin" />
+          </div>
           <p className="text-sm font-bold text-text-muted">Loading leaderboard...</p>
         </div>
       </div>

@@ -96,7 +96,13 @@ export default function ReflectionsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="w-10 h-10 rounded-full border-4 border-pink/20 border-t-pink spinner" />
+        <div className="flex flex-col items-center gap-3">
+          <div className="relative w-10 h-10">
+            <div className="absolute inset-0 rounded-full border-[3px] border-pink/15" />
+            <div className="absolute inset-0 rounded-full border-[3px] border-transparent border-t-pink animate-spin" />
+          </div>
+          <p className="text-sm font-bold text-text-muted">Loading reflections...</p>
+        </div>
       </div>
     );
   }
@@ -115,8 +121,7 @@ export default function ReflectionsPage() {
       </PageHeader>
 
       {/* ── New Reflection Form ── */}
-      <div className="relative rounded-[1.75rem] border border-pink/20 p-6 mb-6 overflow-hidden"
-        style={{ background: "linear-gradient(135deg, #FFF1F2 0%, #FFF0F6 50%, #FFE4EC 100%)" }}>
+      <div className="relative rounded-[1.75rem] border border-pink/20 p-6 mb-6 overflow-hidden bg-card-gradient-pink shadow-[0_8px_25px_rgba(255,92,138,0.06)]">
         <div className="absolute top-3 right-5 opacity-20">
           <Heart className="w-16 h-16 text-pink" />
         </div>
@@ -180,7 +185,12 @@ export default function ReflectionsPage() {
                 className={cn(
                   "rounded-[1.25rem] border bg-white p-5 transition-all duration-200",
                   "hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(15,23,42,0.06)]",
-                  moodConfig ? `border-${moodConfig.color.replace("text-", "")}/20` : "border-border-soft"
+                  moodConfig?.color === "text-red-500" ? "border-red-200" :
+                  moodConfig?.color === "text-amber-500" ? "border-amber-200" :
+                  moodConfig?.color === "text-blue-500" ? "border-blue-200" :
+                  moodConfig?.color === "text-emerald-500" ? "border-emerald-200" :
+                  moodConfig?.color === "text-pink" ? "border-pink/20" :
+                  "border-border-soft"
                 )}
               >
                 <div className="flex items-start justify-between gap-2 mb-2">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { GraduationCap, Star, Trophy, Flame, BookOpen, Palette } from "lucide-react";
 import { PageHeader, SectionHeader, StatCard, GradientButton, ProgressBar, EmptyStateCard } from "@/components/ui/Pill";
 import { CoinIcon, StreakIcon } from "@/components/ui/Illustrations";
@@ -17,7 +18,19 @@ export default function StudentProfile() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="flex items-center justify-center min-h-[40vh]"><div className="w-10 h-10 rounded-full border-4 border-primary/20 border-t-primary spinner" /></div>;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative w-12 h-12">
+            <div className="absolute inset-0 rounded-full border-[3px] border-primary/15" />
+            <div className="absolute inset-0 rounded-full border-[3px] border-transparent border-t-primary animate-spin" />
+          </div>
+          <p className="text-text-muted font-bold text-sm">Loading your profile...</p>
+        </div>
+      </div>
+    );
+  }
 
   const totalXp = profile?.totalXp || 0;
   const currentStreak = profile?.currentStreak || 0;
@@ -31,9 +44,9 @@ export default function StudentProfile() {
       <PageHeader title="My Profile" subtitle="Your learning journey at a glance" />
 
       {/* Profile Card */}
-      <div className="rounded-[20px] border border-primary/10 bg-white p-6 lg:p-8" style={{ background: "linear-gradient(135deg, #EEF2FF 0%, #FDF4FF 100%)" }}>
+      <div className="rounded-[20px] border border-primary/10 bg-card-gradient-purple p-6 lg:p-8 shadow-[0_8px_25px_rgba(79,70,229,0.06)]">
         <div className="flex flex-col sm:flex-row items-center gap-6">
-          <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-white text-3xl font-extrabold shadow-lg">
+          <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-primary to-accent-purple flex items-center justify-center text-white text-3xl font-extrabold shadow-lg">
             {(profile?.name || "S").charAt(0).toUpperCase()}
           </div>
           <div className="text-center sm:text-left flex-1">
@@ -50,9 +63,11 @@ export default function StudentProfile() {
               </div>
             </div>
           </div>
-          <GradientButton variant="primary" size="sm" icon={<Palette className="w-4 h-4" />}>
-            Edit Profile
-          </GradientButton>
+          <Link href="/dashboard/student/settings">
+            <GradientButton variant="secondary" size="sm" icon={<Palette className="w-4 h-4" />}>
+              Settings
+            </GradientButton>
+          </Link>
         </div>
       </div>
 

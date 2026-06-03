@@ -66,9 +66,11 @@ export const GET = withAuth(async (req: NextRequest, user: any) => {
     const result = [
       ...(checkins || []).map((c: any) => ({
         childName: c.learner?.displayName || c.learner?.user?.name || "Your child",
+        learnerProfileId: c.learner?.id || null,
         emotion: c.emotion,
         emotionLabel: c.emotionLabel,
         checkedIn: true,
+        createdAt: c.createdAt,
       })),
       ...childrenWithoutCheckin,
     ];
