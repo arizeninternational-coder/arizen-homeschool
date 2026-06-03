@@ -1,7 +1,6 @@
 // GET /api/learner/subjects — Get subjects for the current learner's grade
-// Returns ALL themes for the learner's grade (regardless of publish status)
-// but only counts PUBLISHED lessons — so students see their subjects even
-// when no lessons are published yet
+// Uses ThemeSubject table as the canonical source of subject names
+// Only counts PUBLISHED lessons for lesson counts
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { getAuthUser } from "@/lib/api-guard";
@@ -21,7 +20,7 @@ export async function GET(req: NextRequest) {
 
     const learnerGrade = profile?.grade || null;
 
-    // Fetch ALL themes for this grade (regardless of status)
+    // Fetch themes for this grade (any status — so subjects show even without published content)
     let themeQuery = supabase
       .from("Theme")
       .select("id, title, slug, grade, status")
@@ -37,13 +36,13 @@ export async function GET(req: NextRequest) {
 
     const themeIds = themes.map(t => t.id);
 
-    // Fetch theme subjects
+    // Fetch canonical subject mappings from ThemeSubject
     const { data: themeSubjects } = await supabase
       .from("ThemeSubject")
       .select("themeId, subject")
       .in("themeId", themeIds);
 
-    // Fetch only PUBLISHED quests for these themes
+    // Fetch PUBLISHED quests for these themes
     const { data: quests } = await supabase
       .from("Quest")
       .select("id, themeId")
@@ -52,7 +51,7 @@ export async function GET(req: NextRequest) {
 
     const questIds = (quests || []).map(q => q.id);
 
-    // Fetch only PUBLISHED lessons for these quests
+    // Fetch PUBLISHED lessons for these quests
     const { data: lessons } = await supabase
       .from("Lesson")
       .select("id, questId")
@@ -71,51 +70,50 @@ export async function GET(req: NextRequest) {
       lessonsByQuest.set(l.questId, (lessonsByQuest.get(l.questId) || 0) + 1);
     }
 
-    const questsByTheme = new Map<string, any[]>();
+    const questsByTheme = new Map<string, string[]>();
     for (const q of (quests || [])) {
       if (!questsByTheme.has(q.themeId)) questsByTheme.set(q.themeId, []);
-      questsByTheme.get(q.themeId)!.push(q);
+      questsByTheme.get(q.themeId)!.push(q.id);
     }
 
-    // Build subject list from ALL themes (not just published)
+    // Build subject list from canonical ThemeSubject data only
     const subjectMap = new Map<string, any>();
+
     for (const theme of themes) {
+      // Use ONLY the canonical subject from ThemeSubject — never parse from title
       const themeSubjectsList = subjectsByTheme.get(theme.id) || [];
-      let subjectName = themeSubjectsList[0] || "";
 
-      // Fallback: parse from theme title
-      if (!subjectName) {
-        const parts = (theme.title || "").split(" ");
-        if (parts.length >= 3) subjectName = parts.slice(2).join(" ");
-        else if (parts.length === 2) subjectName = parts[1];
-      }
-      if (!subjectName) subjectName = theme.title || "Subject";
+      for (const subjectName of themeSubjectsList) {
+        const gradeNum = theme.grade || 0;
+        const mapKey = `${gradeNum}-${subjectName}`;
 
-      const gradeNum = theme.grade || 0;
-      const mapKey = `${gradeNum}-${subjectName}`;
+        // Count published lessons for this theme
+        const themeQuests = questsByTheme.get(theme.id) || [];
+        const publishedLessonCount = themeQuests.reduce(
+          (sum, qId) => sum + (lessonsByQuest.get(qId) || 0), 0
+        );
 
-      // Count only published lessons
-      const themeQuests = questsByTheme.get(theme.id) || [];
-      const publishedLessonCount = themeQuests.reduce(
-        (sum, q) => sum + (lessonsByQuest.get(q.id) || 0), 0
-      );
-
-      if (!subjectMap.has(mapKey)) {
-        subjectMap.set(mapKey, {
-          id: `${subjectName.toLowerCase().replace(/\s+/g, "-")}-${gradeNum}`,
-          name: subjectName,
-          grade: gradeNum,
-          themeSlug: theme.slug,
-          themeId: theme.id,
-          lessonCount: publishedLessonCount,
-        });
-      } else {
-        subjectMap.get(mapKey)!.lessonCount += publishedLessonCount;
+        if (!subjectMap.has(mapKey)) {
+          subjectMap.set(mapKey, {
+            id: `${subjectName.toLowerCase().replace(/\s+/g, "-")}-${gradeNum}`,
+            name: subjectName,
+            grade: gradeNum,
+            themeSlug: theme.slug,
+            themeId: theme.id,
+            lessonCount: publishedLessonCount,
+          });
+        } else {
+          subjectMap.get(mapKey)!.lessonCount += publishedLessonCount;
+        }
       }
     }
+
+    // If no ThemeSubject records exist yet, return empty rather than parsing titles
+    // This prevents broken subject names from appearing
+    const subjects = Array.from(subjectMap.values());
 
     return NextResponse.json({
-      subjects: Array.from(subjectMap.values()),
+      subjects,
       grade: learnerGrade,
     });
   } catch (err: any) {
