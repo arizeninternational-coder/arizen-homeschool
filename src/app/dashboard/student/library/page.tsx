@@ -76,8 +76,8 @@ export default function LibraryPage() {
       ) : (
         <div className="space-y-6">
           {Array.from(lessonsBySubject.entries()).map(([key, subj]) => (
-            <div key={key} className="rounded-[1.75rem] border border-border-soft bg-white overflow-hidden">
-              <div className="px-5 py-4 border-b border-border-soft flex items-center justify-between">
+            <div key={key} className="rounded-[1.75rem] border border-white/60 bg-white overflow-hidden">
+              <div className="px-5 py-4 border-b border-white/60 flex items-center justify-between">
                 <div>
                   <h3 className="font-extrabold text-text">{subj.name}</h3>
                   <p className="text-xs text-text-muted">Grade {subj.grade || "—"} • {subj.lessons.length} resource{subj.lessons.length !== 1 ? "s" : ""}</p>
@@ -86,7 +86,7 @@ export default function LibraryPage() {
                   View Subject <ChevronRight className="w-3 h-3" />
                 </Link>
               </div>
-              <div className="divide-y divide-border-soft/50">
+              <div className="divide-y divide-white/30">
                 {subj.lessons.map((lesson: any) => {
                   const xp = lesson.xpReward?.base || lesson.xpReward?.amount || (typeof lesson.xpReward === "number" ? lesson.xpReward : 0);
                   return (
@@ -113,7 +113,7 @@ export default function LibraryPage() {
       )}
 
       {subjects.length > 0 && !hasContent && (
-        <div className="rounded-[1.75rem] border border-border-soft bg-white p-5">
+        <div className="rounded-[1.75rem] border border-white/60 bg-white p-5">
           <h3 className="font-extrabold text-text mb-3">Your Subjects</h3>
           <p className="text-xs text-text-muted mb-4">These subjects don't have published lessons yet. Check back soon!</p>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -121,7 +121,7 @@ export default function LibraryPage() {
               <Link
                 key={s.id}
                 href="/dashboard/student/subjects"
-                className="flex items-center gap-2.5 p-3 rounded-xl border border-border-soft hover:border-primary/20 hover:bg-primary-soft/30 transition-all"
+                className="flex items-center gap-2.5 p-3 rounded-xl border border-white/60 hover:border-primary/20 hover:bg-primary-soft/30 transition-all"
               >
                 <div className="w-8 h-8 rounded-lg bg-secondary-soft flex items-center justify-center flex-shrink-0">
                   <GraduationCap className="w-4 h-4 text-secondary" />

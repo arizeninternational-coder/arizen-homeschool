@@ -156,10 +156,10 @@ export default function StudentMessagesPage() {
     <div className="flex h-[calc(100vh-4rem)] overflow-hidden animate-fade-in">
       {/* Sidebar */}
       <div className={cn(
-        "w-full sm:w-[300px] border-r border-border-soft bg-white flex flex-col flex-shrink-0",
+        "w-full sm:w-[300px] border-r border-white/40 bg-white flex flex-col flex-shrink-0",
         activeConv && !showSidebar ? "hidden sm:flex" : "flex"
       )}>
-        <div className="p-4 border-b border-border-soft bg-white sticky top-0 z-10">
+        <div className="p-4 border-b border-white/40 bg-white sticky top-0 z-10">
           <div className="flex items-center justify-between mb-1">
             <h2 className="text-lg font-extrabold text-text">Messages</h2>
             <button
@@ -173,7 +173,7 @@ export default function StudentMessagesPage() {
         </div>
 
         {showNewConv && (
-          <div className="p-4 border-b border-border-soft bg-primary/5">
+          <div className="p-4 border-b border-white/40 bg-primary/5">
             <h3 className="text-sm font-bold text-text mb-3">Start a conversation</h3>
             {members.length === 0 ? (
               <p className="text-xs text-text-muted">No contacts available.</p>
@@ -183,7 +183,7 @@ export default function StudentMessagesPage() {
                   <button
                     key={m.id}
                     onClick={() => startConversation(m.id)}
-                    className="w-full flex items-center gap-3 p-3 rounded-xl bg-white border border-border-soft hover:border-primary/30 transition-all text-left"
+                    className="w-full flex items-center gap-3 p-3 rounded-xl bg-white border border-white/60 hover:border-primary/30 transition-all text-left"
                   >
                     <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-accent-purple flex items-center justify-center text-white text-sm font-bold">
                       {(m.name || "U").charAt(0)}
@@ -218,7 +218,7 @@ export default function StudentMessagesPage() {
                 key={conv.id}
                 onClick={() => { setActiveConv(conv); setShowSidebar(false); }}
                 className={cn(
-                  "w-full p-4 border-b border-border-soft/50 flex items-center gap-3 transition-all text-left hover:bg-primary/5",
+                  "w-full p-4 border-b border-white/40/50 flex items-center gap-3 transition-all text-left hover:bg-primary/5",
                   activeConv?.id === conv.id && "bg-primary/5 border-l-4 border-l-primary"
                 )}
               >
@@ -250,7 +250,7 @@ export default function StudentMessagesPage() {
         {activeConv ? (
           <>
             {/* Header */}
-            <div className="p-4 border-b border-border-soft bg-white flex items-center gap-3">
+            <div className="p-4 border-b border-white/40 bg-white flex items-center gap-3">
               <button
                 onClick={() => { setActiveConv(null); setShowSidebar(true); }}
                 className="sm:hidden p-1.5 rounded-lg hover:bg-bg-main text-text-muted"
@@ -281,7 +281,7 @@ export default function StudentMessagesPage() {
                       "max-w-[75%] px-4 py-2.5 rounded-2xl text-sm",
                       isMine
                         ? "bg-primary text-white rounded-br-md"
-                        : "bg-white border border-border-soft text-text rounded-bl-md shadow-sm"
+                        : "bg-white border border-white/60 text-text rounded-bl-md shadow-sm"
                     )}>
                       <p>{msg.body}</p>
                       <p className={cn(
@@ -298,7 +298,7 @@ export default function StudentMessagesPage() {
             </div>
 
             {/* Input */}
-            <div className="p-4 border-t border-border-soft bg-white">
+            <div className="p-4 border-t border-white/40 bg-white">
               <div className="flex items-center gap-2">
                 <input
                   type="text"
@@ -306,7 +306,7 @@ export default function StudentMessagesPage() {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && sendMessage()}
                   placeholder="Type a message..."
-                  className="flex-1 px-4 py-3 rounded-2xl border border-border-soft bg-bg-main text-sm text-text placeholder:text-text-muted focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/10"
+                  className="flex-1 px-4 py-3 rounded-2xl border border-white/60 bg-bg-main text-sm text-text placeholder:text-text-muted focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/10"
                 />
                 <button
                   onClick={sendMessage}

@@ -72,7 +72,7 @@ export default function AdminUsersPage() {
           <Link href="/dashboard/admin" className="inline-flex items-center gap-2 text-text-muted hover:text-text text-sm font-semibold transition-colors">
             <ArrowLeft className="w-4 h-4" /> Back to Admin Dashboard
           </Link>
-          <button onClick={() => signOut({ callbackUrl: "/" })} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border-soft text-text-muted hover:bg-white hover:border-primary/30 cursor-pointer text-xs font-semibold transition-all">
+          <button onClick={() => signOut({ callbackUrl: "/" })} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/60 text-text-muted hover:bg-white hover:border-primary/30 cursor-pointer text-xs font-semibold transition-all">
             Sign Out
           </button>
         </div>
@@ -100,7 +100,7 @@ export default function AdminUsersPage() {
             placeholder="Search users by name or email..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-2xl text-sm font-medium text-text bg-white border border-border-soft placeholder:text-text-muted/60 focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all"
+            className="w-full pl-10 pr-4 py-2.5 rounded-2xl text-sm font-medium text-text bg-white border border-white/60 placeholder:text-text-muted/60 focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all"
           />
         </div>
 
@@ -113,7 +113,7 @@ export default function AdminUsersPage() {
 
         {/* Content */}
         {loading ? (
-          <div className="rounded-[1.75rem] border border-border-soft bg-white p-12 text-center">
+          <div className="rounded-[1.75rem] border border-white/60 bg-white p-12 text-center">
             <Loader2 className="w-8 h-8 text-primary animate-spin mx-auto mb-3" />
             <p className="text-text-muted text-sm font-medium">Loading users...</p>
           </div>
@@ -130,7 +130,7 @@ export default function AdminUsersPage() {
               const roleColor = u.role === "ADMIN" ? "text-gold" : u.role === "PARENT" ? "text-accent-purple" : "text-emerald-600";
               const roleBg = u.role === "ADMIN" ? "bg-amber-50" : u.role === "PARENT" ? "bg-primary-soft" : "bg-emerald-50";
               return (
-                <div key={u.id} className="rounded-[1.75rem] border border-border-soft bg-white p-4 flex items-center gap-4 hover:shadow-[0_4px_20px_rgba(15,23,42,0.06)] transition-all">
+                <div key={u.id} className="rounded-[1.75rem] border border-white/60 bg-white p-4 flex items-center gap-4 hover:shadow-[0_4px_20px_rgba(15,23,42,0.06)] transition-all">
                   <div className={`w-11 h-11 rounded-full ${roleBg} flex items-center justify-center flex-shrink-0`}>
                     <RoleIcon className={`w-5 h-5 ${roleColor}`} />
                   </div>

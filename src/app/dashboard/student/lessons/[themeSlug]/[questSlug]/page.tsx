@@ -97,7 +97,7 @@ export default function QuestDetailPage({ params }: { params: Promise<{ themeSlu
       <h2 className="text-lg font-extrabold text-text mb-4">Lessons</h2>
 
       {lessons.length === 0 ? (
-        <div className="rounded-2xl border border-border-soft bg-white text-center p-8">
+        <div className="rounded-2xl border border-white/60 bg-white text-center p-8">
           <p className="text-sm text-text-muted">No lessons available in this quest yet.</p>
         </div>
       ) : (
@@ -115,7 +115,7 @@ function LessonCard({ lesson, index, themeSlug, questSlug }: { lesson: Lesson; i
   const xp = typeof lesson.xpReward === "object" ? (lesson.xpReward as any)?.base : lesson.xpReward;
 
   return (
-    <Link href={`/dashboard/student/lessons/${themeSlug}/${questSlug}/${lesson.slug}`} className="rounded-2xl border border-border-soft bg-white p-4 flex items-center gap-3 hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(0,0,0,0.06)] transition-all duration-200 no-underline group">
+    <Link href={`/dashboard/student/lessons/${themeSlug}/${questSlug}/${lesson.slug}`} className="rounded-2xl border border-white/60 bg-white p-4 flex items-center gap-3 hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(0,0,0,0.06)] transition-all duration-200 no-underline group">
       <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 ${
         lesson.isCompleted ? "bg-secondary-soft" : lesson.progress > 0 ? "bg-primary-soft" : "bg-bg-main"
       }`}>

@@ -93,8 +93,8 @@ export default function CalendarPage() {
       <PageHeader title="Calendar" subtitle="Your learning schedule this week" />
 
       {/* Weekly Grid */}
-      <div className="rounded-[1.75rem] border border-border-soft bg-white overflow-hidden">
-        <div className="grid grid-cols-7 divide-x divide-border-soft/50">
+      <div className="rounded-[1.75rem] border border-white/60 bg-white overflow-hidden">
+        <div className="grid grid-cols-7 divide-x divide-white/30">
           {weekDays.map((day, i) => {
             const today = isToday(day);
             const hasCheckin = checkinDays.has(day.toDateString());
@@ -142,7 +142,7 @@ export default function CalendarPage() {
       </div>
 
       {/* This Week's Goals */}
-      <div className="rounded-[1.75rem] border border-border-soft bg-white p-5 lg:p-6">
+      <div className="rounded-[1.75rem] border border-white/60 bg-white p-5 lg:p-6">
         <h3 className="font-extrabold text-text mb-4 flex items-center gap-2">
           <Target className="w-5 h-5 text-primary" />
           This Week&apos;s Goals
@@ -175,7 +175,7 @@ export default function CalendarPage() {
       </div>
 
       {/* Upcoming Lessons */}
-      <div className="rounded-[1.75rem] border border-border-soft bg-white p-5 lg:p-6">
+      <div className="rounded-[1.75rem] border border-white/60 bg-white p-5 lg:p-6">
         <h3 className="font-extrabold text-text mb-4 flex items-center gap-2">
           <BookOpen className="w-5 h-5 text-accent-purple" />
           Available Lessons
@@ -190,7 +190,7 @@ export default function CalendarPage() {
             {lessons.slice(0, 8).map((lesson: any) => {
               const completed = !!lesson.progress?.completedAt;
               return (
-                <div key={lesson.id} className="flex items-center gap-3 p-3 rounded-xl bg-bg-main/50 border border-border-soft/50">
+                <div key={lesson.id} className="flex items-center gap-3 p-3 rounded-xl bg-bg-main/50 border border-white/60/50">
                   {completed ? (
                     <CheckCircle2 className="w-5 h-5 text-secondary flex-shrink-0" />
                   ) : (

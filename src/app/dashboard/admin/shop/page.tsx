@@ -124,7 +124,7 @@ export default function AdminShopPage() {
           <Link href="/dashboard/admin" className="inline-flex items-center gap-2 text-text-muted hover:text-text text-sm font-semibold transition-colors">
             <ArrowLeft className="w-4 h-4" /> Back to Admin Dashboard
           </Link>
-          <button onClick={() => signOut({ callbackUrl: "/" })} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border-soft text-text-muted hover:bg-white hover:border-primary/30 cursor-pointer text-xs font-semibold transition-all">
+          <button onClick={() => signOut({ callbackUrl: "/" })} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/60 text-text-muted hover:bg-white hover:border-primary/30 cursor-pointer text-xs font-semibold transition-all">
             Sign Out
           </button>
         </div>
@@ -148,10 +148,10 @@ export default function AdminShopPage() {
 
         {/* Tabs */}
         <div className="flex gap-2 mb-6">
-          <button onClick={() => setTab("items")} className={`px-4 py-2 rounded-2xl font-bold text-sm cursor-pointer transition-all ${tab === "items" ? "bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-[0_4px_15px_rgba(79,70,229,0.2)]" : "bg-white border border-border-soft text-text-muted hover:bg-bg-main"}`}>
+          <button onClick={() => setTab("items")} className={`px-4 py-2 rounded-2xl font-bold text-sm cursor-pointer transition-all ${tab === "items" ? "bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-[0_4px_15px_rgba(79,70,229,0.2)]" : "bg-white border border-white/60 text-text-muted hover:bg-bg-main"}`}>
             Shop Items ({items.length})
           </button>
-          <button onClick={() => setTab("rules")} className={`px-4 py-2 rounded-2xl font-bold text-sm cursor-pointer transition-all ${tab === "rules" ? "bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-[0_4px_15px_rgba(79,70,229,0.2)]" : "bg-white border border-border-soft text-text-muted hover:bg-bg-main"}`}>
+          <button onClick={() => setTab("rules")} className={`px-4 py-2 rounded-2xl font-bold text-sm cursor-pointer transition-all ${tab === "rules" ? "bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-[0_4px_15px_rgba(79,70,229,0.2)]" : "bg-white border border-white/60 text-text-muted hover:bg-bg-main"}`}>
             Reward Rules ({rules.length})
           </button>
         </div>
@@ -162,10 +162,10 @@ export default function AdminShopPage() {
             <div className="flex gap-3 mb-6 flex-wrap">
               <div className="relative flex-1 min-w-[200px]">
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
-                <input placeholder="Search items..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-10 pr-4 py-2.5 rounded-2xl text-sm font-medium text-text bg-white border border-border-soft placeholder:text-text-muted/60 focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all" />
+                <input placeholder="Search items..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-10 pr-4 py-2.5 rounded-2xl text-sm font-medium text-text bg-white border border-white/60 placeholder:text-text-muted/60 focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all" />
               </div>
               {categories.length > 0 && (
-                <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)} className="px-4 py-2.5 rounded-2xl text-sm font-medium text-text bg-white border border-border-soft focus:outline-none focus:border-primary/40 transition-all min-w-[140px]">
+                <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)} className="px-4 py-2.5 rounded-2xl text-sm font-medium text-text bg-white border border-white/60 focus:outline-none focus:border-primary/40 transition-all min-w-[140px]">
                   <option value="all">All Categories</option>
                   {categories.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
@@ -173,7 +173,7 @@ export default function AdminShopPage() {
             </div>
 
             {loading ? (
-              <div className="rounded-[1.75rem] border border-border-soft bg-white p-12 text-center">
+              <div className="rounded-[1.75rem] border border-white/60 bg-white p-12 text-center">
                 <Loader2 className="w-8 h-8 text-primary animate-spin mx-auto mb-3" />
                 <p className="text-text-muted text-sm font-medium">Loading shop items...</p>
               </div>
@@ -189,7 +189,7 @@ export default function AdminShopPage() {
                   const RarityIcon = rarityIcons[item.rarity] || Star;
                   const rarityColor = rarityColors[item.rarity] || "#9CA3AF";
                   return (
-                    <div key={item.id} className="rounded-[1.75rem] border border-border-soft bg-white p-5 hover:shadow-[0_8px_30px_rgba(15,23,42,0.08)] transition-all duration-200 hover:-translate-y-1" style={{ borderColor: `${rarityColor}30` }}>
+                    <div key={item.id} className="rounded-[1.75rem] border border-white/60 bg-white p-5 hover:shadow-[0_8px_30px_rgba(15,23,42,0.08)] transition-all duration-200 hover:-translate-y-1" style={{ borderColor: `${rarityColor}30` }}>
                       <div className="flex justify-between items-start mb-3">
                         <div className="w-11 h-11 rounded-2xl flex items-center justify-center" style={{ background: `${rarityColor}18` }}>
                           <RarityIcon className="w-[22px] h-[22px]" style={{ color: rarityColor }} />
@@ -221,7 +221,7 @@ export default function AdminShopPage() {
         {tab === "rules" && (
           <>
             {loading ? (
-              <div className="rounded-[1.75rem] border border-border-soft bg-white p-12 text-center">
+              <div className="rounded-[1.75rem] border border-white/60 bg-white p-12 text-center">
                 <Loader2 className="w-8 h-8 text-primary animate-spin mx-auto mb-3" />
                 <p className="text-text-muted text-sm font-medium">Loading reward rules...</p>
               </div>
@@ -234,7 +234,7 @@ export default function AdminShopPage() {
             ) : (
               <div className="flex flex-col gap-2">
                 {rules.map((rule) => (
-                  <div key={rule.id} className="rounded-[1.75rem] border border-border-soft bg-white p-4 flex items-center gap-4 hover:shadow-[0_4px_20px_rgba(15,23,42,0.06)] transition-all">
+                  <div key={rule.id} className="rounded-[1.75rem] border border-white/60 bg-white p-4 flex items-center gap-4 hover:shadow-[0_4px_20px_rgba(15,23,42,0.06)] transition-all">
                     <div className="w-10 h-10 rounded-2xl bg-primary-soft flex items-center justify-center flex-shrink-0">
                       <Coins className="w-[18px] h-[18px] text-primary" />
                     </div>

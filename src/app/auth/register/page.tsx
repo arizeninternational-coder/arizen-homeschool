@@ -3,13 +3,11 @@
 export const dynamic = "force-dynamic";
 
 import { useState, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Flower2, Mail, Lock, User, AlertCircle, ArrowLeft, Eye, EyeOff, GraduationCap, Users, Loader2, Sparkles } from "lucide-react";
-import { ds, colors, gradients, shadows } from "@/lib/design-system";
+import { Mail, Lock, User, AlertCircle, ArrowLeft, Eye, EyeOff, GraduationCap, Users, Loader2, Sparkles } from "lucide-react";
 
 function RegisterForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const initialRole = searchParams.get("role") || "learner";
 
@@ -44,29 +42,23 @@ function RegisterForm() {
         }),
       });
       const data = await res.json();
-      if (!res.ok) { setError(data.error || "Failed to create account"); return; }
+      if (!res.ok) { setError(data.error || "Failed to create account"); setLoading(false); return; }
       const { signIn } = await import("next-auth/react");
-      const result = await signIn("credentials", { 
-        email: form.email.toLowerCase().trim(), 
-        password: form.password, 
-        redirect: false 
+      const result = await signIn("credentials", {
+        email: form.email.toLowerCase().trim(),
+        password: form.password,
+        redirect: false,
       });
-      if (result?.error) { 
-        setError(`Login after registration failed: ${result.error}. Please log in manually.`); 
+      if (result?.error) {
+        setError(`Login after registration failed: ${result.error}. Please log in manually.`);
         setLoading(false);
-      } else { 
-        // Fetch session to get role, then redirect accordingly
+      } else {
         const sessionRes = await fetch("/api/auth/session");
         const sessionData = await sessionRes.json();
         const role = sessionData?.user?.role;
-        
-        if (role === "ADMIN") {
-          window.location.replace("/dashboard/admin");
-        } else if (role === "PARENT") {
-          window.location.replace("/dashboard/parent");
-        } else {
-          window.location.replace("/dashboard/student");
-        }
+        if (role === "ADMIN") window.location.replace("/dashboard/admin");
+        else if (role === "PARENT") window.location.replace("/dashboard/parent");
+        else window.location.replace("/dashboard/student");
       }
     } catch { setError("Something went wrong. Please try again."); }
     finally { setLoading(false); }
@@ -75,169 +67,149 @@ function RegisterForm() {
   const isParent = form.role === "PARENT";
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden', background: colors.bg }}>
-      {/* Background */}
-      <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }} aria-hidden="true">
-        <div style={{ ...ds.orb(colors.accentSoft, '30rem'), top: '-10rem', left: '-10rem', opacity: 0.3 }} className="float-slow" />
-        <div style={{ ...ds.orb(colors.primarySoft, '26rem'), bottom: '-8rem', right: '-8rem', opacity: 0.25 }} className="float-medium" />
-        <div style={{ ...ds.orb(colors.warmSoft, '18rem'), top: '50%', left: '50%', opacity: 0.15 }} className="float-fast" />
+    <div className="min-h-screen flex flex-col relative overflow-hidden bg-bg-main">
+      {/* Background blobs */}
+      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+        <div className="absolute -top-40 -left-40 w-[480px] h-[480px] rounded-full bg-[radial-gradient(circle,rgba(139,92,246,0.10)_0%,transparent_60%)] float-slow" />
+        <div className="absolute -bottom-32 -right-32 w-[400px] h-[400px] rounded-full bg-[radial-gradient(circle,rgba(79,70,229,0.10)_0%,transparent_60%)] float-medium" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 w-[280px] h-[280px] rounded-full bg-[radial-gradient(circle,rgba(245,165,36,0.06)_0%,transparent_60%)] float-fast" />
       </div>
 
       {/* Header */}
-      <header style={{ position: 'relative', padding: '1.25rem 1rem 0.75rem' }}>
-        <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', fontWeight: 600, color: colors.textMuted, textDecoration: 'none' }}>
-          <ArrowLeft style={{ width: '16px', height: '16px' }} /> Back to Home
+      <header className="relative px-4 pt-5 pb-3">
+        <Link href="/" className="inline-flex items-center gap-2 text-sm font-semibold text-text-muted hover:text-text transition-colors no-underline">
+          <ArrowLeft className="w-4 h-4" /> Back to Home
         </Link>
       </header>
 
       {/* Main */}
-      <main style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem 1rem 3rem' }}>
-        <div style={{ width: '100%', maxWidth: '460px' }} className="fade-in-up">
+      <main className="relative flex-1 flex items-center justify-center px-4 pb-12">
+        <div className="w-full max-w-[460px] fade-in-up">
           {/* Logo & Header */}
-          <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-            <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none', marginBottom: '1rem' }}>
-              <div style={{ ...ds.logoMark, width: '48px', height: '48px' }}>
-                <Flower2 style={{ width: '26px', height: '26px' }} />
+          <div className="text-center mb-6">
+            <Link href="/" className="inline-flex items-center gap-3 no-underline mb-4">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-accent-purple flex items-center justify-center text-white font-black text-xl shadow-[0_0_20px_rgba(79,70,229,0.25)]">
+                A
               </div>
-              <span style={{ fontSize: '1.375rem', fontWeight: 900, ...ds.textGradient }}>Arizen School</span>
+              <span className="text-xl font-black tracking-tight bg-gradient-to-r from-primary to-accent-purple bg-clip-text text-transparent">
+                Arizen School
+              </span>
             </Link>
-            <h1 style={{ ...ds.headingLg, marginBottom: '0.5rem' }}>Create your account</h1>
-            <p style={ds.textBody}>Join Arizen and start your learning adventure.</p>
+            <h1 className="text-3xl font-extrabold text-text tracking-tight mb-2">Create your account</h1>
+            <p className="text-text-muted">Join Arizen and start your learning adventure.</p>
           </div>
 
           {/* Role Toggle */}
-          <div style={{ display: 'flex', borderRadius: '1.25rem', padding: '0.375rem', marginBottom: '1.5rem', background: colors.bgSoft, border: `1.5px solid ${colors.border}`, boxShadow: shadows.sm }}>
-            <button type="button" onClick={() => update("role", "LEARNER")} style={{
-              flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
-              padding: '0.75rem', borderRadius: '1rem', fontSize: '0.875rem', fontWeight: 800,
-              border: 'none', cursor: 'pointer', transition: 'all 0.25s ease',
-              ...(isParent
-                ? { color: colors.textMuted, background: 'transparent' }
-                : { color: 'white', background: gradients.primary, boxShadow: shadows.primary }),
-            }}>
-              <GraduationCap style={{ width: '16px', height: '16px' }} /> I'm a Child
+          <div className="flex rounded-2xl p-1 mb-6 bg-bg-main/60 border border-white/60 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+            <button type="button" onClick={() => update("role", "LEARNER")}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-extrabold border-none cursor-pointer transition-all ${
+                !isParent
+                  ? "bg-gradient-to-r from-primary to-primary-light text-white shadow-[0_4px_16px_rgba(79,70,229,0.2)]"
+                  : "text-text-muted bg-transparent"
+              }`}>
+              <GraduationCap className="w-4 h-4" /> I&apos;m a Child
             </button>
-            <button type="button" onClick={() => update("role", "PARENT")} style={{
-              flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
-              padding: '0.75rem', borderRadius: '1rem', fontSize: '0.875rem', fontWeight: 800,
-              border: 'none', cursor: 'pointer', transition: 'all 0.25s ease',
-              ...(isParent
-                ? { color: 'white', background: gradients.primary, boxShadow: shadows.primary }
-                : { color: colors.textMuted, background: 'transparent' }),
-            }}>
-              <Users style={{ width: '16px', height: '16px' }} /> I'm a Parent
+            <button type="button" onClick={() => update("role", "PARENT")}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-extrabold border-none cursor-pointer transition-all ${
+                isParent
+                  ? "bg-gradient-to-r from-primary to-primary-light text-white shadow-[0_4px_16px_rgba(79,70,229,0.2)]"
+                  : "text-text-muted bg-transparent"
+              }`}>
+              <Users className="w-4 h-4" /> I&apos;m a Parent
             </button>
           </div>
 
           {/* Form Card */}
-          <div style={ds.cardGlass}>
+          <div className="rounded-[1.5rem] bg-white/80 backdrop-blur-xl border border-white/60 shadow-[0_4px_24px_rgba(0,0,0,0.04)] p-6 lg:p-8">
             {error && (
-              <div style={ds.alertError} className="fade-in">
-                <AlertCircle style={{ width: '20px', height: '20px', color: colors.danger, flexShrink: 0, marginTop: '2px' }} />
-                <span style={{ fontSize: '0.875rem', color: colors.danger, fontWeight: 600 }}>{error}</span>
+              <div className="flex items-start gap-3 rounded-2xl bg-red-50/80 border border-red-200/60 px-4 py-3 mb-5 fade-in">
+                <AlertCircle className="w-5 h-5 text-danger flex-shrink-0 mt-0.5" />
+                <span className="text-sm text-danger font-semibold">{error}</span>
               </div>
             )}
 
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <div>
-                <label style={ds.label} htmlFor="name">Full Name</label>
-                <div style={{ position: 'relative' }}>
-                  <User style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: colors.textMuted }} />
-                  <input id="name" type="text" value={form.name} onChange={(e) => update("name", e.target.value)} placeholder="Your full name" required style={{ ...ds.input, paddingLeft: '2.75rem' }}
-                    onFocus={(e) => { e.currentTarget.style.borderColor = colors.primary; e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primarySoft}`; e.currentTarget.style.background = 'white'; }}
-                    onBlur={(e) => { e.currentTarget.style.borderColor = colors.border; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.background = colors.bgSoft; }}
+                <label className="block text-[11px] font-extrabold uppercase tracking-[0.12em] text-text mb-1.5" htmlFor="name">Full Name</label>
+                <div className="relative">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+                  <input id="name" type="text" value={form.name} onChange={(e) => update("name", e.target.value)} placeholder="Your full name" required
+                    className="w-full pl-11 pr-4 py-3 rounded-2xl text-sm font-medium text-text bg-bg-main/60 border border-white/60 focus:border-primary/40 focus:ring-2 focus:ring-primary/10 focus:bg-white focus:outline-none transition-all placeholder:text-text-muted"
                   />
                 </div>
               </div>
 
               {!isParent && (
                 <div>
-                  <label style={ds.label} htmlFor="displayName">Display Name</label>
-                  <div style={{ position: 'relative' }}>
-                    <User style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: colors.textMuted }} />
-                    <input id="displayName" type="text" value={form.displayName} onChange={(e) => update("displayName", e.target.value)} placeholder="What should we call you?" style={{ ...ds.input, paddingLeft: '2.75rem' }}
-                      onFocus={(e) => { e.currentTarget.style.borderColor = colors.primary; e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primarySoft}`; e.currentTarget.style.background = 'white'; }}
-                      onBlur={(e) => { e.currentTarget.style.borderColor = colors.border; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.background = colors.bgSoft; }}
+                  <label className="block text-[11px] font-extrabold uppercase tracking-[0.12em] text-text mb-1.5" htmlFor="displayName">Display Name</label>
+                  <div className="relative">
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+                    <input id="displayName" type="text" value={form.displayName} onChange={(e) => update("displayName", e.target.value)} placeholder="What should we call you?"
+                      className="w-full pl-11 pr-4 py-3 rounded-2xl text-sm font-medium text-text bg-bg-main/60 border border-white/60 focus:border-primary/40 focus:ring-2 focus:ring-primary/10 focus:bg-white focus:outline-none transition-all placeholder:text-text-muted"
                     />
                   </div>
                 </div>
               )}
 
               <div>
-                <label style={ds.label} htmlFor="email">Email</label>
-                <div style={{ position: 'relative' }}>
-                  <Mail style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: colors.textMuted }} />
-                  <input id="email" type="email" value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="you@example.com" required autoComplete="email" style={{ ...ds.input, paddingLeft: '2.75rem' }}
-                    onFocus={(e) => { e.currentTarget.style.borderColor = colors.primary; e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primarySoft}`; e.currentTarget.style.background = 'white'; }}
-                    onBlur={(e) => { e.currentTarget.style.borderColor = colors.border; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.background = colors.bgSoft; }}
+                <label className="block text-[11px] font-extrabold uppercase tracking-[0.12em] text-text mb-1.5" htmlFor="email">Email</label>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+                  <input id="email" type="email" value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="you@example.com" required autoComplete="email"
+                    className="w-full pl-11 pr-4 py-3 rounded-2xl text-sm font-medium text-text bg-bg-main/60 border border-white/60 focus:border-primary/40 focus:ring-2 focus:ring-primary/10 focus:bg-white focus:outline-none transition-all placeholder:text-text-muted"
                   />
                 </div>
               </div>
 
               {!isParent && (
                 <div>
-                  <label style={ds.label} htmlFor="grade">Grade</label>
-                  <select id="grade" value={form.grade} onChange={(e) => update("grade", e.target.value)} style={{ ...ds.input, cursor: 'pointer' }}
-                    onFocus={(e) => { e.currentTarget.style.borderColor = colors.primary; e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primarySoft}`; }}
-                    onBlur={(e) => { e.currentTarget.style.borderColor = colors.border; e.currentTarget.style.boxShadow = 'none'; }}
+                  <label className="block text-[11px] font-extrabold uppercase tracking-[0.12em] text-text mb-1.5" htmlFor="grade">Grade</label>
+                  <select id="grade" value={form.grade} onChange={(e) => update("grade", e.target.value)}
+                    className="w-full px-4 py-3 rounded-2xl text-sm font-medium text-text bg-bg-main/60 border border-white/60 focus:border-primary/40 focus:ring-2 focus:ring-primary/10 focus:outline-none transition-all cursor-pointer"
                   >
-                    {[1, 2, 3, 4, 5, 6, 7, 8].map((g) => <option key={g} value={g}>Grade {g}</option>)}
+                    {[1,2,3,4,5,6,7,8].map(g => <option key={g} value={g}>Grade {g}</option>)}
                   </select>
                 </div>
               )}
 
               <div>
-                <label style={ds.label} htmlFor="password">Password</label>
-                <div style={{ position: 'relative' }}>
-                  <Lock style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: colors.textMuted }} />
-                  <input id="password" type={showPassword ? "text" : "password"} value={form.password} onChange={(e) => update("password", e.target.value)} placeholder="At least 8 characters" required autoComplete="new-password" style={{ ...ds.input, paddingLeft: '2.75rem', paddingRight: '2.75rem' }}
-                    onFocus={(e) => { e.currentTarget.style.borderColor = colors.primary; e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primarySoft}`; e.currentTarget.style.background = 'white'; }}
-                    onBlur={(e) => { e.currentTarget.style.borderColor = colors.border; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.background = colors.bgSoft; }}
+                <label className="block text-[11px] font-extrabold uppercase tracking-[0.12em] text-text mb-1.5" htmlFor="password">Password</label>
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+                  <input id="password" type={showPassword ? "text" : "password"} value={form.password} onChange={(e) => update("password", e.target.value)} placeholder="At least 8 characters" required autoComplete="new-password"
+                    className="w-full pl-11 pr-11 py-3 rounded-2xl text-sm font-medium text-text bg-bg-main/60 border border-white/60 focus:border-primary/40 focus:ring-2 focus:ring-primary/10 focus:bg-white focus:outline-none transition-all placeholder:text-text-muted"
                   />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: colors.textMuted, padding: 0, display: 'flex', alignItems: 'center' }}>
-                    {showPassword ? <EyeOff style={{ width: '16px', height: '16px' }} /> : <Eye style={{ width: '16px', height: '16px' }} />}
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted hover:text-text transition-colors">
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
 
               <div>
-                <label style={ds.label} htmlFor="confirmPassword">Confirm Password</label>
-                <div style={{ position: 'relative' }}>
-                  <Lock style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: colors.textMuted }} />
-                  <input id="confirmPassword" type="password" value={form.confirmPassword} onChange={(e) => update("confirmPassword", e.target.value)} placeholder="Repeat your password" required autoComplete="new-password" style={{ ...ds.input, paddingLeft: '2.75rem' }}
-                    onFocus={(e) => { e.currentTarget.style.borderColor = colors.primary; e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primarySoft}`; e.currentTarget.style.background = 'white'; }}
-                    onBlur={(e) => { e.currentTarget.style.borderColor = colors.border; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.background = colors.bgSoft; }}
+                <label className="block text-[11px] font-extrabold uppercase tracking-[0.12em] text-text mb-1.5" htmlFor="confirmPassword">Confirm Password</label>
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+                  <input id="confirmPassword" type="password" value={form.confirmPassword} onChange={(e) => update("confirmPassword", e.target.value)} placeholder="Repeat your password" required autoComplete="new-password"
+                    className="w-full pl-11 pr-4 py-3 rounded-2xl text-sm font-medium text-text bg-bg-main/60 border border-white/60 focus:border-primary/40 focus:ring-2 focus:ring-primary/10 focus:bg-white focus:outline-none transition-all placeholder:text-text-muted"
                   />
                 </div>
               </div>
 
-              <button type="submit" disabled={loading} style={{
-                ...ds.btnPrimary,
-                width: '100%',
-                padding: '0.9375rem',
-                marginTop: '0.25rem',
-                opacity: loading ? 0.7 : 1,
-                cursor: loading ? 'not-allowed' : 'pointer',
-                gap: '0.5rem',
-              }}>
+              <button type="submit" disabled={loading}
+                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-primary-light text-white font-bold text-sm py-3.5 rounded-2xl shadow-[0_4px_16px_rgba(79,70,229,0.2)] hover:shadow-[0_8px_24px_rgba(79,70,229,0.3)] hover:brightness-110 transition-all disabled:opacity-60 disabled:cursor-not-allowed mt-1"
+              >
                 {loading ? (
-                  <>
-                    <Loader2 style={{ width: '18px', height: '18px' }} className="spinner" />
-                    Creating account...
-                  </>
+                  <><Loader2 className="w-4 h-4 spinner" /> Creating account...</>
                 ) : (
-                  <>
-                    <Sparkles style={{ width: '16px', height: '16px' }} />
-                    Create Account
-                  </>
+                  <><Sparkles className="w-4 h-4" /> Create Account</>
                 )}
               </button>
             </form>
           </div>
 
-          <p style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.875rem', color: colors.textMuted, fontWeight: 600 }}>
+          <p className="text-center mt-6 text-sm text-text-muted font-semibold">
             Already have an account?{" "}
-            <Link href="/auth/login" style={{ fontWeight: 800, color: colors.primary, textDecoration: 'none' }}>Sign in</Link>
+            <Link href="/auth/login" className="font-extrabold text-primary hover:text-primary-dark no-underline">Sign in</Link>
           </p>
         </div>
       </main>
@@ -248,9 +220,9 @@ function RegisterForm() {
 export default function RegisterPage() {
   return (
     <Suspense fallback={
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: colors.bg }}>
-        <div style={{ width: '56px', height: '56px', borderRadius: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', background: colors.primarySoft }}>
-          <Flower2 style={{ width: '28px', height: '28px', color: colors.primary }} />
+      <div className="min-h-screen flex items-center justify-center bg-bg-main">
+        <div className="w-14 h-14 rounded-3xl bg-primary-soft flex items-center justify-center">
+          <Sparkles className="w-7 h-7 text-primary animate-pulse" />
         </div>
       </div>
     }>

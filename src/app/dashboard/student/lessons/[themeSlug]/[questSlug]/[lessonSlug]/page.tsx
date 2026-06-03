@@ -174,7 +174,7 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
     return (
       <div className="fixed inset-0 z-50 bg-bg-main flex flex-col">
         {/* Sticky header */}
-        <div className="bg-white/90 backdrop-blur-xl border-b border-border-soft px-4 lg:px-6 py-3 flex justify-between items-center flex-shrink-0">
+        <div className="bg-white/90 backdrop-blur-xl border-b border-white/40 px-4 lg:px-6 py-3 flex justify-between items-center flex-shrink-0">
           <div className="flex items-center gap-3">
             <button
               onClick={() => { setViewing(false); setShowCelebration(false); }}
@@ -305,7 +305,7 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
                 if (currentGroup) cardGroups.push(currentGroup);
 
                 return cardGroups.map((group, i) => (
-                  <div key={i} className="rounded-2xl border border-border-soft bg-white p-5 lg:p-6">
+                  <div key={i} className="rounded-2xl border border-white/60 bg-white/90 backdrop-blur-sm p-5 lg:p-6">
                     {group.heading && <ContentBlock block={group.heading} isHeading />}
                     <div className="flex flex-col gap-4">
                       {group.items.map((block, j) => (
@@ -317,7 +317,7 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
               })()}
             </div>
           ) : (
-            <div className="rounded-2xl border border-border-soft bg-white text-center p-12">
+            <div className="rounded-2xl border border-white/60 bg-white/90 backdrop-blur-sm text-center p-12">
               <BookOpen className="w-10 h-10 text-text-muted/30 mx-auto mb-3" />
               <h3 className="text-lg font-bold text-text mb-2">Lesson content coming soon</h3>
               <p className="text-text-muted text-sm">This lesson is being prepared. Check back soon!</p>
@@ -442,7 +442,7 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
 
       {/* ── Content preview ── */}
       {lesson?.contentBlocks && lesson.contentBlocks.length > 0 && (
-        <div className="rounded-2xl border border-border-soft bg-white p-5 lg:p-6 mb-5">
+        <div className="rounded-2xl border border-white/60 bg-white/90 backdrop-blur-sm p-5 lg:p-6 mb-5">
           <h3 className="font-extrabold text-text text-base mb-4 flex items-center gap-2">
             <BookOpen className="w-5 h-5 text-primary" /> What you'll learn
           </h3>

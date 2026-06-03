@@ -26,8 +26,8 @@ export default function ParentSettingsPage() {
           <ArrowLeft className="w-4 h-4" /> Back to Dashboard
         </Link>
         <h1 className="text-2xl font-extrabold text-text mb-8">Settings</h1>
-        <div className="rounded-2xl border border-border-soft bg-white p-6 lg:p-8 shadow-[0_1px_3px_rgba(0,0,0,0.03),0_4px_12px_rgba(0,0,0,0.02)]">
-          <div className="flex items-center gap-4 mb-6 pb-6 border-b border-border-soft">
+        <div className="rounded-2xl border border-white/60 bg-white p-6 lg:p-8 shadow-[0_1px_3px_rgba(0,0,0,0.03),0_4px_12px_rgba(0,0,0,0.02)]">
+          <div className="flex items-center gap-4 mb-6 pb-6 border-b border-white/60">
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-secondary to-secondary-dark flex items-center justify-center text-white text-xl font-extrabold shadow-[0_4px_15px_rgba(0,168,132,0.2)]">
               {(user?.name || "P").charAt(0).toUpperCase()}
             </div>
@@ -37,7 +37,7 @@ export default function ParentSettingsPage() {
             </div>
           </div>
           <div className="space-y-0">
-            <div className="flex justify-between items-center py-4 border-b border-border-soft/50">
+            <div className="flex justify-between items-center py-4 border-b border-white/60/50">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-xl bg-accent-blue-soft flex items-center justify-center">
                   <Mail className="w-4 h-4 text-accent-blue" />
@@ -51,7 +51,7 @@ export default function ParentSettingsPage() {
                 <div className="absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow-sm" />
               </div>
             </div>
-            <div className="flex justify-between items-center py-4 border-b border-border-soft/50">
+            <div className="flex justify-between items-center py-4 border-b border-white/60/50">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-xl bg-gold-soft/50 flex items-center justify-center">
                   <Bell className="w-4 h-4 text-gold" />

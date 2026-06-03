@@ -130,7 +130,7 @@ export default function ParentChildrenPage() {
           <Link href="/dashboard/parent" className="inline-flex items-center gap-2 text-text-muted text-sm font-semibold hover:text-text transition-colors">
             <ArrowLeft className="w-4 h-4" /> Back to Dashboard
           </Link>
-          <button onClick={() => signOut({ callbackUrl: "/" })} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border-soft text-text-muted cursor-pointer text-sm font-semibold hover:bg-red-50 hover:text-danger transition-colors">
+          <button onClick={() => signOut({ callbackUrl: "/" })} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/60 text-text-muted cursor-pointer text-sm font-semibold hover:bg-red-50 hover:text-danger transition-colors">
             Sign Out
           </button>
         </div>
@@ -144,7 +144,7 @@ export default function ParentChildrenPage() {
             <Plus className="w-4 h-4" /> Add Child
           </button>
         ) : (
-          <div className="rounded-2xl border border-border-soft bg-white p-6 mb-6 shadow-[0_1px_3px_rgba(0,0,0,0.03),0_4px_12px_rgba(0,0,0,0.02)]">
+          <div className="rounded-2xl border border-white/60 bg-white p-6 mb-6 shadow-[0_1px_3px_rgba(0,0,0,0.03),0_4px_12px_rgba(0,0,0,0.02)]">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-base font-extrabold text-text">Create Child Profile</h2>
               <button onClick={() => { setShowCreateForm(false); setCreateMsg(null); }} className="p-1.5 rounded-lg hover:bg-bg-main text-text-muted transition-colors">
@@ -165,9 +165,9 @@ export default function ParentChildrenPage() {
               <input
                 type="text" value={createName} onChange={(e) => setCreateName(e.target.value)}
                 placeholder="Child's name" required
-                className="flex-1 min-w-[160px] px-4 py-3 rounded-2xl text-sm font-medium text-text bg-bg-main border border-border-soft focus:outline-none focus:border-secondary/50 focus:ring-2 focus:ring-secondary/10 transition-all"
+                className="flex-1 min-w-[160px] px-4 py-3 rounded-2xl text-sm font-medium text-text bg-bg-main border border-white/60 focus:outline-none focus:border-secondary/50 focus:ring-2 focus:ring-secondary/10 transition-all"
               />
-              <select value={createGrade} onChange={(e) => setCreateGrade(e.target.value)} className="min-w-[100px] px-4 py-3 rounded-2xl text-sm font-medium text-text bg-bg-main border border-border-soft focus:outline-none focus:border-secondary/50 transition-all">
+              <select value={createGrade} onChange={(e) => setCreateGrade(e.target.value)} className="min-w-[100px] px-4 py-3 rounded-2xl text-sm font-medium text-text bg-bg-main border border-white/60 focus:outline-none focus:border-secondary/50 transition-all">
                 {[1,2,3,4,5,6,7,8].map(g => <option key={g} value={g}>Grade {g}</option>)}
               </select>
               <button type="submit" disabled={creating} className="inline-flex items-center gap-2 rounded-2xl px-6 py-3 text-sm font-bold text-white bg-gradient-to-br from-secondary to-secondary-dark shadow-[0_4px_15px_rgba(0,168,132,0.2)] hover:shadow-[0_8px_25px_rgba(0,168,132,0.3)] hover:brightness-110 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed whitespace-nowrap">
@@ -178,7 +178,7 @@ export default function ParentChildrenPage() {
         )}
 
         {/* Link Existing Child */}
-        <div className="rounded-2xl border border-border-soft bg-white p-6 mb-8 shadow-[0_1px_3px_rgba(0,0,0,0.03),0_4px_12px_rgba(0,0,0,0.02)]">
+        <div className="rounded-2xl border border-white/60 bg-white p-6 mb-8 shadow-[0_1px_3px_rgba(0,0,0,0.03),0_4px_12px_rgba(0,0,0,0.02)]">
           <h2 className="text-base font-extrabold text-text mb-1">Link Existing Learner</h2>
           <p className="text-sm text-text-muted mb-4">
             If your child already has a learner account, enter their email to link it.
@@ -196,7 +196,7 @@ export default function ParentChildrenPage() {
           <form onSubmit={handleLink} className="flex gap-3">
             <input type="email" value={linkEmail} onChange={(e) => setLinkEmail(e.target.value)}
               placeholder="child@example.com" required
-              className="flex-1 px-4 py-3 rounded-2xl text-sm font-medium text-text bg-bg-main border border-border-soft focus:outline-none focus:border-secondary/50 focus:ring-2 focus:ring-secondary/10 transition-all"
+              className="flex-1 px-4 py-3 rounded-2xl text-sm font-medium text-text bg-bg-main border border-white/60 focus:outline-none focus:border-secondary/50 focus:ring-2 focus:ring-secondary/10 transition-all"
             />
             <button type="submit" disabled={linking} className="inline-flex items-center gap-2 rounded-2xl px-6 py-3 text-sm font-bold text-white bg-gradient-to-br from-secondary to-secondary-dark shadow-[0_4px_15px_rgba(0,168,132,0.2)] hover:shadow-[0_8px_25px_rgba(0,168,132,0.3)] hover:brightness-110 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed whitespace-nowrap">
               {linking ? <><Loader2 className="w-4 h-4 spinner" /> Linking...</> : <><Plus className="w-4 h-4" /> Link Child</>}
@@ -210,7 +210,7 @@ export default function ParentChildrenPage() {
         </h2>
 
         {children.length === 0 ? (
-          <div className="rounded-2xl border border-border-soft bg-white text-center p-10 shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
+          <div className="rounded-2xl border border-white/60 bg-white text-center p-10 shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
             <div className="w-14 h-14 rounded-3xl bg-secondary-soft/50 flex items-center justify-center mx-auto mb-4">
               <Users className="w-7 h-7 text-secondary" />
             </div>
@@ -227,7 +227,7 @@ export default function ParentChildrenPage() {
               const childXp = child.totalXp || 0;
               const childStreak = child.currentStreak || 0;
               return (
-                <div key={child.id} className="rounded-2xl border border-border-soft bg-white p-5 flex items-center gap-4 shadow-[0_1px_3px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.05)] transition-all duration-200">
+                <div key={child.id} className="rounded-2xl border border-white/60 bg-white p-5 flex items-center gap-4 shadow-[0_1px_3px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.05)] transition-all duration-200">
                   <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-secondary/10 to-secondary-dark/10 flex items-center justify-center text-secondary text-base font-extrabold flex-shrink-0">
                     {displayName.charAt(0).toUpperCase()}
                   </div>

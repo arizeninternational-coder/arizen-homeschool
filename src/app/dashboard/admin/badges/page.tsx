@@ -138,7 +138,7 @@ export default function AdminBadgesPage() {
           <Link href="/dashboard/admin" className="inline-flex items-center gap-2 text-text-muted hover:text-text text-sm font-semibold transition-colors">
             <ArrowLeft className="w-4 h-4" /> Back to Admin Dashboard
           </Link>
-          <button onClick={() => signOut({ callbackUrl: "/" })} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border-soft text-text-muted hover:bg-white hover:border-primary/30 cursor-pointer text-xs font-semibold transition-all">
+          <button onClick={() => signOut({ callbackUrl: "/" })} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/60 text-text-muted hover:bg-white hover:border-primary/30 cursor-pointer text-xs font-semibold transition-all">
             Sign Out
           </button>
         </div>
@@ -161,7 +161,7 @@ export default function AdminBadgesPage() {
 
         {/* Create Form */}
         {showCreate && (
-          <div className="rounded-[1.75rem] border border-border-soft bg-white p-6 mb-6">
+          <div className="rounded-[1.75rem] border border-white/60 bg-white p-6 mb-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-base font-bold text-text">Create Badge Template</h2>
               <button onClick={() => { setShowCreate(false); setCreateMsg(null); }} className="text-text-muted hover:text-text transition-colors cursor-pointer p-1 rounded-lg hover:bg-bg-main"><X className="w-5 h-5" /></button>
@@ -173,14 +173,14 @@ export default function AdminBadgesPage() {
               </div>
             )}
             <form onSubmit={handleCreate} className="flex flex-col gap-3">
-              <input type="text" value={createName} onChange={e => setCreateName(e.target.value)} placeholder="Badge name * (e.g. 'Math Whiz', 'Reading Star')" required className="w-full px-4 py-2.5 rounded-2xl text-sm font-medium text-text bg-bg-main border border-border-soft placeholder:text-text-muted/60 focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all" />
-              <textarea value={createDesc} onChange={e => setCreateDesc(e.target.value)} placeholder="Description — what does this badge represent?" rows={2} className="w-full px-4 py-2.5 rounded-2xl text-sm font-medium text-text bg-bg-main border border-border-soft placeholder:text-text-muted/60 focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all resize-y" />
+              <input type="text" value={createName} onChange={e => setCreateName(e.target.value)} placeholder="Badge name * (e.g. 'Math Whiz', 'Reading Star')" required className="w-full px-4 py-2.5 rounded-2xl text-sm font-medium text-text bg-bg-main border border-white/60 placeholder:text-text-muted/60 focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all" />
+              <textarea value={createDesc} onChange={e => setCreateDesc(e.target.value)} placeholder="Description — what does this badge represent?" rows={2} className="w-full px-4 py-2.5 rounded-2xl text-sm font-medium text-text bg-bg-main border border-white/60 placeholder:text-text-muted/60 focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all resize-y" />
               <div className="flex gap-3 flex-wrap">
-                <select value={createIcon} onChange={e => setCreateIcon(e.target.value)} className="px-4 py-2.5 rounded-2xl text-sm font-medium text-text bg-bg-main border border-border-soft focus:outline-none focus:border-primary/40 transition-all min-w-[140px]">
+                <select value={createIcon} onChange={e => setCreateIcon(e.target.value)} className="px-4 py-2.5 rounded-2xl text-sm font-medium text-text bg-bg-main border border-white/60 focus:outline-none focus:border-primary/40 transition-all min-w-[140px]">
                   {BADGE_ICONS.map(({ value, label }) => <option key={value} value={value}>Icon: {label}</option>)}
                 </select>
-                <input type="number" value={createXp} onChange={e => setCreateXp(e.target.value)} placeholder="XP Reward" min="0" className="px-4 py-2.5 rounded-2xl text-sm font-medium text-text bg-bg-main border border-border-soft placeholder:text-text-muted/60 focus:outline-none focus:border-primary/40 transition-all w-[120px]" />
-                <input type="text" value={createCondition} onChange={e => setCreateCondition(e.target.value)} placeholder="Unlock condition (e.g. 'Complete 5 math lessons')" className="px-4 py-2.5 rounded-2xl text-sm font-medium text-text bg-bg-main border border-border-soft placeholder:text-text-muted/60 focus:outline-none focus:border-primary/40 transition-all flex-1 min-w-[200px]" />
+                <input type="number" value={createXp} onChange={e => setCreateXp(e.target.value)} placeholder="XP Reward" min="0" className="px-4 py-2.5 rounded-2xl text-sm font-medium text-text bg-bg-main border border-white/60 placeholder:text-text-muted/60 focus:outline-none focus:border-primary/40 transition-all w-[120px]" />
+                <input type="text" value={createCondition} onChange={e => setCreateCondition(e.target.value)} placeholder="Unlock condition (e.g. 'Complete 5 math lessons')" className="px-4 py-2.5 rounded-2xl text-sm font-medium text-text bg-bg-main border border-white/60 placeholder:text-text-muted/60 focus:outline-none focus:border-primary/40 transition-all flex-1 min-w-[200px]" />
               </div>
               <button type="submit" disabled={creating} className="self-start">
                 <GradientButton variant="primary" size="sm" disabled={creating}>
@@ -195,9 +195,9 @@ export default function AdminBadgesPage() {
         <div className="flex gap-3 mb-6 flex-wrap">
           <div className="relative flex-1 min-w-[200px]">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
-            <input placeholder="Search badges..." value={search} onChange={e => setSearch(e.target.value)} className="w-full pl-10 pr-4 py-2.5 rounded-2xl text-sm font-medium text-text bg-white border border-border-soft placeholder:text-text-muted/60 focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all" />
+            <input placeholder="Search badges..." value={search} onChange={e => setSearch(e.target.value)} className="w-full pl-10 pr-4 py-2.5 rounded-2xl text-sm font-medium text-text bg-white border border-white/60 placeholder:text-text-muted/60 focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all" />
           </div>
-          <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="px-4 py-2.5 rounded-2xl text-sm font-medium text-text bg-white border border-border-soft focus:outline-none focus:border-primary/40 transition-all min-w-[120px]">
+          <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="px-4 py-2.5 rounded-2xl text-sm font-medium text-text bg-white border border-white/60 focus:outline-none focus:border-primary/40 transition-all min-w-[120px]">
             <option value="all">All Status</option>
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
@@ -207,7 +207,7 @@ export default function AdminBadgesPage() {
 
         {/* Content */}
         {loading ? (
-          <div className="rounded-[1.75rem] border border-border-soft bg-white p-12 text-center">
+          <div className="rounded-[1.75rem] border border-white/60 bg-white p-12 text-center">
             <Loader2 className="w-8 h-8 text-primary animate-spin mx-auto mb-3" />
             <p className="text-text-muted text-sm font-medium">Loading badges...</p>
           </div>
@@ -223,7 +223,7 @@ export default function AdminBadgesPage() {
               const iconData = BADGE_ICONS.find(i => i.value === (badge.icon || "star")) || BADGE_ICONS[0];
               const IconComp = iconData.Icon;
               return (
-                <div key={badge.id} className="rounded-[1.75rem] border border-border-soft bg-white p-4 flex items-center gap-4 hover:shadow-[0_4px_20px_rgba(15,23,42,0.06)] transition-all">
+                <div key={badge.id} className="rounded-[1.75rem] border border-white/60 bg-white p-4 flex items-center gap-4 hover:shadow-[0_4px_20px_rgba(15,23,42,0.06)] transition-all">
                   <div className="w-11 h-11 rounded-2xl bg-primary-soft flex items-center justify-center flex-shrink-0">
                     <IconComp className="w-[22px] h-[22px] text-primary" />
                   </div>

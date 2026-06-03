@@ -182,7 +182,7 @@ export default function ThemeDetailPage({ params }: { params: Promise<{ themeSlu
       />
 
       {quests.length === 0 ? (
-        <div className="rounded-[1.75rem] border border-border-soft bg-white p-12 text-center">
+        <div className="rounded-[1.75rem] border border-white/60 bg-white p-12 text-center">
           <p className="text-sm text-text-muted">No quests with published lessons in this theme yet. Ask your admin to publish more content.</p>
         </div>
       ) : (
@@ -210,7 +210,7 @@ function QuestCard({ quest, index, themeSlug }: { quest: Quest; index: number; t
         "hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(15,23,42,0.08)]",
         quest.isCompleted
           ? "border-secondary/20 bg-gradient-to-br from-secondary-soft/50 to-emerald-50"
-          : "border-border-soft bg-white"
+          : "border-white/60 bg-white"
       )}
     >
       {/* Card top accent bar */}

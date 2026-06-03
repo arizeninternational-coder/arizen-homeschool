@@ -3,11 +3,9 @@
 export const dynamic = "force-dynamic";
 
 import { useState, useEffect, Suspense } from "react";
-import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Flower2, Mail, Lock, AlertCircle, ArrowLeft, Eye, EyeOff, Loader2, Sparkles } from "lucide-react";
-import { ds, colors, gradients, shadows } from "@/lib/design-system";
+import { Mail, Lock, AlertCircle, ArrowLeft, Eye, EyeOff, Loader2, Sparkles } from "lucide-react";
 
 function LoginForm() {
   const router = useRouter();
@@ -38,17 +36,13 @@ function LoginForm() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: email.toLowerCase().trim(),
-          password,
-        }),
+        body: JSON.stringify({ email: email.toLowerCase().trim(), password }),
       });
       const data = await res.json();
       if (!res.ok || data.error) {
         setError(data.error || "Invalid email or password. Please try again.");
         setLoading(false);
       } else {
-        // Session cookie is set by the server — just redirect
         window.location.replace(data.redirectUrl || "/");
       }
     } catch (err: any) {
@@ -59,115 +53,91 @@ function LoginForm() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden', background: colors.bg }}>
-      {/* Background */}
-      <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }} aria-hidden="true">
-        <div style={{ ...ds.orb(colors.primarySoft, '32rem'), top: '-12rem', right: '-10rem', opacity: 0.35 }} className="float-slow" />
-        <div style={{ ...ds.orb(colors.accentSoft, '28rem'), bottom: '-10rem', left: '-8rem', opacity: 0.25 }} className="float-medium" />
-        <div style={{ ...ds.orb(colors.warmSoft, '20rem'), top: '40%', right: '10%', opacity: 0.2 }} className="float-fast" />
+    <div className="min-h-screen flex flex-col relative overflow-hidden bg-bg-main">
+      {/* Background blobs */}
+      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+        <div className="absolute -top-48 -right-40 w-[500px] h-[500px] rounded-full bg-[radial-gradient(circle,rgba(79,70,229,0.12)_0%,transparent_60%)] float-slow" />
+        <div className="absolute -bottom-40 -left-32 w-[400px] h-[400px] rounded-full bg-[radial-gradient(circle,rgba(139,92,246,0.10)_0%,transparent_60%)] float-medium" />
+        <div className="absolute top-1/2 right-[10%] w-[300px] h-[300px] rounded-full bg-[radial-gradient(circle,rgba(245,165,36,0.08)_0%,transparent_60%)] float-fast" />
       </div>
 
       {/* Header */}
-      <header style={{ position: 'relative', padding: '1.25rem 1rem 0.75rem' }}>
-        <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', fontWeight: 600, color: colors.textMuted, textDecoration: 'none', transition: 'color 0.2s' }}>
-          <ArrowLeft style={{ width: '16px', height: '16px' }} /> Back to Home
+      <header className="relative px-4 pt-5 pb-3">
+        <Link href="/" className="inline-flex items-center gap-2 text-sm font-semibold text-text-muted hover:text-text transition-colors no-underline">
+          <ArrowLeft className="w-4 h-4" /> Back to Home
         </Link>
       </header>
 
       {/* Main */}
-      <main style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem 1rem 3rem' }}>
-        <div style={{ width: '100%', maxWidth: '440px' }} className="fade-in-up">
+      <main className="relative flex-1 flex items-center justify-center px-4 pb-12">
+        <div className="w-full max-w-[440px] fade-in-up">
           {/* Logo & Header */}
-          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-            <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none', marginBottom: '1.5rem' }}>
-              <div style={{ ...ds.logoMark, width: '48px', height: '48px' }}>
-                <Flower2 style={{ width: '26px', height: '26px' }} />
+          <div className="text-center mb-8">
+            <Link href="/" className="inline-flex items-center gap-3 no-underline mb-6">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-accent-purple flex items-center justify-center text-white font-black text-xl shadow-[0_0_20px_rgba(79,70,229,0.25)]">
+                A
               </div>
-              <span style={{ fontSize: '1.375rem', fontWeight: 900, ...ds.textGradient }}>Arizen School</span>
+              <span className="text-xl font-black tracking-tight bg-gradient-to-r from-primary to-accent-purple bg-clip-text text-transparent">
+                Arizen School
+              </span>
             </Link>
-            <h1 style={{ ...ds.headingLg, marginBottom: '0.5rem' }}>Welcome back</h1>
-            <p style={ds.textBody}>Sign in to continue your learning journey.</p>
+            <h1 className="text-3xl font-extrabold text-text tracking-tight mb-2">Welcome back</h1>
+            <p className="text-text-muted">Sign in to continue your learning journey.</p>
           </div>
 
           {/* Card */}
-          <div style={ds.cardGlass}>
+          <div className="rounded-[1.5rem] bg-white/80 backdrop-blur-xl border border-white/60 shadow-[0_4px_24px_rgba(0,0,0,0.04)] p-6 lg:p-8">
             {error && (
-              <div style={ds.alertError} className="fade-in">
-                <AlertCircle style={{ width: '20px', height: '20px', color: colors.danger, flexShrink: 0, marginTop: '2px' }} />
-                <span style={{ fontSize: '0.875rem', color: colors.danger, fontWeight: 600 }}>{error}</span>
+              <div className="flex items-start gap-3 rounded-2xl bg-red-50/80 border border-red-200/60 px-4 py-3 mb-5 fade-in">
+                <AlertCircle className="w-5 h-5 text-danger flex-shrink-0 mt-0.5" />
+                <span className="text-sm text-danger font-semibold">{error}</span>
               </div>
             )}
 
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
               <div>
-                <label style={ds.label} htmlFor="email">Email</label>
-                <div style={{ position: 'relative' }}>
-                  <Mail style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: colors.textMuted }} />
+                <label className="block text-[11px] font-extrabold uppercase tracking-[0.12em] text-text mb-1.5" htmlFor="email">Email</label>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
                   <input
-                    id="email"
-                    type="email"
-                    value={email}
+                    id="email" type="email" value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@example.com"
-                    required
-                    autoComplete="email"
-                    style={{ ...ds.input, paddingLeft: '2.75rem' }}
-                    onFocus={(e) => { e.currentTarget.style.borderColor = colors.primary; e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primarySoft}`; e.currentTarget.style.background = 'white'; }}
-                    onBlur={(e) => { e.currentTarget.style.borderColor = colors.border; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.background = colors.bgSoft; }}
+                    placeholder="you@example.com" required autoComplete="email"
+                    className="w-full pl-11 pr-4 py-3 rounded-2xl text-sm font-medium text-text bg-bg-main/60 border border-white/60 focus:border-primary/40 focus:ring-2 focus:ring-primary/10 focus:bg-white focus:outline-none transition-all placeholder:text-text-muted"
                   />
                 </div>
               </div>
 
               <div>
-                <label style={ds.label} htmlFor="password">Password</label>
-                <div style={{ position: 'relative' }}>
-                  <Lock style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: colors.textMuted }} />
+                <label className="block text-[11px] font-extrabold uppercase tracking-[0.12em] text-text mb-1.5" htmlFor="password">Password</label>
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
                   <input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    value={password}
+                    id="password" type={showPassword ? "text" : "password"} value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter your password"
-                    required
-                    autoComplete="current-password"
-                    style={{ ...ds.input, paddingLeft: '2.75rem', paddingRight: '2.75rem' }}
-                    onFocus={(e) => { e.currentTarget.style.borderColor = colors.primary; e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primarySoft}`; e.currentTarget.style.background = 'white'; }}
-                    onBlur={(e) => { e.currentTarget.style.borderColor = colors.border; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.background = colors.bgSoft; }}
+                    placeholder="Enter your password" required autoComplete="current-password"
+                    className="w-full pl-11 pr-11 py-3 rounded-2xl text-sm font-medium text-text bg-bg-main/60 border border-white/60 focus:border-primary/40 focus:ring-2 focus:ring-primary/10 focus:bg-white focus:outline-none transition-all placeholder:text-text-muted"
                   />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: colors.textMuted, padding: 0, display: 'flex', alignItems: 'center' }}>
-                    {showPassword ? <EyeOff style={{ width: '16px', height: '16px' }} /> : <Eye style={{ width: '16px', height: '16px' }} />}
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted hover:text-text transition-colors">
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
 
-              <button type="submit" disabled={loading} style={{
-                ...ds.btnPrimary,
-                width: '100%',
-                padding: '0.9375rem',
-                marginTop: '0.25rem',
-                opacity: loading ? 0.7 : 1,
-                cursor: loading ? 'not-allowed' : 'pointer',
-                gap: '0.5rem',
-              }}>
+              <button type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-primary-light text-white font-bold text-sm py-3.5 rounded-2xl shadow-[0_4px_16px_rgba(79,70,229,0.2)] hover:shadow-[0_8px_24px_rgba(79,70,229,0.3)] hover:brightness-110 transition-all disabled:opacity-60 disabled:cursor-not-allowed mt-1">
                 {loading ? (
-                  <>
-                    <Loader2 style={{ width: '18px', height: '18px' }} className="spinner" />
-                    Signing in...
-                  </>
+                  <><Loader2 className="w-4 h-4 spinner" /> Signing in...</>
                 ) : (
-                  <>
-                    <Sparkles style={{ width: '16px', height: '16px' }} />
-                    Sign In
-                  </>
+                  <><Sparkles className="w-4 h-4" /> Sign In</>
                 )}
               </button>
             </form>
           </div>
 
           {/* Footer link */}
-          <p style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.875rem', color: colors.textMuted, fontWeight: 600 }}>
-            Don't have an account?{" "}
-            <Link href="/auth/register" style={{ fontWeight: 800, color: colors.primary, textDecoration: 'none' }}>Create one free</Link>
+          <p className="text-center mt-6 text-sm text-text-muted font-semibold">
+            Don&apos;t have an account?{" "}
+            <Link href="/auth/register" className="font-extrabold text-primary hover:text-primary-dark no-underline">Create one free</Link>
           </p>
         </div>
       </main>
@@ -178,9 +148,9 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: colors.bg }}>
-        <div style={{ width: '56px', height: '56px', borderRadius: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', background: colors.primarySoft }}>
-          <Flower2 style={{ width: '28px', height: '28px', color: colors.primary }} />
+      <div className="min-h-screen flex items-center justify-center bg-bg-main">
+        <div className="w-14 h-14 rounded-3xl bg-primary-soft flex items-center justify-center">
+          <Sparkles className="w-7 h-7 text-primary animate-pulse" />
         </div>
       </div>
     }>

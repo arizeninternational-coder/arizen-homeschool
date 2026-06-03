@@ -149,7 +149,7 @@ export default function ParentLessonsPage() {
   return (
     <div className="min-h-screen bg-bg-main">
       {/* Header */}
-      <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-border-soft">
+      <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-white/60">
         <div className="max-w-[1400px] mx-auto px-4 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/dashboard/parent" className="p-2 rounded-xl hover:bg-bg-main text-text-muted transition-colors">
@@ -179,7 +179,7 @@ export default function ParentLessonsPage() {
               {children.map((child) => {
                 const childSubjects = subjects.filter(s => !s.grade || s.grade === child.grade);
                 return (
-                  <div key={child.id} className="rounded-[1.5rem] border border-border-soft bg-white p-5">
+                  <div key={child.id} className="rounded-[1.5rem] border border-white/60 bg-white p-5">
                     <div className="flex items-center gap-3 mb-3">
                       <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-accent-purple flex items-center justify-center text-white font-extrabold text-base">
                         {(child.name || "S").charAt(0).toUpperCase()}
@@ -206,7 +206,7 @@ export default function ParentLessonsPage() {
                     {childSubjects.length > 0 ? (
                       <div className="space-y-1.5">
                         {childSubjects.map((subj, i) => (
-                          <div key={i} className="flex items-center justify-between px-3 py-2 rounded-xl bg-bg-main/80 border border-border-soft/50">
+                          <div key={i} className="flex items-center justify-between px-3 py-2 rounded-xl bg-bg-main/80 border border-white/60/50">
                             <div className="min-w-0 flex-1">
                               <p className="text-xs font-bold text-text truncate">{subj.subject}</p>
                               <p className="text-[10px] text-text-muted">{subj.lessons.length} lesson{subj.lessons.length !== 1 ? "s" : ""}</p>
@@ -235,8 +235,8 @@ export default function ParentLessonsPage() {
             ) : (
               <div className="space-y-6">
                 {subjects.map((subj, si) => (
-                  <div key={si} className="rounded-[1.75rem] border border-border-soft bg-white overflow-hidden">
-                    <div className="px-5 py-4 border-b border-border-soft flex items-center justify-between">
+                  <div key={si} className="rounded-[1.75rem] border border-white/60 bg-white overflow-hidden">
+                    <div className="px-5 py-4 border-b border-white/60 flex items-center justify-between">
                       <div>
                         <h3 className="font-extrabold text-text">{subj.subject}</h3>
                         <p className="text-xs text-text-muted">Grade {subj.grade || "—"} • {subj.lessons.length} lesson{subj.lessons.length !== 1 ? "s" : ""}</p>

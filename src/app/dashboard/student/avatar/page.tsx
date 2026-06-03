@@ -428,7 +428,7 @@ function HairStylePreview({
       className={`flex flex-col items-center gap-1.5 p-3 rounded-2xl border-2 transition-all duration-200 cursor-pointer hover:-translate-y-0.5 ${
         selected
           ? "border-primary bg-primary/5 shadow-[0_4px_15px_rgba(79,70,229,0.12)]"
-          : "border-border-soft bg-white hover:border-primary/30"
+          : "border-white/60 bg-white hover:border-primary/30"
       }`}
     >
       <svg viewBox="0 6 50 40" width={48} height={40}>
@@ -538,7 +538,7 @@ function ExpressionPreview({
       className={`flex flex-col items-center gap-1.5 p-3 rounded-2xl border-2 transition-all duration-200 cursor-pointer hover:-translate-y-0.5 ${
         selected
           ? "border-primary bg-primary/5 shadow-[0_4px_15px_rgba(79,70,229,0.12)]"
-          : "border-border-soft bg-white hover:border-primary/30"
+          : "border-white/60 bg-white hover:border-primary/30"
       }`}
     >
       <svg viewBox="14 6 48 42" width={52} height={44}>
@@ -772,7 +772,7 @@ export default function AvatarPage() {
         {/* ═══ AVATAR STAGE ═══ */}
         <div className="relative">
           <div
-            className="rounded-3xl border border-border-soft overflow-hidden relative"
+            className="rounded-3xl border border-white/60 overflow-hidden relative"
             style={{
               background: "linear-gradient(180deg, #F0FDF4 0%, #EEF2FF 100%)",
               minHeight: "480px",
@@ -811,14 +811,14 @@ export default function AvatarPage() {
               <div className="flex gap-3 w-full">
                 <button
                   onClick={handleRandomize}
-                  className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-border-soft bg-white text-text font-bold text-xs cursor-pointer transition-all hover:bg-bg-main hover:border-primary/30 active:scale-[0.97]"
+                  className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-white/60 bg-white text-text font-bold text-xs cursor-pointer transition-all hover:bg-bg-main hover:border-primary/30 active:scale-[0.97]"
                 >
                   <Shuffle size={14} />
                   Randomize
                 </button>
                 <button
                   onClick={handleReset}
-                  className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-border-soft bg-white text-text font-bold text-xs cursor-pointer transition-all hover:bg-bg-main hover:border-primary/30 active:scale-[0.97]"
+                  className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-white/60 bg-white text-text font-bold text-xs cursor-pointer transition-all hover:bg-bg-main hover:border-primary/30 active:scale-[0.97]"
                 >
                   <RotateCcw size={14} />
                   Reset
@@ -851,10 +851,10 @@ export default function AvatarPage() {
         </div>
 
         {/* ═══ CUSTOMIZATION PANELS ═══ */}
-        <div className="bg-white rounded-3xl border border-border-soft" style={{ padding: "28px" }}>
+        <div className="bg-white rounded-3xl border border-white/60" style={{ padding: "28px" }}>
           {/* Tabs */}
           <div
-            className="flex gap-1.5 mb-8 border-b border-border-soft pb-4 overflow-x-auto"
+            className="flex gap-1.5 mb-8 border-b border-white/60 pb-4 overflow-x-auto"
             style={{ scrollbarWidth: "none" }}
           >
             {TABS.map((tab) => (
