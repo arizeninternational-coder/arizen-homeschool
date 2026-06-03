@@ -1,7 +1,5 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
@@ -9,27 +7,21 @@ import {
   Music, Loader2, GraduationCap, Microscope, Cpu, PenTool,
   Map, Drama, Layers
 } from "lucide-react";
-import { PageHeader, EmptyStateCard, GradientButton } from "@/components/ui/Pill";
+import { PageHeader } from "@/components/ui/Pill";
+import { FloatingCard, BrowseGrid, CompactEmpty, CARD_COLORS } from "@/components/ui/FloatingCard";
+import { cn } from "@/lib/utils/cn";
 
 const SUBJECT_ICONS: Record<string, React.ElementType> = {
-  "Mathematics": Calculator, "Math": Calculator,
-  "English": BookOpen, "Language": Languages, "Languages": Languages,
-  "Science": FlaskConical, "Chemistry": FlaskConical, "Physics": FlaskConical, "Biology": Microscope,
-  "Geography": Globe, "Social Studies": Globe, "History": Map,
-  "Art": Palette, "Arts": Palette, "Creative Arts": Drama, "Drama": Drama,
-  "Music": Music,
-  "Computer": Cpu, "Computing": Cpu, "ICT": Cpu,
-  "General": BookOpen, "Reading": PenTool, "Writing": PenTool,
+  Mathematics: Calculator, Math: Calculator,
+  English: BookOpen, Language: Languages, Languages: Languages,
+  Science: FlaskConical, Chemistry: FlaskConical, Physics: FlaskConical, Biology: Microscope,
+  Geography: Globe, "Social Studies": Globe, History: Map,
+  Art: Palette, Arts: Palette, "Creative Arts": Drama, Drama: Drama,
+  Music: Music,
+  Computer: Cpu, Computing: Cpu, ICT: Cpu,
+  Kiswahili: Languages, CRE: BookOpen, "Physical Education": GraduationCap,
+  General: BookOpen, Reading: PenTool, Writing: PenTool,
 };
-
-const CARD_COLORS = [
-  { bg: "bg-accent-blue/10", border: "border-accent-blue/25", iconBg: "bg-accent-blue/20", iconColor: "text-accent-blue", gradient: "bg-gradient-to-r from-accent-blue to-accent-blue/80" },
-  { bg: "bg-primary/10", border: "border-primary/25", iconBg: "bg-primary/20", iconColor: "text-primary", gradient: "bg-gradient-to-r from-primary to-primary/80" },
-  { bg: "bg-secondary/10", border: "border-secondary/25", iconBg: "bg-secondary/20", iconColor: "text-secondary", gradient: "bg-gradient-to-r from-secondary to-secondary/80" },
-  { bg: "bg-accent-purple/10", border: "border-accent-purple/25", iconBg: "bg-accent-purple/20", iconColor: "text-accent-purple", gradient: "bg-gradient-to-r from-accent-purple to-accent-purple/80" },
-  { bg: "bg-gold/10", border: "border-gold/25", iconBg: "bg-gold/20", iconColor: "text-gold", gradient: "bg-gradient-to-r from-gold to-gold/80" },
-  { bg: "bg-pink/10", border: "border-pink/25", iconBg: "bg-pink/20", iconColor: "text-pink", gradient: "bg-gradient-to-r from-pink to-pink/80" },
-];
 
 interface SubjectData {
   id: string;
@@ -38,7 +30,6 @@ interface SubjectData {
   themeSlug: string;
   themeId: string;
   lessonCount: number;
-  color: string;
 }
 
 function getSubjectIcon(name: string): React.ElementType {
@@ -60,8 +51,7 @@ export default function SubjectsPage() {
         const profileRes = await fetch("/api/learner/profile", { credentials: "include" });
         if (profileRes.ok) {
           const profileData = await profileRes.json();
-          const grade = profileData?.profile?.grade ?? profileData?.grade ?? null;
-          setLearnerGrade(grade);
+          setLearnerGrade(profileData?.profile?.grade ?? profileData?.grade ?? null);
         }
 
         const res = await fetch("/api/learner/subjects", { credentials: "include" });
@@ -73,8 +63,7 @@ export default function SubjectsPage() {
         }
         const data = await res.json();
         setSubjects(data.subjects || []);
-      } catch (e: any) {
-        console.error("[SUBJECTS] Load error:", e);
+      } catch {
         setError("Unable to load subjects. Please try again.");
       }
       setLoading(false);
@@ -84,41 +73,32 @@ export default function SubjectsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh] animate-fade-in">
-        <div className="text-center">
-          <Loader2 size={40} className="animate-spin text-primary mx-auto mb-4" />
-          <p className="text-text-muted font-bold text-lg">Loading your subjects...</p>
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="flex flex-col items-center gap-3">
+          <div className="relative w-10 h-10">
+            <div className="absolute inset-0 rounded-full border-[3px] border-primary/15" />
+            <div className="absolute inset-0 rounded-full border-[3px] border-transparent border-t-primary animate-spin" />
+          </div>
+          <p className="text-sm font-bold text-text-muted">Loading your subjects...</p>
         </div>
       </div>
     );
   }
 
   if (error) {
-    return (
-      <div className="text-center py-12 px-4 animate-fade-in">
-        <div className="w-20 h-20 rounded-3xl bg-bg-main flex items-center justify-center mx-auto mb-5">
-          <BookOpen size={40} className="text-text-muted" />
-        </div>
-        <h3 className="text-xl font-extrabold text-text mb-2">{error}</h3>
-        <Link href="/dashboard/student" className="text-primary font-bold text-sm hover:underline">← Back to Dashboard</Link>
-      </div>
-    );
+    return <CompactEmpty icon={<BookOpen size={28} />} title={error} />;
   }
 
   if (subjects.length === 0) {
     return (
-      <div className="animate-fade-in">
-        <PageHeader
-          title="My Subjects"
-          subtitle="Explore your learning journey"
-        />
-        <EmptyStateCard
-          icon={<BookOpen size={36} />}
+      <div>
+        <PageHeader title="My Subjects" subtitle="Explore your learning journey" />
+        <CompactEmpty
+          icon={<BookOpen size={28} />}
           title="No subjects yet"
-          description={
-            learnerGrade
-              ? `No subjects found for Grade ${learnerGrade}. Ask your admin to add curriculum for your grade.`
-              : "Your subjects will appear here once your grade is set and curriculum is added by your admin."
+          description={learnerGrade
+            ? `No subjects found for Grade ${learnerGrade}. Ask your admin to add curriculum for your grade.`
+            : "Your subjects will appear here once your grade is set and curriculum is added by your admin."
           }
         />
       </div>
@@ -126,76 +106,45 @@ export default function SubjectsPage() {
   }
 
   return (
-    <div className="animate-fade-in">
+    <div>
       <PageHeader
         title="My Subjects"
-        subtitle={`Explore your learning journey · ${subjects.length} subject${subjects.length !== 1 ? "s" : ""}`}
-      >
-        {learnerGrade && (
-          <span className="inline-flex items-center gap-1.5 mt-2 px-3 py-1 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20">
-            Grade {learnerGrade}
-          </span>
-        )}
-      </PageHeader>
+        subtitle={`${subjects.length} subject${subjects.length !== 1 ? "s" : ""} available`}
+      />
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <BrowseGrid cols={4}>
         {subjects.map((subject, idx) => {
           const Icon = getSubjectIcon(subject.name);
           const color = CARD_COLORS[idx % CARD_COLORS.length];
           const hasLessons = subject.lessonCount > 0;
 
-          const cardContent = (
-            <>
-              {/* Color banner at top */}
-              <div className={`h-2 rounded-t-[1.4rem] -mx-5 -mt-5 mb-4 ${color.gradient}`} />
-
-              {/* Icon */}
-              <div className={`w-14 h-14 rounded-2xl ${color.iconBg} flex items-center justify-center mb-4`}>
-                <Icon size={28} className={color.iconColor} strokeWidth={2} />
-              </div>
-
-              {/* Subject name */}
-              <h3 className="text-base font-extrabold text-text mb-1 leading-tight">{subject.name}</h3>
-
-              {/* Lesson count */}
-              <p className="text-xs text-text-muted font-semibold mb-3">
-                {hasLessons
-                  ? `${subject.lessonCount} lesson${subject.lessonCount !== 1 ? "s" : ""}`
-                  : "No published lessons yet"}
-              </p>
-
-              {/* Action */}
-              {hasLessons ? (
-                <div className={`flex items-center gap-1.5 text-xs font-bold ${color.iconColor}`}>
-                  <GraduationCap size={14} />
-                  Open subject →
-                </div>
-              ) : (
-                <span className="text-[11px] text-text-muted italic">Ask your admin to publish</span>
-              )}
-            </>
-          );
-
           return (
             <div key={subject.id} className="group">
               {hasLessons ? (
-                <Link
-                  href={`/dashboard/student/lessons/${subject.themeSlug}`}
-                  className={`block rounded-[1.5rem] border ${color.border} bg-white p-5
-                    transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_35px_rgba(0,0,0,0.08)]
-                    cursor-pointer no-underline group-hover:border-opacity-50`}
-                >
-                  {cardContent}
+                <Link href={`/dashboard/student/lessons/${subject.themeSlug}`} className="block">
+                  <FloatingCard className={cn("text-center", color.border)}>
+                    <div className={cn("w-11 h-11 rounded-xl mx-auto mb-2.5 flex items-center justify-center", color.iconBg)}>
+                      <Icon size={22} className={color.textColor} />
+                    </div>
+                    <h3 className="text-sm font-extrabold text-text leading-tight mb-0.5">{subject.name}</h3>
+                    <p className="text-[10px] text-text-muted font-semibold">
+                      {hasLessons ? `${subject.lessonCount} lesson${subject.lessonCount !== 1 ? "s" : ""}` : "Coming soon"}
+                    </p>
+                  </FloatingCard>
                 </Link>
               ) : (
-                <div className={`rounded-[1.5rem] border ${color.border} bg-white p-5 opacity-70`}>
-                  {cardContent}
-                </div>
+                <FloatingCard className={cn("text-center opacity-60", color.border)}>
+                  <div className={cn("w-11 h-11 rounded-xl mx-auto mb-2.5 flex items-center justify-center", color.iconBg)}>
+                    <Icon size={22} className={color.textColor} />
+                  </div>
+                  <h3 className="text-sm font-extrabold text-text leading-tight mb-0.5">{subject.name}</h3>
+                  <p className="text-[10px] text-text-muted font-semibold">Coming soon</p>
+                </FloatingCard>
               )}
             </div>
           );
         })}
-      </div>
+      </BrowseGrid>
     </div>
   );
 }
