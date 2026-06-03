@@ -3,8 +3,9 @@ export const dynamic = "force-dynamic";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
-import { Layers, ArrowLeft, Plus, Search, AlertCircle, Edit, Trash2, Eye, X, Check } from "lucide-react";
-import { ds, colors } from "@/lib/design-system";
+import { Layers, ArrowLeft, Plus, Search, AlertCircle, Edit, Trash2, Eye, X, Check, Loader2 } from "lucide-react";
+import { PageHeader, GradientButton, EmptyStateCard } from "@/components/ui/Pill";
+import { QuestIcon } from "@/components/ui/Illustrations";
 
 interface QuestRecord {
   id: string;
@@ -53,7 +54,6 @@ export default function AdminQuestsPage() {
         const errBody = await res.json().catch(() => ({}));
         setError(errBody.error || "Failed to load quests");
       }
-      // Load themes for the create form
       const themesRes = await fetch("/api/themes", { credentials: "include" });
       if (themesRes.ok) {
         const themesData = await themesRes.json();
@@ -130,85 +130,88 @@ export default function AdminQuestsPage() {
   });
 
   return (
-    <div style={{ minHeight: "100vh", background: colors.bg }}>
-      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "2rem 1.5rem" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
-          <Link href="/dashboard/admin" style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", color: colors.textMuted, textDecoration: "none", fontSize: "0.875rem", fontWeight: 600 }}>
-            <ArrowLeft style={{ width: 16, height: 16 }} /> Back to Admin Dashboard
+    <div className="min-h-screen bg-bg-main">
+      <div className="max-w-[1100px] mx-auto py-8 px-6">
+        {/* Top bar */}
+        <div className="flex justify-between items-center mb-6">
+          <Link href="/dashboard/admin" className="inline-flex items-center gap-2 text-text-muted hover:text-text text-sm font-semibold transition-colors">
+            <ArrowLeft className="w-4 h-4" /> Back to Admin Dashboard
           </Link>
-          <button onClick={() => signOut({ callbackUrl: "/" })} style={{ display: "flex", alignItems: "center", gap: "0.375rem", padding: "0.375rem 0.75rem", borderRadius: 8, border: `1px solid ${colors.border}`, background: "none", color: colors.textMuted, cursor: "pointer", fontSize: "0.8125rem", fontWeight: 600 }}>
+          <button onClick={() => signOut({ callbackUrl: "/" })} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border-soft text-text-muted hover:bg-white hover:border-primary/30 cursor-pointer text-xs font-semibold transition-all">
             Sign Out
           </button>
         </div>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", flexWrap: "wrap", gap: "1rem" }}>
-          <div>
-            <h1 style={{ fontSize: "1.5rem", fontWeight: 800, color: colors.text, marginBottom: "0.25rem" }}>Quests</h1>
-            <p style={{ color: colors.textMuted }}>{quests.length} quests across all themes</p>
+        {/* Header */}
+        <PageHeader title="Quests" subtitle={`${quests.length} quests across all themes`}>
+          <div className="mt-4">
+            <GradientButton variant="primary" size="sm" icon={<Plus className="w-4 h-4" />} onClick={() => setShowCreate(!showCreate)}>
+              Create Quest
+            </GradientButton>
           </div>
-          <button onClick={() => setShowCreate(!showCreate)} style={{ ...ds.btnPrimary, fontSize: "0.875rem", padding: "0.625rem 1.25rem" }}>
-            <Plus style={{ width: 14, height: 14 }} /> Create Quest
-          </button>
-        </div>
+        </PageHeader>
 
+        {/* Error */}
         {error && (
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.75rem 1rem", borderRadius: 10, marginBottom: "1.5rem", background: `${colors.warning || "#F59E0B"}15`, border: `1px solid ${colors.warning || "#F59E0B"}30`, color: colors.warning || "#B45309", fontSize: "0.875rem", fontWeight: 600 }}>
-            <AlertCircle style={{ width: 16, height: 16 }} /> {error}
+          <div className="flex items-center gap-2 p-3 rounded-2xl mb-6 bg-amber-50 border border-amber-200 text-amber-800 text-sm font-semibold">
+            <AlertCircle className="w-4 h-4 flex-shrink-0" /> {error}
           </div>
         )}
 
         {/* Create Form */}
         {showCreate && (
-          <div style={{ ...ds.card, padding: "1.5rem", marginBottom: "1.5rem" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-              <h2 style={{ fontSize: "1rem", fontWeight: 700, color: colors.text }}>Create New Quest</h2>
-              <button onClick={() => { setShowCreate(false); setCreateMsg(null); }} style={{ background: "none", border: "none", cursor: "pointer", color: colors.textMuted }}><X style={{ width: 18, height: 18 }} /></button>
+          <div className="rounded-[1.75rem] border border-border-soft bg-white p-6 mb-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-base font-bold text-text">Create New Quest</h2>
+              <button onClick={() => { setShowCreate(false); setCreateMsg(null); }} className="text-text-muted hover:text-text transition-colors cursor-pointer p-1 rounded-lg hover:bg-bg-main"><X className="w-5 h-5" /></button>
             </div>
             {createMsg && (
-              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.75rem 1rem", borderRadius: 10, marginBottom: "1rem", background: createMsg.type === "success" ? `${colors.success}10` : `${colors.warning || "#EF4444"}10`, color: createMsg.type === "success" ? colors.success : "#DC2626", fontSize: "0.875rem", fontWeight: 600 }}>
-                {createMsg.type === "success" ? <Check style={{ width: 16, height: 16 }} /> : <AlertCircle style={{ width: 16, height: 16 }} />}
+              <div className={`flex items-center gap-2 p-3 rounded-2xl mb-4 text-sm font-semibold ${createMsg.type === "success" ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-red-50 text-red-700 border border-red-200"}`}>
+                {createMsg.type === "success" ? <Check className="w-4 h-4 flex-shrink-0" /> : <AlertCircle className="w-4 h-4 flex-shrink-0" />}
                 {createMsg.text}
               </div>
             )}
-            <form onSubmit={handleCreate} style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-              <input type="text" value={createTitle} onChange={e => setCreateTitle(e.target.value)} placeholder="Quest title *" required style={{ ...ds.input, fontSize: "0.875rem" }} />
-              <textarea value={createDesc} onChange={e => setCreateDesc(e.target.value)} placeholder="Description (optional)" rows={2} style={{ ...ds.input, fontSize: "0.875rem", resize: "vertical" }} />
-              <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
-                <select value={createThemeId} onChange={e => setCreateThemeId(e.target.value)} required style={{ ...ds.input, fontSize: "0.875rem", flex: 1, minWidth: 160 }}>
+            <form onSubmit={handleCreate} className="flex flex-col gap-3">
+              <input type="text" value={createTitle} onChange={e => setCreateTitle(e.target.value)} placeholder="Quest title *" required className="w-full px-4 py-2.5 rounded-2xl text-sm font-medium text-text bg-bg-main border border-border-soft placeholder:text-text-muted/60 focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all" />
+              <textarea value={createDesc} onChange={e => setCreateDesc(e.target.value)} placeholder="Description (optional)" rows={2} className="w-full px-4 py-2.5 rounded-2xl text-sm font-medium text-text bg-bg-main border border-border-soft placeholder:text-text-muted/60 focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all resize-y" />
+              <div className="flex gap-3 flex-wrap">
+                <select value={createThemeId} onChange={e => setCreateThemeId(e.target.value)} required className="px-4 py-2.5 rounded-2xl text-sm font-medium text-text bg-bg-main border border-border-soft focus:outline-none focus:border-primary/40 transition-all flex-1 min-w-[160px]">
                   <option value="">Select theme *</option>
                   {themes.map(t => <option key={t.id} value={t.id}>Grade {t.grade} — {t.title}</option>)}
                 </select>
-                <select value={createType} onChange={e => setCreateType(e.target.value)} style={{ ...ds.input, fontSize: "0.875rem", minWidth: 120 }}>
+                <select value={createType} onChange={e => setCreateType(e.target.value)} className="px-4 py-2.5 rounded-2xl text-sm font-medium text-text bg-bg-main border border-border-soft focus:outline-none focus:border-primary/40 transition-all min-w-[120px]">
                   <option value="MAIN">Main Quest</option>
                   <option value="SIDE">Side Quest</option>
                   <option value="CHALLENGE">Challenge</option>
                 </select>
-                <select value={createStatus} onChange={e => setCreateStatus(e.target.value)} style={{ ...ds.input, fontSize: "0.875rem", minWidth: 120 }}>
+                <select value={createStatus} onChange={e => setCreateStatus(e.target.value)} className="px-4 py-2.5 rounded-2xl text-sm font-medium text-text bg-bg-main border border-border-soft focus:outline-none focus:border-primary/40 transition-all min-w-[120px]">
                   <option value="DRAFT">Draft</option>
                   <option value="REVIEW">Review</option>
                   <option value="PUBLISHED">Published</option>
                 </select>
               </div>
-              <button type="submit" disabled={creating} style={{ ...ds.btnPrimary, fontSize: "0.875rem", padding: "0.75rem 1.5rem", alignSelf: "flex-start" }}>
-                {creating ? "Creating..." : "Create Quest"}
+              <button type="submit" disabled={creating} className="self-start">
+                <GradientButton variant="primary" size="sm" disabled={creating}>
+                  {creating ? <><Loader2 className="w-4 h-4 animate-spin" /> Creating...</> : "Create Quest"}
+                </GradientButton>
               </button>
             </form>
           </div>
         )}
 
         {/* Filters */}
-        <div style={{ display: "flex", gap: "0.75rem", marginBottom: "1.5rem", flexWrap: "wrap" }}>
-          <div style={{ position: "relative", flex: 1, minWidth: 200 }}>
-            <Search style={{ position: "absolute", left: "0.875rem", top: "50%", transform: "translateY(-50%)", width: 16, height: 16, color: colors.textMuted }} />
-            <input placeholder="Search quests..." value={search} onChange={e => setSearch(e.target.value)} style={{ ...ds.input, paddingLeft: "2.5rem", fontSize: "0.875rem" }} />
+        <div className="flex gap-3 mb-6 flex-wrap">
+          <div className="relative flex-1 min-w-[200px]">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+            <input placeholder="Search quests..." value={search} onChange={e => setSearch(e.target.value)} className="w-full pl-10 pr-4 py-2.5 rounded-2xl text-sm font-medium text-text bg-white border border-border-soft placeholder:text-text-muted/60 focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all" />
           </div>
           {grades.length > 0 && (
-            <select value={filterGrade} onChange={e => setFilterGrade(e.target.value)} style={{ ...ds.input, fontSize: "0.875rem", minWidth: 120 }}>
+            <select value={filterGrade} onChange={e => setFilterGrade(e.target.value)} className="px-4 py-2.5 rounded-2xl text-sm font-medium text-text bg-white border border-border-soft focus:outline-none focus:border-primary/40 transition-all min-w-[120px]">
               <option value="all">All Grades</option>
               {grades.map(g => <option key={g} value={g}>Grade {g}</option>)}
             </select>
           )}
-          <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{ ...ds.input, fontSize: "0.875rem", minWidth: 120 }}>
+          <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="px-4 py-2.5 rounded-2xl text-sm font-medium text-text bg-white border border-border-soft focus:outline-none focus:border-primary/40 transition-all min-w-[120px]">
             <option value="all">All Status</option>
             <option value="DRAFT">Draft</option>
             <option value="REVIEW">Review</option>
@@ -216,40 +219,37 @@ export default function AdminQuestsPage() {
           </select>
         </div>
 
+        {/* Content */}
         {loading ? (
-          <div style={{ ...ds.card, textAlign: "center", padding: "3rem 2rem", color: colors.textMuted }}>Loading quests...</div>
-        ) : filtered.length === 0 ? (
-          <div style={{ ...ds.card, textAlign: "center", padding: "3rem 2rem" }}>
-            <Layers style={{ width: 48, height: 48, color: colors.textMuted, margin: "0 auto 1rem", opacity: 0.4 }} />
-            <h3 style={{ fontSize: "1.125rem", fontWeight: 700, color: colors.text, marginBottom: "0.5rem" }}>
-              {search || filterGrade !== "all" || filterStatus !== "all" ? "No quests match your filters" : "No quests found"}
-            </h3>
-            <p style={{ color: colors.textMuted, fontSize: "0.9375rem" }}>
-              {search || filterGrade !== "all" || filterStatus !== "all" ? "Try adjusting your search or filters." : "Create your first quest using the button above, or run the seed script."}
-            </p>
+          <div className="rounded-[1.75rem] border border-border-soft bg-white p-12 text-center">
+            <Loader2 className="w-8 h-8 text-primary animate-spin mx-auto mb-3" />
+            <p className="text-text-muted text-sm font-medium">Loading quests...</p>
           </div>
+        ) : filtered.length === 0 ? (
+          <EmptyStateCard
+            icon={<QuestIcon size={48} />}
+            title={search || filterGrade !== "all" || filterStatus !== "all" ? "No quests match your filters" : "No quests found"}
+            description={search || filterGrade !== "all" || filterStatus !== "all" ? "Try adjusting your search or filters." : "Create your first quest using the button above, or run the seed script."}
+          />
         ) : (
-          <div style={{ display: "grid", gap: "0.5rem" }}>
+          <div className="flex flex-col gap-2">
             {filtered.map(quest => (
-              <Link key={quest.id} href={`/dashboard/admin/quests/${quest.id}`} style={{ ...ds.card, padding: "1rem 1.25rem", display: "flex", alignItems: "center", gap: "1rem", textDecoration: "none" }}>
-                <div style={{ width: 40, height: 40, borderRadius: 10, background: colors.primarySoft, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                  <Layers style={{ width: 18, height: 18, color: colors.primary }} />
+              <Link key={quest.id} href={`/dashboard/admin/quests/${quest.id}`} className="rounded-[1.75rem] border border-border-soft bg-white p-4 flex items-center gap-4 hover:shadow-[0_4px_20px_rgba(15,23,42,0.06)] transition-all group">
+                <div className="w-10 h-10 rounded-2xl bg-primary-soft flex items-center justify-center flex-shrink-0">
+                  <Layers className="w-[18px] h-[18px] text-primary" />
                 </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 700, color: colors.text, fontSize: "0.9375rem" }}>{quest.title}</div>
-                  <div style={{ fontSize: "0.75rem", color: colors.textMuted, marginTop: "0.125rem" }}>
+                <div className="flex-1 min-w-0">
+                  <div className="font-bold text-text text-sm group-hover:text-primary transition-colors">{quest.title}</div>
+                  <div className="text-xs text-text-muted mt-0.5">
                     {quest.theme && <span>Grade {quest.theme.grade} · {quest.theme.title}</span>}
-                    <span style={{ marginLeft: "0.75rem" }}>{quest.questType}</span>
+                    <span className="ml-3">{quest.questType}</span>
                   </div>
                 </div>
-                <span style={{
-                  fontSize: "0.6875rem", fontWeight: 700,
-                  color: quest.status === "PUBLISHED" ? colors.success : colors.warning || "#F59E0B",
-                  background: quest.status === "PUBLISHED" ? `${colors.success}15` : `${colors.warning || "#F59E0B"}15`,
-                  padding: "0.2rem 0.5rem", borderRadius: 6, flexShrink: 0, textTransform: "uppercase"
-                }}>{quest.status}</span>
-                <button onClick={() => handleDelete(quest.id, quest.title)} style={{ background: "none", border: "none", cursor: "pointer", color: colors.textMuted, padding: "0.25rem", flexShrink: 0 }} title="Delete">
-                  <Trash2 style={{ width: 14, height: 14 }} />
+                <span className={`text-[0.6875rem] font-bold px-2 py-1 rounded-lg flex-shrink-0 uppercase ${
+                  quest.status === "PUBLISHED" ? "text-emerald-700 bg-emerald-50" : "text-amber-700 bg-amber-50"
+                }`}>{quest.status}</span>
+                <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDelete(quest.id, quest.title); }} className="text-text-muted hover:text-red-500 p-1 rounded-lg hover:bg-red-50 transition-all flex-shrink-0 cursor-pointer" title="Delete">
+                  <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </Link>
             ))}

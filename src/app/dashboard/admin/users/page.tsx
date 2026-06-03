@@ -5,8 +5,9 @@ export const dynamic = "force-dynamic";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
-import { Users, ArrowLeft, Plus, Search, Shield, UserCheck, GraduationCap, Mail, Calendar } from "lucide-react";
-import { ds, colors } from "@/lib/design-system";
+import { Users, ArrowLeft, Plus, Search, Shield, UserCheck, GraduationCap, Mail, Calendar, Loader2 } from "lucide-react";
+import { PageHeader, StatCard, EmptyStateCard } from "@/components/ui/Pill";
+import { GradientButton } from "@/components/ui/Pill";
 
 interface UserRecord {
   id: string;
@@ -25,12 +26,6 @@ const roleIcons: Record<string, any> = {
   ADMIN: Shield,
   PARENT: UserCheck,
   LEARNER: GraduationCap,
-};
-
-const roleColors: Record<string, string> = {
-  ADMIN: colors.warning || "#F59E0B",
-  PARENT: colors.accent,
-  LEARNER: colors.success,
 };
 
 export default function AdminUsersPage() {
@@ -65,86 +60,103 @@ export default function AdminUsersPage() {
     return (u.name || "").toLowerCase().includes(q) || (u.email || "").toLowerCase().includes(q);
   });
 
+  const adminCount = users.filter(u => u.role === "ADMIN").length;
+  const parentCount = users.filter(u => u.role === "PARENT").length;
+  const learnerCount = users.filter(u => u.role === "LEARNER").length;
+
   return (
-    <div style={{ minHeight: "100vh", background: colors.bg }}>
-      <div style={{ maxWidth: 1000, margin: "0 auto", padding: "2rem 1.5rem" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
-          <Link href="/dashboard/admin" style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", color: colors.textMuted, textDecoration: "none", fontSize: "0.875rem", fontWeight: 600 }}>
-            <ArrowLeft style={{ width: 16, height: 16 }} /> Back to Admin Dashboard
+    <div className="min-h-screen bg-bg-main">
+      <div className="max-w-[1000px] mx-auto py-8 px-6">
+        {/* Top bar */}
+        <div className="flex justify-between items-center mb-6">
+          <Link href="/dashboard/admin" className="inline-flex items-center gap-2 text-text-muted hover:text-text text-sm font-semibold transition-colors">
+            <ArrowLeft className="w-4 h-4" /> Back to Admin Dashboard
           </Link>
-          <button onClick={() => signOut({ callbackUrl: "/" })} style={{ display: "flex", alignItems: "center", gap: "0.375rem", padding: "0.375rem 0.75rem", borderRadius: 8, border: `1px solid ${colors.border}`, background: "none", color: colors.textMuted, cursor: "pointer", fontSize: "0.8125rem", fontWeight: 600 }}>
+          <button onClick={() => signOut({ callbackUrl: "/" })} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border-soft text-text-muted hover:bg-white hover:border-primary/30 cursor-pointer text-xs font-semibold transition-all">
             Sign Out
           </button>
         </div>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", flexWrap: "wrap", gap: "1rem" }}>
-          <div>
-            <h1 style={{ fontSize: "1.5rem", fontWeight: 800, color: colors.text, marginBottom: "0.25rem" }}>Users</h1>
-            <p style={{ color: colors.textMuted }}>{users.length} total users in the system</p>
+        {/* Header */}
+        <PageHeader title="Users" subtitle={`${users.length} total users in the system`}>
+          <div className="mt-4">
+            <GradientButton variant="primary" size="sm" icon={<Plus className="w-4 h-4" />} disabled>
+              Add User
+            </GradientButton>
           </div>
-          <button style={{ ...ds.btnPrimary, fontSize: "0.875rem", padding: "0.625rem 1.25rem", cursor: "default" }}>
-            <Plus style={{ width: 14, height: 14 }} /> Add User
-          </button>
+        </PageHeader>
+
+        {/* Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          <StatCard label="Admins" value={adminCount} gradient="bg-card-gradient-gold" borderColor="border-gold/20" textColor="text-amber-700" icon={<Shield className="w-5 h-5 text-gold" />} />
+          <StatCard label="Parents" value={parentCount} gradient="bg-card-gradient-purple" borderColor="border-accent-purple/20" textColor="text-primary-dark" icon={<UserCheck className="w-5 h-5 text-accent-purple" />} />
+          <StatCard label="Learners" value={learnerCount} gradient="bg-card-gradient-green" borderColor="border-secondary/20" textColor="text-emerald-700" icon={<GraduationCap className="w-5 h-5 text-emerald-600" />} />
         </div>
 
         {/* Search */}
-        <div style={{ position: "relative", marginBottom: "1.5rem" }}>
-          <Search style={{ position: "absolute", left: "0.875rem", top: "50%", transform: "translateY(-50%)", width: 16, height: 16, color: colors.textMuted }} />
+        <div className="relative mb-6">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
           <input
             placeholder="Search users by name or email..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            style={{ ...ds.input, paddingLeft: "2.5rem", fontSize: "0.875rem" }}
+            className="w-full pl-10 pr-4 py-2.5 rounded-2xl text-sm font-medium text-text bg-white border border-border-soft placeholder:text-text-muted/60 focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all"
           />
         </div>
 
+        {/* Error */}
         {error && (
-          <div style={{ padding: "0.75rem 1rem", borderRadius: 10, marginBottom: "1rem", background: `${colors.warning || "#F59E0B"}15`, border: `1px solid ${colors.warning || "#F59E0B"}30`, color: colors.warning || "#B45309", fontSize: "0.875rem", fontWeight: 600 }}>
+          <div className="p-3 rounded-2xl mb-4 bg-amber-50 border border-amber-200 text-amber-800 text-sm font-semibold">
             {error}
           </div>
         )}
 
+        {/* Content */}
         {loading ? (
-          <div style={{ ...ds.card, textAlign: "center", padding: "3rem 2rem", color: colors.textMuted }}>Loading users...</div>
-        ) : filtered.length === 0 ? (
-          <div style={{ ...ds.card, textAlign: "center", padding: "3rem 2rem" }}>
-            <Users style={{ width: 48, height: 48, color: colors.textMuted, margin: "0 auto 1rem", opacity: 0.4 }} />
-            <h3 style={{ fontSize: "1.125rem", fontWeight: 700, color: colors.text, marginBottom: "0.5rem" }}>
-              {search ? "No users match your search" : "No users found"}
-            </h3>
-            <p style={{ color: colors.textMuted, fontSize: "0.9375rem" }}>
-              {search ? "Try a different search term." : "Users will appear here once they register."}
-            </p>
+          <div className="rounded-[1.75rem] border border-border-soft bg-white p-12 text-center">
+            <Loader2 className="w-8 h-8 text-primary animate-spin mx-auto mb-3" />
+            <p className="text-text-muted text-sm font-medium">Loading users...</p>
           </div>
+        ) : filtered.length === 0 ? (
+          <EmptyStateCard
+            icon={<Users size={48} />}
+            title={search ? "No users match your search" : "No users found"}
+            description={search ? "Try a different search term." : "Users will appear here once they register."}
+          />
         ) : (
-          <div style={{ display: "grid", gap: "0.75rem" }}>
+          <div className="flex flex-col gap-3">
             {filtered.map((u) => {
               const RoleIcon = roleIcons[u.role] || Users;
-              const roleColor = roleColors[u.role] || colors.textMuted;
+              const roleColor = u.role === "ADMIN" ? "text-gold" : u.role === "PARENT" ? "text-accent-purple" : "text-emerald-600";
+              const roleBg = u.role === "ADMIN" ? "bg-amber-50" : u.role === "PARENT" ? "bg-primary-soft" : "bg-emerald-50";
               return (
-                <div key={u.id} style={{ ...ds.card, padding: "1rem 1.25rem", display: "flex", alignItems: "center", gap: "1rem" }}>
-                  <div style={{ width: 44, height: 44, borderRadius: "50%", background: `${roleColor}15`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <RoleIcon style={{ width: 20, height: 20, color: roleColor }} />
+                <div key={u.id} className="rounded-[1.75rem] border border-border-soft bg-white p-4 flex items-center gap-4 hover:shadow-[0_4px_20px_rgba(15,23,42,0.06)] transition-all">
+                  <div className={`w-11 h-11 rounded-full ${roleBg} flex items-center justify-center flex-shrink-0`}>
+                    <RoleIcon className={`w-5 h-5 ${roleColor}`} />
                   </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 700, color: colors.text, fontSize: "0.9375rem" }}>{u.name || "Unnamed User"}</div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "0.8125rem", color: colors.textMuted, marginTop: "0.125rem" }}>
-                      <Mail style={{ width: 12, height: 12 }} /> {u.email || "No email"}
+                  <div className="flex-1 min-w-0">
+                    <div className="font-bold text-text text-sm">{u.name || "Unnamed User"}</div>
+                    <div className="flex items-center gap-1.5 text-xs text-text-muted mt-0.5">
+                      <Mail className="w-3 h-3" /> {u.email || "No email"}
                     </div>
                     {u.learnerProfile && (
-                      <div style={{ fontSize: "0.75rem", color: colors.textMuted, marginTop: "0.25rem" }}>
+                      <div className="text-xs text-text-muted mt-1">
                         Grade {u.learnerProfile.grade} · {u.learnerProfile.totalXp} XP
                       </div>
                     )}
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexShrink: 0 }}>
-                    <span style={{ fontSize: "0.6875rem", fontWeight: 700, color: roleColor, background: `${roleColor}15`, padding: "0.2rem 0.5rem", borderRadius: 6 }}>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <span className={`text-[0.6875rem] font-bold px-2 py-1 rounded-lg ${
+                      u.role === "ADMIN" ? "text-amber-700 bg-amber-50" :
+                      u.role === "PARENT" ? "text-accent-purple bg-primary-soft" :
+                      "text-emerald-700 bg-emerald-50"
+                    }`}>
                       {u.role}
                     </span>
                   </div>
                   {u.createdAt && (
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.25rem", fontSize: "0.6875rem", color: colors.textMuted, flexShrink: 0 }}>
-                      <Calendar style={{ width: 10, height: 10 }} />
+                    <div className="flex items-center gap-1 text-[0.6875rem] text-text-muted flex-shrink-0">
+                      <Calendar className="w-3 h-3" />
                       {new Date(u.createdAt).toLocaleDateString()}
                     </div>
                   )}
@@ -154,8 +166,8 @@ export default function AdminUsersPage() {
           </div>
         )}
 
-        <div style={{ marginTop: "1.5rem", padding: "1rem", borderRadius: 10, background: colors.bgAlt, fontSize: "0.8125rem", color: colors.textMuted }}>
-          <strong>Note:</strong> New users can be created via the <Link href="/auth/register" style={{ color: colors.primary, fontWeight: 600 }}>registration page</Link>. User management CRUD (edit, delete, role changes) is coming soon.
+        <div className="mt-6 p-4 rounded-2xl bg-bg-main text-xs text-text-muted">
+          <strong>Note:</strong> New users can be created via the <Link href="/auth/register" className="text-primary font-semibold hover:underline">registration page</Link>. User management CRUD (edit, delete, role changes) is coming soon.
         </div>
       </div>
     </div>

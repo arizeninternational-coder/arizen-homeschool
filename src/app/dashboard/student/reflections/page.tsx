@@ -3,9 +3,10 @@
 export const dynamic = "force-dynamic";
 
 import { useState, useEffect } from "react";
-import { Heart, CheckCircle2 } from "lucide-react";
-
-const C = { page: "#F7FBF7", teal: "#047A70", dark: "#0F172A", body: "#64748B", white: "#FFFFFF", border: "#E2E8F0" };
+import { Heart, RefreshCw, PenLine, Frown, Meh, Smile, Laugh, SmilePlus } from "lucide-react";
+import { PageHeader, SectionHeader, GradientButton, EmptyStateCard } from "@/components/ui/Pill";
+import { HeartIcon } from "@/components/ui/Illustrations";
+import { cn } from "@/lib/utils/cn";
 
 const PROMPTS = [
   "How did today's lesson make you feel?",
@@ -39,6 +40,18 @@ function getReflectionDate(r: any): string {
   if (!d) return "";
   try { return new Date(d).toLocaleDateString(); } catch { return ""; }
 }
+
+function getMood(r: any): string {
+  return r?.mood || r?.moodIndicator || "";
+}
+
+const MOOD_CONFIG: Record<string, { color: string; bg: string; Icon: React.FC<any> }> = {
+  sad:     { color: "text-red-500",  bg: "bg-red-soft",   Icon: Frown },
+  neutral: { color: "text-amber-500", bg: "bg-gold-soft",  Icon: Meh },
+  happy:   { color: "text-blue-500", bg: "bg-accent-blue-soft", Icon: Smile },
+  excited: { color: "text-emerald-500", bg: "bg-secondary-soft", Icon: Laugh },
+  joyful:  { color: "text-pink",     bg: "bg-pink-soft",  Icon: SmilePlus },
+};
 
 export default function ReflectionsPage() {
   const [reflections, setReflections] = useState<any[]>([]);
@@ -82,59 +95,128 @@ export default function ReflectionsPage() {
 
   if (loading) {
     return (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh" }}>
-        <p style={{ color: C.body, fontWeight: 600 }}>Loading reflections...</p>
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="w-10 h-10 rounded-full border-4 border-pink/20 border-t-pink spinner" />
       </div>
     );
   }
 
   return (
-    <div>
-      <h1 style={{ fontSize: "1.5rem", fontWeight: 800, color: C.dark, margin: "0 0 0.5rem 0" }}>
-        <Heart size={22} style={{ display: "inline", verticalAlign: "middle", marginRight: 8, color: "#E11D48" }} /> Reflections
-      </h1>
-      <p style={{ color: C.body, fontSize: "0.9375rem", margin: "0 0 20px 0" }}>Share your thoughts and feelings after each lesson.</p>
+    <div className="fade-in">
+      <PageHeader
+        title="My Reflections"
+        subtitle="Share your thoughts and feelings after each lesson."
+      >
+        <div className="flex items-center gap-2 mt-3">
+          <div className="w-9 h-9 rounded-2xl bg-pink-soft flex items-center justify-center">
+            <HeartIcon size={18} />
+          </div>
+        </div>
+      </PageHeader>
 
-      {/* Write new reflection */}
-      <div style={{ background: "#FFF1F2", borderRadius: 16, border: "1px solid #FECDD3", padding: "20px", marginBottom: 24 }}>
-        <p style={{ fontSize: "0.75rem", fontWeight: 700, color: "#E11D48", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 8 }}>New Reflection</p>
-        <p style={{ fontSize: "0.875rem", fontWeight: 600, color: C.dark, marginBottom: 12 }}>{prompt}</p>
-        <textarea value={text} onChange={e => setText(e.target.value)} placeholder="Write your thoughts here..." style={{
-          width: "100%", minHeight: 100, padding: "12px", borderRadius: 10,
-          border: "1px solid #E2E8F0", fontSize: "0.875rem", fontFamily: "inherit",
-          resize: "vertical", boxSizing: "border-box",
-        }} />
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 12 }}>
-          <button onClick={() => setPrompt(PROMPTS[Math.floor(Math.random() * PROMPTS.length)])} style={{
-            padding: "6px 12px", borderRadius: 8, border: "1px solid #E2E8F0",
-            background: "#fff", color: C.body, fontWeight: 600, fontSize: "0.75rem", cursor: "pointer",
-          }}>🔄 New Prompt</button>
-          <button onClick={handleSave} disabled={saving || !text.trim()} style={{
-            padding: "8px 20px", borderRadius: 10, border: "none",
-            background: text.trim() ? C.teal : "#E2E8F0", color: text.trim() ? "#fff" : "#94A3B8",
-            fontWeight: 700, fontSize: "0.8125rem", cursor: text.trim() ? "pointer" : "default",
-          }}>{saving ? "Saving..." : saved ? "✓ Saved" : "Save Reflection"}</button>
+      {/* ── New Reflection Form ── */}
+      <div className="relative rounded-[1.75rem] border border-pink/20 p-6 mb-6 overflow-hidden"
+        style={{ background: "linear-gradient(135deg, #FFF1F2 0%, #FFF0F6 50%, #FFE4EC 100%)" }}>
+        <div className="absolute top-3 right-5 opacity-20">
+          <Heart className="w-16 h-16 text-pink" />
+        </div>
+        <div className="relative z-10">
+          <div className="flex items-center gap-2 mb-3">
+            <PenLine className="w-4 h-4 text-pink" />
+            <p className="text-[10px] font-extrabold uppercase tracking-[0.15em] text-pink">New Reflection</p>
+          </div>
+          <p className="text-sm font-bold text-text mb-4">{prompt}</p>
+          <textarea
+            value={text}
+            onChange={e => setText(e.target.value)}
+            placeholder="Write your thoughts here..."
+            className="w-full min-h-[100px] p-4 rounded-2xl border border-pink/20 bg-white/80 text-sm text-text placeholder:text-text-muted resize-vertical focus:outline-none focus:ring-2 focus:ring-pink/30 transition-all"
+          />
+          <div className="flex items-center justify-between mt-4 gap-3 flex-wrap">
+            <button
+              onClick={() => setPrompt(PROMPTS[Math.floor(Math.random() * PROMPTS.length)])}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-pink/20 bg-white/80 text-xs font-bold text-text-muted hover:bg-white hover:text-text transition-all"
+            >
+              <RefreshCw className="w-3.5 h-3.5" /> New Prompt
+            </button>
+            <GradientButton
+              variant={saved ? "success" : "primary"}
+              size="sm"
+              icon={saved ? undefined : <PenLine className="w-4 h-4" />}
+              onClick={handleSave}
+              disabled={saving || !text.trim()}
+            >
+              {saving ? (
+                <span className="flex items-center gap-2">
+                  <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full spinner" />
+                  Saving...
+                </span>
+              ) : saved ? "Saved!" : "Save Reflection"}
+            </GradientButton>
+          </div>
         </div>
       </div>
 
-      {/* Past reflections */}
+      {/* ── Past Reflections ── */}
       {reflections.length === 0 ? (
-        <div style={{ textAlign: "center", padding: "3rem", background: "#fff", borderRadius: 16, border: "1px solid #E2E8F0" }}>
-          <Heart size={32} style={{ color: "#94A3B8", margin: "0 auto 1rem" }} />
-          <p style={{ color: C.body, fontWeight: 600 }}>No reflections yet.</p>
-          <p style={{ color: "#94A3B8", fontSize: "0.875rem", marginTop: 4 }}>Write your first reflection above!</p>
-        </div>
+        <EmptyStateCard
+          icon={<Heart className="w-8 h-8" />}
+          title="No reflections yet"
+          description="Write your first reflection above!"
+        />
       ) : (
-        <div style={{ display: "grid", gap: 12 }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {reflections.map((r, i) => {
             const reflectionText = getReflectionText(r);
             const reflectionPrompt = getReflectionPrompt(r);
             const reflectionDate = getReflectionDate(r);
+            const mood = getMood(r);
+            const moodConfig = mood ? MOOD_CONFIG[mood.toLowerCase()] : null;
+            const MoodIcon = moodConfig?.Icon;
+
             return (
-              <div key={i} style={{ padding: "16px", borderRadius: 12, background: "#fff", border: "1px solid #E2E8F0" }}>
-                <p style={{ fontSize: "0.6875rem", fontWeight: 700, color: "#E11D48", marginBottom: 4 }}>{reflectionPrompt}</p>
-                {reflectionText && <p style={{ fontSize: "0.875rem", color: C.dark, margin: "0 0 6px 0" }}>{reflectionText}</p>}
-                {reflectionDate && <span style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>{reflectionDate}</span>}
+              <div
+                key={i}
+                className={cn(
+                  "rounded-[1.25rem] border bg-white p-5 transition-all duration-200",
+                  "hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(15,23,42,0.06)]",
+                  moodConfig ? `border-${moodConfig.color.replace("text-", "")}/20` : "border-border-soft"
+                )}
+              >
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <p className="text-[10px] font-extrabold uppercase tracking-[0.12em] text-pink leading-tight">
+                    {reflectionPrompt}
+                  </p>
+                  {moodConfig && MoodIcon && (
+                    <div className={cn("w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0", moodConfig.bg)}>
+                      <MoodIcon className={cn("w-4 h-4", moodConfig.color)} />
+                    </div>
+                  )}
+                </div>
+                {reflectionText && (
+                  <p className="text-sm text-text-muted leading-relaxed mb-3 line-clamp-3">
+                    {reflectionText}
+                  </p>
+                )}
+                <div className="flex items-center justify-between">
+                  {reflectionDate && (
+                    <span className="text-xs font-semibold text-text-muted">{reflectionDate}</span>
+                  )}
+                  {mood && (
+                    <span className="flex items-center gap-1.5 text-xs font-bold text-text-muted">
+                      <span className={cn(
+                        "w-2 h-2 rounded-full",
+                        mood === "sad" ? "bg-red-400" :
+                        mood === "neutral" ? "bg-amber-400" :
+                        mood === "happy" ? "bg-blue-400" :
+                        mood === "excited" ? "bg-emerald-400" :
+                        mood === "joyful" ? "bg-pink" :
+                        "bg-text-muted"
+                      )} />
+                      {mood}
+                    </span>
+                  )}
+                </div>
               </div>
             );
           })}

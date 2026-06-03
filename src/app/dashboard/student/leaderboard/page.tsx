@@ -3,9 +3,8 @@
 export const dynamic = "force-dynamic";
 
 import { useState, useEffect } from "react";
-import { Trophy, Star, Flame } from "lucide-react";
-
-const C = { page: "#F7FBF7", teal: "#047A70", dark: "#0F172A", body: "#64748B", white: "#FFFFFF", border: "#E2E8F0" };
+import { Trophy, Star, Flame, Eye } from "lucide-react";
+import { PageHeader, StatCard } from "@/components/ui/Pill";
 
 interface LeaderboardEntry {
   displayName: string;
@@ -38,7 +37,7 @@ export default function LeaderboardPage() {
 
           // Calculate score from real data only (XP + streak bonus)
           const scored: LeaderboardEntry[] = learners
-            .filter((l: any) => (l.totalXp || 0) > 0 || (l.currentStreak || 0) > 0) // Only show learners with some activity
+            .filter((l: any) => (l.totalXp || 0) > 0 || (l.currentStreak || 0) > 0)
             .map((l: any) => {
               const xp = l.totalXp || 0;
               const streak = l.currentStreak || 0;
@@ -72,9 +71,11 @@ export default function LeaderboardPage() {
 
   if (loading) {
     return (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh", flexDirection: "column", gap: 12 }}>
-        <Trophy size={32} style={{ color: C.teal }} />
-        <p style={{ color: C.body, fontWeight: 600 }}>Loading leaderboard...</p>
+      <div className="flex items-center justify-center min-h-[60vh] animate-fade-in">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+          <p className="text-sm font-bold text-text-muted">Loading leaderboard...</p>
+        </div>
       </div>
     );
   }
@@ -82,101 +83,157 @@ export default function LeaderboardPage() {
   const meEntry = entries.find(e => e.isMe);
   const topEntries = entries.slice(0, 10);
 
+  const getRankBadgeClasses = (rank: number, isMe: boolean) => {
+    if (rank === 1) return "bg-gradient-to-br from-gold to-amber-500 text-white shadow-[0_4px_15px_rgba(245,165,36,0.35)]";
+    if (rank === 2) return "bg-gradient-to-br from-slate-300 to-slate-400 text-white shadow-[0_4px_12px_rgba(100,116,139,0.25)]";
+    if (rank === 3) return "bg-gradient-to-br from-amber-600 to-amber-700 text-white shadow-[0_4px_12px_rgba(180,83,9,0.25)]";
+    if (isMe) return "bg-gradient-to-br from-primary to-accent-purple text-white shadow-[0_4px_15px_rgba(79,70,229,0.25)]";
+    return "bg-bg-card text-text-muted";
+  };
+
+  const getCardClasses = (rank: number, isMe: boolean) => {
+    if (rank === 1) return "bg-[linear-gradient(135deg,rgb(var(--color-gold-soft))_0%,rgb(var(--color-peach-soft))_100%)] border-gold/30";
+    if (rank === 2) return "bg-[linear-gradient(135deg,rgb(var(--color-surface-soft))_0%,rgb(var(--color-green-soft))_100%)] border-border-soft";
+    if (rank === 3) return "bg-[linear-gradient(135deg,rgb(var(--color-peach-soft))_0%,rgb(var(--color-gold-soft))_100%)] border-peach/20";
+    if (isMe) return "bg-[linear-gradient(135deg,rgb(var(--color-primary-soft))_0%,rgb(var(--color-accent-purple-soft))_100%)] border-primary/30 ring-2 ring-primary/10";
+    return "bg-white border-border-soft hover:shadow-card-hover";
+  };
+
+  const getAvatarInitials = (name: string) => {
+    const parts = name.split(" ");
+    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+    return name.charAt(0).toUpperCase();
+  };
+
   return (
-    <div>
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-        <Trophy size={24} style={{ color: "#D97706" }} />
-        <div>
-          <h1 style={{ fontSize: "1.375rem", fontWeight: 800, color: C.dark, margin: 0 }}>Leaderboard</h1>
-          <p style={{ color: C.body, fontSize: "0.8125rem", margin: 0 }}>Real rankings from learner activity</p>
+    <div className="animate-fade-in">
+      <PageHeader
+        title="Leaderboard"
+        subtitle="Real rankings from learner activity"
+      />
+
+      {/* Top stats cards */}
+      {topEntries.length > 0 && (
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          <StatCard
+            label={topEntries[0] ? topEntries[0].displayName : "—"}
+            value={`${topEntries[0]?.score || 0} pts`}
+            icon={<Trophy size={18} className="text-gold" />}
+            gradient="bg-card-gradient-gold"
+            borderColor="border-gold/20"
+            textColor="text-amber-800"
+          />
+          <StatCard
+            label={topEntries[1] ? topEntries[1].displayName : "—"}
+            value={`${topEntries[1]?.score || 0} pts`}
+            icon={<Trophy size={18} className="text-slate-500" />}
+            gradient="bg-[linear-gradient(135deg,rgb(var(--color-surface-soft))_0%,rgb(var(--color-green-soft))_100%)]"
+            borderColor="border-slate-200"
+            textColor="text-slate-700"
+          />
+          <StatCard
+            label={topEntries[2] ? topEntries[2].displayName : "—"}
+            value={`${topEntries[2]?.score || 0} pts`}
+            icon={<Trophy size={18} className="text-amber-700" />}
+            gradient="bg-[linear-gradient(135deg,rgb(var(--color-peach-soft))_0%,rgb(var(--color-gold-soft))_100%)]"
+            borderColor="border-gold/20"
+            textColor="text-amber-800"
+          />
         </div>
-      </div>
+      )}
 
       {/* My position card */}
       {meEntry && (
-        <div style={{
-          background: "linear-gradient(135deg, #E6F5F1, #D1FAE5)", borderRadius: 14, padding: "12px 16px",
-          marginBottom: 16, border: "1px solid #A7F3D0", display: "flex", alignItems: "center", gap: 12,
-        }}>
-          <Star size={18} style={{ color: C.teal }} />
-          <span style={{ fontWeight: 700, color: C.dark, fontSize: "0.875rem" }}>
-            You are <span style={{ color: C.teal }}>#{meEntry.rank}</span> of {entries.length}
+        <div className="bg-[linear-gradient(135deg,rgb(var(--color-primary-soft))_0%,rgb(var(--color-secondary-soft))_100%)] rounded-2xl p-4 mb-5 border border-primary/20 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent-purple flex items-center justify-center shadow-pill">
+            <Star size={18} className="text-white" />
+          </div>
+          <span className="font-bold text-text text-sm">
+            You are <span className="text-primary">#{meEntry.rank}</span> of {entries.length}
+            <span className="text-text-muted ml-1">({meEntry.totalXp} XP)</span>
           </span>
         </div>
       )}
 
       {topEntries.length === 0 ? (
-        <div style={{ textAlign: "center", padding: "3rem 1rem", background: C.white, borderRadius: 20, border: `1px solid ${C.border}` }}>
-          <div style={{ fontSize: "2.5rem", marginBottom: "0.75rem" }}>🏆</div>
-          <h3 style={{ fontSize: "1.125rem", fontWeight: 800, color: C.dark, marginBottom: "0.5rem" }}>No rankings yet</h3>
-          <p style={{ color: C.body, fontSize: "0.875rem", maxWidth: 360, margin: "0 auto" }}>
+        <div className="rounded-[1.75rem] border border-border-soft bg-white p-12 text-center">
+          <div className="w-16 h-16 rounded-3xl bg-gold-soft/50 flex items-center justify-center mx-auto mb-4">
+            <Trophy size={32} className="text-gold" />
+          </div>
+          <h3 className="text-lg font-bold text-text mb-2">No rankings yet</h3>
+          <p className="text-sm text-text-muted max-w-[360px] mx-auto">
             Complete lessons and earn XP to appear on the leaderboard.
           </p>
         </div>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 10 }}>
-          {topEntries.map((entry) => {
-            const rankColor = entry.rank === 1 ? "#D97706" : entry.rank === 2 ? "#6B7280" : entry.rank === 3 ? "#B45309" : C.body;
-            const bg = entry.rank === 1
-              ? "linear-gradient(135deg, #FEF3C7, #FDE68A)"
-              : entry.rank === 2
-              ? "linear-gradient(135deg, #F1F5F9, #E2E8F0)"
-              : entry.rank === 3
-              ? "linear-gradient(135deg, #FFEDD5, #FED7AA)"
-              : entry.isMe
-              ? "linear-gradient(135deg, #E6F5F1, #D1FAE5)"
-              : C.white;
-            const border = entry.isMe ? "2px solid #6EE7B7" : `1px solid ${C.border}`;
-
-            return (
-              <div key={`${entry.displayName}-${entry.rank}`} style={{
-                background: bg, borderRadius: 14, padding: "14px 12px", border,
-                textAlign: "center", position: "relative",
-              }}>
+        <div className="grid gap-3">
+          {topEntries.map((entry) => (
+            <div
+              key={`${entry.displayName}-${entry.rank}`}
+              className={`rounded-2xl border p-4 transition-all duration-200 hover:-translate-y-0.5 ${getCardClasses(entry.rank, !!entry.isMe)}`}
+            >
+              <div className="flex items-center gap-4">
                 {/* Rank badge */}
-                <div style={{
-                  position: "absolute", top: -8, left: "50%", transform: "translateX(-50%)",
-                  width: 24, height: 24, borderRadius: "50%", background: rankColor,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: "0.6875rem", fontWeight: 800, color: "#fff",
-                  boxShadow: "0 2px 4px rgba(0,0,0,0.15)",
-                }}>
-                  {entry.rank}
-                </div>
-
-                {/* Avatar circle */}
-                <div style={{
-                  width: 40, height: 40, borderRadius: "50%", margin: "12px auto 8px",
-                  background: entry.rank <= 3 ? "rgba(255,255,255,0.8)" : "#E2E8F0",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: "1.125rem", fontWeight: 700, color: C.dark,
-                }}>
-                  {entry.displayName.charAt(0).toUpperCase()}
-                </div>
-
-                {/* Name */}
-                <div style={{ fontWeight: 700, color: C.dark, fontSize: "0.8125rem", marginBottom: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                  {entry.displayName}
-                  {entry.isMe && <span style={{ color: C.teal, fontSize: "0.6875rem", marginLeft: 4 }}>(me)</span>}
-                </div>
-
-                {/* Stats */}
-                <div style={{ display: "flex", justifyContent: "center", gap: 8, fontSize: "0.6875rem", color: C.body }}>
-                  <span>{entry.totalXp} XP</span>
-                  {entry.currentStreak > 0 && (
-                    <span style={{ display: "flex", alignItems: "center", gap: 2 }}>
-                      <Flame size={10} style={{ color: "#D97706" }} /> {entry.currentStreak}d
-                    </span>
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-extrabold text-sm flex-shrink-0 ${getRankBadgeClasses(entry.rank, !!entry.isMe)}`}>
+                  {entry.rank <= 3 ? (
+                    <Trophy size={18} />
+                  ) : (
+                    entry.rank
                   )}
                 </div>
 
-                {/* Score */}
-                <div style={{ marginTop: 6, fontSize: "0.625rem", fontWeight: 700, color: rankColor }}>
+                {/* Avatar circle */}
+                <div className={`w-11 h-11 rounded-full flex items-center justify-center font-extrabold text-sm flex-shrink-0 ${
+                  entry.rank === 1
+                    ? "bg-gold-soft text-amber-800 border-2 border-gold/30"
+                    : entry.rank === 2
+                    ? "bg-slate-100 text-slate-600 border-2 border-slate-200"
+                    : entry.rank === 3
+                    ? "bg-peach-soft text-amber-800 border-2 border-peach/30"
+                    : entry.isMe
+                    ? "bg-primary-soft text-primary-dark border-2 border-primary/30"
+                    : "bg-bg-main text-text-muted border border-border-soft"
+                }`}>
+                  {getAvatarInitials(entry.displayName)}
+                </div>
+
+                {/* Name + stats */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-text text-sm truncate">{entry.displayName}</span>
+                    {entry.isMe && (
+                      <span className="px-2 py-0.5 rounded-full bg-primary-soft text-primary-dark text-[10px] font-extrabold uppercase tracking-wider">
+                        (me)
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3 mt-1">
+                    <span className="text-xs font-bold text-text-muted">{entry.totalXp} XP</span>
+                    {entry.currentStreak > 0 && (
+                      <span className="inline-flex items-center gap-1 text-xs font-bold text-pink">
+                        <Flame size={12} /> {entry.currentStreak}d
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Score pill */}
+                <div className={`px-3 py-1.5 rounded-full text-xs font-extrabold flex-shrink-0 ${
+                  entry.rank === 1
+                    ? "bg-gold-soft text-amber-800 border border-gold/20"
+                    : entry.rank === 2
+                    ? "bg-slate-100 text-slate-600 border border-slate-200"
+                    : entry.rank === 3
+                    ? "bg-peach-soft text-amber-800 border border-peach/20"
+                    : entry.isMe
+                    ? "bg-primary-soft text-primary-dark border border-primary/20"
+                    : "bg-bg-main text-text-muted border border-border-soft"
+                }`}>
                   {entry.score} pts
                 </div>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       )}
     </div>

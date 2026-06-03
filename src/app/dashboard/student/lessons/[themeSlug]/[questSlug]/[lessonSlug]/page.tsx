@@ -9,8 +9,9 @@ import { signOut as nextAuthSignOut } from "next-auth/react";
 import {
   Sparkles, ArrowLeft, CheckCircle2, Zap, LogOut, BookOpen, Flame, Award
 } from "lucide-react";
-import { ds, colors, gradients } from "@/lib/design-system";
+import { PageHeader, SectionHeader, GradientButton, ProgressBar, EmptyStateCard } from "@/components/ui/Pill";
 import confetti from "canvas-confetti";
+import { cn } from "@/lib/utils/cn";
 
 // Inject celebration animations
 const celebrationStyles = `
@@ -76,14 +77,12 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
   }, [params]);
 
   const fireConfetti = useCallback(() => {
-    // Primary burst from center
     confetti({
       particleCount: 80,
       spread: 70,
       origin: { y: 0.6 },
       colors: ["#2DD4BF", "#F59E0B", "#3B82F6", "#EC4899", "#10B981"],
     });
-    // Left burst
     setTimeout(() => {
       confetti({
         particleCount: 40,
@@ -93,7 +92,6 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
         colors: ["#2DD4BF", "#F59E0B", "#3B82F6"],
       });
     }, 150);
-    // Right burst
     setTimeout(() => {
       confetti({
         particleCount: 40,
@@ -103,7 +101,6 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
         colors: ["#EC4899", "#10B981", "#F59E0B"],
       });
     }, 300);
-    // Star shapes finale
     setTimeout(() => {
       confetti({
         particleCount: 30,
@@ -123,7 +120,6 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
     const tick = () => {
       const elapsed = Date.now() - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      // Ease out cubic
       const eased = 1 - Math.pow(1 - progress, 3);
       setAnimatedXp(Math.floor(eased * total));
       if (progress < 1) requestAnimationFrame(tick);
@@ -156,10 +152,7 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
         setStreakBonus(streak);
         setShowCelebration(true);
 
-        // Fire confetti
         fireConfetti();
-
-        // Animate XP counter
         animateXpCounter(xp, streak);
       } else if (data.alreadyCompleted) {
         setCompleted(true);
@@ -174,71 +167,83 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
 
   const totalXpWithBonus = xpEarned + streakBonus;
 
-  if (status === "loading" || loading) return <LoadingScreen />;
-  if (!lesson) return <NotFoundScreen />;
-
-  const xp = typeof lesson.xpReward === "object" ? (lesson.xpReward as any)?.base : lesson.xpReward;
+  const xp = typeof lesson?.xpReward === "object" ? (lesson?.xpReward as any)?.base : lesson?.xpReward;
 
   // Lesson viewer overlay
   if (viewing) {
     return (
-      <div style={{ position: "fixed", inset: 0, zIndex: 50, background: colors.bg, display: "flex", flexDirection: "column" }}>
+      <div className="fixed inset-0 z-50 bg-bg-main flex flex-col">
         {/* Sticky header */}
-        <div style={{ background: "rgba(253,253,251,0.95)", backdropFilter: "blur(12px)", borderBottom: `1px solid ${colors.border}`, padding: "0.75rem 1.5rem", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-            <button onClick={() => { setViewing(false); setShowCelebration(false); }} style={{ display: "flex", alignItems: "center", gap: "0.375rem", padding: "0.375rem 0.75rem", borderRadius: 8, border: `1px solid ${colors.border}`, background: "none", color: colors.textMuted, cursor: "pointer", fontSize: "0.8125rem", fontWeight: 600 }}>
-              <ArrowLeft style={{ width: 14, height: 14 }} /> Exit
+        <div className="bg-white/90 backdrop-blur-xl border-b border-border-soft px-4 lg:px-6 py-3 flex justify-between items-center flex-shrink-0">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => { setViewing(false); setShowCelebration(false); }}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border-soft hover:bg-bg-main text-text-muted font-semibold text-sm transition-colors"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" /> Exit
             </button>
-            <span style={{ fontWeight: 700, color: colors.text, fontSize: "0.9375rem" }}>{lesson.title}</span>
+            <span className="font-bold text-text text-sm lg:text-base truncate max-w-[200px] lg:max-w-none">{lesson?.title}</span>
           </div>
           {!completed && (
-            <button onClick={handleComplete} disabled={completing} style={{ ...ds.btnPrimary, padding: "0.5rem 1rem", fontSize: "0.875rem", opacity: completing ? 0.6 : 1, cursor: completing ? "wait" : "pointer" }}>
+            <GradientButton
+              variant="success"
+              size="sm"
+              onClick={handleComplete}
+              disabled={completing}
+            >
               {completing ? (
-                <span style={{ display: "flex", alignItems: "center", gap: "0.375rem" }}>
-                  <span style={{ width: 14, height: 14, border: "2px solid white", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite", display: "inline-block" }} />
+                <span className="flex items-center gap-2">
+                  <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full spinner" />
                   Completing...
                 </span>
               ) : "Mark Complete"}
-            </button>
+            </GradientButton>
           )}
           {completed && (
-            <span style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontWeight: 700, color: colors.success, fontSize: "0.875rem" }}>
-              <CheckCircle2 style={{ width: 18, height: 18 }} /> Completed
+            <span className="inline-flex items-center gap-1.5 font-bold text-secondary text-sm">
+              <CheckCircle2 className="w-[18px] h-[18px]" /> Completed
             </span>
           )}
         </div>
 
         {/* Scrollable content */}
-        <div style={{ flex: 1, overflow: "auto", padding: "2rem", maxWidth: 720, margin: "0 auto", width: "100%" }}>
+        <div className="flex-1 overflow-auto p-4 lg:p-8 max-w-[760px] mx-auto w-full">
           {/* Celebration overlay */}
           {showCelebration && totalXpWithBonus > 0 && (
-            <div style={{ textAlign: "center", padding: "2rem", borderRadius: 20, background: `linear-gradient(135deg, ${colors.primarySoft}, ${colors.warmSoft})`, marginBottom: "1.5rem", border: `2px solid ${colors.primary}30`, position: "relative", overflow: "hidden" }}>
+            <div
+              className="relative rounded-[1.5rem] p-8 mb-6 text-center overflow-hidden border-2 border-primary/20"
+              style={{ background: "linear-gradient(135deg, #EEF2FF 0%, #FFF7ED 50%, #FFF1F2 100%)" }}
+            >
               <style>{celebrationStyles}</style>
               {/* Animated background particles */}
-              <div style={{ position: "absolute", inset: 0, overflow: "hidden", pointerEvents: "none" }}>
+              <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 {[...Array(6)].map((_, i) => (
-                  <div key={i} style={{ position: "absolute", fontSize: "1.5rem", left: `${15 + i * 15}%`, top: `${20 + (i % 3) * 25}%`, animation: `float ${2 + i * 0.5}s ease-in-out infinite alternate`, animationDelay: `${i * 0.2}s` }}>
+                  <div key={i} className="absolute text-2xl" style={{
+                    left: `${15 + i * 15}%`, top: `${20 + (i % 3) * 25}%`,
+                    animation: `float ${2 + i * 0.5}s ease-in-out infinite alternate`,
+                    animationDelay: `${i * 0.2}s`
+                  }}>
                     {["⭐", "✨", "🎉", "💫", "🌟", "⚡"][i]}
                   </div>
                 ))}
               </div>
 
-              <div style={{ position: "relative", zIndex: 1 }}>
-                <div style={{ fontSize: "3rem", marginBottom: "0.5rem" }}>🎉</div>
-                <h2 style={{ fontSize: "1.5rem", fontWeight: 800, color: colors.text, marginBottom: "0.5rem" }}>Lesson Complete!</h2>
+              <div className="relative z-10">
+                <div className="text-5xl mb-2">🎉</div>
+                <h2 className="text-2xl font-extrabold text-text mb-2">Lesson Complete!</h2>
 
                 {/* Animated XP display */}
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "1rem", marginTop: "1rem", flexWrap: "wrap" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", padding: "0.5rem 1rem", borderRadius: 12, background: "white", boxShadow: shadows.sm, animation: "xpBurst 0.5s ease-out" }}>
-                    <Zap style={{ width: 20, height: 20, color: colors.primary }} />
-                    <span style={{ fontSize: "1.25rem", fontWeight: 800, color: colors.primary }}>+{animatedXp}</span>
-                    <span style={{ fontSize: "0.875rem", fontWeight: 600, color: colors.textMuted }}>XP</span>
+                <div className="flex items-center justify-center gap-4 mt-4 flex-wrap">
+                  <div className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-white shadow-[0_4px_15px_rgba(79,70,229,0.10)]" style={{ animation: "xpBurst 0.5s ease-out" }}>
+                    <Zap className="w-5 h-5 text-primary" />
+                    <span className="text-xl font-extrabold text-primary">+{animatedXp}</span>
+                    <span className="text-sm font-semibold text-text-muted">XP</span>
                   </div>
                   {streakBonus > 0 && (
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", padding: "0.5rem 1rem", borderRadius: 12, background: colors.warmSoft, boxShadow: shadows.sm }}>
-                      <Flame style={{ width: 20, height: 20, color: colors.warm }} />
-                      <span style={{ fontSize: "1.25rem", fontWeight: 800, color: colors.warm }}>+{streakBonus}</span>
-                      <span style={{ fontSize: "0.875rem", fontWeight: 600, color: colors.warm }}>streak</span>
+                    <div className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-pink-soft shadow-[0_4px_15px_rgba(255,92,138,0.10)]">
+                      <Flame className="w-5 h-5 text-pink" />
+                      <span className="text-xl font-extrabold text-pink">+{streakBonus}</span>
+                      <span className="text-sm font-semibold text-pink">streak</span>
                     </div>
                   )}
                 </div>
@@ -248,17 +253,21 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
 
           {/* New badges earned */}
           {showCelebration && newBadges.length > 0 && (
-            <div style={{ marginBottom: "1.5rem" }}>
-              <h3 style={{ fontSize: "1rem", fontWeight: 700, color: colors.text, marginBottom: "0.75rem", display: "flex", alignItems: "center", gap: "0.375rem" }}>
-                <Award style={{ width: 18, height: 18, color: colors.accent }} /> New Badge{newBadges.length > 1 ? "s" : ""} Earned!
+            <div className="mb-6">
+              <h3 className="text-base font-bold text-text mb-3 flex items-center gap-1.5">
+                <Award className="w-[18px] h-[18px] text-accent-purple" /> New Badge{newBadges.length > 1 ? "s" : ""} Earned!
               </h3>
-              <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
+              <div className="flex gap-3 flex-wrap">
                 {newBadges.map((badge) => (
-                  <div key={badge.id} style={{ ...ds.card, padding: "0.875rem 1.25rem", display: "flex", alignItems: "center", gap: "0.625rem", background: `${colors.accent}10`, border: `2px solid ${colors.accent}30`, animation: "popIn 0.4s ease-out" }}>
-                    <span style={{ fontSize: "1.5rem" }}>🏅</span>
+                  <div
+                    key={badge.id}
+                    className="rounded-2xl border-2 border-accent-purple/20 bg-accent-purple-soft/40 p-3.5 flex items-center gap-2.5"
+                    style={{ animation: "popIn 0.4s ease-out" }}
+                  >
+                    <span className="text-2xl">🏅</span>
                     <div>
-                      <div style={{ fontWeight: 700, color: colors.text, fontSize: "0.875rem" }}>{badge.name}</div>
-                      <div style={{ fontSize: "0.6875rem", color: colors.textMuted }}>New badge earned!</div>
+                      <div className="font-bold text-text text-sm">{badge.name}</div>
+                      <div className="text-xs text-text-muted">New badge earned!</div>
                     </div>
                   </div>
                 ))}
@@ -268,53 +277,95 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
 
           {/* Already completed state (no celebration) */}
           {completed && !showCelebration && (
-            <div style={{ textAlign: "center", padding: "1.5rem", borderRadius: 16, background: `${colors.success}10`, marginBottom: "1.5rem", border: `1px solid ${colors.success}30` }}>
-              <CheckCircle2 style={{ width: 32, height: 32, color: colors.success, margin: "0 auto 0.5rem" }} />
-              <h3 style={{ fontWeight: 700, color: colors.success, fontSize: "1rem" }}>Lesson Already Completed</h3>
-              <p style={{ color: colors.textMuted, fontSize: "0.875rem", marginTop: "0.25rem" }}>You've already earned XP for this lesson. Review the content below!</p>
+            <div className="text-center rounded-2xl p-6 mb-6 border border-secondary/20 bg-secondary-soft/40">
+              <CheckCircle2 className="w-8 h-8 text-secondary mx-auto mb-2" />
+              <h3 className="font-bold text-secondary text-base">Lesson Already Completed</h3>
+              <p className="text-text-muted text-sm mt-1">You've already earned XP for this lesson. Review the content below!</p>
             </div>
           )}
 
           {/* Content blocks */}
-          {lesson.contentBlocks && lesson.contentBlocks.length > 0 ? (
-            <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-              {(lesson.contentBlocks as any[]).map((block: any, i: number) => (
-                <ContentBlock key={i} block={block} />
-              ))}
+          {lesson?.contentBlocks && lesson.contentBlocks.length > 0 ? (
+            <div className="flex flex-col gap-4">
+              {(() => {
+                // Group content blocks so headings and their body content share the same card
+                const cardGroups: { heading?: typeof lesson.contentBlocks extends (infer T)[] ? T : never; items: typeof lesson.contentBlocks }[] = [];
+                let currentGroup: typeof cardGroups[number] | null = null;
+
+                (lesson.contentBlocks as any[]).forEach((block: any) => {
+                  const type = block?.type || block?.blockType || "text";
+                  if (type === "heading" || type === "h1" || type === "h2" || type === "h3" || type === "subheading") {
+                    if (currentGroup) cardGroups.push(currentGroup);
+                    currentGroup = { heading: block, items: [] };
+                  } else {
+                    if (!currentGroup) currentGroup = { items: [] };
+                    currentGroup.items.push(block);
+                  }
+                });
+                if (currentGroup) cardGroups.push(currentGroup);
+
+                return cardGroups.map((group, i) => (
+                  <div key={i} className="rounded-2xl border border-border-soft bg-white p-5 lg:p-6">
+                    {group.heading && <ContentBlock block={group.heading} isHeading />}
+                    <div className="flex flex-col gap-4">
+                      {group.items.map((block, j) => (
+                        <ContentBlock key={j} block={block} />
+                      ))}
+                    </div>
+                  </div>
+                ));
+              })()}
             </div>
           ) : (
-            <div style={{ ...ds.card, textAlign: "center", padding: "3rem 2rem" }}>
-              <BookOpen style={{ width: 40, height: 40, color: colors.textMuted, margin: "0 auto 1rem", opacity: 0.3 }} />
-              <h3 style={{ fontSize: "1.125rem", fontWeight: 700, color: colors.text, marginBottom: "0.5rem" }}>Lesson content coming soon</h3>
-              <p style={{ color: colors.textMuted, fontSize: "0.9375rem" }}>This lesson is being prepared. Check back soon!</p>
+            <div className="rounded-2xl border border-border-soft bg-white text-center p-12">
+              <BookOpen className="w-10 h-10 text-text-muted/30 mx-auto mb-3" />
+              <h3 className="text-lg font-bold text-text mb-2">Lesson content coming soon</h3>
+              <p className="text-text-muted text-sm">This lesson is being prepared. Check back soon!</p>
             </div>
           )}
 
           {/* Bottom complete button */}
-          {!completed && lesson.contentBlocks && lesson.contentBlocks.length > 0 && (
-            <div style={{ marginTop: "2rem", textAlign: "center" }}>
-              <button onClick={handleComplete} disabled={completing} style={{ ...ds.btnPrimary, padding: "0.875rem 2rem", fontSize: "1rem", opacity: completing ? 0.6 : 1 }}>
+          {!completed && lesson?.contentBlocks && lesson.contentBlocks.length > 0 && (
+            <div className="mt-6">
+              <GradientButton
+                variant="success"
+                size="lg"
+                icon={<CheckCircle2 className="w-5 h-5" />}
+                onClick={handleComplete}
+                disabled={completing}
+                className="w-full"
+              >
                 {completing ? (
-                  <span style={{ display: "flex", alignItems: "center", gap: "0.375rem" }}>
-                    <span style={{ width: 16, height: 16, border: "2px solid white", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite", display: "inline-block" }} />
+                  <span className="flex items-center gap-2">
+                    <span className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full spinner" />
                     Completing...
                   </span>
                 ) : (
-                  <span style={{ display: "flex", alignItems: "center", gap: "0.375rem" }}>
+                  <span className="flex items-center gap-2">
                     Complete Lesson
-                    {xp && <span style={{ background: "rgba(255,255,255,0.2)", padding: "0.125rem 0.5rem", borderRadius: 6, fontSize: "0.8125rem", display: "flex", alignItems: "center", gap: "0.25rem" }}><Zap style={{ width: 12, height: 12 }} /> +{xp} XP</span>}
+                    {xp && (
+                      <span className="bg-white/20 px-2.5 py-0.5 rounded-lg text-xs font-bold flex items-center gap-1">
+                        <Zap className="w-3 h-3" /> +{xp} XP
+                      </span>
+                    )}
                   </span>
                 )}
-              </button>
+              </GradientButton>
             </div>
           )}
 
           {/* Review mode: exit button */}
           {completed && (
-            <div style={{ marginTop: "2rem", textAlign: "center" }}>
-              <button onClick={() => { setViewing(false); setShowCelebration(false); }} style={{ ...ds.btnSecondary, padding: "0.75rem 1.5rem", fontSize: "0.937rem" }}>
-                <ArrowLeft style={{ width: 16, height: 16 }} /> Back to Quest
-              </button>
+            <div className="mt-6">
+              <GradientButton
+                variant="secondary"
+                size="md"
+                icon={<ArrowLeft className="w-4 h-4" />}
+                onClick={() => { setViewing(false); setShowCelebration(false); }}
+                className="w-full"
+              >
+                Back to Quest
+              </GradientButton>
             </div>
           )}
         </div>
@@ -322,74 +373,105 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
     );
   }
 
-  // Lesson landing page
+  // Lesson landing page (outside overlay)
   return (
-    <div style={{ minHeight: "100vh", background: colors.bg }}>
-      <header style={{ background: "rgba(253,253,251,0.85)", backdropFilter: "blur(12px)", borderBottom: `1px solid ${colors.border}`, padding: "0.75rem 1.5rem", display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 10 }}>
-        <Link href="/dashboard/student" style={{ display: "flex", alignItems: "center", gap: "0.75rem", textDecoration: "none" }}>
-          <Sparkles style={{ width: 28, height: 28, color: colors.primary }} />
-          <span style={{ fontWeight: 800, fontSize: "1.125rem", ...ds.textGradient }}>Arizen School</span>
-        </Link>
-        <button onClick={() => nextAuthSignOut({ callbackUrl: "/" })} style={{ display: "flex", alignItems: "center", gap: "0.375rem", padding: "0.375rem 0.75rem", borderRadius: 8, border: `1px solid ${colors.border}`, background: "none", color: colors.textMuted, cursor: "pointer", fontSize: "0.8125rem", fontWeight: 600 }}>
-          <LogOut style={{ width: 14, height: 14 }} /> Exit
-        </button>
-      </header>
-
-      <main style={{ maxWidth: 720, margin: "0 auto", padding: "2rem 1.5rem" }}>
-        <Link href={slugs ? `/dashboard/student/lessons/${slugs.themeSlug}/${slugs.questSlug}` : "/dashboard/student/lessons"} style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", color: colors.textMuted, fontSize: "0.875rem", fontWeight: 600, textDecoration: "none", marginBottom: "1rem" }}>
-          <ArrowLeft style={{ width: 16, height: 16 }} /> Back to Quest
-        </Link>
-
-        <div style={{ padding: "1.5rem", borderRadius: 16, background: gradients.primary, color: "white", marginBottom: "1.5rem" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem", flexWrap: "wrap" }}>
-            {lesson.isCompleted && <span style={{ fontSize: "0.6875rem", fontWeight: 700, background: "rgba(255,255,255,0.2)", padding: "0.125rem 0.5rem", borderRadius: 6 }}>✓ COMPLETED</span>}
-            {lesson.difficulty && <span style={{ fontSize: "0.6875rem", fontWeight: 700, background: "rgba(255,255,255,0.2)", padding: "0.125rem 0.5rem", borderRadius: 6 }}>{lesson.difficulty}</span>}
-          </div>
-          <h1 style={{ fontSize: "1.5rem", fontWeight: 800, marginBottom: "0.5rem" }}>{lesson.title}</h1>
-          {lesson.description && <p style={{ opacity: 0.9, fontSize: "0.9375rem" }}>{lesson.description}</p>}
+    <div className="fade-in max-w-[760px] mx-auto">
+      {/* ── Decorative gradient header ── */}
+      <div
+        className="relative rounded-[1.75rem] p-6 lg:p-8 mb-6 overflow-hidden border border-primary/20"
+        style={{ background: "linear-gradient(135deg, #4F46E5 0%, #8B5CF6 50%, #6D28D9 100%)" }}
+      >
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-8 -right-8 w-36 h-36 rounded-full bg-white/10" />
+          <div className="absolute -bottom-8 -left-8 w-28 h-28 rounded-full bg-white/5" />
         </div>
 
-        {/* XP reward card */}
-        {xp && !completed && (
-          <div style={{ ...ds.card, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "1rem 1.25rem", marginBottom: "1.5rem", background: colors.warmSoft }}>
-            <p style={{ fontWeight: 700, color: colors.warmDark, fontSize: "0.9375rem" }}>Complete this lesson to earn XP</p>
-            <span style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontWeight: 800, color: colors.warm, fontSize: "1.125rem" }}>
-              <Zap style={{ width: 18, height: 18 }} /> +{xp} XP
-            </span>
-          </div>
-        )}
+        <div className="relative z-10">
+          {slugs && (
+            <Link
+              href={`/dashboard/student/lessons/${slugs.themeSlug}/${slugs.questSlug}`}
+              className="inline-flex items-center gap-1.5 text-white/70 hover:text-white text-sm font-semibold mb-4 transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" /> Back to Quest
+            </Link>
+          )}
 
-        {completed && (
-          <div style={{ ...ds.card, textAlign: "center", padding: "1.5rem", marginBottom: "1.5rem", background: `${colors.success}10`, border: `1px solid ${colors.success}30` }}>
-            <CheckCircle2 style={{ width: 32, height: 32, color: colors.success, margin: "0 auto 0.5rem" }} />
-            <p style={{ fontWeight: 700, color: colors.success }}>You've completed this lesson!</p>
-            <p style={{ color: colors.textMuted, fontSize: "0.875rem", marginTop: "0.25xp" }}>Review the content or move on to the next lesson.</p>
+          <div className="flex items-center gap-2 mb-3 flex-wrap">
+            {lesson?.isCompleted && (
+              <span className="text-[10px] font-extrabold uppercase tracking-wider bg-white/20 text-white px-2.5 py-1 rounded-full">
+                ✓ Completed
+              </span>
+            )}
+            {lesson?.difficulty && (
+              <span className="text-[10px] font-extrabold uppercase tracking-wider bg-white/20 text-white px-2.5 py-1 rounded-full">
+                {lesson.difficulty}
+              </span>
+            )}
+            {xp && (
+              <span className="text-[10px] font-extrabold uppercase tracking-wider bg-gold/80 text-white px-2.5 py-1 rounded-full flex items-center gap-1">
+                <Zap className="w-3 h-3" /> {xp} XP
+              </span>
+            )}
           </div>
-        )}
 
-        {/* Content preview */}
-        {lesson.contentBlocks && lesson.contentBlocks.length > 0 && (
-          <div style={{ ...ds.card, marginBottom: "1.5rem" }}>
-            <h3 style={{ fontWeight: 700, color: colors.text, fontSize: "1rem", marginBottom: "0.75rem" }}>What you'll learn</h3>
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-              {(lesson.contentBlocks as any[]).slice(0, 3).map((block: any, i: number) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.875rem", color: colors.textMuted }}>
-                  <div style={{ width: 20, height: 20, borderRadius: 6, background: colors.primarySoft, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <span style={{ fontWeight: 700, color: colors.primary, fontSize: "0.6875rem" }}>{i + 1}</span>
-                  </div>
-                  {block.title || block.heading || block.text?.slice(0, 40) || `Section ${i + 1}`}
+          <h1 className="text-2xl lg:text-3xl font-extrabold text-white mb-2 tracking-tight">{lesson?.title}</h1>
+          {lesson?.description && (
+            <p className="text-white/85 text-base leading-relaxed">{lesson.description}</p>
+          )}
+        </div>
+      </div>
+
+      {/* ── XP reward card ── */}
+      {xp && !completed && (
+        <div className="rounded-2xl border border-gold/20 bg-gold-soft/50 p-4 mb-5 flex items-center justify-between">
+          <p className="font-bold text-gold-dark text-sm">Complete this lesson to earn XP</p>
+          <span className="inline-flex items-center gap-1.5 font-extrabold text-gold text-base">
+            <Zap className="w-[18px] h-[18px]" /> +{xp} XP
+          </span>
+        </div>
+      )}
+
+      {/* ── Completed state ── */}
+      {completed && (
+        <div className="rounded-2xl border border-secondary/20 bg-secondary-soft/40 text-center p-6 mb-5">
+          <CheckCircle2 className="w-8 h-8 text-secondary mx-auto mb-2" />
+          <p className="font-bold text-secondary">You've completed this lesson!</p>
+          <p className="text-text-muted text-sm mt-1">Review the content or move on to the next lesson.</p>
+        </div>
+      )}
+
+      {/* ── Content preview ── */}
+      {lesson?.contentBlocks && lesson.contentBlocks.length > 0 && (
+        <div className="rounded-2xl border border-border-soft bg-white p-5 lg:p-6 mb-5">
+          <h3 className="font-extrabold text-text text-base mb-4 flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-primary" /> What you'll learn
+          </h3>
+          <div className="flex flex-col gap-3">
+            {(lesson.contentBlocks as any[]).slice(0, 3).map((block: any, i: number) => (
+              <div key={i} className="flex items-center gap-3 text-sm text-text-muted">
+                <div className="w-7 h-7 rounded-xl bg-primary-soft flex items-center justify-center flex-shrink-0">
+                  <span className="font-extrabold text-primary text-xs">{i + 1}</span>
                 </div>
-              ))}
-              {lesson.contentBlocks.length > 3 && (
-                <span style={{ fontSize: "0.75rem", color: colors.textMuted }}>+{lesson.contentBlocks.length - 3} more sections</span>
-              )}
-            </div>
+                <span className="truncate">
+                  {block.title || block.heading || block.text?.slice(0, 40) || `Section ${i + 1}`}
+                </span>
+              </div>
+            ))}
+            {lesson.contentBlocks.length > 3 && (
+              <span className="text-xs text-text-muted font-semibold pl-10">
+                +{lesson.contentBlocks.length - 3} more sections
+              </span>
+            )}
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Start/Continue button */}
-        <button onClick={async () => {
-          // Track lesson start
+      {/* ── Start/Continue button ── */}
+      <GradientButton
+        variant={completed ? "secondary" : "primary"}
+        size="lg"
+        icon={completed ? <BookOpen className="w-5 h-5" /> : <Sparkles className="w-5 h-5" />}
+        onClick={async () => {
           if (lesson?.id) {
             try {
               await fetch("/api/learner/progress", {
@@ -401,57 +483,58 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
             } catch (e) { /* non-blocking */ }
           }
           setViewing(true);
-        }} style={{ ...ds.btnPrimary, width: "100%", padding: "1rem", fontSize: "1rem" }}>
-          {completed ? "Review Lesson" : "Start Lesson"}
-        </button>
-      </main>
+        }}
+        className="w-full"
+      >
+        {completed ? "Review Lesson" : "Start Lesson"}
+      </GradientButton>
     </div>
   );
 }
 
-function ContentBlock({ block }: { block: any }) {
+function ContentBlock({ block, isHeading }: { block: any; isHeading?: boolean }) {
   if (!block || typeof block !== "object") return null;
   const type = block.type || block.blockType || "text";
 
   switch (type) {
     case "heading":
     case "h1":
-      return <h1 style={{ fontSize: "1.375rem", fontWeight: 800, color: colors.text, marginBottom: "0.5rem" }}>{block.text || block.content || block.title}</h1>;
+      return <h1 className="text-xl font-extrabold text-text mb-0">{block.text || block.content || block.title}</h1>;
     case "h2":
     case "subheading":
-      return <h2 style={{ fontSize: "1.125rem", fontWeight: 700, color: colors.text, marginBottom: "0.5rem", marginTop: "1rem" }}>{block.text || block.content || block.title}</h2>;
+      return <h2 className="text-lg font-bold text-text mb-0">{block.text || block.content || block.title}</h2>;
     case "h3":
-      return <h3 style={{ fontSize: "1rem", fontWeight: 700, color: colors.text, marginBottom: "0.375rem", marginTop: "0.75rem" }}>{block.text || block.content || block.title}</h3>;
+      return <h3 className="text-base font-bold text-text mb-0">{block.text || block.content || block.title}</h3>;
     case "paragraph":
     case "text":
-      return <p style={{ color: colors.text, lineHeight: 1.7, fontSize: "0.9375rem" }}>{block.text || block.content || block.body || ""}</p>;
+      return <p className="text-text leading-[1.7] text-sm">{block.text || block.content || block.body || ""}</p>;
     case "image":
       return (
-        <div style={{ borderRadius: 12, overflow: "hidden", background: colors.bgAlt }}>
-          {block.url && <img src={block.url} alt={block.alt || block.caption || ""} style={{ width: "100%", height: "auto", display: "block" }} />}
-          {block.caption && <p style={{ padding: "0.75rem", fontSize: "0.8125rem", color: colors.textMuted, textAlign: "center" }}>{block.caption}</p>}
+        <div className="rounded-2xl overflow-hidden bg-bg-main">
+          {block.url && <img src={block.url} alt={block.alt || block.caption || ""} className="w-full h-auto block" />}
+          {block.caption && <p className="p-3 text-xs text-text-muted text-center">{block.caption}</p>}
         </div>
       );
     case "video":
       return (
-        <div style={{ borderRadius: 12, overflow: "hidden", background: "#000" }}>
-          {block.url && <video src={block.url} controls style={{ width: "100%", display: "block" }} />}
+        <div className="rounded-2xl overflow-hidden bg-black">
+          {block.url && <video src={block.url} controls className="w-full block" />}
         </div>
       );
     case "list":
       return (
-        <ul style={{ paddingLeft: "1.25rem", display: "flex", flexDirection: "column", gap: "0.375rem" }}>
+        <ul className="pl-5 flex flex-col gap-1.5">
           {(block.items || []).map((item: string, i: number) => (
-            <li key={i} style={{ color: colors.text, fontSize: "0.9375rem", lineHeight: 1.6 }}>{item}</li>
+            <li key={i} className="text-text text-sm leading-relaxed">{item}</li>
           ))}
         </ul>
       );
     case "quiz":
       return (
-        <div style={{ ...ds.card, padding: "1.25rem", background: colors.primarySoft }}>
-          <h4 style={{ fontWeight: 700, color: colors.primary, marginBottom: "0.75rem", fontSize: "0.9375rem" }}>❓ {block.question || "Quick Check"}</h4>
+        <div className="rounded-2xl border border-primary/20 bg-primary-soft/40 p-5">
+          <h4 className="font-bold text-primary mb-3 text-sm">❓ {block.question || "Quick Check"}</h4>
           {(block.options || []).map((opt: string, i: number) => (
-            <div key={i} style={{ padding: "0.625rem 0.875rem", borderRadius: 8, border: `1px solid ${colors.border}`, marginBottom: "0.375rem", fontSize: "0.875rem", color: colors.text }}>
+            <div key={i} className="px-3.5 py-2.5 rounded-xl border border-border-soft mb-1.5 text-sm text-text last:mb-0">
               {String.fromCharCode(65 + i)}. {opt}
             </div>
           ))}
@@ -460,39 +543,14 @@ function ContentBlock({ block }: { block: any }) {
     case "callout":
     case "tip":
       return (
-        <div style={{ padding: "1rem", borderRadius: 12, background: colors.warmSoft, borderLeft: `4px solid ${colors.warm}` }}>
-          <p style={{ color: colors.warmDark, fontSize: "0.875rem", fontWeight: 600 }}>💡 {block.title || block.text || block.content || ""}</p>
+        <div className="rounded-2xl p-4 bg-gold-soft/50 border-l-4 border-gold">
+          <p className="text-gold-dark text-sm font-semibold">💡 {block.title || block.text || block.content || ""}</p>
         </div>
       );
     default: {
       const text = block.text || block.content || block.body || block.title || "";
-      if (text) return <p style={{ color: colors.text, lineHeight: 1.7, fontSize: "0.9375rem" }}>{text}</p>;
+      if (text) return <p className="text-text leading-[1.7] text-sm">{text}</p>;
       return null;
     }
   }
 }
-
-function LoadingScreen() {
-  return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: colors.bg }}>
-      <div style={{ textAlign: "center" }}>
-        <Sparkles style={{ width: 48, height: 48, color: colors.primary, margin: "0 auto 1rem" }} />
-        <p style={{ color: colors.textMuted, fontWeight: 600 }}>Loading lesson...</p>
-      </div>
-    </div>
-  );
-}
-
-function NotFoundScreen() {
-  return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: colors.bg }}>
-      <div style={{ textAlign: "center", ...ds.card, padding: "2rem" }}>
-        <BookOpen style={{ width: 40, height: 40, color: colors.textMuted, margin: "0 auto 1rem" }} />
-        <h3 style={{ fontWeight: 700, color: colors.text, marginBottom: "0.5rem" }}>Lesson not found</h3>
-        <p style={{ color: colors.textMuted }}>This lesson may not exist or isn't published yet.</p>
-        <Link href="/dashboard/student/lessons" style={{ ...ds.btnPrimary, display: "inline-flex", textDecoration: "none", marginTop: "1rem" }}>Back to Themes</Link>
-      </div>
-    </div>
-  );
-}
-

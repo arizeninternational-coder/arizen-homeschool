@@ -3,9 +3,13 @@
 export const dynamic = "force-dynamic";
 
 import { useState, useEffect } from "react";
-import { Trophy, Lock, Star, Zap, Heart, Gift, Users, Target } from "lucide-react";
-
-const C = { page: "#F7FBF7", teal: "#047A70", dark: "#0F172A", body: "#64748B", white: "#FFFFFF", border: "#E2E8F0" };
+import {
+  Trophy, Award, Star, Zap, Heart, Gift, Users, Target,
+  Lock, Check, Loader2
+} from "lucide-react";
+import { PageHeader, ProgressBar, EmptyStateCard } from "@/components/ui/Pill";
+import { TrophyIcon, StarIcon } from "@/components/ui/Illustrations";
+import { cn } from "@/lib/utils/cn";
 
 const BADGES = [
   { name: "Math Whiz",        icon: Zap,       color: "#EDE9FE", accent: "#6D28D9", ring: "#A78BFA", requirement: "Complete 5 math lessons",     category: "academic" },
@@ -36,77 +40,140 @@ export default function BadgesPage() {
   const earnedCount = earned.length;
   const totalCount = BADGES.length;
 
-  return (
-    <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, flexWrap: "wrap", gap: 12 }}>
-        <div>
-          <h1 style={{ fontSize: "1.5rem", fontWeight: 800, color: C.dark, margin: "0 0 2px 0" }}>
-            <Trophy size={22} style={{ display: "inline", verticalAlign: "middle", marginRight: 8, color: "#D97706" }} /> My Badges
-          </h1>
-          <p style={{ color: C.body, fontSize: "0.875rem", margin: 0 }}>Complete lessons, quests, and check-ins to unlock badges.</p>
-        </div>
-        <div style={{ padding: "8px 16px", borderRadius: 12, background: "linear-gradient(135deg, #FEF3C7, #FDE68A)", border: "1px solid #F59E0B", display: "inline-flex", alignItems: "center", gap: 6 }}>
-          <Star size={16} style={{ color: "#D97706" }} />
-          <span style={{ fontWeight: 800, color: "#92400E" }}>{earnedCount} / {totalCount}</span>
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh] animate-fade-in">
+        <div className="text-center">
+          <Loader2 size={40} className="animate-spin text-primary mx-auto mb-4" />
+          <p className="text-text-muted font-bold text-lg">Loading your badges...</p>
         </div>
       </div>
+    );
+  }
+
+  return (
+    <div className="animate-fade-in">
+      <PageHeader
+        title="My Badges"
+        subtitle="Complete lessons, quests, and check-ins to unlock badges."
+      >
+        <div className="mt-3 flex items-center gap-3">
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full font-bold text-sm bg-gradient-to-r from-amber-50 to-gold-light/60 text-amber-800 border border-gold/20 shadow-[0_2px_10px_rgba(245,165,36,0.12)]">
+            <Award size={16} className="text-gold" />
+            <span>{earnedCount} / {totalCount}</span>
+          </div>
+        </div>
+      </PageHeader>
 
       {/* Progress bar */}
-      <div style={{ height: 10, borderRadius: 5, background: "#F1F5F9", overflow: "hidden", marginBottom: 8 }}>
-        <div style={{ height: "100%", width: `${totalCount > 0 ? (earnedCount / totalCount) * 100 : 0}%`, borderRadius: 5, background: "linear-gradient(90deg, #F59E0B, #22C55E)", transition: "width 0.5s" }} />
+      <div className="mb-8">
+        <ProgressBar value={earnedCount} max={totalCount} color="bg-gradient-to-r from-gold to-secondary" height="h-3" />
+        <p className="text-xs text-text-muted mt-2 font-semibold">
+          {earnedCount === 0
+            ? "Complete your first lesson to start earning badges!"
+            : `${earnedCount} badge${earnedCount !== 1 ? "s" : ""} earned. Keep going! 🎉`}
+        </p>
       </div>
-      <p style={{ fontSize: "0.75rem", color: C.body, marginBottom: 24 }}>
-        {earnedCount === 0 ? "Complete your first lesson to start earning badges!" : `${earnedCount} badge${earnedCount !== 1 ? "s" : ""} earned. Keep going!`}
-      </p>
 
       {/* Badge grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 16 }}>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {BADGES.map(badge => {
           const Icon = badge.icon;
           const isEarned = earnedSet.has(badge.name);
+
           return (
-            <div key={badge.name} style={{
-              padding: "24px 20px", borderRadius: 18,
-              border: `2px solid ${isEarned ? badge.ring : C.border}`,
-              background: isEarned
-                ? `linear-gradient(135deg, ${badge.color}, white)`
-                : C.white,
-              textAlign: "center", position: "relative",
-              boxShadow: isEarned ? `0 4px 20px ${badge.accent}22` : "none",
-            }}>
+            <div
+              key={badge.name}
+              className={cn(
+                "relative rounded-[1.5rem] border-2 p-5 text-center transition-all duration-200 hover:-translate-y-1",
+                isEarned
+                  ? "border-transparent bg-white hover:shadow-[0_12px_35px_rgba(0,0,0,0.08)]"
+                  : "border-border-soft bg-white opacity-70 hover:shadow-[0_6px_20px_rgba(0,0,0,0.05)]"
+              )}
+              style={isEarned ? {
+                borderImage: `linear-gradient(135deg, ${badge.ring}, ${badge.accent}, ${badge.ring}) 1`,
+                boxShadow: `0 4px 20px ${badge.accent}18`,
+              } : undefined}
+            >
+              {/* Gradient border overlay for earned badges */}
               {isEarned && (
-                <span style={{ position: "absolute", top: 10, right: 10, width: 24, height: 24, borderRadius: "50%", background: badge.accent, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.75rem", fontWeight: 800 }}>✓</span>
+                <div
+                  className="absolute inset-0 rounded-[1.5rem] pointer-events-none"
+                  style={{
+                    background: `linear-gradient(135deg, ${badge.ring}40, transparent 50%, ${badge.accent}30)`,
+                    WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+                    WebkitMaskComposite: "xor",
+                    maskComposite: "exclude",
+                    padding: "2px",
+                  }}
+                />
               )}
-              {!isEarned && (
-                <span style={{ position: "absolute", top: 10, right: 10, width: 24, height: 24, borderRadius: "50%", background: "#F1F5F9", border: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.75rem" }}>
-                  <Lock size={10} style={{ color: "#94A3B8" }} />
-                </span>
-              )}
-              <div style={{
-                width: 64, height: 64, borderRadius: "50%",
-                background: isEarned ? `linear-gradient(135deg, ${badge.accent}30, ${badge.accent}10)` : "#F8FAFC",
-                border: `3px solid ${isEarned ? badge.ring : "#E2E8F0"}`,
-                margin: "0 auto 14px",
-                display: "flex", alignItems: "center", justifyContent: "center",
-              }}>
+
+              {/* Status indicator */}
+              <div className="absolute top-3 right-3 z-10">
+                {isEarned ? (
+                  <div
+                    className="w-7 h-7 rounded-full flex items-center justify-center"
+                    style={{ background: badge.accent }}
+                  >
+                    <Check size={14} className="text-white" strokeWidth={3} />
+                  </div>
+                ) : (
+                  <div className="w-7 h-7 rounded-full bg-gray-100 border border-border-soft flex items-center justify-center">
+                    <Lock size={12} className="text-gray-400" />
+                  </div>
+                )}
+              </div>
+
+              {/* Icon circle */}
+              <div
+                className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center border-[3px] transition-all"
+                style={{
+                  background: isEarned
+                    ? `linear-gradient(135deg, ${badge.accent}25, ${badge.accent}08)`
+                    : "#F8FAFC",
+                  borderColor: isEarned ? badge.ring : "#E5EAF3",
+                  boxShadow: isEarned ? `0 0 25px ${badge.accent}15` : "none",
+                }}
+              >
                 <Icon size={28} style={{ color: isEarned ? badge.accent : "#CBD5E1" }} />
               </div>
-              <h4 style={{ fontSize: "0.9375rem", fontWeight: 800, color: isEarned ? C.dark : "#94A3B8", margin: "0 0 4px 0" }}>{badge.name}</h4>
-              <p style={{ fontSize: "0.6875rem", color: isEarned ? C.body : "#B0B8C4", margin: 0 }}>{badge.requirement}</p>
-              {isEarned && (
-                <span style={{ display: "inline-block", marginTop: 8, padding: "2px 10px", borderRadius: 999, background: badge.accent, color: "#fff", fontSize: "0.625rem", fontWeight: 700 }}>
-                  ✨ Earned
-                </span>
-              )}
-              {!isEarned && (
-                <span style={{ display: "inline-block", marginTop: 8, padding: "2px 10px", borderRadius: 999, background: "#F1F5F9", color: "#94A3B8", fontSize: "0.625rem", fontWeight: 600 }}>
-                  🔒 Locked
-                </span>
-              )}
+
+              {/* Badge name */}
+              <h4
+                className="text-sm font-extrabold mb-1"
+                style={{ color: isEarned ? "#111827" : "#94A3B8" }}
+              >
+                {badge.name}
+              </h4>
+
+              {/* Requirement */}
+              <p className="text-[11px] leading-relaxed mb-3" style={{ color: isEarned ? "#64748B" : "#B0B8C4" }}>
+                {badge.requirement}
+              </p>
+
+              {/* Status pill */}
+              <span
+                className="inline-block px-3 py-1 rounded-full text-[10px] font-bold tracking-wide"
+                style={{
+                  background: isEarned ? badge.accent : "#F1F5F9",
+                  color: isEarned ? "#fff" : "#94A3B8",
+                }}
+              >
+                {isEarned ? "✨ EARNED" : "🔒 LOCKED"}
+              </span>
             </div>
           );
         })}
       </div>
+
+      {totalCount === 0 && (
+        <EmptyStateCard
+          icon={<Trophy size={36} />}
+          title="No badges available"
+          description="Badges will appear here as they become available."
+        />
+      )}
     </div>
   );
 }

@@ -1,22 +1,17 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
-import { useState, useEffect } from "react";
 import { CalendarDays } from "lucide-react";
-
-const C = { page: "#F7FBF7", teal: "#047A70", dark: "#0F172A", body: "#64748B", white: "#FFFFFF", border: "#E2E8F0" };
+import { PageHeader, EmptyStateCard } from "@/components/ui/Pill";
 
 export default function CalendarPage() {
   return (
-    <div>
-      <div style={{ textAlign: "center", padding: "3rem 1rem" }}>
-        <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>📅</div>
-        <h1 style={{ fontSize: "1.5rem", fontWeight: 800, color: C.dark, margin: "0 0 0.5rem 0" }}>Calendar</h1>
-        <p style={{ color: C.body, fontSize: "0.9375rem", maxWidth: 400, margin: "0 auto" }}>
-          Your lesson schedule will appear here.
-        </p>
-      </div>
+    <div className="space-y-8 fade-in">
+      <PageHeader title="Calendar" subtitle="Your learning schedule and events" />
+      <EmptyStateCard
+        icon={<CalendarDays className="w-8 h-8" />}
+        title="Calendar coming soon"
+        description="We're building a calendar to help you plan your learning activities."
+      />
     </div>
   );
 }

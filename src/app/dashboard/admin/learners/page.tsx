@@ -3,8 +3,8 @@ export const dynamic = "force-dynamic";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
-import { GraduationCap, ArrowLeft, Search, AlertCircle, Users, Flame, Award, Mail } from "lucide-react";
-import { ds, colors } from "@/lib/design-system";
+import { GraduationCap, ArrowLeft, Search, AlertCircle, Users, Flame, Award, Mail, Loader2 } from "lucide-react";
+import { PageHeader, StatCard, EmptyStateCard } from "@/components/ui/Pill";
 
 interface LearnerRecord {
   id: string;
@@ -61,76 +61,87 @@ export default function AdminLearnersPage() {
            (l.user?.email || "").toLowerCase().includes(s);
   });
 
+  const totalXp = learners.reduce((sum, l) => sum + (l.totalXp || 0), 0);
+  const avgStreak = learners.length ? Math.round(learners.reduce((sum, l) => sum + (l.currentStreak || 0), 0) / learners.length) : 0;
+
   return (
-    <div style={{ minHeight: "100vh", background: colors.bg }}>
-      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "2rem 1.5rem" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
-          <Link href="/dashboard/admin" style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", color: colors.textMuted, textDecoration: "none", fontSize: "0.875rem", fontWeight: 600 }}>
-            <ArrowLeft style={{ width: 16, height: 16 }} /> Back to Admin Dashboard
+    <div className="min-h-screen bg-bg-main">
+      <div className="max-w-[1100px] mx-auto py-8 px-6">
+        {/* Top bar */}
+        <div className="flex justify-between items-center mb-6">
+          <Link href="/dashboard/admin" className="inline-flex items-center gap-2 text-text-muted hover:text-text text-sm font-semibold transition-colors">
+            <ArrowLeft className="w-4 h-4" /> Back to Admin Dashboard
           </Link>
-          <button onClick={() => signOut({ callbackUrl: "/" })} style={{ display: "flex", alignItems: "center", gap: "0.375rem", padding: "0.375rem 0.75rem", borderRadius: 8, border: `1px solid ${colors.border}`, background: "none", color: colors.textMuted, cursor: "pointer", fontSize: "0.8125rem", fontWeight: 600 }}>
+          <button onClick={() => signOut({ callbackUrl: "/" })} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border-soft text-text-muted hover:bg-white hover:border-primary/30 cursor-pointer text-xs font-semibold transition-all">
             Sign Out
           </button>
         </div>
 
-        <div style={{ marginBottom: "1.5rem" }}>
-          <h1 style={{ fontSize: "1.5rem", fontWeight: 800, color: colors.text, marginBottom: "0.25rem" }}>Learners</h1>
-          <p style={{ color: colors.textMuted }}>{learners.length} students enrolled</p>
+        {/* Header */}
+        <PageHeader title="Learners" subtitle={`${learners.length} students enrolled`} />
+
+        {/* Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          <StatCard label="Enrolled" value={learners.length} gradient="bg-card-gradient-purple" borderColor="border-accent-purple/20" textColor="text-primary-dark" icon={<Users className="w-5 h-5 text-accent-purple" />} />
+          <StatCard label="Total XP Earned" value={totalXp.toLocaleString()} gradient="bg-card-gradient-gold" borderColor="border-gold/20" textColor="text-amber-700" icon={<Award className="w-5 h-5 text-gold" />} />
+          <StatCard label="Avg Streak" value={`${avgStreak}d`} gradient="bg-card-gradient-pink" borderColor="border-pink/20" textColor="text-pink-700" icon={<Flame className="w-5 h-5 text-pink" />} />
         </div>
 
+        {/* Error */}
         {error && (
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.75rem 1rem", borderRadius: 10, marginBottom: "1.5rem", background: `${colors.warning || "#F59E0B"}15`, border: `1px solid ${colors.warning || "#F59E0B"}30`, color: colors.warning || "#B45309", fontSize: "0.875rem", fontWeight: 600 }}>
-            <AlertCircle style={{ width: 16, height: 16 }} /> {error}
+          <div className="flex items-center gap-2 p-3 rounded-2xl mb-6 bg-amber-50 border border-amber-200 text-amber-800 text-sm font-semibold">
+            <AlertCircle className="w-4 h-4 flex-shrink-0" /> {error}
           </div>
         )}
 
-        <div style={{ display: "flex", gap: "0.75rem", marginBottom: "1.5rem", flexWrap: "wrap" }}>
-          <div style={{ position: "relative", flex: 1, minWidth: 200 }}>
-            <Search style={{ position: "absolute", left: "0.875rem", top: "50%", transform: "translateY(-50%)", width: 16, height: 16, color: colors.textMuted }} />
-            <input placeholder="Search learners..." value={search} onChange={e => setSearch(e.target.value)} style={{ ...ds.input, paddingLeft: "2.5rem", fontSize: "0.875rem" }} />
+        {/* Filters */}
+        <div className="flex gap-3 mb-6 flex-wrap">
+          <div className="relative flex-1 min-w-[200px]">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+            <input placeholder="Search learners..." value={search} onChange={e => setSearch(e.target.value)} className="w-full pl-10 pr-4 py-2.5 rounded-2xl text-sm font-medium text-text bg-white border border-border-soft placeholder:text-text-muted/60 focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all" />
           </div>
           {grades.length > 0 && (
-            <select value={filterGrade} onChange={e => setFilterGrade(e.target.value)} style={{ ...ds.input, fontSize: "0.875rem", minWidth: 120 }}>
+            <select value={filterGrade} onChange={e => setFilterGrade(e.target.value)} className="px-4 py-2.5 rounded-2xl text-sm font-medium text-text bg-white border border-border-soft focus:outline-none focus:border-primary/40 transition-all min-w-[120px]">
               <option value="all">All Grades</option>
               {grades.map(g => <option key={g} value={g}>Grade {g}</option>)}
             </select>
           )}
         </div>
 
+        {/* Content */}
         {loading ? (
-          <div style={{ ...ds.card, textAlign: "center", padding: "3rem 2rem", color: colors.textMuted }}>Loading learners...</div>
-        ) : filtered.length === 0 ? (
-          <div style={{ ...ds.card, textAlign: "center", padding: "3rem 2rem" }}>
-            <GraduationCap style={{ width: 48, height: 48, color: colors.textMuted, margin: "0 auto 1rem", opacity: 0.4 }} />
-            <h3 style={{ fontSize: "1.125rem", fontWeight: 700, color: colors.text, marginBottom: "0.5rem" }}>
-              {search || filterGrade !== "all" ? "No learners match your filters" : "No learners found"}
-            </h3>
-            <p style={{ color: colors.textMuted, fontSize: "0.9375rem" }}>
-              {search || filterGrade !== "all" ? "Try adjusting your search or filters." : "Learners will appear here when they register."}
-            </p>
+          <div className="rounded-[1.75rem] border border-border-soft bg-white p-12 text-center">
+            <Loader2 className="w-8 h-8 text-primary animate-spin mx-auto mb-3" />
+            <p className="text-text-muted text-sm font-medium">Loading learners...</p>
           </div>
+        ) : filtered.length === 0 ? (
+          <EmptyStateCard
+            icon={<GraduationCap size={48} />}
+            title={search || filterGrade !== "all" ? "No learners match your filters" : "No learners found"}
+            description={search || filterGrade !== "all" ? "Try adjusting your search or filters." : "Learners will appear here when they register."}
+          />
         ) : (
-          <div style={{ display: "grid", gap: "0.5rem" }}>
+          <div className="flex flex-col gap-2">
             {filtered.map(learner => (
-              <div key={learner.id} style={{ ...ds.card, padding: "1rem 1.25rem", display: "flex", alignItems: "center", gap: "1rem" }}>
-                <div style={{ width: 44, height: 44, borderRadius: "50%", background: colors.primarySoft, display: "flex", alignItems: "center", justifyContent: "center", color: colors.primary, fontWeight: 800, fontSize: "1rem", flexShrink: 0 }}>
+              <div key={learner.id} className="rounded-[1.75rem] border border-border-soft bg-white p-4 flex items-center gap-4 hover:shadow-[0_4px_20px_rgba(15,23,42,0.06)] transition-all">
+                <div className="w-11 h-11 rounded-full bg-primary-soft flex items-center justify-center text-primary font-extrabold text-base flex-shrink-0">
                   {(learner.displayName || "L").charAt(0).toUpperCase()}
                 </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 700, color: colors.text, fontSize: "0.9375rem" }}>{learner.displayName}</div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "0.8125rem", color: colors.textMuted, marginTop: "0.125rem" }}>
-                    <Mail style={{ width: 12, height: 12 }} /> {learner.user?.email || "No email"}
+                <div className="flex-1 min-w-0">
+                  <div className="font-bold text-text text-sm">{learner.displayName}</div>
+                  <div className="flex items-center gap-1.5 text-xs text-text-muted mt-0.5">
+                    <Mail className="w-3 h-3" /> {learner.user?.email || "No email"}
                   </div>
                 </div>
-                <div style={{ display: "flex", gap: "1rem", fontSize: "0.75rem", flexShrink: 0 }}>
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", color: colors.primary, fontWeight: 600 }}>
-                    <GraduationCap style={{ width: 12, height: 12 }} /> Grade {learner.grade}
+                <div className="flex gap-4 text-xs flex-shrink-0">
+                  <span className="inline-flex items-center gap-1 text-primary font-semibold">
+                    <GraduationCap className="w-3 h-3" /> Grade {learner.grade}
                   </span>
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", color: colors.warm, fontWeight: 600 }}>
-                    <Award style={{ width: 12, height: 12 }} /> {learner.totalXp} XP
+                  <span className="inline-flex items-center gap-1 text-gold font-semibold">
+                    <Award className="w-3 h-3" /> {learner.totalXp} XP
                   </span>
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", color: colors.success, fontWeight: 600 }}>
-                    <Flame style={{ width: 12, height: 12 }} /> {learner.currentStreak}d
+                  <span className="inline-flex items-center gap-1 text-emerald-600 font-semibold">
+                    <Flame className="w-3 h-3" /> {learner.currentStreak}d
                   </span>
                 </div>
               </div>

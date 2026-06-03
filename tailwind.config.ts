@@ -9,6 +9,48 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // New v6 palette
+        primary: {
+          DEFAULT: "rgb(var(--color-primary) / <alpha-value>)",
+          light: "rgb(var(--color-primary-light) / <alpha-value>)",
+          soft: "rgb(var(--color-primary-soft) / <alpha-value>)",
+          dark: "rgb(var(--color-primary-dark) / <alpha-value>)",
+        },
+        secondary: {
+          DEFAULT: "rgb(var(--color-secondary) / <alpha-value>)",
+          light: "rgb(var(--color-secondary-light) / <alpha-value>)",
+          soft: "rgb(var(--color-secondary-soft) / <alpha-value>)",
+          dark: "rgb(var(--color-secondary-dark) / <alpha-value>)",
+        },
+        gold: {
+          DEFAULT: "rgb(var(--color-gold) / <alpha-value>)",
+          light: "rgb(var(--color-gold-light) / <alpha-value>)",
+          soft: "rgb(var(--color-gold-soft) / <alpha-value>)",
+        },
+        pink: {
+          DEFAULT: "rgb(var(--color-pink) / <alpha-value>)",
+          light: "rgb(var(--color-pink-light) / <alpha-value>)",
+          soft: "rgb(var(--color-pink-soft) / <alpha-value>)",
+        },
+        "accent-blue": {
+          DEFAULT: "rgb(var(--color-accent-blue) / <alpha-value>)",
+          light: "rgb(var(--color-accent-blue-light) / <alpha-value>)",
+          soft: "rgb(var(--color-accent-blue-soft) / <alpha-value>)",
+        },
+        "accent-purple": {
+          DEFAULT: "rgb(var(--color-accent-purple) / <alpha-value>)",
+          light: "rgb(var(--color-accent-purple-light) / <alpha-value>)",
+          soft: "rgb(var(--color-accent-purple-soft) / <alpha-value>)",
+        },
+        success: "rgb(var(--color-success) / <alpha-value>)",
+        warning: "rgb(var(--color-warning) / <alpha-value>)",
+        danger: "rgb(var(--color-danger) / <alpha-value>)",
+        "bg-main": "rgb(var(--color-bg-main))",
+        "bg-card": "rgb(var(--color-bg-card))",
+        "text-muted": "rgb(var(--color-text-muted))",
+        "border-soft": "rgb(var(--color-border))",
+
+        // Backwards compat aliases
         cream: "rgb(var(--color-cream) / <alpha-value>)",
         lavender: {
           DEFAULT: "rgb(var(--color-lavender) / <alpha-value>)",
@@ -30,18 +72,10 @@ const config: Config = {
           light: "rgb(var(--color-peach-light) / <alpha-value>)",
           soft: "rgb(var(--color-peach-soft) / <alpha-value>)",
         },
-        primary: {
-          DEFAULT: "rgb(var(--color-primary) / <alpha-value>)",
-          light: "rgb(var(--color-primary-light) / <alpha-value>)",
-          dark: "rgb(var(--color-primary-dark) / <alpha-value>)",
-        },
         accent: {
-          DEFAULT: "rgb(var(--color-accent) / <alpha-value>)",
-          light: "rgb(var(--color-accent-light) / <alpha-value>)",
+          DEFAULT: "rgb(var(--color-gold) / <alpha-value>)",
+          light: "rgb(var(--color-gold-light) / <alpha-value>)",
         },
-        success: "rgb(var(--color-success) / <alpha-value>)",
-        warning: "rgb(var(--color-warning) / <alpha-value>)",
-        danger: "rgb(var(--color-danger) / <alpha-value>)",
         surface: {
           DEFAULT: "rgb(var(--color-surface) / <alpha-value>)",
           soft: "rgb(var(--color-surface-soft) / <alpha-value>)",
@@ -71,8 +105,13 @@ const config: Config = {
       boxShadow: {
         card: "0 1px 3px rgb(0 0 0 / 0.03), 0 4px 12px rgb(0 0 0 / 0.02)",
         "card-hover": "0 8px 30px rgb(0 0 0 / 0.06), 0 2px 8px rgb(0 0 0 / 0.03)",
-        glow: "0 0 30px rgba(124, 58, 237, 0.12)",
-        "glow-soft": "0 0 20px rgba(167, 139, 250, 0.1)",
+        glow: "0 0 30px rgba(79, 70, 229, 0.12)",
+        "glow-soft": "0 0 20px rgba(79, 70, 229, 0.08)",
+        "glow-gold": "0 0 20px rgba(245, 165, 36, 0.15)",
+        "glow-pink": "0 0 20px rgba(255, 92, 138, 0.12)",
+        pill: "0 4px 15px rgba(79, 70, 229, 0.20)",
+        "pill-gold": "0 4px 15px rgba(245, 165, 36, 0.25)",
+        "pill-pink": "0 4px 15px rgba(255, 92, 138, 0.20)",
       },
       animation: {
         "fade-in": "fadeIn 0.4s ease-out",
@@ -82,6 +121,8 @@ const config: Config = {
         "float-slow": "floatSlow 6s ease-in-out infinite",
         "float-medium": "floatMedium 4s ease-in-out infinite",
         "float-fast": "floatFast 3s ease-in-out infinite",
+        "coin-sparkle": "coinSparkle 0.6s ease-in-out",
+        "progress-fill": "progressFill 1s ease-out both",
       },
       keyframes: {
         fadeIn: {
@@ -97,8 +138,8 @@ const config: Config = {
           to: { opacity: "1", transform: "translateY(0)" },
         },
         pulseGlow: {
-          "0%, 100%": { boxShadow: "0 0 20px rgba(167, 139, 250, 0.15)" },
-          "50%": { boxShadow: "0 0 30px rgba(167, 139, 250, 0.25)" },
+          "0%, 100%": { boxShadow: "0 0 20px rgba(79, 70, 229, 0.10)" },
+          "50%": { boxShadow: "0 0 30px rgba(79, 70, 229, 0.20)" },
         },
         floatSlow: {
           "0%, 100%": { transform: "translateY(0)" },
@@ -111,6 +152,13 @@ const config: Config = {
         floatFast: {
           "0%, 100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(-5px)" },
+        },
+        coinSparkle: {
+          "0%, 100%": { transform: "scale(1) rotate(0deg)" },
+          "50%": { transform: "scale(1.2) rotate(5deg)" },
+        },
+        progressFill: {
+          from: { width: "0%" },
         },
       },
     },

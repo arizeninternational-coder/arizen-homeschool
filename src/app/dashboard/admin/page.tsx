@@ -7,29 +7,41 @@ import Link from "next/link";
 import {
   Users, BookOpen, GraduationCap, Award, Settings, BarChart3,
   Shield, LogOut, Plus, ChevronRight, TrendingUp, Activity,
-  UserCheck, Layers, Zap, AlertCircle, Menu, X, ShoppingBag, Bell, Flame, CheckCircle
+  UserCheck, Layers, Zap, AlertCircle, Menu, X, ShoppingBag, Bell, Flame, CheckCircle,
+  BookCheck, Sparkles, UserCog, FileText, ScrollText, Swords
 } from "lucide-react";
 import { ds, colors, gradients, shadows } from "@/lib/design-system";
+import {
+  StatCard, SectionHeader, PageHeader, EmptyStateCard, GradientButton
+} from "@/components/ui/Pill";
 
 interface AdminStats {
   users: number;
   parents: number;
   learners: number;
+  teachers: number;
+  admins: number;
   lessons: number;
+  publishedLessons: number;
+  draftLessons: number;
   quests: number;
+  badges: number;
   shopItems: number;
+  completedLessons: number;
+  activeLearners: number;
+  activeToday: number;
+  totalXpAwarded: number;
 }
 
-const OWL_MESSAGES: Record<string, string> = {
-  happy: "Wonderful! Let's use that bright energy for today's lesson.",
-  calm: "A calm mind is ready to learn. Let's begin with something cool.",
-  curious: "Curiosity is a superpower. Let's explore something new.",
-  okay: "That's okay. One small step is enough to begin.",
-  worried: "Thank you for sharing. Let's take it slowly today.",
-  tired: "Thanks for noticing. A short lesson might be just right.",
-  frustrated: "That feeling is allowed. Let's start with something simple.",
-  sad: "I'm here with you. One small step is enough today.",
-};
+interface ProgressStats {
+  totalCompletedLessons: number;
+  activeLearners: number;
+  activeToday: number;
+  totalXpAwarded: number;
+  totalCoinsAwarded: number;
+  topLearners: Array<{ id: string; displayName: string; totalXp: number; currentStreak: number }>;
+}
+
 interface SeedFeedback {
   type: "success" | "error";
   message: string;
@@ -38,7 +50,8 @@ interface SeedFeedback {
 export default function AdminDashboard() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState<AdminStats>({ users: 0, parents: 0, learners: 0, lessons: 0, quests: 0 });
+  const [stats, setStats] = useState<AdminStats | null>(null);
+  const [progress, setProgress] = useState<ProgressStats | null>(null);
   const [statsError, setStatsError] = useState<string | null>(null);
   const [seedFeedback, setSeedFeedback] = useState<SeedFeedback | null>(null);
   const [seeding, setSeeding] = useState(false);
@@ -89,9 +102,14 @@ export default function AdminDashboard() {
           return;
         }
         setUser(data.user);
-        // Fetch stats — do NOT swallow errors
+
+        // Fetch both stats and progress in parallel
         try {
-          const statsRes = await fetch("/api/admin/stats", { credentials: "include" });
+          const [statsRes, progressRes] = await Promise.all([
+            fetch("/api/admin/stats", { credentials: "include" }),
+            fetch("/api/admin/progress", { credentials: "include" }),
+          ]);
+
           if (statsRes.ok) {
             const statsData = await statsRes.json();
             if (statsData.error) {
@@ -104,8 +122,17 @@ export default function AdminDashboard() {
             const errBody = await statsRes.json().catch(() => ({}));
             setStatsError(errBody.error || `Stats API returned ${statsRes.status}`);
           }
-        } catch (statsErr: any) {
-          setStatsError(statsErr?.message || "Failed to load dashboard stats");
+
+          if (progressRes.ok) {
+            const progressData = await progressRes.json();
+            if (progressData.error) {
+              // Non-fatal: stats already loaded
+            } else {
+              setProgress(progressData);
+            }
+          }
+        } catch (fetchErr: any) {
+          setStatsError(fetchErr?.message || "Failed to load dashboard data");
         }
       } catch {
         window.location.replace("/auth/login");
@@ -135,7 +162,6 @@ export default function AdminDashboard() {
       setSeedFeedback({ type: "error", message: err?.message || "Network error — please try again" });
     } finally {
       setSeeding(false);
-      // Auto-dismiss after 8s
       setTimeout(() => setSeedFeedback(null), 8000);
     }
   }, []);
@@ -163,12 +189,16 @@ export default function AdminDashboard() {
     }
   }, []);
 
+  // ── Loading State ──
   if (loading) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: colors.bg }}>
-        <div style={{ textAlign: "center" }}>
-          <Shield style={{ width: 48, height: 48, color: colors.primary, margin: "0 auto 1rem" }} />
-          <p style={{ color: colors.textMuted, fontWeight: 600 }}>Loading admin dashboard...</p>
+      <div className="min-h-screen flex items-center justify-center bg-bg-main">
+        <div className="text-center">
+          <div className="relative mx-auto w-16 h-16 mb-4">
+            <div className="absolute inset-0 rounded-full border-4 border-primary/20" />
+            <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-primary animate-spin" />
+          </div>
+          <p className="text-text-muted font-bold text-sm">Loading admin dashboard...</p>
         </div>
       </div>
     );
@@ -176,9 +206,39 @@ export default function AdminDashboard() {
 
   if (!user) return null;
 
-  // Fix: proper name fallback chain
+  // ── Error State ──
+  if (statsError && !stats) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-bg-main p-4">
+        <EmptyStateCard
+          icon={<AlertCircle className="w-8 h-8" />}
+          title="Unable to load dashboard"
+          description={statsError}
+        />
+      </div>
+    );
+  }
+
   const displayName = user.name || user.email || "Admin";
   const firstName = displayName.includes(" ") ? displayName.split(" ")[0] : displayName;
+
+  // Merge stats with progress data (progress API has more detailed learning stats)
+  const s = stats || {} as AdminStats;
+  const p = progress || {} as ProgressStats;
+
+  const totalUsers = s.users || 0;
+  const parents = s.parents || 0;
+  const learners = s.learners || 0;
+  const teachers = s.teachers || 0;
+  const admins = s.admins || 0;
+  const completedLessons = p.totalCompletedLessons || s.completedLessons || 0;
+  const activeLearners = p.activeLearners || s.activeLearners || 0;
+  const activeToday = p.activeToday || s.activeToday || 0;
+  const totalXp = p.totalXpAwarded || s.totalXpAwarded || 0;
+  const publishedLessons = s.publishedLessons || 0;
+  const draftLessons = s.draftLessons || 0;
+  const quests = s.quests || 0;
+  const shopItems = s.shopItems || 0;
 
   const navItems = [
     { icon: BarChart3, label: "Dashboard", href: "/dashboard/admin", active: true, desc: "Overview & analytics" },
@@ -192,34 +252,9 @@ export default function AdminDashboard() {
     { icon: Settings, label: "Settings", href: "/dashboard/admin/settings", desc: "App settings" },
   ];
 
-  const statCards = [
-    { label: "Total Users", value: stats.users, icon: Users, color: colors.primary },
-    { label: "Parents", value: stats.parents, icon: UserCheck, color: colors.accent },
-    { label: "Learners", value: stats.learners, icon: GraduationCap, color: colors.success },
-    { label: "Teachers", value: stats.teachers || 0, icon: GraduationCap, color: "#7C3AED" },
-    { label: "Admins", value: stats.admins || 0, icon: Shield, color: "#DC2626" },
-    { label: "Lessons", value: stats.lessons, icon: BookOpen, color: colors.warning },
-    { label: "Published Lessons", value: stats.publishedLessons || 0, icon: BookOpen, color: colors.success },
-    { label: "Draft Lessons", value: stats.draftLessons || 0, icon: BookOpen, color: colors.warning },
-    { label: "Completed Lessons", value: stats.completedLessons || 0, icon: CheckCircle, color: "#059669" },
-    { label: "Active Learners", value: stats.activeLearners || 0, icon: Flame, color: "#D97706" },
-    { label: "Active Today", value: stats.activeToday || 0, icon: Activity, color: "#2563EB" },
-    { label: "Total XP Awarded", value: stats.totalXpAwarded || 0, icon: Zap, color: "#7C3AED" },
-    { label: "Quests", value: stats.quests, icon: Layers, color: colors.primary },
-    { label: "Shop Items", value: stats.shopItems, icon: ShoppingBag, color: colors.accent },
-  ];
-
-  const quickActions = [
-    { label: "Manage Users", icon: Plus, desc: "View and manage accounts", href: "/dashboard/admin/users" },
-    { label: "Create Lesson", icon: BookOpen, desc: "Add new lesson content", href: "/dashboard/admin/lessons" },
-    { label: "Design Quest", icon: Layers, desc: "Build a new quest", href: "/dashboard/admin/quests" },
-    { label: "Issue Badge", icon: Award, desc: "Configure achievements", href: "/dashboard/admin/badges" },
-  ];
-
   // Shared sidebar/nav content
   const renderNavContent = (inline: boolean) => (
     <>
-      {/* Brand / Logo area — only for desktop sidebar, not mobile drawer */}
       {!inline && (
         <div style={{ padding: "0 1.25rem", marginBottom: "1.5rem" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
@@ -234,7 +269,6 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* Navigation links */}
       {!inline && (
         <nav style={{ flex: 1, padding: "0 0.75rem" }}>
           {navItems.map((item) => (
@@ -263,7 +297,6 @@ export default function AdminDashboard() {
         </nav>
       )}
 
-      {/* Logout */}
       {!inline ? (
         <div style={{ padding: "0 1.25rem", borderTop: `1px solid ${colors.border}`, paddingTop: "1rem" }}>
           <button onClick={handleLogout} style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.5rem", borderRadius: 8, border: "none", background: "none", color: colors.textMuted, cursor: "pointer", fontSize: "0.875rem", fontWeight: 600, width: "100%" }}>
@@ -345,7 +378,6 @@ export default function AdminDashboard() {
             padding: "1.25rem 0",
           }}
         >
-          {/* Drawer header with close button */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 1.25rem", marginBottom: "1.5rem" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
               <div style={{ width: 36, height: 36, borderRadius: 10, background: gradients.primary, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -364,7 +396,6 @@ export default function AdminDashboard() {
               <X style={{ width: 18, height: 18 }} />
             </button>
           </div>
-
           {renderNavContent(true)}
         </aside>
       )}
@@ -390,7 +421,6 @@ export default function AdminDashboard() {
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: "0.625rem", minWidth: 0 }}>
-            {/* Hamburger (mobile only) */}
             {!isDesktop && (
               <button
                 onClick={() => setDrawerOpen(!drawerOpen)}
@@ -426,7 +456,6 @@ export default function AdminDashboard() {
             <div style={{ width: 36, height: 36, minWidth: 36, borderRadius: "50%", background: gradients.primary, display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: 700, fontSize: "0.875rem" }}>
               {firstName.charAt(0).toUpperCase()}
             </div>
-            {/* Mobile logout in top bar */}
             {!isDesktop && (
               <button
                 onClick={handleLogout}
@@ -473,7 +502,7 @@ export default function AdminDashboard() {
                 </div>
                 <div style={{ maxHeight: 320, overflowY: "auto" }}>
                   {notifications.length === 0 ? (
-                    <div style={{ padding: "2rem 1rem", textAlign: "center", color: colors.textMuted, fontSize: "0.8125rem" }}>No notifications yet ✨</div>
+                    <div style={{ padding: "2rem 1rem", textAlign: "center", color: colors.textMuted, fontSize: "0.8125rem" }}>No notifications yet</div>
                   ) : notifications.slice(0, 10).map((n: any) => (
                     <div key={n.id} style={{ padding: "0.75rem 1rem", borderBottom: `1px solid ${colors.borderLight}`, fontSize: "0.8125rem" }}>
                       <div style={{ fontWeight: 700, color: colors.text, fontSize: "0.8125rem" }}>{n.title}</div>
@@ -486,22 +515,18 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* Page Content */}
+        {/* ═══════════════════════════════════════════════════════════
+            PAGE CONTENT — v6 Design System
+            ═══════════════════════════════════════════════════════════ */}
         <div style={{ padding: isDesktop ? "2rem" : "1.25rem", flex: 1 }}>
 
-          {/* Welcome Header — desktop only */}
-          {isDesktop && (
-            <div style={{ marginBottom: "2rem" }}>
-              <h2 style={{ fontSize: "1.5rem", fontWeight: 800, color: colors.text, marginBottom: "0.25rm" }}>
-                Welcome back, {firstName} 👋
-              </h2>
-              <p style={{ color: colors.textMuted, fontSize: "0.875rem" }}>
-                Here's what's happening across your homeschool network.
-              </p>
-            </div>
-          )}
+          {/* ── Page Header ── */}
+          <PageHeader
+            title="Teacher Dashboard"
+            subtitle={`Welcome back, ${firstName}. Here's an overview of your homeschool network.`}
+          />
 
-          {/* Stats error banner */}
+          {/* ── Stats Error Banner ── */}
           {statsError && (
             <div style={{ ...ds.alertError, marginBottom: "1.5rem" }}>
               <AlertCircle style={{ width: 16, height: 16, flexShrink: 0, marginTop: 2 }} />
@@ -509,64 +534,172 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {/* Stats Cards */}
-          <div style={{ display: "grid", gridTemplateColumns: isDesktop ? "repeat(auto-fit, minmax(180px, 1fr))" : "repeat(2, 1fr)", gap: isDesktop ? "1rem" : "0.75rem", marginBottom: "2rem" }}>
-            {statCards.map((stat) => (
-              <div key={stat.label} style={{ ...ds.card, padding: "1.25rem" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.75rem" }}>
-                  <div style={{ width: 40, height: 40, borderRadius: 10, background: `${stat.color}15`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <stat.icon style={{ width: 20, height: 20, color: stat.color }} />
-                  </div>
-                  {statsError && (
-                    <AlertCircle style={{ width: 14, height: 14, color: colors.warning }} />
-                  )}
-                  {!statsError && (
-                    <TrendingUp style={{ width: 16, height: 16, color: colors.success }} />
-                  )}
-                </div>
-                <div style={{ fontSize: "1.75rem", fontWeight: 800, color: colors.text }}>
-                  {statsError ? "—" : stat.value}
-                </div>
-                <div style={{ fontSize: "0.8125rem", color: colors.textMuted, fontWeight: 600 }}>{stat.label}</div>
-                {statsError && (
-                  <div style={{ fontSize: "0.6875rem", color: colors.warning, fontWeight: 600, marginTop: "0.25rem" }}>
-                    Unable to load
-                  </div>
-                )}
-              </div>
-            ))}
+          {/* ═══════════════════════════════════════════════════════════
+              SECTION 1 — Users
+              ═══════════════════════════════════════════════════════════ */}
+          <SectionHeader
+            title="Users"
+            subtitle="People in your homeschool network"
+          />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <StatCard
+              label="Total Users"
+              value={totalUsers.toLocaleString()}
+              icon={<Users className="w-5 h-5 text-primary" />}
+              gradient="bg-card-gradient-purple"
+              borderColor="border-accent-purple/20"
+              textColor="text-primary-dark"
+            />
+            <StatCard
+              label="Parents"
+              value={parents.toLocaleString()}
+              icon={<UserCheck className="w-5 h-5 text-accent-purple" />}
+              gradient="bg-card-gradient-purple"
+              borderColor="border-accent-purple/20"
+              textColor="text-primary-dark"
+            />
+            <StatCard
+              label="Learners"
+              value={learners.toLocaleString()}
+              icon={<GraduationCap className="w-5 h-5 text-primary" />}
+              gradient="bg-card-gradient-purple"
+              borderColor="border-primary/20"
+              textColor="text-primary-dark"
+            />
+            <StatCard
+              label="Teachers & Admins"
+              value={(teachers + admins).toLocaleString()}
+              icon={<Shield className="w-5 h-5 text-accent-purple" />}
+              gradient="bg-card-gradient-purple"
+              borderColor="border-accent-purple/20"
+              textColor="text-primary-dark"
+            />
           </div>
 
-          {/* Quick Actions */}
-          <h2 style={{ fontSize: isDesktop ? "1.125rem" : "1rem", fontWeight: 700, color: colors.text, marginBottom: "1rem" }}>Quick Actions</h2>
-          <div style={{ display: "grid", gridTemplateColumns: isDesktop ? "repeat(auto-fit, minmax(200px, 1fr))" : "repeat(2, 1fr)", gap: isDesktop ? "1rem" : "0.75rem", marginBottom: "2rem" }}>
-            {quickActions.map((action) => (
-              <Link key={action.label} href={action.href} style={{
-                ...ds.card,
-                padding: "1.25rem",
-                textAlign: "left",
-                cursor: "pointer",
-                border: `1.5px solid ${colors.border}`,
-                background: "white",
-                transition: "all 0.15s",
-                textDecoration: "none",
-                display: "block",
-              }}>
-                <action.icon style={{ width: 24, height: 24, color: colors.primary, marginBottom: "0.75rem" }} />
-                <div style={{ fontWeight: 700, color: colors.text, fontSize: "0.9375rem" }}>{action.label}</div>
-                <div style={{ fontSize: "0.75rem", color: colors.textMuted, marginTop: "0.25rem" }}>{action.desc}</div>
-              </Link>
-            ))}
+          {/* ═══════════════════════════════════════════════════════════
+              SECTION 2 — Learning Activity
+              ═══════════════════════════════════════════════════════════ */}
+          <SectionHeader
+            title="Learning Activity"
+            subtitle="Engagement and progress across all learners"
+          />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <StatCard
+              label="Completed Lessons"
+              value={completedLessons.toLocaleString()}
+              icon={<BookCheck className="w-5 h-5 text-secondary" />}
+              gradient="bg-card-gradient-green"
+              borderColor="border-secondary/20"
+              textColor="text-emerald-700"
+            />
+            <StatCard
+              label="Active Learners"
+              value={activeLearners.toLocaleString()}
+              icon={<Flame className="w-5 h-5 text-pink" />}
+              gradient="bg-card-gradient-pink"
+              borderColor="border-pink/20"
+              textColor="text-pink-700"
+            />
+            <StatCard
+              label="Active Today"
+              value={activeToday.toLocaleString()}
+              icon={<Activity className="w-5 h-5 text-accent-blue" />}
+              gradient="bg-card-gradient-blue"
+              borderColor="border-accent-blue/20"
+              textColor="text-blue-700"
+            />
+            <StatCard
+              label="Total XP Awarded"
+              value={totalXp.toLocaleString()}
+              icon={<Sparkles className="w-5 h-5 text-gold" />}
+              gradient="bg-card-gradient-gold"
+              borderColor="border-gold/20"
+              textColor="text-amber-700"
+            />
           </div>
 
-          {/* Seed Curriculum */}
+          {/* ═══════════════════════════════════════════════════════════
+              SECTION 3 — Content
+              ═══════════════════════════════════════════════════════════ */}
+          <SectionHeader
+            title="Content"
+            subtitle="Lessons, quests, and shop items available"
+          />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <StatCard
+              label="Published Lessons"
+              value={publishedLessons.toLocaleString()}
+              icon={<BookOpen className="w-5 h-5 text-secondary" />}
+              gradient="bg-card-gradient-green"
+              borderColor="border-secondary/20"
+              textColor="text-emerald-700"
+            />
+            <StatCard
+              label="Draft Lessons"
+              value={draftLessons.toLocaleString()}
+              icon={<FileText className="w-5 h-5 text-gold" />}
+              gradient="bg-card-gradient-gold"
+              borderColor="border-gold/20"
+              textColor="text-amber-700"
+            />
+            <StatCard
+              label="Quests"
+              value={quests.toLocaleString()}
+              icon={<Swords className="w-5 h-5 text-accent-purple" />}
+              gradient="bg-card-gradient-purple"
+              borderColor="border-accent-purple/20"
+              textColor="text-primary-dark"
+            />
+            <StatCard
+              label="Shop Items"
+              value={shopItems.toLocaleString()}
+              icon={<ShoppingBag className="w-5 h-5 text-accent-blue" />}
+              gradient="bg-card-gradient-blue"
+              borderColor="border-accent-blue/20"
+              textColor="text-blue-700"
+            />
+          </div>
+
+          {/* ═══════════════════════════════════════════════════════════
+              QUICK ACTIONS
+              ═══════════════════════════════════════════════════════════ */}
+          <SectionHeader
+            title="Quick Actions"
+            subtitle="Common tasks to manage your platform"
+          />
+          <div className="flex flex-wrap gap-3 mb-8">
+            <GradientButton
+              variant="primary"
+              size="md"
+              icon={<BookOpen className="w-4 h-4" />}
+            >
+              Create Lesson
+            </GradientButton>
+            <GradientButton
+              variant="success"
+              size="md"
+              icon={<Swords className="w-4 h-4" />}
+            >
+              Add Quest
+            </GradientButton>
+            <GradientButton
+              variant="secondary"
+              size="md"
+              icon={<ScrollText className="w-4 h-4" />}
+            >
+              Import Curriculum
+            </GradientButton>
+          </div>
+
+          {/* ═══════════════════════════════════════════════════════════
+              CURRICULUM SEED
+              ═══════════════════════════════════════════════════════════ */}
           <div style={{ ...ds.card, padding: "1.5rem", marginBottom: "2rem" }}>
             <h2 style={{ fontSize: "1.125rem", fontWeight: 700, color: colors.text, marginBottom: "0.5rem" }}>Curriculum</h2>
             <p style={{ color: colors.textMuted, fontSize: "0.875rem", marginBottom: "1rem" }}>
               Seed draft curriculum structure for Grade 2 and Grade 5. This creates themes, quests, and lesson placeholders. Already-existing records will not be duplicated.
             </p>
 
-            {/* Inline feedback banner */}
             {seedFeedback && (
               <div
                 style={{
@@ -583,16 +716,13 @@ export default function AdminDashboard() {
                   color: seedFeedback.type === "success" ? colors.success : colors.danger,
                 }}
               >
-                <span style={{ fontSize: "1.125rem", flexShrink: 0 }}>
-                  {seedFeedback.type === "success" ? "✅" : "❌"}
-                </span>
                 {seedFeedback.message}
                 <button
                   onClick={() => setSeedFeedback(null)}
                   style={{ marginLeft: "auto", background: "none", border: "none", color: "inherit", cursor: "pointer", fontSize: "1rem", padding: "0 0.25rem" }}
                   aria-label="Dismiss"
                 >
-                  ×
+                  <X style={{ width: 14, height: 14 }} />
                 </button>
               </div>
             )}
@@ -622,12 +752,16 @@ export default function AdminDashboard() {
                   Seeding...
                 </>
               ) : (
-                <>🌱 Seed Draft Curriculum</>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}>
+                  <Sparkles style={{ width: 16, height: 16 }} /> Seed Draft Curriculum
+                </span>
               )}
             </button>
           </div>
 
-          {/* Seed Shop Items */}
+          {/* ═══════════════════════════════════════════════════════════
+              SHOP SEED
+              ═══════════════════════════════════════════════════════════ */}
           <div style={{ ...ds.card, padding: "1.5rem", marginBottom: "2rem" }}>
             <h2 style={{ fontSize: "1.125rem", fontWeight: 700, color: colors.text, marginBottom: "0.5rem" }}>Reward Shop</h2>
             <p style={{ color: colors.textMuted, fontSize: "0.875rem", marginBottom: "1rem" }}>
@@ -650,16 +784,13 @@ export default function AdminDashboard() {
                   color: shopSeedFeedback.type === "success" ? colors.success : colors.danger,
                 }}
               >
-                <span style={{ fontSize: "1.125rem", flexShrink: 0 }}>
-                  {shopSeedFeedback.type === "success" ? "✅" : "❌"}
-                </span>
                 {shopSeedFeedback.message}
                 <button
                   onClick={() => setShopSeedFeedback(null)}
                   style={{ marginLeft: "auto", background: "none", border: "none", color: "inherit", cursor: "pointer", fontSize: "1rem", padding: "0 0.25rem" }}
                   aria-label="Dismiss"
                 >
-                  ×
+                  <X style={{ width: 14, height: 14 }} />
                 </button>
               </div>
             )}
@@ -689,13 +820,17 @@ export default function AdminDashboard() {
                   Seeding...
                 </>
               ) : (
-                <>🛍️ Seed Shop Items & Rewards</>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}>
+                  <ShoppingBag style={{ width: 16, height: 16 }} /> Seed Shop Items & Rewards
+                </span>
               )}
             </button>
           </div>
 
-          {/* Recent Activity */}
-          <h2 style={{ fontSize: "1.125rem", fontWeight: 700, color: colors.text, marginBottom: "1rem" }}>System Activity</h2>
+          {/* ═══════════════════════════════════════════════════════════
+              SYSTEM ACTIVITY
+              ═══════════════════════════════════════════════════════════ */}
+          <SectionHeader title="System Activity" />
           <div style={{ ...ds.card, padding: "1.5rem" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.75rem 0" }}>
               <Activity style={{ width: 18, height: 18, color: colors.primary }} />
