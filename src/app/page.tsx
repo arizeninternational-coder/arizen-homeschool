@@ -45,7 +45,7 @@ export default async function HomePage() {
     const firstName = userName ? userName.split(" ")[0] : "";
     return (
       <div className="min-h-screen bg-bg-main">
-        <nav className="h-[72px] border-b border-border-soft bg-white/90 backdrop-blur-xl sticky top-0 z-50">
+        <nav className="h-[68px] border-b border-border-soft/50 bg-white/80 backdrop-blur-xl sticky top-0 z-50">
           <div className="max-w-[1280px] mx-auto px-8 flex items-center justify-between h-full">
             <Link href="/" className="flex items-center gap-2.5 no-underline">
               <div className="w-9 h-9 rounded-lg bg-primary text-white flex items-center justify-center font-black text-lg">A</div>
@@ -58,7 +58,7 @@ export default async function HomePage() {
           </div>
         </nav>
         <div className="flex items-center justify-center min-h-[70vh] p-8">
-          <div className="text-center bg-white rounded-3xl border border-border-soft p-10 max-w-[420px] shadow-card">
+          <div className="text-center bg-white/90 backdrop-blur-sm rounded-3xl border border-white/60 p-10 max-w-[420px] shadow-[0_4px_24px_rgba(0,0,0,0.04)]">
             <div className="text-4xl mb-3 flex justify-center"><Sparkles className="text-gold w-10 h-10" /></div>
             <h2 className="text-xl font-extrabold text-text mb-2">Welcome back{firstName ? `, ${firstName}` : ""}!</h2>
             <p className="text-text-muted mb-6 text-sm">You are signed in. Head to your dashboard to continue.</p>
@@ -96,7 +96,7 @@ export default async function HomePage() {
 
       {/* ── Navbar ── */}
       <div className="relative z-10">
-        <nav className="h-[72px] bg-white/70 backdrop-blur-2xl sticky top-0 z-50 shadow-[0_1px_0_rgb(var(--color-border),0.5)]">
+        <nav className="h-[68px] bg-white/60 backdrop-blur-2xl sticky top-0 z-50 shadow-[0_1px_0_rgb(var(--color-border-soft),0.5)]">
           <div className="max-w-[1380px] mx-auto px-6 lg:px-10 flex items-center justify-between h-full">
             <Link href="/" className="flex items-center gap-2.5 no-underline">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent-purple text-white flex items-center justify-center font-black text-lg shadow-[0_0_20px_rgba(79,70,229,0.25)]">A</div>
@@ -268,7 +268,7 @@ export default async function HomePage() {
       {/* ═══════════════════════════════════════════════════════════
           FOOTER
           ═══════════════════════════════════════════════════════════════════ */}
-      <footer className="relative z-10 bg-white/50 backdrop-blur-sm">
+      <footer className="relative z-10 bg-white/40 backdrop-blur-sm border-t border-white/60">
         <div className="max-w-[1380px] mx-auto px-6 lg:px-10 py-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2.5">

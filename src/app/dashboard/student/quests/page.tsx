@@ -96,7 +96,7 @@ export default function QuestsPage() {
         />
       )}
       {activeQuests.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 mb-6">
           {activeQuests.map((quest: any, i: number) => {
             const lessonCount = quest.lessons?.length || 0;
             const xpReward = quest.xpReward
@@ -106,9 +106,9 @@ export default function QuestsPage() {
             const progress = quest.progress || 0;
 
             const typeStyles: Record<string, { bg: string; text: string; border: string; pillBg: string }> = {
-              MAIN: { bg: "bg-gradient-to-br from-primary-soft/60 to-accent-purple-soft/40", text: "text-primary", border: "border-primary/20", pillBg: "bg-primary-soft text-primary" },
-              SIDE: { bg: "bg-gradient-to-br from-gold-soft/60 to-amber-50", text: "text-gold", border: "border-gold/20", pillBg: "bg-gold-soft text-gold" },
-              BONUS: { bg: "bg-gradient-to-br from-accent-purple-soft/60 to-pink-soft/40", text: "text-accent-purple", border: "border-accent-purple/20", pillBg: "bg-accent-purple-soft text-accent-purple" },
+              MAIN: { bg: "bg-gradient-to-br from-primary-soft/60 to-accent-purple-soft/40", text: "text-primary", border: "border-primary/10", pillBg: "bg-primary-soft text-primary" },
+              SIDE: { bg: "bg-gradient-to-br from-gold-soft/60 to-amber-50", text: "text-gold", border: "border-gold/10", pillBg: "bg-gold-soft text-gold" },
+              BONUS: { bg: "bg-gradient-to-br from-accent-purple-soft/60 to-pink-soft/40", text: "text-accent-purple", border: "border-accent-purple/10", pillBg: "bg-accent-purple-soft text-accent-purple" },
             };
             const styles = typeStyles[questType] || typeStyles.MAIN;
 
@@ -162,7 +162,7 @@ export default function QuestsPage() {
         />
       )}
       {completedQuests.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
           {completedQuests.map((quest: any) => {
             const lessonCount = quest.lessons?.length || 0;
             const xpReward = quest.xpReward
@@ -174,7 +174,7 @@ export default function QuestsPage() {
                 key={quest.id}
                 href={`/dashboard/student/lessons/${quest.themeSlug}/${quest.slug}`}
                 className={cn(
-                  "group rounded-[1.5rem] border border-secondary/20 p-5 transition-all duration-200",
+                  "group rounded-[1.5rem] border border-secondary/10 p-5 transition-all duration-200",
                   "bg-gradient-to-br from-secondary-soft/40 to-emerald-50",
                   "hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(15,23,42,0.08)]"
                 )}

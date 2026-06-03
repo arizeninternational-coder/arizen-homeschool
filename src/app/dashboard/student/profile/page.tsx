@@ -5,6 +5,7 @@ import Link from "next/link";
 import { GraduationCap, Star, Trophy, Flame, BookOpen, Palette } from "lucide-react";
 import { PageHeader, SectionHeader, StatCard, GradientButton, ProgressBar, EmptyStateCard } from "@/components/ui/Pill";
 import { CoinIcon, StreakIcon } from "@/components/ui/Illustrations";
+import AvatarRenderer from "@/components/AvatarRenderer";
 
 export default function StudentProfile() {
   const [profile, setProfile] = useState<any>(null);
@@ -40,14 +41,14 @@ export default function StudentProfile() {
   const xpProgress = totalXp % 100;
 
   return (
-    <div className="space-y-8 fade-in">
+    <div className="space-y-5 fade-in">
       <PageHeader title="My Profile" subtitle="Your learning journey at a glance" />
 
       {/* Profile Card */}
-      <div className="rounded-[20px] border border-primary/10 bg-card-gradient-purple p-6 lg:p-8 shadow-[0_8px_25px_rgba(79,70,229,0.06)]">
+      <div className="rounded-[1.5rem] bg-white/90 backdrop-blur-sm p-6 lg:p-8 shadow-[0_4px_20px_rgba(79,70,229,0.05)] border border-primary/8">
         <div className="flex flex-col sm:flex-row items-center gap-6">
-          <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-primary to-accent-purple flex items-center justify-center text-white text-3xl font-extrabold shadow-lg">
-            {(profile?.name || "S").charAt(0).toUpperCase()}
+          <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-primary/10 to-accent-purple/10 flex items-center justify-center shadow-lg overflow-hidden">
+            <AvatarRenderer size="md" skinHex="#C68642" hairColorHex="#1a1a1a" hairStyle="short-curls" outfitHex="#4F46E5" shoeHex="#37474F" expression="happy" />
           </div>
           <div className="text-center sm:text-left flex-1">
             <h2 className="text-xl font-extrabold text-text">{profile?.name || profile?.displayName || "Student"}</h2>
@@ -73,14 +74,14 @@ export default function StudentProfile() {
 
       <SectionHeader title="Stats" subtitle="Your achievements" />
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Total XP" value={totalXp.toLocaleString()} icon={<Star className="w-5 h-5 text-primary" />} gradient="bg-white" borderColor="border-primary/15" textColor="text-primary" />
-        <StatCard label="Current Streak" value={`${currentStreak} days`} icon={<Flame className="w-5 h-5 text-pink" />} gradient="bg-white" borderColor="border-pink/15" textColor="text-pink" />
-        <StatCard label="Coins" value={coins.toLocaleString()} icon={<CoinIcon size={20} />} gradient="bg-white" borderColor="border-gold/15" textColor="text-gold" />
-        <StatCard label="Badges" value={badges} icon={<Trophy className="w-5 h-5 text-accent-purple" />} gradient="bg-white" borderColor="border-accent-purple/15" textColor="text-accent-purple" />
+        <StatCard label="Total XP" value={totalXp.toLocaleString()} icon={<Star className="w-5 h-5 text-primary" />} gradient="bg-white" borderColor="border-primary/8" textColor="text-primary" />
+        <StatCard label="Current Streak" value={`${currentStreak} days`} icon={<Flame className="w-5 h-5 text-pink" />} gradient="bg-white" borderColor="border-pink/8" textColor="text-pink" />
+        <StatCard label="Coins" value={coins.toLocaleString()} icon={<CoinIcon size={20} />} gradient="bg-white" borderColor="border-gold/8" textColor="text-gold" />
+        <StatCard label="Badges" value={badges} icon={<Trophy className="w-5 h-5 text-accent-purple" />} gradient="bg-white" borderColor="border-accent-purple/8" textColor="text-accent-purple" />
       </div>
 
       <SectionHeader title="Level Progress" />
-      <div className="rounded-[20px] border border-border-soft bg-white p-6">
+      <div className="rounded-[1.5rem] bg-white/90 backdrop-blur-sm p-6 border border-white/60 shadow-[0_2px_12px_rgba(0,0,0,0.03)]">
         <div className="flex items-center justify-between mb-3">
           <span className="text-sm font-bold text-text">Level {level}</span>
           <span className="text-sm font-bold text-text-muted">{xpProgress}/100 XP</span>

@@ -121,7 +121,7 @@ export default function ReflectionsPage() {
       </PageHeader>
 
       {/* ── New Reflection Form ── */}
-      <div className="relative rounded-[1.75rem] border border-pink/20 p-6 mb-6 overflow-hidden bg-card-gradient-pink shadow-[0_8px_25px_rgba(255,92,138,0.06)]">
+      <div className="relative rounded-[1.5rem] border border-pink/10 p-5 mb-5 overflow-hidden bg-card-gradient-pink shadow-[0_4px_20px_rgba(255,92,138,0.04)] backdrop-blur-sm">
         <div className="absolute top-3 right-5 opacity-20">
           <Heart className="w-16 h-16 text-pink" />
         </div>
@@ -135,7 +135,7 @@ export default function ReflectionsPage() {
             value={text}
             onChange={e => setText(e.target.value)}
             placeholder="Write your thoughts here..."
-            className="w-full min-h-[100px] p-4 rounded-2xl border border-pink/20 bg-white/80 text-sm text-text placeholder:text-text-muted resize-vertical focus:outline-none focus:ring-2 focus:ring-pink/30 transition-all"
+            className="w-full min-h-[90px] p-4 rounded-2xl border border-pink/10 bg-white/80 text-sm text-text placeholder:text-text-muted resize-vertical focus:outline-none focus:ring-2 focus:ring-pink/20 transition-all"
           />
           <div className="flex items-center justify-between mt-4 gap-3 flex-wrap">
             <button
@@ -170,7 +170,7 @@ export default function ReflectionsPage() {
           description="Write your first reflection above!"
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {reflections.map((r, i) => {
             const reflectionText = getReflectionText(r);
             const reflectionPrompt = getReflectionPrompt(r);
@@ -183,14 +183,14 @@ export default function ReflectionsPage() {
               <div
                 key={i}
                 className={cn(
-                  "rounded-[1.25rem] border bg-white p-5 transition-all duration-200",
+                  "rounded-[1.25rem] border bg-white/90 backdrop-blur-sm p-5 transition-all duration-200",
                   "hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(15,23,42,0.06)]",
-                  moodConfig?.color === "text-red-500" ? "border-red-200" :
-                  moodConfig?.color === "text-amber-500" ? "border-amber-200" :
-                  moodConfig?.color === "text-blue-500" ? "border-blue-200" :
-                  moodConfig?.color === "text-emerald-500" ? "border-emerald-200" :
-                  moodConfig?.color === "text-pink" ? "border-pink/20" :
-                  "border-border-soft"
+                  moodConfig?.color === "text-red-500" ? "border-red-200/60" :
+                  moodConfig?.color === "text-amber-500" ? "border-amber-200/60" :
+                  moodConfig?.color === "text-blue-500" ? "border-blue-200/60" :
+                  moodConfig?.color === "text-emerald-500" ? "border-emerald-200/60" :
+                  moodConfig?.color === "text-pink" ? "border-pink/10" :
+                  "border-white/60"
                 )}
               >
                 <div className="flex items-start justify-between gap-2 mb-2">

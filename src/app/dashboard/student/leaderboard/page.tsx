@@ -99,7 +99,7 @@ export default function LeaderboardPage() {
     if (rank === 2) return "bg-[linear-gradient(135deg,rgb(var(--color-surface-soft))_0%,rgb(var(--color-green-soft))_100%)] border-border-soft";
     if (rank === 3) return "bg-[linear-gradient(135deg,rgb(var(--color-peach-soft))_0%,rgb(var(--color-gold-soft))_100%)] border-peach/20";
     if (isMe) return "bg-[linear-gradient(135deg,rgb(var(--color-primary-soft))_0%,rgb(var(--color-accent-purple-soft))_100%)] border-primary/30 ring-2 ring-primary/10";
-    return "bg-white border-border-soft hover:shadow-card-hover";
+    return "bg-white/90 backdrop-blur-sm border border-white/60 hover:shadow-[0_4px_20px_rgba(0,0,0,0.05)]";
   };
 
   const getAvatarInitials = (name: string) => {
@@ -147,7 +147,7 @@ export default function LeaderboardPage() {
 
       {/* My position card */}
       {meEntry && (
-        <div className="bg-[linear-gradient(135deg,rgb(var(--color-primary-soft))_0%,rgb(var(--color-secondary-soft))_100%)] rounded-2xl p-4 mb-5 border border-primary/20 flex items-center gap-3">
+        <div className="bg-[linear-gradient(135deg,rgb(var(--color-primary-soft))_0%,rgb(var(--color-secondary-soft))_100%)] rounded-2xl px-4 py-3 mb-4 border border-primary/15 flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent-purple flex items-center justify-center shadow-pill">
             <Star size={18} className="text-white" />
           </div>
@@ -159,7 +159,7 @@ export default function LeaderboardPage() {
       )}
 
       {topEntries.length === 0 ? (
-        <div className="rounded-[1.75rem] border border-border-soft bg-white p-12 text-center">
+        <div className="rounded-[1.75rem] bg-white/60 backdrop-blur-sm p-12 text-center border border-white/60">
           <div className="w-16 h-16 rounded-3xl bg-gold-soft/50 flex items-center justify-center mx-auto mb-4">
             <Trophy size={32} className="text-gold" />
           </div>
@@ -169,7 +169,7 @@ export default function LeaderboardPage() {
           </p>
         </div>
       ) : (
-        <div className="grid gap-3">
+        <div className="grid gap-2">
           {topEntries.map((entry) => (
             <div
               key={`${entry.displayName}-${entry.rank}`}
@@ -195,7 +195,7 @@ export default function LeaderboardPage() {
                     ? "bg-peach-soft text-amber-800 border-2 border-peach/30"
                     : entry.isMe
                     ? "bg-primary-soft text-primary-dark border-2 border-primary/30"
-                    : "bg-bg-main text-text-muted border border-border-soft"
+                    : "bg-bg-main/60 text-text-muted border border-white/40"
                 }`}>
                   {getAvatarInitials(entry.displayName)}
                 </div>
@@ -230,7 +230,7 @@ export default function LeaderboardPage() {
                     ? "bg-peach-soft text-amber-800 border border-peach/20"
                     : entry.isMe
                     ? "bg-primary-soft text-primary-dark border border-primary/20"
-                    : "bg-bg-main text-text-muted border border-border-soft"
+                    : "bg-bg-main/60 text-text-muted border border-white/40"
                 }`}>
                   {entry.score} pts
                 </div>
