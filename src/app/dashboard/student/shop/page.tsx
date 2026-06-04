@@ -408,9 +408,9 @@ export default function ShopPage() {
           const canBuy = !owned && !locked && coins >= item.cost;
 
           return (
-            <FloatingCard key={item.id} className={cn("!p-3", rarity.glow, locked ? "opacity-80" : "")}>
+            <FloatingCard key={item.id} className={cn("!p-3", rarity.glow)}>
               {/* Illustration */}
-              <div className={cn("h-20 flex items-center justify-center rounded-xl mb-2", locked ? "bg-bg-main/50" : rarity.bg)}>
+              <div className={cn("h-20 flex items-center justify-center rounded-xl mb-2", rarity.bg)}>
                 <ItemIllustration name={item.name} category={item.category} locked={locked} className="w-20 h-14" />
               </div>
 

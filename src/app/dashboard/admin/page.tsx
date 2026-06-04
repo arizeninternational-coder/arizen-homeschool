@@ -3,17 +3,12 @@
 export const dynamic = "force-dynamic";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import Link from "next/link";
 import {
-  Users, BookOpen, GraduationCap, Award, Settings, BarChart3,
-  Shield, LogOut, Plus, ChevronRight, TrendingUp, Activity,
-  UserCheck, Layers, Zap, AlertCircle, Menu, X, ShoppingBag, Bell, Flame, CheckCircle,
-  BookCheck, Sparkles, UserCog, FileText, ScrollText, Swords
+  Users, GraduationCap, Award, Settings, BarChart3,
+  Shield, Plus, ChevronRight, TrendingUp, Activity,
+  UserCheck, Layers, Zap, AlertCircle, ShoppingBag, CheckCircle,
+  BookCheck, Sparkles, FileText, ScrollText, Swords
 } from "lucide-react";
-import { ds, colors, gradients, shadows } from "@/lib/design-system";
-import {
-  StatCard, SectionHeader, PageHeader, EmptyStateCard, GradientButton
-} from "@/components/ui/Pill";
 
 interface AdminStats {
   users: number;
@@ -57,40 +52,6 @@ export default function AdminDashboard() {
   const [seeding, setSeeding] = useState(false);
   const [shopSeedFeedback, setShopSeedFeedback] = useState<SeedFeedback | null>(null);
   const [shopSeeding, setShopSeeding] = useState(false);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [isDesktop, setIsDesktop] = useState(false);
-  const [notifications, setNotifications] = useState<any[]>([]);
-  const [notifOpen, setNotifOpen] = useState(false);
-  const notifRef = useRef<HTMLDivElement>(null);
-
-  const handleLogout = useCallback(async () => {
-    try {
-      await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
-    } catch {}
-    window.location.href = "/";
-  }, []);
-
-  // Detect desktop viewport
-  useEffect(() => {
-    const check = () => {
-      const desktop = window.innerWidth >= 1024;
-      setIsDesktop(desktop);
-      if (desktop) setDrawerOpen(false);
-    };
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
-
-  // Prevent body scroll when mobile drawer is open
-  useEffect(() => {
-    if (drawerOpen && !isDesktop) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => { document.body.style.overflow = ""; };
-  }, [drawerOpen, isDesktop]);
 
   useEffect(() => {
     async function checkAuth() {
@@ -103,7 +64,6 @@ export default function AdminDashboard() {
         }
         setUser(data.user);
 
-        // Fetch both stats and progress in parallel
         try {
           const [statsRes, progressRes] = await Promise.all([
             fetch("/api/admin/stats", { credentials: "include" }),
@@ -125,9 +85,7 @@ export default function AdminDashboard() {
 
           if (progressRes.ok) {
             const progressData = await progressRes.json();
-            if (progressData.error) {
-              // Non-fatal: stats already loaded
-            } else {
+            if (!progressData.error) {
               setProgress(progressData);
             }
           }
@@ -189,16 +147,15 @@ export default function AdminDashboard() {
     }
   }, []);
 
-  // ── Loading State ──
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-bg-main">
-        <div className="text-center">
-          <div className="relative mx-auto w-16 h-16 mb-4">
-            <div className="absolute inset-0 rounded-full border-4 border-primary/20" />
-            <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-primary animate-spin" />
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="relative w-10 h-10">
+            <div className="absolute inset-0 rounded-full border-[3px] border-[#4F46E5]/15" />
+            <div className="absolute inset-0 rounded-full border-[3px] border-transparent border-t-[#4F46E5] animate-spin" />
           </div>
-          <p className="text-text-muted font-bold text-sm">Loading admin dashboard...</p>
+          <p className="text-sm font-bold text-[#64748B]">Loading admin dashboard...</p>
         </div>
       </div>
     );
@@ -206,15 +163,14 @@ export default function AdminDashboard() {
 
   if (!user) return null;
 
-  // ── Error State ──
   if (statsError && !stats) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-bg-main p-4">
-        <EmptyStateCard
-          icon={<AlertCircle className="w-8 h-8" />}
-          title="Unable to load dashboard"
-          description={statsError}
-        />
+      <div className="min-h-[60vh] flex items-center justify-center p-4">
+        <div className="rounded-3xl bg-red-50/80 border border-red-200/60 p-8 text-center max-w-md">
+          <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-3" />
+          <h3 className="text-lg font-bold text-[#0F172A] mb-2">Unable to load dashboard</h3>
+          <p className="text-sm text-[#64748B]">{statsError}</p>
+        </div>
       </div>
     );
   }
@@ -222,14 +178,12 @@ export default function AdminDashboard() {
   const displayName = user.name || user.email || "Admin";
   const firstName = displayName.includes(" ") ? displayName.split(" ")[0] : displayName;
 
-  // Merge stats with progress data (progress API has more detailed learning stats)
   const s = stats || {} as AdminStats;
   const p = progress || {} as ProgressStats;
 
   const totalUsers = s.users || 0;
   const parents = s.parents || 0;
   const learners = s.learners || 0;
-  const teachers = s.teachers || 0;
   const admins = s.admins || 0;
   const completedLessons = p.totalCompletedLessons || s.completedLessons || 0;
   const activeLearners = p.activeLearners || s.activeLearners || 0;
@@ -240,527 +194,182 @@ export default function AdminDashboard() {
   const quests = s.quests || 0;
   const shopItems = s.shopItems || 0;
 
-  const navItems = [
-    { icon: BarChart3, label: "Dashboard", href: "/dashboard/admin", active: true, desc: "Overview & analytics" },
-    { icon: Users, label: "Users", href: "/dashboard/admin/users", desc: "Manage all users" },
-    { icon: GraduationCap, label: "Learners", href: "/dashboard/admin/learners", desc: "Student profiles" },
-    { icon: GraduationCap, label: "Grades", href: "/dashboard/admin/grades", desc: "Grade levels & subjects" },
-    { icon: Layers, label: "Quests", href: "/dashboard/admin/quests", desc: "Quest management" },
-    { icon: Award, label: "Badges", href: "/dashboard/admin/badges", desc: "Achievement badges" },
-    { icon: ShoppingBag, label: "Shop", href: "/dashboard/admin/shop", desc: "Shop items & rewards" },
-    { icon: TrendingUp, label: "Reports", href: "/dashboard/admin/reports", desc: "System reports" },
-    { icon: Settings, label: "Settings", href: "/dashboard/admin/settings", desc: "App settings" },
-  ];
-
-  // Shared sidebar/nav content
-  const renderNavContent = (inline: boolean) => (
-    <>
-      {!inline && (
-        <div style={{ padding: "0 1.25rem", marginBottom: "1.5rem" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: gradients.primary, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-              <Shield style={{ width: 20, height: 20, color: "white" }} />
-            </div>
-            <div>
-              <div style={{ fontWeight: 800, fontSize: "0.9375rem", color: colors.text }}>Arizen Admin</div>
-              <div style={{ fontSize: "0.75rem", color: colors.textMuted }}>Management Portal</div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {!inline && (
-        <nav style={{ flex: 1, padding: "0 0.75rem" }}>
-          {navItems.map((item) => (
-            <Link key={item.label} href={item.href} onClick={() => { if (!isDesktop) setDrawerOpen(false); }} style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.6875rem 0.75rem", borderRadius: 10, marginBottom: "0.25rem", textDecoration: "none", background: item.active ? colors.primarySoft : "transparent", color: item.active ? colors.primary : colors.textMuted, fontWeight: item.active ? 700 : 500, fontSize: "0.875rem", transition: "all 0.15s" }}>
-              <item.icon style={{ width: 18, height: 18 }} />
-              <div>
-                <div>{item.label}</div>
-                {item.active && <div style={{ fontSize: "0.6875rem", opacity: 0.7, fontWeight: 400 }}>{item.desc}</div>}
-              </div>
-            </Link>
-          ))}
-        </nav>
-      )}
-
-      {inline && (
-        <nav style={{ padding: "0 0.75rem" }}>
-          {navItems.map((item) => (
-            <Link key={item.label} href={item.href} onClick={() => { if (!isDesktop) setDrawerOpen(false); }} style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.875rem 0.75rem", borderRadius: 10, marginBottom: "0.25rem", textDecoration: "none", background: item.active ? colors.primarySoft : "transparent", color: item.active ? colors.primary : colors.textMuted, fontWeight: item.active ? 700 : 500, fontSize: "0.875rem", transition: "all 0.15s" }}>
-              <item.icon style={{ width: 18, height: 18 }} />
-              <div>
-                <div>{item.label}</div>
-                {item.active && <div style={{ fontSize: "0.6875rem", opacity: 0.7, fontWeight: 400 }}>{item.desc}</div>}
-              </div>
-            </Link>
-          ))}
-        </nav>
-      )}
-
-      {!inline ? (
-        <div style={{ padding: "0 1.25rem", borderTop: `1px solid ${colors.border}`, paddingTop: "1rem" }}>
-          <button onClick={handleLogout} style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.5rem", borderRadius: 8, border: "none", background: "none", color: colors.textMuted, cursor: "pointer", fontSize: "0.875rem", fontWeight: 600, width: "100%" }}>
-            <LogOut style={{ width: 16, height: 16 }} /> Sign Out
-          </button>
-        </div>
-      ) : (
-        <div style={{ padding: "1rem" }}>
-          <button onClick={handleLogout} style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.625rem 1rem", borderRadius: 10, border: `1px solid ${colors.border}`, background: "rgba(239,68,68,0.05)", color: colors.danger, cursor: "pointer", fontSize: "0.875rem", fontWeight: 700, width: "100%", justifyContent: "center", marginTop: "0.5rem" }}>
-            <LogOut style={{ width: 16, height: 16 }} /> Sign Out
-          </button>
-        </div>
-      )}
-    </>
-  );
-
   return (
-    <div style={{ minHeight: "100vh", background: colors.bg }}>
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
+    <div className="space-y-6">
+      {/* Welcome */}
+      <div>
+        <h1 className="text-xl lg:text-2xl font-extrabold text-[#0F172A] tracking-tight">
+          Admin Dashboard
+        </h1>
+        <p className="text-[#64748B] text-sm mt-0.5">Welcome back, {firstName}. Here's an overview of your homeschool network.</p>
+      </div>
 
-        {/* Mobile Top Bar */}
-        <header
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "0.625rem 1rem",
-            background: "rgba(253,253,251,0.92)",
-            backdropFilter: "blur(12px)",
-            WebkitBackdropFilter: "blur(12px)",
-            borderBottom: `1px solid ${colors.border}`,
-            position: "sticky",
-            top: 0,
-            zIndex: 30,
-            gap: "0.75rem",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "0.625rem", minWidth: 0 }}>
-            {!isDesktop && (
-              <button
-                onClick={() => setDrawerOpen(!drawerOpen)}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: 40,
-                  height: 40,
-                  minWidth: 40,
-                  borderRadius: 10,
-                  border: `1px solid ${colors.border}`,
-                  background: "white",
-                  color: colors.text,
-                  cursor: "pointer",
-                  flexShrink: 0,
-                }}
-                aria-label="Open menu"
-              >
-                <Menu style={{ width: 20, height: 20 }} />
-              </button>
-            )}
-            <div style={{ minWidth: 0 }}>
-              <h1 style={{ fontSize: "1.125rem", fontWeight: 800, color: colors.text, marginBottom: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                Dashboard
-              </h1>
-              <p style={{ display: "none", color: colors.textMuted, fontSize: "0.75rem" }}>Welcome back, {firstName}</p>
-            </div>
-          </div>
+      {/* Stats Error Banner */}
+      {statsError && (
+        <div className="flex items-start gap-2 p-3 rounded-2xl bg-amber-50/80 border border-amber-200/60 text-amber-800 text-sm font-semibold">
+          <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+          <span>Unable to load some dashboard stats: {statsError}</span>
+        </div>
+      )}
 
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexShrink: 0 }}>
-            <div style={{ padding: "0.375rem 0.875rem", borderRadius: 20, background: colors.primarySoft, color: colors.primary, fontSize: "0.75rem", fontWeight: 700 }}>ADMIN</div>
-            <div style={{ width: 36, height: 36, minWidth: 36, borderRadius: "50%", background: gradients.primary, display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: 700, fontSize: "0.875rem" }}>
-              {firstName.charAt(0).toUpperCase()}
-            </div>
-            {!isDesktop && (
-              <button
-                onClick={handleLogout}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: 36,
-                  height: 36,
-                  minWidth: 36,
-                  borderRadius: 8,
-                  border: `1px solid ${colors.border}`,
-                  background: "rgba(239,68,68,0.05)",
-                  color: colors.danger,
-                  cursor: "pointer",
-                }}
-                aria-label="Sign out"
-              >
-                <LogOut style={{ width: 16, height: 16 }} />
-              </button>
-            )}
-          </div>
-        </header>
-
-        {/* Notification bell for mobile */}
-        {!isDesktop && (
-          <div style={{ position: "relative" }}>
-            <button
-              onClick={() => { setNotifOpen(!notifOpen); if (!notifOpen) { fetch("/api/notifications", { credentials: "include" }).then(r => r.json()).then(d => setNotifications(d.notifications || [])).catch(() => {}); } }}
-              style={{ position: "fixed", bottom: 24, right: 24, zIndex: 70, width: 52, height: 52, borderRadius: "50%", background: gradients.primary, color: "white", border: "none", boxShadow: shadows.primary, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
-            >
-              <Bell style={{ width: 22, height: 22 }} />
-              {notifications.filter((n: any) => !n.read).length > 0 && (
-                <span style={{ position: "absolute", top: -2, right: -2, width: 20, height: 20, borderRadius: "50%", background: colors.danger, color: "white", fontSize: "0.6875rem", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  {notifications.filter((n: any) => !n.read).length}
-                </span>
-              )}
-            </button>
-            {notifOpen && (
-              <div style={{ position: "fixed", bottom: 84, right: 16, width: 320, maxWidth: "95vw", background: "white", borderRadius: 16, boxShadow: shadows.xl, zIndex: 70, border: `1px solid ${colors.border}`, overflow: "hidden" }}>
-                <div style={{ padding: "0.875rem 1rem", borderBottom: `1px solid ${colors.border}`, fontWeight: 700, fontSize: "0.875rem", color: colors.text, display: "flex", justifyContent: "space-between", alignItems: "center", background: gradients.primarySoft }}>
-                  <span style={{ background: gradients.textPrimary, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Notifications</span>
-                  <button onClick={() => setNotifOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", color: colors.textMuted }}><X style={{ width: 16, height: 16 }} /></button>
+      {/* Users */}
+      <div>
+        <h2 className="text-sm font-extrabold uppercase tracking-[0.1em] text-[#64748B] mb-3">Users</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {[
+            { label: "Total Users", value: totalUsers.toLocaleString(), icon: Users },
+            { label: "Parents", value: parents.toLocaleString(), icon: UserCheck },
+            { label: "Learners", value: learners.toLocaleString(), icon: GraduationCap },
+            { label: "Admins", value: admins.toLocaleString(), icon: Shield },
+          ].map((stat) => (
+            <div key={stat.label} className="rounded-2xl bg-white/90 backdrop-blur-sm border border-[#E2E8F0]/60 p-4 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center">
+                  <stat.icon className="w-5 h-5 text-[#4F46E5]" />
                 </div>
-                <div style={{ maxHeight: 320, overflowY: "auto" }}>
-                  {notifications.length === 0 ? (
-                    <div style={{ padding: "2rem 1rem", textAlign: "center", color: colors.textMuted, fontSize: "0.8125rem" }}>No notifications yet</div>
-                  ) : notifications.slice(0, 10).map((n: any) => (
-                    <div key={n.id} style={{ padding: "0.75rem 1rem", borderBottom: `1px solid ${colors.borderLight}`, fontSize: "0.8125rem" }}>
-                      <div style={{ fontWeight: 700, color: colors.text, fontSize: "0.8125rem" }}>{n.title}</div>
-                      <div style={{ color: colors.textMuted, marginTop: "0.125rem", fontSize: "0.75rem" }}>{n.message}</div>
-                    </div>
-                  ))}
+                <div>
+                  <p className="text-xs font-medium text-[#64748B]">{stat.label}</p>
+                  <p className="text-lg font-bold text-[#0F172A]">{stat.value}</p>
                 </div>
               </div>
-            )}
-          </div>
-        )}
-
-        {/* ═══════════════════════════════════════════════════════════
-            PAGE CONTENT — v6 Design System
-            ═══════════════════════════════════════════════════════════ */}
-        <div style={{ padding: isDesktop ? "2rem" : "1.25rem", flex: 1 }}>
-
-          {/* ── Page Header ── */}
-          <PageHeader
-            title="Teacher Dashboard"
-            subtitle={`Welcome back, ${firstName}. Here's an overview of your homeschool network.`}
-          />
-
-          {/* ── Stats Error Banner ── */}
-          {statsError && (
-            <div style={{ ...ds.alertError, marginBottom: "1.5rem" }}>
-              <AlertCircle style={{ width: 16, height: 16, flexShrink: 0, marginTop: 2 }} />
-              <span>Unable to load some dashboard stats: {statsError}</span>
             </div>
-          )}
-
-          {/* ═══════════════════════════════════════════════════════════
-              SECTION 1 — Users
-              ═══════════════════════════════════════════════════════════ */}
-          <SectionHeader
-            title="Users"
-            subtitle="People in your homeschool network"
-          />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <StatCard
-              label="Total Users"
-              value={totalUsers.toLocaleString()}
-              icon={<Users className="w-5 h-5 text-primary" />}
-              gradient="bg-card-gradient-purple"
-              borderColor="border-accent-purple/20"
-              textColor="text-primary-dark"
-            />
-            <StatCard
-              label="Parents"
-              value={parents.toLocaleString()}
-              icon={<UserCheck className="w-5 h-5 text-accent-purple" />}
-              gradient="bg-card-gradient-purple"
-              borderColor="border-accent-purple/20"
-              textColor="text-primary-dark"
-            />
-            <StatCard
-              label="Learners"
-              value={learners.toLocaleString()}
-              icon={<GraduationCap className="w-5 h-5 text-primary" />}
-              gradient="bg-card-gradient-purple"
-              borderColor="border-primary/20"
-              textColor="text-primary-dark"
-            />
-            <StatCard
-              label="Teachers & Admins"
-              value={(teachers + admins).toLocaleString()}
-              icon={<Shield className="w-5 h-5 text-accent-purple" />}
-              gradient="bg-card-gradient-purple"
-              borderColor="border-accent-purple/20"
-              textColor="text-primary-dark"
-            />
-          </div>
-
-          {/* ═══════════════════════════════════════════════════════════
-              SECTION 2 — Learning Activity
-              ═══════════════════════════════════════════════════════════ */}
-          <SectionHeader
-            title="Learning Activity"
-            subtitle="Engagement and progress across all learners"
-          />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <StatCard
-              label="Completed Lessons"
-              value={completedLessons.toLocaleString()}
-              icon={<BookCheck className="w-5 h-5 text-secondary" />}
-              gradient="bg-card-gradient-green"
-              borderColor="border-secondary/20"
-              textColor="text-emerald-700"
-            />
-            <StatCard
-              label="Active Learners"
-              value={activeLearners.toLocaleString()}
-              icon={<Flame className="w-5 h-5 text-pink" />}
-              gradient="bg-card-gradient-pink"
-              borderColor="border-pink/20"
-              textColor="text-pink-700"
-            />
-            <StatCard
-              label="Active Today"
-              value={activeToday.toLocaleString()}
-              icon={<Activity className="w-5 h-5 text-accent-blue" />}
-              gradient="bg-card-gradient-blue"
-              borderColor="border-accent-blue/20"
-              textColor="text-blue-700"
-            />
-            <StatCard
-              label="Total XP Awarded"
-              value={totalXp.toLocaleString()}
-              icon={<Sparkles className="w-5 h-5 text-gold" />}
-              gradient="bg-card-gradient-gold"
-              borderColor="border-gold/20"
-              textColor="text-amber-700"
-            />
-          </div>
-
-          {/* ═══════════════════════════════════════════════════════════
-              SECTION 3 — Content
-              ═══════════════════════════════════════════════════════════ */}
-          <SectionHeader
-            title="Content"
-            subtitle="Lessons, quests, and shop items available"
-          />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <StatCard
-              label="Published Lessons"
-              value={publishedLessons.toLocaleString()}
-              icon={<BookOpen className="w-5 h-5 text-secondary" />}
-              gradient="bg-card-gradient-green"
-              borderColor="border-secondary/20"
-              textColor="text-emerald-700"
-            />
-            <StatCard
-              label="Draft Lessons"
-              value={draftLessons.toLocaleString()}
-              icon={<FileText className="w-5 h-5 text-gold" />}
-              gradient="bg-card-gradient-gold"
-              borderColor="border-gold/20"
-              textColor="text-amber-700"
-            />
-            <StatCard
-              label="Quests"
-              value={quests.toLocaleString()}
-              icon={<Swords className="w-5 h-5 text-accent-purple" />}
-              gradient="bg-card-gradient-purple"
-              borderColor="border-accent-purple/20"
-              textColor="text-primary-dark"
-            />
-            <StatCard
-              label="Shop Items"
-              value={shopItems.toLocaleString()}
-              icon={<ShoppingBag className="w-5 h-5 text-accent-blue" />}
-              gradient="bg-card-gradient-blue"
-              borderColor="border-accent-blue/20"
-              textColor="text-blue-700"
-            />
-          </div>
-
-          {/* ═══════════════════════════════════════════════════════════
-              QUICK ACTIONS
-              ═══════════════════════════════════════════════════════════ */}
-          <SectionHeader
-            title="Quick Actions"
-            subtitle="Common tasks to manage your platform"
-          />
-          <div className="flex flex-wrap gap-3 mb-8">
-            <GradientButton
-              variant="primary"
-              size="md"
-              icon={<BookOpen className="w-4 h-4" />}
-            >
-              Create Lesson
-            </GradientButton>
-            <GradientButton
-              variant="success"
-              size="md"
-              icon={<Swords className="w-4 h-4" />}
-            >
-              Add Quest
-            </GradientButton>
-            <GradientButton
-              variant="secondary"
-              size="md"
-              icon={<ScrollText className="w-4 h-4" />}
-            >
-              Import Curriculum
-            </GradientButton>
-          </div>
-
-          {/* ═══════════════════════════════════════════════════════════
-              CURRICULUM SEED
-              ═══════════════════════════════════════════════════════════ */}
-          <div style={{ ...ds.card, padding: "1.5rem", marginBottom: "2rem" }}>
-            <h2 style={{ fontSize: "1.125rem", fontWeight: 700, color: colors.text, marginBottom: "0.5rem" }}>Curriculum</h2>
-            <p style={{ color: colors.textMuted, fontSize: "0.875rem", marginBottom: "1rem" }}>
-              Seed draft curriculum structure for Grade 2 and Grade 5. This creates themes, quests, and lesson placeholders. Already-existing records will not be duplicated.
-            </p>
-
-            {seedFeedback && (
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.65rem",
-                  padding: "0.75rem 1rem",
-                  borderRadius: 12,
-                  marginBottom: "1rem",
-                  fontSize: "0.875rem",
-                  fontWeight: 600,
-                  background: seedFeedback.type === "success" ? "rgba(34,197,94,0.08)" : "rgba(239,68,68,0.06)",
-                  border: `1px solid ${seedFeedback.type === "success" ? "rgba(34,197,94,0.2)" : "rgba(239,68,68,0.15)"}`,
-                  color: seedFeedback.type === "success" ? colors.success : colors.danger,
-                }}
-              >
-                {seedFeedback.message}
-                <button
-                  onClick={() => setSeedFeedback(null)}
-                  style={{ marginLeft: "auto", background: "none", border: "none", color: "inherit", cursor: "pointer", fontSize: "1rem", padding: "0 0.25rem" }}
-                  aria-label="Dismiss"
-                >
-                  <X style={{ width: 14, height: 14 }} />
-                </button>
-              </div>
-            )}
-
-            <button
-              onClick={handleSeed}
-              disabled={seeding}
-              style={{
-                ...ds.btnPrimary,
-                padding: "0.75rem 1.5rem",
-                fontSize: "0.875rem",
-                cursor: seeding ? "not-allowed" : "pointer",
-                opacity: seeding ? 0.7 : 1,
-              }}
-            >
-              {seeding ? (
-                <>
-                  <span style={{
-                    display: "inline-block",
-                    width: 16,
-                    height: 16,
-                    border: "2px solid rgba(255,255,255,0.3)",
-                    borderTopColor: "white",
-                    borderRadius: "50%",
-                    animation: "spin 0.6s linear infinite",
-                  }} />
-                  Seeding...
-                </>
-              ) : (
-                <span style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}>
-                  <Sparkles style={{ width: 16, height: 16 }} /> Seed Draft Curriculum
-                </span>
-              )}
-            </button>
-          </div>
-
-          {/* ═══════════════════════════════════════════════════════════
-              SHOP SEED
-              ═══════════════════════════════════════════════════════════ */}
-          <div style={{ ...ds.card, padding: "1.5rem", marginBottom: "2rem" }}>
-            <h2 style={{ fontSize: "1.125rem", fontWeight: 700, color: colors.text, marginBottom: "0.5rem" }}>Reward Shop</h2>
-            <p style={{ color: colors.textMuted, fontSize: "0.875rem", marginBottom: "1rem" }}>
-              Seed default avatar shop items and reward rules. This creates 20 shop items (hats, clothing, pets, backgrounds, etc.) and 7 reward rules for earning Spark Coins.
-            </p>
-
-            {shopSeedFeedback && (
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.65rem",
-                  padding: "0.75rem 1rem",
-                  borderRadius: 12,
-                  marginBottom: "1rem",
-                  fontSize: "0.875rem",
-                  fontWeight: 600,
-                  background: shopSeedFeedback.type === "success" ? "rgba(34,197,94,0.08)" : "rgba(239,68,68,0.06)",
-                  border: `1px solid ${shopSeedFeedback.type === "success" ? "rgba(34,197,94,0.2)" : "rgba(239,68,68,0.15)"}`,
-                  color: shopSeedFeedback.type === "success" ? colors.success : colors.danger,
-                }}
-              >
-                {shopSeedFeedback.message}
-                <button
-                  onClick={() => setShopSeedFeedback(null)}
-                  style={{ marginLeft: "auto", background: "none", border: "none", color: "inherit", cursor: "pointer", fontSize: "1rem", padding: "0 0.25rem" }}
-                  aria-label="Dismiss"
-                >
-                  <X style={{ width: 14, height: 14 }} />
-                </button>
-              </div>
-            )}
-
-            <button
-              onClick={handleShopSeed}
-              disabled={shopSeeding}
-              style={{
-                ...ds.btnPrimary,
-                padding: "0.75rem 1.5rem",
-                fontSize: "0.875rem",
-                cursor: shopSeeding ? "not-allowed" : "pointer",
-                opacity: shopSeeding ? 0.7 : 1,
-              }}
-            >
-              {shopSeeding ? (
-                <>
-                  <span style={{
-                    display: "inline-block",
-                    width: 16,
-                    height: 16,
-                    border: "2px solid rgba(255,255,255,0.3)",
-                    borderTopColor: "white",
-                    borderRadius: "50%",
-                    animation: "spin 0.6s linear infinite",
-                  }} />
-                  Seeding...
-                </>
-              ) : (
-                <span style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}>
-                  <ShoppingBag style={{ width: 16, height: 16 }} /> Seed Shop Items & Rewards
-                </span>
-              )}
-            </button>
-          </div>
-
-          {/* ═══════════════════════════════════════════════════════════
-              SYSTEM ACTIVITY
-              ═══════════════════════════════════════════════════════════ */}
-          <SectionHeader title="System Activity" />
-          <div style={{ ...ds.card, padding: "1.5rem" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.75rem 0" }}>
-              <Activity style={{ width: 18, height: 18, color: colors.primary }} />
-              <span style={{ fontSize: "0.875rem", color: colors.text }}>Dashboard loaded successfully</span>
-              <span style={{ fontSize: "0.75rem", color: colors.textMuted, marginLeft: "auto" }}>Just now</span>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
 
-      {/* Spin animation for loading spinner */}
-      <style>{`
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
+      {/* Learning Activity */}
+      <div>
+        <h2 className="text-sm font-extrabold uppercase tracking-[0.1em] text-[#64748B] mb-3">Learning Activity</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {[
+            { label: "Completed Lessons", value: completedLessons.toLocaleString(), icon: BookCheck, color: "text-[#059669]", bg: "bg-emerald-50" },
+            { label: "Active Learners", value: activeLearners.toLocaleString(), icon: Activity, color: "text-[#EC4899]", bg: "bg-pink-50" },
+            { label: "Active Today", value: activeToday.toLocaleString(), icon: Zap, color: "text-[#3B82F6]", bg: "bg-blue-50" },
+            { label: "Total XP Awarded", value: totalXp.toLocaleString(), icon: Sparkles, color: "text-[#D97706]", bg: "bg-amber-50" },
+          ].map((stat) => (
+            <div key={stat.label} className="rounded-2xl bg-white/90 backdrop-blur-sm border border-[#E2E8F0]/60 p-4 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-xl ${stat.bg} flex items-center justify-center`}>
+                  <stat.icon className={`w-5 h-5 ${stat.color}`} />
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-[#64748B]">{stat.label}</p>
+                  <p className="text-lg font-bold text-[#0F172A]">{stat.value}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Content */}
+      <div>
+        <h2 className="text-sm font-extrabold uppercase tracking-[0.1em] text-[#64748B] mb-3">Content</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {[
+            { label: "Published Lessons", value: publishedLessons.toLocaleString(), icon: CheckCircle, color: "text-[#059669]", bg: "bg-emerald-50" },
+            { label: "Draft Lessons", value: draftLessons.toLocaleString(), icon: FileText, color: "text-[#D97706]", bg: "bg-amber-50" },
+            { label: "Quests", value: quests.toLocaleString(), icon: Swords, color: "text-[#7C3AED]", bg: "bg-violet-50" },
+            { label: "Shop Items", value: shopItems.toLocaleString(), icon: ShoppingBag, color: "text-[#3B82F6]", bg: "bg-blue-50" },
+          ].map((stat) => (
+            <div key={stat.label} className="rounded-2xl bg-white/90 backdrop-blur-sm border border-[#E2E8F0]/60 p-4 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-xl ${stat.bg} flex items-center justify-center`}>
+                  <stat.icon className={`w-5 h-5 ${stat.color}`} />
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-[#64748B]">{stat.label}</p>
+                  <p className="text-lg font-bold text-[#0F172A]">{stat.value}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div>
+        <h2 className="text-sm font-extrabold uppercase tracking-[0.1em] text-[#64748B] mb-3">Quick Actions</h2>
+        <div className="flex flex-wrap gap-2">
+          <button className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-bold bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] text-white shadow-[0_4px_15px_rgba(79,70,229,0.15)] hover:shadow-[0_6px_20px_rgba(79,70,229,0.25)] transition-all">
+            <Plus className="w-4 h-4" /> Create Lesson
+          </button>
+          <button className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-bold bg-gradient-to-r from-[#059669] to-[#00A884] text-white shadow-[0_4px_15px_rgba(5,150,105,0.15)] hover:shadow-[0_6px_20px_rgba(5,150,105,0.25)] transition-all">
+            <Swords className="w-4 h-4" /> Add Quest
+          </button>
+          <button className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-bold bg-gradient-to-r from-[#D97706] to-[#F59E0B] text-white shadow-[0_4px_15px_rgba(217,119,6,0.15)] hover:shadow-[0_6px_20px_rgba(217,119,6,0.25)] transition-all">
+            <ScrollText className="w-4 h-4" /> Import Curriculum
+          </button>
+        </div>
+      </div>
+
+      {/* Curriculum Seed */}
+      <div className="rounded-2xl bg-white/90 backdrop-blur-sm border border-[#E2E8F0]/60 p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+        <h2 className="text-base font-bold text-[#0F172A] mb-1">Curriculum</h2>
+        <p className="text-sm text-[#64748B] mb-4">
+          Seed draft curriculum structure for Grade 2 and Grade 5. Already-existing records will not be duplicated.
+        </p>
+        {seedFeedback && (
+          <div className={`flex items-center gap-2 p-3 rounded-xl mb-4 text-sm font-semibold ${seedFeedback.type === "success" ? "bg-emerald-50 text-emerald-700 border border-emerald-200/60" : "bg-red-50 text-red-700 border border-red-200/60"}`}>
+            {seedFeedback.message}
+            <button onClick={() => setSeedFeedback(null)} className="ml-auto text-current opacity-60 hover:opacity-100">✕</button>
+          </div>
+        )}
+        <button
+          onClick={handleSeed}
+          disabled={seeding}
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] text-white shadow-[0_4px_15px_rgba(79,70,229,0.15)] hover:shadow-[0_6px_20px_rgba(79,70,229,0.25)] transition-all disabled:opacity-60 cursor-pointer"
+        >
+          {seeding ? (
+            <>
+              <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              Seeding...
+            </>
+          ) : (
+            <><Sparkles className="w-4 h-4" /> Seed Draft Curriculum</>
+          )}
+        </button>
+      </div>
+
+      {/* Shop Seed */}
+      <div className="rounded-2xl bg-white/90 backdrop-blur-sm border border-[#E2E8F0]/60 p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+        <h2 className="text-base font-bold text-[#0F172A] mb-1">Reward Shop</h2>
+        <p className="text-sm text-[#64748B] mb-4">
+          Seed default avatar shop items and reward rules. Creates 20 shop items and 7 reward rules.
+        </p>
+        {shopSeedFeedback && (
+          <div className={`flex items-center gap-2 p-3 rounded-xl mb-4 text-sm font-semibold ${shopSeedFeedback.type === "success" ? "bg-emerald-50 text-emerald-700 border border-emerald-200/60" : "bg-red-50 text-red-700 border border-red-200/60"}`}>
+            {shopSeedFeedback.message}
+            <button onClick={() => setShopSeedFeedback(null)} className="ml-auto text-current opacity-60 hover:opacity-100">✕</button>
+          </div>
+        )}
+        <button
+          onClick={handleShopSeed}
+          disabled={shopSeeding}
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold bg-gradient-to-r from-[#059669] to-[#00A884] text-white shadow-[0_4px_15px_rgba(5,150,105,0.15)] hover:shadow-[0_6px_20px_rgba(5,150,105,0.25)] transition-all disabled:opacity-60 cursor-pointer"
+        >
+          {shopSeeding ? (
+            <>
+              <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              Seeding...
+            </>
+          ) : (
+            <><ShoppingBag className="w-4 h-4" /> Seed Shop Items & Rewards</>
+          )}
+        </button>
+      </div>
+
+      {/* System Activity */}
+      <div>
+        <h2 className="text-sm font-extrabold uppercase tracking-[0.1em] text-[#64748B] mb-3">System Activity</h2>
+        <div className="rounded-2xl bg-white/90 backdrop-blur-sm border border-[#E2E8F0]/60 p-4 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+          <div className="flex items-center gap-3">
+            <Activity className="w-5 h-5 text-[#4F46E5]" />
+            <span className="text-sm text-[#0F172A]">Dashboard loaded successfully</span>
+            <span className="text-xs text-[#64748B] ml-auto">Just now</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

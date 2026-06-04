@@ -8,6 +8,7 @@ import {
   Sparkles, Palette, Scissors, Smile, Footprints,
   Loader2, Star,
 } from "lucide-react";
+import AvatarRenderer from "@/components/AvatarRenderer";
 import { PageHeader, GradientButton } from "@/components/ui/Pill";
 
 /* ═══════════════════════════════════════════════════════════
@@ -100,262 +101,6 @@ function getHex(arr: { id: string; hex: string }[], id: string, fallback: string
   return arr.find((x) => x.id === id)?.hex || fallback;
 }
 
-/* ═══════════════════════════════════════════════════════════
-   FULL BODY AVATAR SVG
-   ═══════════════════════════════════════════════════════════ */
-
-function AvatarSVG({
-  skinHex,
-  hairColorHex,
-  hairStyle,
-  outfitHex,
-  shoeHex,
-  expression,
-}: {
-  skinHex: string;
-  hairColorHex: string;
-  hairStyle: string;
-  outfitHex: string;
-  shoeHex: string;
-  expression: string;
-}) {
-  const sD = darken(skinHex, 25);
-  const sOut = darken(skinHex, 50);
-  const hcDark = darken(hairColorHex, 30);
-
-  const renderHair = () => {
-    switch (hairStyle) {
-      case "afro":
-        return (
-          <g>
-            <ellipse cx="60" cy="28" rx="33" ry="27" fill={hairColorHex} />
-            <ellipse cx="60" cy="28" rx="33" ry="27" fill="none" stroke={hcDark} strokeWidth="1" opacity="0.4" />
-            {[38,48,58,68,78].map((x,i) => (
-              <circle key={i} cx={x} cy={16 + (i%2)*4} r={4+ (i%3)} fill={hairColorHex} opacity="0.85" />
-            ))}
-            <circle cx="32" cy="28" r="4" fill={hairColorHex} opacity="0.7" />
-            <circle cx="88" cy="28" r="4" fill={hairColorHex} opacity="0.7" />
-          </g>
-        );
-      case "puff-buns":
-        return (
-          <g>
-            <ellipse cx="60" cy="32" rx="27" ry="17" fill={hairColorHex} />
-            <circle cx="32" cy="18" r="14" fill={hairColorHex} />
-            <circle cx="32" cy="18" r="14" fill="none" stroke={hcDark} strokeWidth="0.8" opacity="0.5" />
-            <circle cx="88" cy="18" r="14" fill={hairColorHex} />
-            <circle cx="88" cy="18" r="14" fill="none" stroke={hcDark} strokeWidth="0.8" opacity="0.5" />
-            <circle cx="32" cy="11" r="3.5" fill="#FF5C8A" opacity="0.85" />
-            <circle cx="88" cy="11" r="3.5" fill="#FF5C8A" opacity="0.85" />
-          </g>
-        );
-      case "braids":
-        return (
-          <g>
-            <ellipse cx="60" cy="32" rx="27" ry="17" fill={hairColorHex} />
-            <rect x="28" y="28" width="8" height="40" rx="4" fill={hairColorHex} />
-            <rect x="29" y="28" width="2.5" height="40" rx="1.25" fill={hcDark} opacity="0.35" />
-            <rect x="84" y="28" width="8" height="40" rx="4" fill={hairColorHex} />
-            <rect x="86.5" y="28" width="2.5" height="40" rx="1.25" fill={hcDark} opacity="0.35" />
-            <circle cx="32" cy="70" r="4.5" fill={hairColorHex} />
-            <circle cx="88" cy="70" r="4.5" fill={hairColorHex} />
-            <rect x="28" y="67" width="8" height="3" rx="1.5" fill="#FF5C8A" opacity="0.8" />
-            <rect x="84" y="67" width="8" height="3" rx="1.5" fill="#FF5C8A" opacity="0.8" />
-          </g>
-        );
-      case "hightop-fade":
-        return (
-          <g>
-            <ellipse cx="60" cy="33" rx="22" ry="14" fill={hairColorHex} opacity="0.45" />
-            <rect x="38" y="10" width="44" height="28" rx="12" fill={hairColorHex} />
-            <rect x="42" y="6" width="36" height="20" rx="8" fill={hairColorHex} />
-            <rect x="33" y="26" width="6" height="13" rx="3" fill={hairColorHex} opacity="0.35" />
-            <rect x="81" y="26" width="6" height="13" rx="3" fill={hairColorHex} opacity="0.35" />
-          </g>
-        );
-      case "twists":
-        return (
-          <g>
-            <ellipse cx="60" cy="31" rx="27" ry="17" fill={hairColorHex} />
-            <rect x="30" y="27" width="7" height="32" rx="3.5" fill={hairColorHex} />
-            <rect x="31" y="27" width="2" height="32" rx="1" fill={hcDark} opacity="0.35" />
-            <rect x="83" y="27" width="7" height="32" rx="3.5" fill={hairColorHex} />
-            <rect x="85" y="27" width="2" height="32" rx="1" fill={hcDark} opacity="0.35" />
-            <ellipse cx="48" cy="20" rx="5.5" ry="8" fill={hairColorHex} />
-            <ellipse cx="72" cy="20" rx="5.5" ry="8" fill={hairColorHex} />
-          </g>
-        );
-      default: // short-curls
-        return (
-          <g>
-            <ellipse cx="60" cy="31" rx="27" ry="18" fill={hairColorHex} />
-            {[42,50,58,66,74].map((x,i) => (
-              <circle key={i} cx={x} cy={18 + (i%2)*3} r={4} fill={hairColorHex} opacity="0.9" />
-            ))}
-            <circle cx="35" cy="30" r="3" fill={hairColorHex} opacity="0.7" />
-            <circle cx="85" cy="30" r="3" fill={hairColorHex} opacity="0.7" />
-          </g>
-        );
-    }
-  };
-
-  const renderEyesAndMouth = () => {
-    // Eyes
-    let eyes: React.ReactNode;
-    let mouth: React.ReactNode;
-
-    switch (expression) {
-      case "excited":
-        eyes = (
-          <>
-            <ellipse cx="48.5" cy="45" rx="6" ry="6.5" fill="white" />
-            <ellipse cx="71.5" cy="45" rx="6" ry="6.5" fill="white" />
-            <circle cx="50" cy="44.5" r="3.5" fill="#2D1B0E" />
-            <circle cx="73" cy="44.5" r="3.5" fill="#2D1B0E" />
-            <circle cx="51.5" cy="42.5" r="1.5" fill="white" />
-            <circle cx="74.5" cy="42.5" r="1.5" fill="white" />
-            <path d="M42 38 Q48.5 35.5 55 38" stroke={hairColorHex} strokeWidth="2" fill="none" strokeLinecap="round" />
-            <path d="M65 38 Q71.5 35.5 78 38" stroke={hairColorHex} strokeWidth="2" fill="none" strokeLinecap="round" />
-          </>
-        );
-        mouth = (
-          <>
-            <ellipse cx="60" cy="60" rx="8" ry="6" fill="#E57373" />
-            <ellipse cx="60" cy="56.5" rx="6.5" ry="3" fill={skinHex} />
-            <ellipse cx="60" cy="63.5" rx="4.5" ry="2" fill="#FF8A80" opacity="0.5" />
-          </>
-        );
-        break;
-      case "cool":
-        eyes = (
-          <>
-            <rect x="42" y="41" width="13" height="8.5" rx="4.25" fill="#37474F" opacity="0.88" />
-            <rect x="65" y="41" width="13" height="8.5" rx="4.25" fill="#37474F" opacity="0.88" />
-            <line x1="55" y1="45" x2="65" y2="45" stroke="#37474F" strokeWidth="2" />
-            <line x1="42" y1="44" x2="37" y2="42" stroke="#37474F" strokeWidth="2" />
-            <line x1="78" y1="44" x2="83" y2="42" stroke="#37474F" strokeWidth="2" />
-            <rect x="44" y="43" width="4" height="1.5" rx="0.75" fill="white" opacity="0.25" />
-            <rect x="67" y="43" width="4" height="1.5" rx="0.75" fill="white" opacity="0.25" />
-          </>
-        );
-        mouth = <path d="M50 58 Q57 62 60 58 Q63 62 70 58" stroke="#C68642" strokeWidth="2" fill="none" strokeLinecap="round" />;
-        break;
-      case "proud":
-        eyes = (
-          <>
-            <ellipse cx="48.5" cy="45" rx="5.5" ry="6" fill="white" />
-            <ellipse cx="71.5" cy="45" rx="5.5" ry="6" fill="white" />
-            <circle cx="49.5" cy="44.5" r="3.2" fill="#2D1B0E" />
-            <circle cx="72.5" cy="44.5" r="3.2" fill="#2D1B0E" />
-            <circle cx="50.8" cy="43" r="1.2" fill="white" />
-            <circle cx="73.8" cy="43" r="1.2" fill="white" />
-            <path d="M42 38 L55 40" stroke={hairColorHex} strokeWidth="2" fill="none" strokeLinecap="round" />
-            <path d="M78 40 L65 38" stroke={hairColorHex} strokeWidth="2" fill="none" strokeLinecap="round" />
-            <text x="60" y="33" textAnchor="middle" fontSize="9" fontWeight="900" fill="#F5A524" opacity="0.8">★</text>
-          </>
-        );
-        mouth = (
-          <>
-            <path d="M48 56 Q60 67 72 56" fill="#E57373" opacity="0.9" />
-            <path d="M50 56 Q60 64 70 56" stroke="#C68642" strokeWidth="1" fill="none" />
-          </>
-        );
-        break;
-      default: // happy
-        eyes = (
-          <>
-            <ellipse cx="48.5" cy="45" rx="5" ry="5.5" fill="white" />
-            <ellipse cx="71.5" cy="45" rx="5" ry="5.5" fill="white" />
-            <circle cx="49.5" cy="44.5" r="3" fill="#2D1B0E" />
-            <circle cx="72.5" cy="44.5" r="3" fill="#2D1B0E" />
-            <circle cx="50.8" cy="43" r="1.1" fill="white" />
-            <circle cx="73.8" cy="43" r="1.1" fill="white" />
-            <path d="M42 39 Q48.5 36.5 55 39" stroke={hairColorHex} strokeWidth="1.8" fill="none" strokeLinecap="round" />
-            <path d="M65 39 Q71.5 36.5 78 39" stroke={hairColorHex} strokeWidth="1.8" fill="none" strokeLinecap="round" />
-          </>
-        );
-        mouth = (
-          <>
-            <path d="M49 55 Q60 66 71 55" stroke="#C68642" strokeWidth="2.2" fill="none" strokeLinecap="round" />
-            <path d="M51 56 Q60 63 69 56" fill="#E57373" opacity="0.7" />
-          </>
-        );
-        break;
-    }
-
-    return (
-      <>
-        {eyes}
-        <ellipse cx="60" cy="53" rx="3.5" ry="2.5" fill={sD} opacity="0.4" />
-        {mouth}
-        <circle cx="41" cy="53" r="5" fill="#FFCDD2" opacity="0.3" />
-        <circle cx="79" cy="53" r="5" fill="#FFCDD2" opacity="0.3" />
-      </>
-    );
-  };
-
-  return (
-    <svg viewBox="15 0 90 190" width="200" height="340" xmlns="http://www.w3.org/2000/svg">
-      {/* Ground shadow */}
-      <ellipse cx="60" cy="186" rx="32" ry="4.5" fill="#CBD5E1" opacity="0.35" />
-
-      {/* LEGS */}
-      <rect x="42" y="132" width="14" height="38" rx="6" fill="#37474F" />
-      <rect x="64" y="132" width="14" height="38" rx="6" fill="#37474F" />
-      <rect x="44" y="134" width="4" height="34" rx="2" fill="rgba(0,0,0,0.12)" />
-      <rect x="66" y="134" width="4" height="34" rx="2" fill="rgba(0,0,0,0.12)" />
-
-      {/* SHOES */}
-      <ellipse cx="49" cy="175" rx="14" ry="7.5" fill={shoeHex} />
-      <ellipse cx="71" cy="175" rx="14" ry="7.5" fill={shoeHex} />
-      <ellipse cx="49" cy="178.5" rx="12" ry="4.5" fill={darken(shoeHex, 35)} opacity="0.5" />
-      <ellipse cx="71" cy="178.5" rx="12" ry="4.5" fill={darken(shoeHex, 35)} opacity="0.5" />
-      <ellipse cx="49" cy="171.5" rx="5.5" ry="2.8" fill="white" opacity="0.12" />
-      <ellipse cx="71" cy="171.5" rx="5.5" ry="2.8" fill="white" opacity="0.12" />
-
-      {/* BODY / TORSO */}
-      <rect x="34" y="85" width="52" height="52" rx="14" fill={outfitHex} />
-      <path d="M49 85 Q60 94 71 85" stroke={darken(outfitHex, 30)} strokeWidth="2.5" fill="none" strokeLinecap="round" />
-      <line x1="60" y1="93" x2="60" y2="133" stroke={darken(outfitHex, 20)} strokeWidth="1" opacity="0.25" />
-      <rect x="37" y="88" width="9" height="22" rx="4.5" fill="white" opacity="0.08" />
-
-      {/* LEFT ARM */}
-      <rect x="20" y="89" width="15" height="38" rx="7.5" fill={outfitHex} />
-      <rect x="22" y="91" width="4" height="34" rx="2" fill={darken(outfitHex, 15)} opacity="0.3" />
-      <circle cx="27.5" cy="129" r="7" fill={skinHex} />
-      <circle cx="27.5" cy="129" r="7" fill="none" stroke={sOut} strokeWidth="0.8" opacity="0.45" />
-
-      {/* RIGHT ARM */}
-      <rect x="85" y="89" width="15" height="38" rx="7.5" fill={outfitHex} />
-      <rect x="87" y="91" width="4" height="34" rx="2" fill={darken(outfitHex, 15)} opacity="0.3" />
-      <circle cx="92.5" cy="129" r="7" fill={skinHex} />
-      <circle cx="92.5" cy="129" r="7" fill="none" stroke={sOut} strokeWidth="0.8" opacity="0.45" />
-
-      {/* NECK */}
-      <rect x="52" y="72" width="16" height="15" rx="5" fill={skinHex} />
-
-      {/* HEAD */}
-      <ellipse cx="60" cy="43" rx="26" ry="29" fill={skinHex} />
-      <ellipse cx="60" cy="43" rx="26" ry="29" fill="none" stroke={sOut} strokeWidth="0.6" opacity="0.35" />
-
-      {/* LEFT EAR */}
-      <ellipse cx="34" cy="46" rx="5.5" ry="7.5" fill={skinHex} />
-      <ellipse cx="34" cy="46" rx="5.5" ry="7.5" fill="none" stroke={sOut} strokeWidth="0.5" opacity="0.4" />
-      <ellipse cx="34" cy="46" rx="2.8" ry="4.5" fill={sD} opacity="0.25" />
-
-      {/* RIGHT EAR */}
-      <ellipse cx="86" cy="46" rx="5.5" ry="7.5" fill={skinHex} />
-      <ellipse cx="86" cy="46" rx="5.5" ry="7.5" fill="none" stroke={sOut} strokeWidth="0.5" opacity="0.4" />
-      <ellipse cx="86" cy="46" rx="2.8" ry="4.5" fill={sD} opacity="0.25" />
-
-      {/* HAIR */}
-      {renderHair()}
-
-      {/* FACE */}
-      {renderEyesAndMouth()}
-    </svg>
-  );
-}
 
 /* ═══════════════════════════════════════════════════════════
    HAIR STYLE MINI PREVIEW
@@ -428,7 +173,7 @@ function HairStylePreview({
       className={`flex flex-col items-center gap-1.5 p-3 rounded-2xl border-2 transition-all duration-200 cursor-pointer hover:-translate-y-0.5 ${
         selected
           ? "border-primary bg-primary/5 shadow-[0_4px_15px_rgba(79,70,229,0.12)]"
-          : "border-white/60 bg-white hover:border-primary/30"
+          : "border-[#E2E8F0]/50 bg-white hover:border-primary/30"
       }`}
     >
       <svg viewBox="0 6 50 40" width={48} height={40}>
@@ -538,7 +283,7 @@ function ExpressionPreview({
       className={`flex flex-col items-center gap-1.5 p-3 rounded-2xl border-2 transition-all duration-200 cursor-pointer hover:-translate-y-0.5 ${
         selected
           ? "border-primary bg-primary/5 shadow-[0_4px_15px_rgba(79,70,229,0.12)]"
-          : "border-white/60 bg-white hover:border-primary/30"
+          : "border-[#E2E8F0]/50 bg-white hover:border-primary/30"
       }`}
     >
       <svg viewBox="14 6 48 42" width={52} height={44}>
@@ -772,7 +517,7 @@ export default function AvatarPage() {
         {/* ═══ AVATAR STAGE ═══ */}
         <div className="relative">
           <div
-            className="rounded-3xl border border-white/60 overflow-hidden relative"
+            className="rounded-3xl border border-[#E2E8F0]/50 overflow-hidden relative"
             style={{
               background: "linear-gradient(180deg, #F0FDF4 0%, #EEF2FF 100%)",
               minHeight: "480px",
@@ -797,7 +542,8 @@ export default function AvatarPage() {
 
               {/* Avatar SVG */}
               <div className="flex items-center justify-center" style={{ marginTop: "16px", marginBottom: "24px" }}>
-                <AvatarSVG
+                <AvatarRenderer
+                  size="lg"
                   skinHex={currentSkinHex}
                   hairColorHex={currentHairColorHex}
                   hairStyle={hairStyle}
@@ -811,14 +557,14 @@ export default function AvatarPage() {
               <div className="flex gap-3 w-full">
                 <button
                   onClick={handleRandomize}
-                  className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-white/60 bg-white text-text font-bold text-xs cursor-pointer transition-all hover:bg-bg-main hover:border-primary/30 active:scale-[0.97]"
+                  className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-[#E2E8F0]/50 bg-white text-text font-bold text-xs cursor-pointer transition-all hover:bg-bg-main hover:border-primary/30 active:scale-[0.97]"
                 >
                   <Shuffle size={14} />
                   Randomize
                 </button>
                 <button
                   onClick={handleReset}
-                  className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-white/60 bg-white text-text font-bold text-xs cursor-pointer transition-all hover:bg-bg-main hover:border-primary/30 active:scale-[0.97]"
+                  className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-[#E2E8F0]/50 bg-white text-text font-bold text-xs cursor-pointer transition-all hover:bg-bg-main hover:border-primary/30 active:scale-[0.97]"
                 >
                   <RotateCcw size={14} />
                   Reset
@@ -851,10 +597,10 @@ export default function AvatarPage() {
         </div>
 
         {/* ═══ CUSTOMIZATION PANELS ═══ */}
-        <div className="bg-white rounded-3xl border border-white/60" style={{ padding: "28px" }}>
+        <div className="bg-white rounded-3xl border border-[#E2E8F0]/50" style={{ padding: "28px" }}>
           {/* Tabs */}
           <div
-            className="flex gap-1.5 mb-8 border-b border-white/60 pb-4 overflow-x-auto"
+            className="flex gap-1.5 mb-8 border-b border-[#E2E8F0]/50 pb-4 overflow-x-auto"
             style={{ scrollbarWidth: "none" }}
           >
             {TABS.map((tab) => (

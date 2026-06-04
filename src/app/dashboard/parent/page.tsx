@@ -98,15 +98,15 @@ export default function ParentDashboard() {
   return (
     <div className="min-h-screen bg-bg-main">
       {/* Header — floating glass, no hard border */}
-      <header className="sticky top-0 z-30 bg-white/70 backdrop-blur-2xl shadow-[0_1px_0_rgb(var(--color-border-soft),0.6)]">
+      <header className="sticky top-0 z-30 bg-white/60 backdrop-blur-2xl">
         <div className="max-w-[1400px] mx-auto px-4 lg:px-8 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-secondary to-secondary-dark flex items-center justify-center shadow-[0_0_16px_rgba(0,168,132,0.2)]">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#00A884] to-[#047A70] flex items-center justify-center shadow-[0_0_16px_rgba(0,168,132,0.15)]">
               <GraduationCap className="w-5 h-5 text-white" />
             </div>
             <div>
-              <span className="font-extrabold text-base text-text tracking-tight">Arizen</span>
-              <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-text-muted ml-2">Parent</span>
+              <span className="font-extrabold text-base text-[#0F172A] tracking-tight">Arizen</span>
+              <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#64748B] ml-2">Parent</span>
             </div>
           </div>
           <button
@@ -193,7 +193,7 @@ export default function ParentDashboard() {
                 {children.map((child) => (
                   <div
                     key={child.id || child.learnerProfileId}
-                    className="rounded-[1.5rem] bg-white/90 backdrop-blur-sm p-5 shadow-[0_2px_12px_rgba(0,0,0,0.03)] border border-white/60 hover:shadow-[0_8px_25px_rgba(0,0,0,0.06)] transition-all duration-200"
+                    className="rounded-[1.5rem] bg-white/80 backdrop-blur-sm p-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-[#E2E8F0]/40 hover:shadow-[0_8px_25px_rgba(0,0,0,0.05)] transition-all duration-200"
                   >
                     <div className="flex items-start gap-4 mb-4">
                       <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/10 to-accent-purple/10 flex items-center justify-center shadow-md flex-shrink-0 overflow-hidden">

@@ -55,7 +55,7 @@ export function StudentSidebar({ children }: { children: React.ReactNode }) {
   const avatarLevel = Math.floor(totalXp / 100) + 1;
 
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-white/90 backdrop-blur-xl">
+    <div className="flex flex-col h-full bg-white/80 backdrop-blur-xl">
       {/* Logo */}
       <div className="flex items-center gap-3 px-5 py-4">
         <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center shadow-[0_4px_15px_rgba(79,70,229,0.25)]">
@@ -88,8 +88,8 @@ export function StudentSidebar({ children }: { children: React.ReactNode }) {
               className={cn(
                 "flex items-center gap-3 px-4 py-2.5 rounded-2xl text-sm font-semibold transition-all duration-150",
                 isActive
-                  ? "bg-gradient-to-r from-primary-soft to-secondary-soft/40 text-primary-dark shadow-[0_2px_8px_rgba(79,70,229,0.08)]"
-                  : "text-text-muted hover:bg-bg-main hover:text-text"
+                  ? "bg-gradient-to-r from-indigo-50/80 to-violet-50/60 text-[#4F46E5] shadow-[0_2px_8px_rgba(79,70,229,0.06)]"
+                  : "text-[#64748B] hover:bg-[#F8F7FF] hover:text-[#0F172A]"
               )}
             >
               <item.icon className="w-[18px] h-[18px] flex-shrink-0" />
