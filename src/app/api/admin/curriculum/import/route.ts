@@ -1,36 +1,26 @@
-// POST /api/admin/curriculum/import — Import curriculum from Excel (ADMIN only)
+// DEPRECATED — This route has been replaced by /api/admin/curriculum/upload
+// Use POST /api/admin/curriculum/upload with action=confirm instead.
 import { NextRequest, NextResponse } from "next/server";
-import { requireAdmin } from "@/lib/api-guard";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
-  const auth = await requireAdmin(req);
-  if (auth instanceof NextResponse) return auth;
+  return NextResponse.json(
+    {
+      error: "This route is deprecated. Use POST /api/admin/curriculum/upload with action=confirm instead.",
+      deprecated: true,
+      useInstead: "/api/admin/curriculum/upload",
+    },
+    { status: 410 },
+  );
+}
 
-  try {
-    const formData = await req.formData();
-    const file = formData.get("file") as File | null;
-
-    if (!file) {
-      return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
-    }
-
-    // For now, return a success response
-    // In production, this would parse the xlsx and insert into DB
-    return NextResponse.json({
-      success: true,
-      message: "Curriculum imported successfully as draft.",
-      created: {
-        subjects: 3,
-        weeks: 8,
-        quests: 6,
-        lessons: 12,
-      },
-      skipped: 0,
-      errors: [],
-    });
-  } catch (err: any) {
-    console.error("[CURRICULUM_IMPORT] Error:", err);
-    return NextResponse.json({ error: err.message || "Failed to import curriculum" }, { status: 500 });
-  }
+export async function GET() {
+  return NextResponse.json(
+    {
+      error: "This route is deprecated. Use POST /api/admin/curriculum/upload with action=confirm instead.",
+      deprecated: true,
+      useInstead: "/api/admin/curriculum/upload",
+    },
+    { status: 410 },
+  );
 }
