@@ -33,52 +33,7 @@ function parseCSV(text: string): string[][] {
   return rows.filter(r => r.some(c => c.length > 0));
 }
 
-// ── Column mapping ──────────────────────────────────────────────
-const COLUMN_MAP: Record<string, string> = {
-  "grade": "grade",
-  "subject": "subject",
-  "strand": "strand",
-  "sub_strand": "subStrand",
-  "substrand": "subStrand",
-  "sub-strand": "subStrand",
-  "learning_outcome": "learningOutcome",
-  "learningoutcome": "learningOutcome",
-  "learning outcome": "learningOutcome",
-  "lesson_title": "lessonTitle",
-  "lessontitle": "lessonTitle",
-  "lesson title": "lessonTitle",
-  "lesson": "lessonTitle",
-  "term": "term",
-  "week": "week",
-  "activity_title": "activityTitle",
-  "activitytitle": "activityTitle",
-  "activity title": "activityTitle",
-  "activity_instructions": "activityInstructions",
-  "activityinstructions": "activityInstructions",
-  "activity instructions": "activityInstructions",
-  "quest_title": "questTitle",
-  "questtitle": "questTitle",
-  "quest title": "questTitle",
-  "quest_instructions": "questInstructions",
-  "questinstructions": "questInstructions",
-  "quest instructions": "questInstructions",
-  "reflection_prompt": "reflectionPrompt",
-  "reflectionprompt": "reflectionPrompt",
-  "reflection prompt": "reflectionPrompt",
-  "reward_coins": "rewardCoins",
-  "rewardcoins": "rewardCoins",
-  "reward coins": "rewardCoins",
-  "coins": "rewardCoins",
-  "reward_stars": "rewardStars",
-  "rewardstars": "rewardStars",
-  "reward stars": "rewardStars",
-  "stars": "rewardStars",
-  "estimated_duration": "estimatedDuration",
-  "estimatedduration": "estimatedDuration",
-  "estimated duration": "estimatedDuration",
-  "duration": "estimatedDuration",
-  "difficulty": "difficulty",
-};
+import { normalizeHeader, COLUMN_MAP, REQUIRED_FIELDS, VALID_DIFFICULTIES } from "@/lib/curriculum/cbc-template";
 
 // ── Row validation ──────────────────────────────────────────────
 interface ParsedRow {
@@ -310,9 +265,7 @@ export async function POST(req: NextRequest) {
       const headers = rows[0];
 
       // Normalize headers: remove BOM, trim, lowercase, replace spaces/hyphens with underscores
-      const normalizedHeaders = headers.map(h =>
-        h.replace(/^\uFEFF/, "").trim().toLowerCase().replace(/[\s-]+/g, "_")
-      );
+      const normalizedHeaders = headers.map(normalizeHeader);
 
       // Check for required columns — normalize the same way for comparison
       const requiredCols = ["lesson_title", "lesson"];
