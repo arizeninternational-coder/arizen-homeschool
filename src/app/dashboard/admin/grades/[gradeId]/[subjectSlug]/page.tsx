@@ -180,27 +180,13 @@ export default function SubjectCurriculumPage() {
   };
 
   const downloadTemplate = () => {
-    const headers = [
-      "grade", "subject", "strand", "sub_strand", "learning_outcome",
-      "lesson_title", "term", "week", "activity_title", "activity_instructions",
-      "quest_title", "quest_instructions", "reflection_prompt",
-      "reward_coins", "reward_stars", "estimated_duration", "difficulty"
-    ];
-    const example = [
-      `${gradeId}`, `${subjectName}`, "Number Concept", "Counting",
-      "Count objects up to 100", "Counting to 100", "Term 1", "Week 1",
-      "Counting game", "Use beads to count", "Numbers Quest",
-      "Explore numbers in daily life", "What numbers did you see today?",
-      "10", "2", "30", "easy"
-    ];
-    const csv = [headers.join(","), example.join(",")].join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = `grade-${gradeId}-${subjectSlug}-template.csv`;
-    a.click(); URL.revokeObjectURL(url);
-  };
-
+      const csv = generateCsvTemplate(gradeId, subjectName);
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = `grade-${gradeId}-${subjectSlug}-template.csv`;
+      a.click(); URL.revokeObjectURL(url);
+    };
   const getStatusBadge = (status: string) => {
     const cfg = STATUS_CONFIG[status] || STATUS_CONFIG["DRAFT"];
     return (
