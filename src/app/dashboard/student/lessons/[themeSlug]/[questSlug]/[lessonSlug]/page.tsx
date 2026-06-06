@@ -199,12 +199,6 @@ function getRewardValue(value: any): number {
   return 0;
 }
 
-interface Badge {
-  id: string;
-  name: string;
-  badgeType: string;
-}
-
 export default function LessonPlayerPage({ params }: { params: Promise<{ themeSlug: string; questSlug: string; lessonSlug: string }> }) {
   const { data: session, status } = useSession();
   const [slugs, setSlugs] = useState<{ themeSlug: string; questSlug: string; lessonSlug: string } | null>(null);
@@ -215,7 +209,7 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
   const [completed, setCompleted] = useState(false);
   const [xpEarned, setXpEarned] = useState(0);
   const [streakBonus, setStreakBonus] = useState(0);
-  const [newBadges, setNewBadges] = useState<Badge[]>([]);
+  const [newBadges, setNewBadges] = useState<string[]>([]);
   const [showCelebration, setShowCelebration] = useState(false);
   const [animatedXp, setAnimatedXp] = useState(0);
   const [completeError, setCompleteError] = useState<string | null>(null);
@@ -327,6 +321,11 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
         setXpEarned(xp);
         setStreakBonus(streak);
         setShowCelebration(true);
+
+        // Track newly unlocked badges
+        if (data.newBadges && data.newBadges.length > 0) {
+          setNewBadges(data.newBadges);
+        }
 
         fireConfetti();
         animateXpCounter(xp, streak);
@@ -465,11 +464,11 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
                 <Award className="w-[18px] h-[18px] text-accent-purple" /> New Badge{newBadges.length > 1 ? "s" : ""} Earned!
               </h3>
               <div className="flex gap-3 flex-wrap">
-                {newBadges.map((badge) => (
-                  <div key={badge.id} className="rounded-2xl border-2 border-accent-purple/20 bg-accent-purple-soft/40 p-3.5 flex items-center gap-2.5" style={{ animation: "popIn 0.4s ease-out" }}>
+                {newBadges.map((badgeName, idx) => (
+                  <div key={idx} className="rounded-2xl border-2 border-accent-purple/20 bg-accent-purple-soft/40 p-3.5 flex items-center gap-2.5" style={{ animation: "popIn 0.4s ease-out" }}>
                     <span className="text-2xl">🏅</span>
                     <div>
-                      <div className="font-bold text-text text-sm">{badge.name}</div>
+                      <div className="font-bold text-text text-sm">{badgeName}</div>
                       <div className="text-xs text-text-muted">New badge earned!</div>
                     </div>
                   </div>

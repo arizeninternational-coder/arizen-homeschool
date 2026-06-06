@@ -90,6 +90,12 @@ export async function GET(req: NextRequest) {
     const avatarLevel = Math.floor(totalXp / 100) + 1;
     const nextLevelXp = avatarLevel * 100;
 
+    // Count earned badges
+    const { count: badgeCount } = await supabase
+      .from("Badge")
+      .select("id", { count: "exact", head: true })
+      .eq("learnerId", learnerId);
+
     return NextResponse.json({
       lessonsCompleted: completedCount || 0,
       totalLessons,
@@ -102,6 +108,7 @@ export async function GET(req: NextRequest) {
       recentActivity,
       displayName: profile?.displayName || "Learner",
       grade: learnerGrade,
+      badges: badgeCount || 0,
     });
   } catch (err: any) {
     console.error("[PROGRESS_SUMMARY] Error:", err);

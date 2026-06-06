@@ -61,12 +61,14 @@ export default function StudentDashboard() {
   }
 
   const s = data.summary || {};
-  // API returns: displayName, xp, coins, streak, lessonsCompleted at top level
-  const studentName = s.displayName || s?.profile?.name || s?.profile?.displayName || "Learner";
-  const totalXp = s.xp || s.totalXp || s?.profile?.totalXp || 0;
-  const coins = s.coins || s?.wallet?.balance || 0;
-  const currentStreak = s.streak || s.currentStreak || s?.profile?.currentStreak || 0;
-  const completedLessons = s.lessonsCompleted || s.completedLessons || 0;
+  // API returns: displayName, xp, coins, streak, lessonsCompleted, badges, grade at top level
+  const studentName = s.displayName || "Learner";
+  const grade = s.grade || "";
+  const totalXp = s.xp || 0;
+  const coins = s.coins || 0;
+  const currentStreak = s.streak || 0;
+  const completedLessons = s.lessonsCompleted || 0;
+  const badgeCount = s.badges || 0;
   const avatarLevel = Math.floor(totalXp / 100) + 1;
   const xpProgress = totalXp % 100;
   const hour = new Date().getHours();
@@ -94,7 +96,9 @@ export default function StudentDashboard() {
           <h1 className="text-xl lg:text-2xl font-extrabold text-text tracking-tight">
             {greeting}, {studentName}! <span className="inline-block wiggle">👋</span>
           </h1>
-          <p className="text-text-muted text-sm mt-0.5">Let's make today an amazing learning adventure.</p>
+          <p className="text-text-muted text-sm mt-0.5">
+            {grade ? `Grade ${grade} • ` : ""}Let's make today an amazing learning adventure.
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <CoinPill coins={coins} size="sm" />
@@ -170,7 +174,7 @@ export default function StudentDashboard() {
               <div className="w-8 h-8 rounded-xl bg-accent-purple-soft flex items-center justify-center"><StarIcon size={16} className="text-accent-purple" /></div>
               <span className="text-[10px] font-extrabold uppercase tracking-wider text-text-muted">Badges</span>
             </div>
-            <p className="text-lg font-extrabold text-accent-purple">{s.badges || 0}</p>
+            <p className="text-lg font-extrabold text-accent-purple">{badgeCount}</p>
             <p className="text-[10px] text-text-muted font-semibold">Achievements earned</p>
           </FloatingCard>
         </Link>
@@ -262,10 +266,14 @@ export default function StudentDashboard() {
           </div>
           <div className="flex gap-2 flex-shrink-0">
             <Link href="/dashboard/student/avatar">
-              <button className="px-4 py-2 rounded-xl text-xs font-bold bg-primary text-white hover:brightness-110 transition-all shadow-[0_4px_12px_rgba(79,70,229,0.2)]">Customize</button>
+              <button className="px-4 py-2 rounded-xl text-xs font-bold bg-primary-soft text-primary hover:brightness-110 transition-all flex items-center gap-1.5">
+                <Sparkles size={12} /> Customize <span className="px-1.5 py-0.5 rounded-full bg-red-100 text-red-700 text-[8px] font-extrabold uppercase">Soon</span>
+              </button>
             </Link>
             <Link href="/dashboard/student/shop">
-              <button className="px-4 py-2 rounded-xl text-xs font-bold bg-gold-soft text-amber-800 hover:brightness-105 transition-all flex items-center gap-1"><Sparkles size={12} /> Shop</button>
+              <button className="px-4 py-2 rounded-xl text-xs font-bold bg-gold-soft/50 text-amber-700 hover:brightness-105 transition-all flex items-center gap-1.5">
+                <Sparkles size={12} /> Shop <span className="px-1.5 py-0.5 rounded-full bg-red-100 text-red-700 text-[8px] font-extrabold uppercase">Soon</span>
+              </button>
             </Link>
           </div>
         </div>

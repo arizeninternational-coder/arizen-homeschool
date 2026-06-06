@@ -33,11 +33,21 @@ export function StudentSidebar({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profile, setProfile] = useState<any>(null);
+  const [summary, setSummary] = useState<any>(null);
 
   useEffect(() => {
+    // Fetch profile for name/avatar
     fetch("/api/learner/profile", { credentials: "include" })
       .then(r => r.json())
       .then(d => setProfile(d.profile || null))
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    // Fetch summary for real coins/XP/streak (single source of truth)
+    fetch("/api/learner/progress/summary", { credentials: "include" })
+      .then(r => r.json())
+      .then(d => setSummary(d))
       .catch(() => {});
   }, []);
 
@@ -47,11 +57,11 @@ export function StudentSidebar({ children }: { children: React.ReactNode }) {
     return () => { document.body.style.overflow = ""; };
   }, [mobileOpen]);
 
-  const studentName = profile?.name || profile?.displayName || "Student";
+  const studentName = profile?.displayName || profile?.name || "Student";
   const grade = profile?.grade || "";
-  const totalXp = profile?.totalXp || 0;
-  const currentStreak = profile?.currentStreak || 0;
-  const coins = profile?.wallet?.balance || 0;
+  const totalXp = summary?.xp || profile?.totalXp || 0;
+  const currentStreak = summary?.streak || profile?.currentStreak || 0;
+  const coins = summary?.coins || 0;
   const avatarLevel = Math.floor(totalXp / 100) + 1;
 
   const sidebarContent = (

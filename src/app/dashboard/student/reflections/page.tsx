@@ -3,7 +3,7 @@
 export const dynamic = "force-dynamic";
 
 import { useState, useEffect } from "react";
-import { Heart, RefreshCw, PenLine, Frown, Meh, Smile, Laugh, SmilePlus } from "lucide-react";
+import { Heart, RefreshCw, PenLine, Frown, Meh, Smile, Laugh, SmilePlus, Check, X } from "lucide-react";
 import { PageHeader, SectionHeader, GradientButton, EmptyStateCard } from "@/components/ui/Pill";
 import { HeartIcon } from "@/components/ui/Illustrations";
 import { cn } from "@/lib/utils/cn";
@@ -16,11 +16,21 @@ const PROMPTS = [
   "How can you use what you learned today in real life?",
 ];
 
+const PREMADE_RESPONSES = [
+  "I understand it well.",
+  "I need more practice.",
+  "This was fun.",
+  "This was a little hard.",
+  "I can use this at home.",
+  "I want help from my parent/teacher.",
+  "I learned something new.",
+  "I am proud of myself.",
+];
+
 // Safely extract reflection text from various API response shapes
 function getReflectionText(r: any): string {
   if (!r) return "";
   if (typeof r === "string") return r;
-  // API returns { response: { text: "..." } } or { content: "..." }
   if (r.responseText) return r.responseText;
   if (r.response && typeof r.response === "object") return r.response.text || "";
   if (typeof r.response === "string") return r.response;
@@ -56,6 +66,7 @@ const MOOD_CONFIG: Record<string, { color: string; bg: string; Icon: React.FC<an
 export default function ReflectionsPage() {
   const [reflections, setReflections] = useState<any[]>([]);
   const [text, setText] = useState("");
+  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [prompt, setPrompt] = useState(PROMPTS[0]);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -70,27 +81,52 @@ export default function ReflectionsPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  function toggleOption(option: string) {
+    setSelectedOptions(prev =>
+      prev.includes(option) ? prev.filter(o => o !== option) : [...prev, option]
+    );
+  }
+
   const handleSave = async () => {
-    if (!text.trim() || saving) return;
+    const hasSelection = selectedOptions.length > 0;
+    const hasText = text.trim().length > 0;
+
+    if (!hasSelection && !hasText) {
+      setSaveError("Choose one option or write something before saving.");
+      return;
+    }
+
     setSaving(true);
     setSaveError(null);
+
+    // Combine selected options and custom text into one response
+    const parts: string[] = [];
+    if (hasSelection) {
+      parts.push(selectedOptions.join(". "));
+    }
+    if (hasText) {
+      parts.push(text.trim());
+    }
+    const combinedResponse = parts.join(". ");
+
     try {
       const res = await fetch("/api/learner/reflections", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ prompt, response: text }),
+        body: JSON.stringify({ prompt, response: combinedResponse }),
       });
       const data = await res.json();
       if (res.ok && data.success) {
         setSaved(true);
         setText("");
+        setSelectedOptions([]);
         setReflections(prev => [{
           prompt,
-          response: { text },
+          response: { text: combinedResponse },
           createdAt: new Date().toISOString(),
         }, ...prev]);
-        setTimeout(() => setSaved(false), 2000);
+        setTimeout(() => setSaved(false), 3000);
       } else {
         setSaveError(data.error || "Failed to save reflection. Please try again.");
       }
@@ -139,15 +175,44 @@ export default function ReflectionsPage() {
             <p className="text-[10px] font-extrabold uppercase tracking-[0.15em] text-pink">New Reflection</p>
           </div>
           <p className="text-sm font-bold text-text mb-4">{prompt}</p>
+
+          {/* Premade response chips */}
+          <div className="mb-4">
+            <p className="text-[10px] font-extrabold uppercase tracking-wider text-text-muted mb-2">Quick responses — tap to select:</p>
+            <div className="flex flex-wrap gap-2">
+              {PREMADE_RESPONSES.map((option) => {
+                const isSelected = selectedOptions.includes(option);
+                return (
+                  <button
+                    key={option}
+                    onClick={() => toggleOption(option)}
+                    className={cn(
+                      "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer active:scale-95 border",
+                      isSelected
+                        ? "bg-pink-100 text-pink-700 border-pink-300 shadow-[0_2px_8px_rgba(225,29,72,0.1)]"
+                        : "bg-white/80 text-text-muted border-pink/10 hover:bg-pink-50 hover:text-pink-600 hover:border-pink/20"
+                    )}
+                  >
+                    {isSelected && <Check size={12} className="text-pink" />}
+                    {option}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Custom text area */}
           <textarea
             value={text}
             onChange={e => setText(e.target.value)}
-            placeholder="Write your thoughts here..."
-            className="w-full min-h-[90px] p-4 rounded-2xl border border-pink/10 bg-white/80 text-sm text-text placeholder:text-text-muted resize-vertical focus:outline-none focus:ring-2 focus:ring-pink/20 transition-all"
+            placeholder="Or write your own thought here..."
+            className="w-full min-h-[80px] p-4 rounded-2xl border border-pink/10 bg-white/80 text-sm text-text placeholder:text-text-muted resize-vertical focus:outline-none focus:ring-2 focus:ring-pink/20 transition-all"
           />
+
           <div className="flex items-center justify-between mt-4 gap-3 flex-wrap">
             {saveError && (
-              <div className="flex-1 min-w-[200px] rounded-lg border border-red-300 bg-red-50 px-3 py-2">
+              <div className="flex-1 min-w-[200px] rounded-lg border border-red-300 bg-red-50 px-3 py-2 flex items-center gap-2">
+                <X size={14} className="text-red-500 flex-shrink-0" />
                 <p className="text-xs font-semibold text-red-700">{saveError}</p>
               </div>
             )}
@@ -167,7 +232,7 @@ export default function ReflectionsPage() {
               size="sm"
               icon={saved ? undefined : <PenLine className="w-4 h-4" />}
               onClick={handleSave}
-              disabled={saving || !text.trim()}
+              disabled={saving}
             >
               {saving ? (
                 <span className="flex items-center gap-2">

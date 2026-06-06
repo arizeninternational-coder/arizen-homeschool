@@ -331,11 +331,60 @@ export async function POST(req: NextRequest) {
       .update({ lastActivityDate: nowDate.toISOString() })
       .eq("id", learnerId);
 
+    // ── Badge unlocking ──
+    const newlyUnlocked: string[] = [];
+
+    // Gather current stats for badge checks
+    const { count: totalCompletedLessons } = await supabase
+      .from("Progress")
+      .select("id", { count: "exact", head: true })
+      .eq("learnerId", learnerId)
+      .not("completedAt", "is", null);
+
+    const { data: latestProfile } = await supabase
+      .from("LearnerProfile")
+      .select("totalXp, currentStreak")
+      .eq("id", learnerId)
+      .maybeSingle();
+
+    const completedCount = totalCompletedLessons || 0;
+    const currentXp = latestProfile?.totalXp || 0;
+    const currentStreakVal = latestProfile?.currentStreak || 0;
+
+    // Check each badge rule and award if newly earned
+    const badgeRules = [
+      { type: "first_lesson", name: "First Lesson", condition: completedCount >= 1 },
+      { type: "five_lessons", name: "5 Lessons", condition: completedCount >= 5 },
+      { type: "three_day_streak", name: "3-Day Streak", condition: currentStreakVal >= 3 },
+      { type: "hundred_xp", name: "100 XP", condition: currentXp >= 100 },
+    ];
+
+    for (const rule of badgeRules) {
+      if (!rule.condition) continue;
+      // Check if already awarded (unique constraint on learnerId + badgeType)
+      const { data: existing } = await supabase
+        .from("Badge")
+        .select("id")
+        .eq("learnerId", learnerId)
+        .eq("badgeType", rule.type)
+        .maybeSingle();
+      if (!existing) {
+        await supabase.from("Badge").insert({
+          learnerId,
+          badgeType: rule.type,
+          name: rule.name,
+          description: `Earned: ${rule.name}`,
+        });
+        newlyUnlocked.push(rule.name);
+      }
+    }
+
     return NextResponse.json({
       progress: progressRecord,
       completed: true,
       rewards,
       streak: newStreak,
+      newBadges: newlyUnlocked,
     });
   } catch (err: any) {
     console.error("[PROGRESS] Critical error:", err);
