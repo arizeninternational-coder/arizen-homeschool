@@ -5,13 +5,17 @@ export const dynamic = "force-dynamic";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { signOut as nextAuthSignOut } from "next-auth/react";
 import {
   Sparkles, ArrowLeft, CheckCircle2, Zap, LogOut, BookOpen, Flame, Award
 } from "lucide-react";
-import { PageHeader, SectionHeader, GradientButton, ProgressBar, EmptyStateCard } from "@/components/ui/Pill";
+import { GradientButton, ProgressBar } from "@/components/ui/Pill";
 import confetti from "canvas-confetti";
-import { cn } from "@/lib/utils/cn";
+import {
+  type JourneyStep,
+  type JourneyStepType,
+  STEP_TYPE_ICONS,
+  buildUniversalJourney,
+} from "@/lib/curriculum/lesson-journey";
 
 // Inject celebration animations
 const celebrationStyles = `
@@ -35,147 +39,22 @@ interface LessonData {
   isCompleted: boolean;
 }
 
-/**
- * Normalize contentBlocks so the student lesson page can safely render
- * regardless of how contentBlocks was stored (array, JSON string,
- * structured CBC-rich object, or null/undefined).
- *
- * For structured objects, generates a student journey with step numbers.
- */
-function normalizeContentBlocks(input: any): any[] {
-  if (Array.isArray(input)) return input;
-
-  if (!input) return [];
-
-  if (typeof input === "string") {
-    try {
-      return normalizeContentBlocks(JSON.parse(input));
-    } catch {
-      return [];
+function buildLessonJourney(lesson: any): { steps: JourneyStep[]; source: string } | null {
+  if (!lesson?.id) return null;
+  return buildUniversalJourney(
+    lesson.id,
+    lesson.title || "Lesson",
+    lesson.contentBlocks,
+    {
+      subject: lesson.subject,
+      grade: lesson.grade,
+      xpReward: getRewardValue(lesson?.xpReward),
+      coinReward: lesson?.coinReward,
     }
-  }
-
-  if (typeof input === "object") {
-    const blocks: any[] = [];
-    let step = 1;
-
-    const curriculum = input.curriculum || {};
-    const shell = input.lessonShell || {};
-
-    const learningGoal =
-      curriculum.specificLearningOutcome ||
-      input.learningOutcome;
-
-    const keyInquiry =
-      curriculum.keyInquiryQuestion ||
-      input.keyInquiryQuestion;
-
-    const suggestedExperience =
-      curriculum.suggestedLearningExperience ||
-      input.suggestedLearningExperience;
-
-    const activityInstructions =
-      shell.activityInstructions ||
-      input.activityInstructions;
-
-    const offlineActivity =
-      shell.offlineActivity ||
-      input.offlineActivity;
-
-    const assessment =
-      shell.assessmentCriteria ||
-      shell.assessmentMethod ||
-      input.assessmentCriteria ||
-      input.assessmentMethod;
-
-    const reflection =
-      shell.reflectionPrompt ||
-      input.reflectionPrompt;
-
-    // A. Mission — Your learning goal
-    if (learningGoal) {
-      blocks.push({
-        type: "journey-mission",
-        step: step++,
-        title: "Your Mission",
-        icon: "🎯",
-        content: learningGoal
-      });
-    }
-
-    // B. Warm-Up — Think first
-    if (keyInquiry) {
-      blocks.push({
-        type: "journey-warmup",
-        step: step++,
-        title: "Think First",
-        icon: "💭",
-        content: keyInquiry
-      });
-    }
-
-    // C. Learn — Suggested learning experience
-    if (suggestedExperience) {
-      blocks.push({
-        type: "journey-learn",
-        step: step++,
-        title: "Learn It",
-        icon: "📖",
-        content: suggestedExperience
-      });
-    }
-
-    // D. Example — From activity instructions (if different from suggested experience)
-    const exampleContent = (activityInstructions && activityInstructions !== suggestedExperience) ? activityInstructions : offlineActivity;
-    if (exampleContent && exampleContent !== suggestedExperience) {
-      blocks.push({
-        type: "journey-example",
-        step: step++,
-        title: "Example",
-        icon: "💡",
-        content: exampleContent
-      });
-    }
-
-    // E. Try It — Activity instructions or offline activity
-    const tryContent = activityInstructions || offlineActivity;
-    if (tryContent) {
-      blocks.push({
-        type: "journey-try",
-        step: step++,
-        title: "Try It Yourself",
-        icon: "✏️",
-        content: tryContent
-      });
-    }
-
-    // E. Quick Check — Assessment
-    if (assessment) {
-      blocks.push({
-        type: "journey-check",
-        step: step++,
-        title: "Quick Check",
-        icon: "✅",
-        content: assessment
-      });
-    }
-
-    // F. Reflect
-    if (reflection) {
-      blocks.push({
-        type: "journey-reflect",
-        step: step++,
-        title: "Reflect",
-        icon: "🪞",
-        content: reflection
-      });
-    }
-
-    return blocks;
-  }
-
-  return [];
+  );
 }
+
+// Keep getRewardValue here since it's also used by the completion handler
 
 /**
  * Safely extract a numeric reward value from any storage shape.
@@ -347,14 +226,27 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
 
   const xp = getRewardValue(lesson?.xpReward);
 
-  // Normalize contentBlocks to a safe array regardless of storage shape
-  const renderBlocks = normalizeContentBlocks(lesson?.contentBlocks);
+  // Build journey: handles AI journey, old array, and structured CBC
+  const journey = buildLessonJourney(lesson);
+  const journeySteps = journey?.steps || [];
+  const journeySource = journey?.source || "cbc_fallback";
 
-  // Determine if we're in journey mode (structured CBC blocks)
-  const isJourney = renderBlocks.some((b: any) => typeof b?.type === "string" && b.type.startsWith("journey-"));
-  const totalSteps = renderBlocks.length;
+  // Determine if we have a valid journey (5+ steps from structured CBC data)
+  // Old array contentBlocks with fewer steps use stacked rendering
+  const isJourney = journeySteps.length >= 5 && journeySource !== "legacy_array";
+  const totalSteps = journeySteps.length;
   const isLastStep = currentStep >= totalSteps - 1;
   const clampedStep = Math.min(currentStep, Math.max(totalSteps - 1, 0));
+  const currentJourneyStep = isJourney && totalSteps > 0 ? journeySteps[clampedStep] : null;
+
+  // Derive renderBlocks from journey steps for progress bar and content preview
+  // This replaces the old normalizeContentBlocks output
+  const renderBlocks = journeySteps.map((s) => ({
+    title: s.title,
+    heading: s.title,
+    text: s.studentText,
+    stepType: s.stepType,
+  }));
 
   // Lesson viewer overlay
   if (viewing) {
@@ -486,41 +378,16 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
             </div>
           )}
 
-          {/* Content blocks — paginated for journey, stacked for arrays */}
-          {renderBlocks.length > 0 ? (
-            isJourney ? (
-              // Journey mode — show one step at a time
-              <JourneyStep block={renderBlocks[clampedStep]} />
-            ) : (
-              // Array mode — show all grouped cards
-              <div className="flex flex-col gap-4">
-                {(() => {
-                  const cardGroups: { heading?: any; items: any[] }[] = [];
-                  let currentGroup: typeof cardGroups[number] | null = null;
-                  renderBlocks.forEach((block: any) => {
-                    const type = block?.type || block?.blockType || "text";
-                    if (type === "heading" || type === "h1" || type === "h2" || type === "h3" || type === "subheading") {
-                      if (currentGroup) cardGroups.push(currentGroup);
-                      currentGroup = { heading: block, items: [] };
-                    } else {
-                      if (!currentGroup) currentGroup = { items: [] };
-                      currentGroup.items.push(block);
-                    }
-                  });
-                  if (currentGroup) cardGroups.push(currentGroup);
-                  return cardGroups.map((group, i) => (
-                    <div key={i} className="rounded-2xl border border-white/60 bg-white/90 backdrop-blur-sm p-5 lg:p-6">
-                      {group.heading && <ContentBlock block={group.heading} isHeading />}
-                      <div className="flex flex-col gap-4">
-                        {group.items.map((block, j) => (
-                          <ContentBlock key={j} block={block} />
-                        ))}
-                      </div>
-                    </div>
-                  ));
-                })()}
-              </div>
-            )
+          {/* Journey steps — one at a time */}
+          {isJourney && currentJourneyStep ? (
+            <JourneyStepView step={currentJourneyStep} stepNumber={clampedStep + 1} totalSteps={totalSteps} />
+          ) : journeySteps.length > 0 ? (
+            /* Fallback: render all journey steps stacked */
+            <div className="flex flex-col gap-4">
+              {journeySteps.map((s, i) => (
+                <JourneyStepView key={s.id} step={s} stepNumber={i + 1} totalSteps={journeySteps.length} />
+              ))}
+            </div>
           ) : (
             <div className="rounded-2xl border border-white/60 bg-white/90 backdrop-blur-sm text-center p-12">
               <BookOpen className="w-10 h-10 text-text-muted/30 mx-auto mb-3" />
@@ -744,80 +611,6 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
   );
 }
 
-function ContentBlock({ block, isHeading }: { block: any; isHeading?: boolean }) {
-  if (!block || typeof block !== "object") return null;
-  const type = block.type || block.blockType || "text";
-
-  switch (type) {
-    case "heading":
-    case "h1":
-      return <h1 className="text-xl font-extrabold text-text mb-0">{block.text || block.content || block.title}</h1>;
-    case "h2":
-    case "subheading":
-      return <h2 className="text-lg font-bold text-text mb-0">{block.text || block.content || block.title}</h2>;
-    case "h3":
-      return <h3 className="text-base font-bold text-text mb-0">{block.text || block.content || block.title}</h3>;
-    case "paragraph":
-    case "text":
-      return <p className="text-text leading-[1.7] text-sm">{block.text || block.content || block.body || ""}</p>;
-    case "image":
-      return (
-        <div className="rounded-2xl overflow-hidden bg-bg-main">
-          {block.url && <img src={block.url} alt={block.alt || block.caption || ""} className="w-full h-auto block" />}
-          {block.caption && <p className="p-3 text-xs text-text-muted text-center">{block.caption}</p>}
-        </div>
-      );
-    case "video":
-      return (
-        <div className="rounded-2xl overflow-hidden bg-black">
-          {block.url && <video src={block.url} controls className="w-full block" />}
-        </div>
-      );
-    case "list":
-      return (
-        <ul className="pl-5 flex flex-col gap-1.5">
-          {(block.items || []).map((item: string, i: number) => (
-            <li key={i} className="text-text text-sm leading-relaxed">{item}</li>
-          ))}
-        </ul>
-      );
-    case "quiz":
-      return (
-        <div className="rounded-2xl border border-primary/20 bg-primary-soft/40 p-5">
-          <h4 className="font-bold text-primary mb-3 text-sm">❓ {block.question || "Quick Check"}</h4>
-          {(block.options || []).map((opt: string, i: number) => (
-            <div key={i} className="px-3.5 py-2.5 rounded-xl border border-border-soft mb-1.5 text-sm text-text last:mb-0">
-              {String.fromCharCode(65 + i)}. {opt}
-            </div>
-          ))}
-        </div>
-      );
-    case "callout":
-    case "tip":
-      return (
-        <div className="rounded-2xl p-4 bg-gold-soft/50 border-l-4 border-gold">
-          <p className="text-gold-dark text-sm font-semibold">💡 {block.title || block.text || block.content || ""}</p>
-        </div>
-      );
-    default: {
-      const text = block.text || block.content || block.body || block.title || "";
-      if (text) return <p className="text-text leading-[1.7] text-sm">{text}</p>;
-      return null;
-    }
-  }
-}
-
-// Owl teacher helper texts for each journey step type
-const OwlHelperMessages: Record<string, string> = {
-  "journey-mission": "📖 This is what you'll be able to do by the end. Read it carefully!",
-  "journey-warmup": "🤔 Think about this question before we start. Your first idea matters!",
-  "journey-learn": "👀 Watch how it works step by step. Don't worry if it's new — we'll practice next.",
-  "journey-example": "✨ See? Here's how someone else did it. This can be your guide!",
-  "journey-try": "✏️ Now it's your turn! Use counters, drawings, or examples to try it yourself.",
-  "journey-check": "🎯 Let's see if the idea makes sense. Can you answer this?",
-  "journey-reflect": "🪞 What did you notice? Write it in your own words — that's how you remember!",
-};
-
 // Split long text into paragraphs for readability
 function splitIntoParagraphs(text: string): string[] {
   if (!text) return [];
@@ -843,58 +636,129 @@ function splitIntoParagraphs(text: string): string[] {
   return [text];
 }
 
-// Journey step color themes
-const journeyThemes: Record<string, { accent: string; bg: string; border: string }> = {
-  "journey-mission":  { accent: "text-indigo-600",   bg: "bg-indigo-50",   border: "border-indigo-200" },
-  "journey-warmup":   { accent: "text-amber-600",    bg: "bg-amber-50",    border: "border-amber-200" },
-  "journey-learn":    { accent: "text-emerald-600",  bg: "bg-emerald-50",  border: "border-emerald-200" },
-  "journey-example":  { accent: "text-cyan-600",    bg: "bg-cyan-50",    border: "border-cyan-200" },
-  "journey-try":      { accent: "text-sky-600",      bg: "bg-sky-50",      border: "border-sky-200" },
-  "journey-check":    { accent: "text-violet-600",   bg: "bg-violet-50",   border: "border-violet-200" },
-  "journey-reflect":  { accent: "text-rose-600",     bg: "bg-rose-50",     border: "border-rose-200" },
+// ── Journey Step View (new schema-based) ────────────────────────────────────
+
+const STEP_THEME_COLORS: Record<JourneyStepType, { accent: string; bg: string; border: string; icon: string }> = {
+  welcome:    { accent: "text-indigo-600", bg: "bg-indigo-50",   border: "border-indigo-200", icon: "🦉" },
+  mission:    { accent: "text-violet-600",  bg: "bg-violet-50",   border: "border-violet-200", icon: "🎯" },
+  think_first:{ accent: "text-amber-600",   bg: "bg-amber-50",    border: "border-amber-200",  icon: "💭" },
+  learn:      { accent: "text-emerald-600", bg: "bg-emerald-50",  border: "border-emerald-200", icon: "📖" },
+  connect:    { accent: "text-teal-600",    bg: "bg-teal-50",     border: "border-teal-200",    icon: "🔗" },
+  example:    { accent: "text-cyan-600",    bg: "bg-cyan-50",     border: "border-cyan-200",    icon: "💡" },
+  practice:   { accent: "text-sky-600",     bg: "bg-sky-50",      border: "border-sky-200",     icon: "✏️" },
+  quick_check:{ accent: "text-lime-600",    bg: "bg-lime-50",     border: "border-lime-200",    icon: "✅" },
+  reflect:    { accent: "text-rose-600",    bg: "bg-rose-50",     border: "border-rose-200",    icon: "🪞" },
+  complete:   { accent: "text-yellow-600",  bg: "bg-yellow-50",   border: "border-yellow-200",  icon: "🏆" },
 };
 
-function JourneyStep({ block }: { block: any }) {
-  if (!block || typeof block !== "object") return null;
+function JourneyStepView({ step, stepNumber, totalSteps }: { step: JourneyStep; stepNumber: number; totalSteps: number }) {
+  if (!step) return null;
 
-  const type = block.type || "";
-  const theme = journeyThemes[type] || { accent: "text-text", bg: "bg-white/90", border: "border-white/60" };
-  const step = block.step || 1;
-  const icon = block.icon || "📌";
-  const title = block.title || "Step";
-  const content = block.content || block.text || block.body || "";
-  const owlMessage = OwlHelperMessages[type] || "";
-
-  if (!content) return null;
-
-  const paragraphs = splitIntoParagraphs(content);
+  const theme = STEP_THEME_COLORS[step.stepType] || STEP_THEME_COLORS.welcome;
+  const icon = STEP_TYPE_ICONS[step.stepType] || theme.icon;
+  const paragraphs = splitIntoParagraphs(step.studentText);
 
   return (
-    <div className={`rounded-xl border ${theme.border} ${theme.bg} p-4 lg:p-5`}>
-      <div className="flex items-start gap-3">
-        {/* Step number bubble */}
-        <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-extrabold ${theme.bg} ${theme.accent} ring-1 ${theme.border}`}>
-          {step}
+    <div className={`rounded-2xl border-2 ${theme.border} ${theme.bg} p-5 lg:p-6 shadow-[0_2px_12px_rgba(0,0,0,0.03)]`}>
+      {/* Step header */}
+      <div className="flex items-center gap-3 mb-4">
+        <div className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-lg font-extrabold ${theme.bg} ${theme.accent} ring-2 ${theme.border} shadow-sm`}>
+          {stepNumber}
         </div>
-        <div className="flex-1 min-w-0">
-          <h4 className={`font-bold text-sm ${theme.accent} flex items-center gap-1.5 mb-2`}>
-            <span>{icon}</span> {title}
+        <div className="flex-1">
+          <h4 className={`font-extrabold text-base ${theme.accent} flex items-center gap-2`}>
+            <span className="text-xl">{icon}</span> {step.title}
           </h4>
-          {/* Owl teacher guide */}
-          {owlMessage && (
-            <div className="flex items-start gap-2 mb-3 px-3 py-2 rounded-lg bg-white/70 border border-white/40">
-              <span className="text-base flex-shrink-0">🦉</span>
-              <p className="text-text-muted text-xs italic leading-relaxed">{owlMessage}</p>
-            </div>
-          )}
-          {/* Content paragraphs */}
-          <div className="flex flex-col gap-2">
-            {paragraphs.map((p, i) => (
-              <p key={i} className="text-text text-sm leading-relaxed">{p}</p>
+          <span className="text-[10px] font-semibold text-text-muted">Step {stepNumber} of {totalSteps}</span>
+        </div>
+      </div>
+
+      {/* Owl teacher guide */}
+      {step.owlText && (
+        <div className="flex items-start gap-2.5 mb-4 px-4 py-3 rounded-xl bg-white/80 border border-white/60 shadow-sm">
+          <span className="text-xl flex-shrink-0 mt-0.5">🦉</span>
+          <p className="text-text text-xs font-medium leading-relaxed italic">{step.owlText}</p>
+        </div>
+      )}
+
+      {/* Math display */}
+      {step.mathDisplay && (
+        <div className="mb-4 px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-center">
+          <span className="text-lg font-mono font-bold text-slate-800">{step.mathDisplay}</span>
+        </div>
+      )}
+
+      {/* Content paragraphs */}
+      <div className="flex flex-col gap-3 mb-4">
+        {paragraphs.map((p, i) => (
+          <p key={i} className="text-text text-sm leading-relaxed">{p}</p>
+        ))}
+      </div>
+
+      {/* Materials list */}
+      {step.materials && step.materials.length > 0 && (
+        <div className="mt-3 px-4 py-3 rounded-xl bg-amber-50/60 border border-amber-200/50">
+          <p className="text-[10px] font-extrabold uppercase tracking-wider text-amber-700 mb-1.5">🧰 What you might need:</p>
+          <div className="flex flex-wrap gap-1.5">
+            {step.materials.map((m: string, i: number) => (
+              <span key={i} className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[11px] font-semibold">
+                {m}
+              </span>
             ))}
           </div>
         </div>
-      </div>
+      )}
+
+      {/* Interaction / Quick check */}
+      {step.interaction && step.interaction.type !== "none" && (
+        <div className="mt-3 px-4 py-3 rounded-xl bg-blue-50/60 border border-blue-200/50">
+          <p className="text-[10px] font-extrabold uppercase tracking-wider text-blue-700 mb-1">
+            {step.interaction.type === "open_response" ? "✏️ Your turn:" :
+             step.interaction.type === "multiple_choice" ? "🔘 Choose one:" :
+             step.interaction.type === "self_check" ? "✅ Check yourself:" :
+             step.interaction.type === "draw_or_use_objects" ? "🎨 Try it:" :
+             step.interaction.type === "parent_assisted" ? "👨‍👩‍👧 With a parent:" :
+             step.interaction.type === "offline_activity" ? "🏠 Offline activity:" : "📝"}
+          </p>
+          {step.interaction.question && (
+            <p className="text-sm font-medium text-blue-900">{step.interaction.question}</p>
+          )}
+          {step.interaction.options && step.interaction.options.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-2">
+              {step.interaction.options.map((opt: string, i: number) => (
+                <span key={i} className="px-3 py-1 rounded-full bg-white border border-blue-200 text-blue-800 text-xs font-semibold">
+                  {opt}
+                </span>
+              ))}
+            </div>
+          )}
+          {step.interaction.hint && (
+            <p className="text-[11px] text-blue-600 mt-2 italic">💡 Hint: {step.interaction.hint}</p>
+          )}
+        </div>
+      )}
+
+      {/* Reflection options */}
+      {step.reflectionOptions && step.reflectionOptions.length > 0 && (
+        <div className="mt-3 px-4 py-3 rounded-xl bg-rose-50/60 border border-rose-200/50">
+          <p className="text-[10px] font-extrabold uppercase tracking-wider text-rose-700 mb-2">🪞 Reflection — tap to select:</p>
+          <div className="flex flex-wrap gap-1.5">
+            {step.reflectionOptions.map((opt: string, i: number) => (
+              <span key={i} className="px-2.5 py-1 rounded-full bg-white border border-rose-200 text-rose-700 text-[11px] font-semibold">
+                {opt}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Illustration prompt (admin-only, not shown to students yet) */}
+      {step.illustrationPrompt && (
+        <div className="mt-3 px-3 py-2 rounded-lg bg-gray-50 border border-gray-200">
+          <p className="text-[9px] font-semibold text-gray-400 uppercase">Illustration prompt (admin only)</p>
+          <p className="text-[11px] text-gray-500 italic">{step.illustrationPrompt}</p>
+        </div>
+      )}
     </div>
   );
 }

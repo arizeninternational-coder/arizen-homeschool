@@ -56,9 +56,17 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    // Parse contentBlocks to extract CSV-imported fields for editing
+// Parse contentBlocks to extract CSV-imported fields for editing
     let meta: any = {};
     try { meta = JSON.parse(lesson.contentBlocks || "{}"); } catch {}
+
+    // Build readiness check
+    let readiness: any = null;
+    try {
+      const { checkLessonReadiness } = await import("@/lib/curriculum/lesson-journey");
+      readiness = checkLessonReadiness(lesson.contentBlocks || {});
+    } catch { readiness = null; }
+
     const enriched = {
       ...lesson,
       strand: meta.strand || "",
@@ -73,6 +81,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
       reflectionPrompt: meta.reflectionPrompt || "",
       rewardCoins: meta.rewardCoins || 10,
       rewardStars: meta.rewardStars || 0,
+      readiness,
     };
 
     return NextResponse.json({ lesson: enriched });

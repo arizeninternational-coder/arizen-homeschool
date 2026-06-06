@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowLeft, AlertCircle, Save, BookOpen } from "lucide-react";
+import { ArrowLeft, AlertCircle, Save, BookOpen, CheckCircle2, AlertTriangle, Info } from "lucide-react";
 import { ds, colors } from "@/lib/design-system";
 
 interface LessonDetail {
@@ -34,6 +34,13 @@ interface LessonDetail {
   reflectionPrompt: string;
   rewardCoins: number;
   rewardStars: number;
+  readiness?: {
+    score: number;
+    isReady: boolean;
+    availableSteps: string[];
+    missingSteps: string[];
+    recommendations: string[];
+  } | null;
 }
 
 const STATUS_OPTIONS = [
@@ -227,6 +234,78 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
           </h1>
           <p style={{ color: colors.textMuted, fontSize: "0.875rem" }}>Slug: {lesson?.slug}</p>
         </div>
+
+        {/* Lesson Readiness */}
+        {lesson?.readiness && (
+          <div style={{ ...ds.card, padding: "1.25rem 1.5rem", marginBottom: "1.5rem" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.75rem", flexWrap: "wrap", gap: 8 }}>
+              <h3 style={{ fontSize: "0.9375rem", fontWeight: 800, color: colors.text, display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <Info style={{ width: 16, height: 16, color: colors.primary }} />
+                Lesson Readiness
+              </h3>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                {lesson.readiness.isReady ? (
+                  <CheckCircle2 style={{ width: 14, height: 14, color: colors.success }} />
+                ) : (
+                  <AlertTriangle style={{ width: 14, height: 14, color: colors.warning }} />
+                )}
+                <span style={{
+                  fontSize: "0.75rem", fontWeight: 700,
+                  color: lesson.readiness.isReady ? colors.success : colors.warning,
+                  background: lesson.readiness.isReady ? `${colors.success}15` : `${colors.warning}15`,
+                  padding: "0.15rem 0.5rem", borderRadius: 6,
+                }}>
+                  {lesson.readiness.score >= 70 ? "Ready to publish" :
+                   lesson.readiness.score >= 42 ? "Almost ready" :
+                   lesson.readiness.score >= 28 ? "Needs work" : "Not ready"}
+                </span>
+              </div>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.75rem" }}>
+              <div style={{ flex: 1, height: 8, background: colors.bgSoft, borderRadius: 4, overflow: "hidden" }}>
+                <div style={{
+                  width: `${Math.min(lesson.readiness.score, 100)}%`,
+                  height: "100%",
+                  background: lesson.readiness.isReady ? colors.success : colors.warning,
+                  borderRadius: 4,
+                  transition: "width 0.3s ease",
+                }} />
+              </div>
+              <span style={{ fontSize: "0.8125rem", fontWeight: 700, color: colors.text, whiteSpace: "nowrap" }}>
+                {lesson.readiness.score}/100
+              </span>
+            </div>
+            {lesson.readiness.missingSteps.length > 0 && (
+              <div style={{ marginBottom: "0.5rem" }}>
+                <p style={{ fontSize: "0.6875rem", fontWeight: 700, color: colors.textMuted, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "0.35rem" }}>
+                  Missing steps
+                </p>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                  {lesson.readiness.missingSteps.map((step, i) => (
+                    <span key={i} style={{
+                      fontSize: "0.6875rem", fontWeight: 600,
+                      color: colors.textMuted,
+                      background: colors.bgSoft,
+                      padding: "0.15rem 0.4rem", borderRadius: 4,
+                    }}>
+                      {step.replace(/_/g, " ")}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {lesson.readiness.recommendations.length > 0 && (
+              <div style={{ borderTop: `1px solid ${colors.border}`, paddingTop: "0.5rem", marginTop: "0.25rem" }}>
+                {lesson.readiness.recommendations.slice(0, 3).map((rec, i) => (
+                  <p key={i} style={{ fontSize: "0.75rem", color: colors.textMuted, marginBottom: "0.2rem", display: "flex", alignItems: "flex-start", gap: "0.35rem" }}>
+                    <span style={{ color: colors.warning, flexShrink: 0 }}>•</span>
+                    {rec}
+                  </p>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Edit form */}
         <div style={{ display: "grid", gap: "1.5rem" }}>
