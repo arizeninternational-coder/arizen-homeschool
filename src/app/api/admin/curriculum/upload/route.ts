@@ -33,7 +33,7 @@ function parseCSV(text: string): string[][] {
   return rows.filter(r => r.some(c => c.length > 0));
 }
 
-import { normalizeHeader, COLUMN_MAP, REQUIRED_FIELDS, VALID_DIFFICULTIES } from "@/lib/curriculum/cbc-template";
+import { normalizeHeader, COLUMN_MAP, REQUIRED_FIELDS, VALID_DIFFICULTIES, buildContentBlocks } from "@/lib/curriculum/cbc-template";
 
 // ── Row validation ──────────────────────────────────────────────
 interface ParsedRow {
@@ -421,25 +421,28 @@ export async function POST(req: NextRequest) {
             continue;
           }
 
-          const contentBlocks = JSON.stringify({
-            grade: String(routeGradeId),
-            subject: routeSubjectName,
-            strand: row.strand,
-            subStrand: row.subStrand,
-            learningOutcome: row.learningOutcome,
-            term: row.term,
-            week: row.week,
-            activityTitle: row.activityTitle,
-            activityInstructions: row.activityInstructions,
-            questTitle: row.questTitle,
-            questInstructions: row.questInstructions,
-            reflectionPrompt: row.reflectionPrompt,
-            rewardCoins: parseInt(row.rewardCoins) || 10,
-            rewardStars: parseInt(row.rewardStars) || 0,
-            estimatedDuration: parseInt(row.estimatedDuration) || null,
-            difficulty: row.difficulty || "medium",
-            importSource: "csv",
-          });
+          const structuredBlocks = buildContentBlocks(row);
+          const contentBlocksObj = {
+                      ...structuredBlocks,
+                      // backward-compatible flat aliases (using route context for grade/subject)
+                      grade: String(routeGradeId),
+                      subject: routeSubjectName,
+                      strand: row.strand,
+                      subStrand: row.subStrand,
+                      term: row.term,
+                      week: row.week,
+                      learningOutcome: row.specificLearningOutcome || row.learningOutcome,
+                      activityTitle: row.activityTitle,
+                      activityInstructions: row.activityInstructions,
+                      questTitle: row.questTitle,
+                      questInstructions: row.questInstructions,
+                      reflectionPrompt: row.reflectionPrompt,
+                      rewardCoins: row.rewardCoins,
+                      rewardStars: row.rewardStars,
+                      estimatedDuration: row.estimatedDuration,
+                      difficulty: row.difficulty,
+                    };
+                    const contentBlocks = JSON.stringify(contentBlocksObj);
 
           const { error: lessonErr } = await supabase.from("Lesson").insert({
             questId,
