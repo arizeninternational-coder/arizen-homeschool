@@ -39,6 +39,8 @@ interface LessonData {
  * Normalize contentBlocks so the student lesson page can safely render
  * regardless of how contentBlocks was stored (array, JSON string,
  * structured CBC-rich object, or null/undefined).
+ *
+ * For structured objects, generates a student journey with step numbers.
  */
 function normalizeContentBlocks(input: any): any[] {
   if (Array.isArray(input)) return input;
@@ -55,6 +57,7 @@ function normalizeContentBlocks(input: any): any[] {
 
   if (typeof input === "object") {
     const blocks: any[] = [];
+    let step = 1;
 
     const curriculum = input.curriculum || {};
     const shell = input.lessonShell || {};
@@ -67,14 +70,17 @@ function normalizeContentBlocks(input: any): any[] {
       curriculum.keyInquiryQuestion ||
       input.keyInquiryQuestion;
 
-    const activityTitle =
-      shell.activityTitle ||
-      input.activityTitle ||
-      "Learning Activity";
+    const suggestedExperience =
+      curriculum.suggestedLearningExperience ||
+      input.suggestedLearningExperience;
 
     const activityInstructions =
       shell.activityInstructions ||
       input.activityInstructions;
+
+    const offlineActivity =
+      shell.offlineActivity ||
+      input.offlineActivity;
 
     const assessment =
       shell.assessmentCriteria ||
@@ -86,42 +92,69 @@ function normalizeContentBlocks(input: any): any[] {
       shell.reflectionPrompt ||
       input.reflectionPrompt;
 
+    // A. Mission — Your learning goal
     if (learningGoal) {
       blocks.push({
-        type: "overview",
-        title: "Learning Goal",
+        type: "journey-mission",
+        step: step++,
+        title: "Your Mission",
+        icon: "🎯",
         content: learningGoal
       });
     }
 
+    // B. Warm-Up — Think first
     if (keyInquiry) {
       blocks.push({
-        type: "inquiry",
-        title: "Key Inquiry Question",
+        type: "journey-warmup",
+        step: step++,
+        title: "Think First",
+        icon: "💭",
         content: keyInquiry
       });
     }
 
-    if (activityInstructions) {
+    // C. Learn — Suggested learning experience
+    if (suggestedExperience) {
       blocks.push({
-        type: "activity",
-        title: activityTitle,
-        content: activityInstructions
+        type: "journey-learn",
+        step: step++,
+        title: "Learn It",
+        icon: "📖",
+        content: suggestedExperience
       });
     }
 
+    // D. Try It — Activity instructions
+    const tryContent = activityInstructions || offlineActivity;
+    if (tryContent) {
+      blocks.push({
+        type: "journey-try",
+        step: step++,
+        title: "Try It Yourself",
+        icon: "✏️",
+        content: tryContent
+      });
+    }
+
+    // E. Quick Check — Assessment
     if (assessment) {
       blocks.push({
-        type: "assessment",
-        title: "Check Your Understanding",
+        type: "journey-check",
+        step: step++,
+        title: "Quick Check",
+        icon: "✅",
         content: assessment
       });
     }
 
+    // F. Reflect
     if (reflection) {
       blocks.push({
-        type: "reflection",
-        title: "Reflection",
+        type: "journey-reflect",
+        step: step++,
+        title: "Reflect",
+        icon: "🪞",
         content: reflection
       });
     }
@@ -130,6 +163,28 @@ function normalizeContentBlocks(input: any): any[] {
   }
 
   return [];
+}
+
+/**
+ * Safely extract a numeric reward value from any storage shape.
+ * Handles: number, "12", '{"base":12}', { base: 12 }, null/undefined
+ */
+function getRewardValue(value: any): number {
+  if (typeof value === "number") return value;
+  if (!value) return 0;
+  if (typeof value === "string") {
+    const num = Number(value);
+    if (!isNaN(num) && value.trim() !== "") return num;
+    try {
+      return getRewardValue(JSON.parse(value));
+    } catch {
+      return 0;
+    }
+  }
+  if (typeof value === "object") {
+    return value?.base ?? value?.amount ?? value?.value ?? 0;
+  }
+  return 0;
 }
 
 interface Badge {
@@ -151,6 +206,7 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
   const [newBadges, setNewBadges] = useState<Badge[]>([]);
   const [showCelebration, setShowCelebration] = useState(false);
   const [animatedXp, setAnimatedXp] = useState(0);
+  const [completeError, setCompleteError] = useState<string | null>(null);
   const celebrationFired = useRef(false);
 
   useEffect(() => {
@@ -225,8 +281,9 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
   }, []);
 
   const handleComplete = useCallback(async () => {
-    if (!slugs || completing) return;
+    if (!slugs || completing || completed) return;
     setCompleting(true);
+    setCompleteError(null);
     try {
       const res = await fetch("/api/learner/progress", {
         method: "POST",
@@ -239,9 +296,14 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
         }),
       });
       const data = await res.json();
+
+      if (!res.ok) {
+        setCompleteError(data.error || `Failed to complete lesson (${res.status})`);
+        return;
+      }
+
       if (data.success || data.completed) {
-        const xp = data.rewards?.xp || 0;
-        const coins = data.rewards?.coins || 0;
+        const xp = getRewardValue(data.rewards?.xp);
         const streak = data.streak || 0;
 
         setCompleted(true);
@@ -254,17 +316,20 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
       } else if (data.alreadyCompleted) {
         setCompleted(true);
         setShowCelebration(false);
+      } else {
+        setCompleteError("Unexpected response. Please try again.");
       }
     } catch (err) {
       console.error("Complete lesson error:", err);
+      setCompleteError("Network error. Please check your connection and try again.");
     } finally {
       setCompleting(false);
     }
-  }, [slugs, completing, lesson?.id, fireConfetti, animateXpCounter]);
+  }, [slugs, completing, completed, lesson?.id, fireConfetti, animateXpCounter]);
 
   const totalXpWithBonus = xpEarned + streakBonus;
 
-  const xp = typeof lesson?.xpReward === "object" ? (lesson?.xpReward as any)?.base : lesson?.xpReward;
+  const xp = getRewardValue(lesson?.xpReward);
 
   // Normalize contentBlocks to a safe array regardless of storage shape
   const renderBlocks = normalizeContentBlocks(lesson?.contentBlocks);
@@ -387,40 +452,60 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
           {/* Content blocks */}
           {renderBlocks.length > 0 ? (
             <div className="flex flex-col gap-4">
-              {(() => {
-                // Group content blocks so headings and their body content share the same card
-                const cardGroups: { heading?: any; items: any[] }[] = [];
-                let currentGroup: typeof cardGroups[number] | null = null;
+              {renderBlocks.some((b: any) => typeof b?.type === "string" && b.type.startsWith("journey-")) ? (
+                // Journey mode — render as step cards
+                renderBlocks.map((block: any, i: number) => (
+                  <JourneyStep key={i} block={block} />
+                ))
+              ) : (
+                // Array mode — group headings with body content
+                (() => {
+                  const cardGroups: { heading?: any; items: any[] }[] = [];
+                  let currentGroup: typeof cardGroups[number] | null = null;
 
-                renderBlocks.forEach((block: any) => {
-                  const type = block?.type || block?.blockType || "text";
-                  if (type === "heading" || type === "h1" || type === "h2" || type === "h3" || type === "subheading") {
-                    if (currentGroup) cardGroups.push(currentGroup);
-                    currentGroup = { heading: block, items: [] };
-                  } else {
-                    if (!currentGroup) currentGroup = { items: [] };
-                    currentGroup.items.push(block);
-                  }
-                });
-                if (currentGroup) cardGroups.push(currentGroup);
+                  renderBlocks.forEach((block: any) => {
+                    const type = block?.type || block?.blockType || "text";
+                    if (type === "heading" || type === "h1" || type === "h2" || type === "h3" || type === "subheading") {
+                      if (currentGroup) cardGroups.push(currentGroup);
+                      currentGroup = { heading: block, items: [] };
+                    } else {
+                      if (!currentGroup) currentGroup = { items: [] };
+                      currentGroup.items.push(block);
+                    }
+                  });
+                  if (currentGroup) cardGroups.push(currentGroup);
 
-                return cardGroups.map((group, i) => (
-                  <div key={i} className="rounded-2xl border border-white/60 bg-white/90 backdrop-blur-sm p-5 lg:p-6">
-                    {group.heading && <ContentBlock block={group.heading} isHeading />}
-                    <div className="flex flex-col gap-4">
-                      {group.items.map((block, j) => (
-                        <ContentBlock key={j} block={block} />
-                      ))}
+                  return cardGroups.map((group, i) => (
+                    <div key={i} className="rounded-2xl border border-white/60 bg-white/90 backdrop-blur-sm p-5 lg:p-6">
+                      {group.heading && <ContentBlock block={group.heading} isHeading />}
+                      <div className="flex flex-col gap-4">
+                        {group.items.map((block, j) => (
+                          <ContentBlock key={j} block={block} />
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ));
-              })()}
+                  ));
+                })()
+              )}
             </div>
           ) : (
             <div className="rounded-2xl border border-white/60 bg-white/90 backdrop-blur-sm text-center p-12">
               <BookOpen className="w-10 h-10 text-text-muted/30 mx-auto mb-3" />
               <h3 className="text-lg font-bold text-text mb-2">This lesson is being prepared</h3>
               <p className="text-text-muted text-sm">Please check back soon.</p>
+            </div>
+          )}
+
+          {/* Completion error */}
+          {completeError && (
+            <div className="mt-4 rounded-xl border border-red-300 bg-red-50 p-4 text-center">
+              <p className="text-sm font-semibold text-red-700">{completeError}</p>
+              <button
+                onClick={() => setCompleteError(null)}
+                className="mt-2 text-xs text-red-500 underline hover:text-red-700"
+              >
+                Dismiss
+              </button>
             </div>
           )}
 
@@ -653,4 +738,44 @@ function ContentBlock({ block, isHeading }: { block: any; isHeading?: boolean })
       return null;
     }
   }
+}
+
+// Journey step color themes
+const journeyThemes: Record<string, { accent: string; bg: string; border: string }> = {
+  "journey-mission":  { accent: "text-indigo-600",   bg: "bg-indigo-50",   border: "border-indigo-200" },
+  "journey-warmup":   { accent: "text-amber-600",    bg: "bg-amber-50",    border: "border-amber-200" },
+  "journey-learn":    { accent: "text-emerald-600",  bg: "bg-emerald-50",  border: "border-emerald-200" },
+  "journey-try":      { accent: "text-sky-600",      bg: "bg-sky-50",      border: "border-sky-200" },
+  "journey-check":    { accent: "text-violet-600",   bg: "bg-violet-50",   border: "border-violet-200" },
+  "journey-reflect":  { accent: "text-rose-600",     bg: "bg-rose-50",     border: "border-rose-200" },
+};
+
+function JourneyStep({ block }: { block: any }) {
+  if (!block || typeof block !== "object") return null;
+
+  const type = block.type || "";
+  const theme = journeyThemes[type] || { accent: "text-text", bg: "bg-white/90", border: "border-white/60" };
+  const step = block.step || 1;
+  const icon = block.icon || "📌";
+  const title = block.title || "Step";
+  const content = block.content || block.text || block.body || "";
+
+  if (!content) return null;
+
+  return (
+    <div className={`rounded-xl border ${theme.border} ${theme.bg} p-4 lg:p-5`}>
+      <div className="flex items-start gap-3">
+        {/* Step number bubble */}
+        <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-extrabold ${theme.bg} ${theme.accent} ring-1 ${theme.border}`}>
+          {step}
+        </div>
+        <div className="flex-1 min-w-0">
+          <h4 className={`font-bold text-sm ${theme.accent} flex items-center gap-1.5 mb-1`}>
+            <span>{icon}</span> {title}
+          </h4>
+          <p className="text-text text-sm leading-relaxed whitespace-pre-wrap">{content}</p>
+        </div>
+      </div>
+    </div>
+  );
 }
