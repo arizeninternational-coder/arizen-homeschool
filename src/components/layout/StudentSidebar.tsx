@@ -9,7 +9,7 @@ import {
   Library, CalendarDays, MessageCircle, Settings
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
-import { CoinIcon, StreakIcon } from "@/components/ui/Illustrations";
+import { StreakIcon } from "@/components/ui/Illustrations";
 import AvatarRenderer from "@/components/AvatarRenderer";
 
 const NAV_ITEMS = [
@@ -74,15 +74,12 @@ export function StudentSidebar({ children }: { children: React.ReactNode }) {
         <span className="font-extrabold text-lg text-text tracking-tight">Arizen</span>
       </div>
 
-      {/* Stats pills */}
-      <div className="px-4 pb-3 flex gap-2">
-        <div className="flex-1 flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gold-soft/50 border border-gold/10">
-          <CoinIcon size={16} />
-          <span className="text-xs font-extrabold text-amber-800">{coins}</span>
-        </div>
-        <div className="flex-1 flex items-center gap-1.5 px-3 py-2 rounded-xl bg-pink-soft/50 border border-pink/10">
+      {/* Stats pills — streak only, coins shown in dashboard header */}
+      <div className="px-4 pb-3">
+        <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-pink-soft/50 border border-pink/10">
           <StreakIcon size={16} />
           <span className="text-xs font-extrabold text-pink-700">{currentStreak}d</span>
+          <span className="text-[10px] font-semibold text-text-muted ml-auto">streak</span>
         </div>
       </div>
 
@@ -168,10 +165,6 @@ export function StudentSidebar({ children }: { children: React.ReactNode }) {
             </Link>
           </div>
           <div className="flex items-center gap-2">
-            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gold-soft/50 border border-gold/10">
-              <CoinIcon size={14} />
-              <span className="text-xs font-extrabold text-amber-800">{coins}</span>
-            </div>
             <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-pink-soft/50 border border-pink/10">
               <StreakIcon size={14} />
               <span className="text-xs font-extrabold text-pink-700">{currentStreak}d</span>

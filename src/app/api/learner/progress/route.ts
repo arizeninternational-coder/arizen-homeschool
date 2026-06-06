@@ -362,20 +362,25 @@ export async function POST(req: NextRequest) {
     for (const rule of badgeRules) {
       if (!rule.condition) continue;
       // Check if already awarded (unique constraint on learnerId + badgeType)
-      const { data: existing } = await supabase
+      const { data: existingBadge } = await supabase
         .from("Badge")
         .select("id")
         .eq("learnerId", learnerId)
         .eq("badgeType", rule.type)
         .maybeSingle();
-      if (!existing) {
-        await supabase.from("Badge").insert({
+      if (!existingBadge) {
+        const { error: badgeErr } = await supabase.from("Badge").insert({
           learnerId,
           badgeType: rule.type,
           name: rule.name,
           description: `Earned: ${rule.name}`,
         });
-        newlyUnlocked.push(rule.name);
+        if (badgeErr) {
+          // Log but don't fail the completion if badge insert fails
+          console.error(`[BADGE_INSERT] ${rule.type}:`, badgeErr.message);
+        } else {
+          newlyUnlocked.push(rule.name);
+        }
       }
     }
 
