@@ -271,17 +271,16 @@ export async function POST(req: NextRequest) {
       // Check for required columns using shared REQUIRED_FIELDS
       const headerFields = normalizedHeaders.flatMap(h => COLUMN_MAP[h] || COLUMN_MAP[h.replace(/\s/g, "")]).filter(Boolean);
       const missingRequired: string[] = [];
+      // Handle both string and object required field definitions
       REQUIRED_FIELDS.forEach(req => {
-        const found = headerFields.includes(req as string);
-        if (!found) {
-          if (req === "specificLearningOutcome") {
-            // allow legacy learningOutcome as fallback
-            if (!headerFields.includes("learningOutcome" as string)) {
-              missingRequired.push(req as string);
-            }
-          } else {
-            missingRequired.push(req as string);
-          }
+        if (typeof req === 'string') {
+          const found = headerFields.includes(req as string);
+          if (!found) missingRequired.push(req as string);
+        } else {
+          const { new: newKey, old: oldKey } = req as { new: string; old?: string };
+          const foundNew = headerFields.includes(newKey as string);
+          const foundOld = oldKey ? headerFields.includes(oldKey as string) : false;
+          if (!foundNew && !foundOld) missingRequired.push(newKey as string);
         }
       });
       if (missingRequired.length > 0) {
