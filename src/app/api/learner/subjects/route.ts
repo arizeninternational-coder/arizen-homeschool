@@ -1,9 +1,11 @@
 // GET /api/learner/subjects — Get subjects for the current learner's grade
 // Uses ThemeSubject table as the canonical source of subject names
+// Falls back to CBC core subjects when no ThemeSubject records exist
 // Only counts PUBLISHED lessons for lesson counts
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { getAuthUser } from "@/lib/api-guard";
+import { getCbcSubjectsForGrade } from "@/lib/cbc-subjects";
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
@@ -108,9 +110,57 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // If no ThemeSubject records exist yet, return empty rather than parsing titles
-    // This prevents broken subject names from appearing
+    // Build subject list from canonical ThemeSubject data, then fall back to CBC if empty
     const subjects = Array.from(subjectMap.values());
+
+    if (subjects.length === 0 && learnerGrade) {
+      const cbcSubjects = getCbcSubjectsForGrade(learnerGrade);
+
+      // Count published lessons per theme for lesson counts
+      const themeLessonCounts = new Map<string, number>();
+      for (const theme of themes) {
+        const themeQuests = questsByTheme.get(theme.id) || [];
+        const count = themeQuests.reduce(
+          (sum, qId) => sum + (lessonsByQuest.get(qId) || 0), 0
+        );
+        themeLessonCounts.set(theme.slug, count);
+      }
+
+      // Find the best-matching theme slug for each subject
+      const themeSlugMap = new Map<string, string>();
+      for (const cbcSub of cbcSubjects) {
+        // Find a theme whose ThemeSubject matches this subject slug, or
+        // match by slug prefix in theme slug
+        let bestSlug = "";
+        for (const ts of (themeSubjects || [])) {
+          const tsData = subjectsByTheme.get(ts.themeId);
+          if (tsData && tsData.some(s => s.toLowerCase().replace(/\s+/g, "-") === cbcSub.slug)) {
+            const matchingTheme = themes.find(t => t.id === ts.themeId);
+            if (matchingTheme) { bestSlug = matchingTheme.slug; break; }
+          }
+        }
+        // If no ThemeSubject match, try matching subject slug to theme slug
+        if (!bestSlug) {
+          const matchingTheme = themes.find(t => t.slug.toLowerCase().includes(cbcSub.slug) || cbcSub.slug.includes(t.slug.toLowerCase()));
+          if (matchingTheme) bestSlug = matchingTheme.slug;
+          else if (themes.length > 0) bestSlug = themes[0].slug; // fallback to first theme
+        }
+        themeSlugMap.set(cbcSub.slug, bestSlug);
+      }
+
+      for (const cbcSub of cbcSubjects) {
+        const themeSlug = themeSlugMap.get(cbcSub.slug) || "";
+        const lessonCount = themeSlug ? (themeLessonCounts.get(themeSlug) || 0) : 0;
+        subjects.push({
+          id: `${cbcSub.slug}-${learnerGrade}`,
+          name: cbcSub.name,
+          grade: learnerGrade,
+          themeSlug,
+          themeId: themes.find(t => t.slug === themeSlug)?.id || "",
+          lessonCount,
+        });
+      }
+    }
 
     return NextResponse.json({
       subjects,

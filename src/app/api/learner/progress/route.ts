@@ -129,6 +129,26 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // If no existing progress record, create one first (learner may have skipped "start")
+    if (!existing) {
+      const { data: created, error: createErr } = await supabase
+        .from("Progress")
+        .insert({
+          learnerId,
+          lessonId,
+          questId: questId || null,
+          masteryPercent: 0,
+          lastAccessed: now,
+        })
+        .select()
+        .single();
+      if (createErr) {
+        console.error("[PROGRESS_COMPLETE_CREATE] Error:", createErr.message);
+        return NextResponse.json({ error: "Failed to create progress record" }, { status: 500 });
+      }
+      progressRecord = created;
+    }
+
     // Mark as completed
     const { data: completed, error: completeErr } = await supabase
       .from("Progress")
@@ -137,7 +157,7 @@ export async function POST(req: NextRequest) {
         masteryPercent: 100,
         lastAccessed: now,
       })
-      .eq("id", existing?.id || "")
+      .eq("id", progressRecord?.id || existing?.id || "")
       .select()
       .single();
 

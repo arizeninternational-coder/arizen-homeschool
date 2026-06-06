@@ -207,6 +207,7 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
   const [showCelebration, setShowCelebration] = useState(false);
   const [animatedXp, setAnimatedXp] = useState(0);
   const [completeError, setCompleteError] = useState<string | null>(null);
+  const [currentStep, setCurrentStep] = useState(0);
   const celebrationFired = useRef(false);
 
   useEffect(() => {
@@ -285,20 +286,24 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
     setCompleting(true);
     setCompleteError(null);
     try {
+      // Use lesson's questId from the API response, falling back to the URL questSlug
+      const questId = (lesson as any)?.questId || slugs.questSlug || null;
+
       const res = await fetch("/api/learner/progress", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
           lessonId: lesson?.id,
-          questId: slugs.questSlug || null,
+          questId,
           action: "complete",
         }),
       });
       const data = await res.json();
 
       if (!res.ok) {
-        setCompleteError(data.error || `Failed to complete lesson (${res.status})`);
+        const detail = data.error || data.message || "";
+        setCompleteError(detail || `Could not complete lesson (status ${res.status})`);
         return;
       }
 
@@ -325,7 +330,7 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
     } finally {
       setCompleting(false);
     }
-  }, [slugs, completing, completed, lesson?.id, fireConfetti, animateXpCounter]);
+  }, [slugs, completing, completed, lesson, fireConfetti, animateXpCounter]);
 
   const totalXpWithBonus = xpEarned + streakBonus;
 
@@ -333,6 +338,12 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
 
   // Normalize contentBlocks to a safe array regardless of storage shape
   const renderBlocks = normalizeContentBlocks(lesson?.contentBlocks);
+
+  // Determine if we're in journey mode (structured CBC blocks)
+  const isJourney = renderBlocks.some((b: any) => typeof b?.type === "string" && b.type.startsWith("journey-"));
+  const totalSteps = renderBlocks.length;
+  const isLastStep = currentStep >= totalSteps - 1;
+  const clampedStep = Math.min(currentStep, Math.max(totalSteps - 1, 0));
 
   // Lesson viewer overlay
   if (viewing) {
@@ -342,14 +353,15 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
         <div className="bg-white/90 backdrop-blur-xl border-b border-white/40 px-4 lg:px-6 py-3 flex justify-between items-center flex-shrink-0">
           <div className="flex items-center gap-3">
             <button
-              onClick={() => { setViewing(false); setShowCelebration(false); }}
+              onClick={() => { setViewing(false); setShowCelebration(false); setCurrentStep(0); }}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border-soft hover:bg-bg-main text-text-muted font-semibold text-sm transition-colors"
             >
               <ArrowLeft className="w-3.5 h-3.5" /> Exit
             </button>
             <span className="font-bold text-text text-sm lg:text-base truncate max-w-[200px] lg:max-w-none">{lesson?.title}</span>
           </div>
-          {!completed && (
+          {/* Only show Mark Complete in header on last step for journey mode, or always for array mode */}
+          {!completed && (!isJourney || isLastStep) && (
             <GradientButton
               variant="success"
               size="sm"
@@ -371,6 +383,28 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
           )}
         </div>
 
+        {/* Step progress bar (journey mode only) */}
+        {isJourney && totalSteps > 0 && (
+          <div className="px-4 lg:px-8 pt-3 pb-1 max-w-[760px] mx-auto w-full">
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-xs font-semibold text-text-muted">Step {clampedStep + 1} of {totalSteps}</span>
+              {xp > 0 && (
+                <span className="text-xs font-semibold text-text-muted flex items-center gap-1">
+                  <Zap className="w-3 h-3" /> {xp} XP
+                </span>
+              )}
+            </div>
+            <div className="flex gap-1.5">
+              {renderBlocks.map((_: any, i: number) => (
+                <div
+                  key={i}
+                  className={`h-1.5 rounded-full flex-1 transition-all ${i <= clampedStep ? "bg-primary" : "bg-primary/15"}`}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Scrollable content */}
         <div className="flex-1 overflow-auto p-4 lg:p-8 max-w-[760px] mx-auto w-full">
           {/* Celebration overlay */}
@@ -380,7 +414,6 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
               style={{ background: "linear-gradient(135deg, #EEF2FF 0%, #FFF7ED 50%, #FFF1F2 100%)" }}
             >
               <style>{celebrationStyles}</style>
-              {/* Animated background particles */}
               <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 {[...Array(6)].map((_, i) => (
                   <div key={i} className="absolute text-2xl" style={{
@@ -392,12 +425,9 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
                   </div>
                 ))}
               </div>
-
               <div className="relative z-10">
                 <div className="text-5xl mb-2">🎉</div>
                 <h2 className="text-2xl font-extrabold text-text mb-2">Lesson Complete!</h2>
-
-                {/* Animated XP display */}
                 <div className="flex items-center justify-center gap-4 mt-4 flex-wrap">
                   <div className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-white shadow-[0_4px_15px_rgba(79,70,229,0.10)]" style={{ animation: "xpBurst 0.5s ease-out" }}>
                     <Zap className="w-5 h-5 text-primary" />
@@ -424,11 +454,7 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
               </h3>
               <div className="flex gap-3 flex-wrap">
                 {newBadges.map((badge) => (
-                  <div
-                    key={badge.id}
-                    className="rounded-2xl border-2 border-accent-purple/20 bg-accent-purple-soft/40 p-3.5 flex items-center gap-2.5"
-                    style={{ animation: "popIn 0.4s ease-out" }}
-                  >
+                  <div key={badge.id} className="rounded-2xl border-2 border-accent-purple/20 bg-accent-purple-soft/40 p-3.5 flex items-center gap-2.5" style={{ animation: "popIn 0.4s ease-out" }}>
                     <span className="text-2xl">🏅</span>
                     <div>
                       <div className="font-bold text-text text-sm">{badge.name}</div>
@@ -449,20 +475,17 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
             </div>
           )}
 
-          {/* Content blocks */}
+          {/* Content blocks — paginated for journey, stacked for arrays */}
           {renderBlocks.length > 0 ? (
-            <div className="flex flex-col gap-4">
-              {renderBlocks.some((b: any) => typeof b?.type === "string" && b.type.startsWith("journey-")) ? (
-                // Journey mode — render as step cards
-                renderBlocks.map((block: any, i: number) => (
-                  <JourneyStep key={i} block={block} />
-                ))
-              ) : (
-                // Array mode — group headings with body content
-                (() => {
+            isJourney ? (
+              // Journey mode — show one step at a time
+              <JourneyStep block={renderBlocks[clampedStep]} />
+            ) : (
+              // Array mode — show all grouped cards
+              <div className="flex flex-col gap-4">
+                {(() => {
                   const cardGroups: { heading?: any; items: any[] }[] = [];
                   let currentGroup: typeof cardGroups[number] | null = null;
-
                   renderBlocks.forEach((block: any) => {
                     const type = block?.type || block?.blockType || "text";
                     if (type === "heading" || type === "h1" || type === "h2" || type === "h3" || type === "subheading") {
@@ -474,7 +497,6 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
                     }
                   });
                   if (currentGroup) cardGroups.push(currentGroup);
-
                   return cardGroups.map((group, i) => (
                     <div key={i} className="rounded-2xl border border-white/60 bg-white/90 backdrop-blur-sm p-5 lg:p-6">
                       {group.heading && <ContentBlock block={group.heading} isHeading />}
@@ -485,9 +507,9 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
                       </div>
                     </div>
                   ));
-                })()
-              )}
-            </div>
+                })()}
+              </div>
+            )
           ) : (
             <div className="rounded-2xl border border-white/60 bg-white/90 backdrop-blur-sm text-center p-12">
               <BookOpen className="w-10 h-10 text-text-muted/30 mx-auto mb-3" />
@@ -500,26 +522,54 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
           {completeError && (
             <div className="mt-4 rounded-xl border border-red-300 bg-red-50 p-4 text-center">
               <p className="text-sm font-semibold text-red-700">{completeError}</p>
-              <button
-                onClick={() => setCompleteError(null)}
-                className="mt-2 text-xs text-red-500 underline hover:text-red-700"
-              >
-                Dismiss
-              </button>
+              <button onClick={() => setCompleteError(null)} className="mt-2 text-xs text-red-500 underline hover:text-red-700">Dismiss</button>
             </div>
           )}
 
-          {/* Bottom complete button */}
-          {!completed && renderBlocks.length > 0 && (
+          {/* Navigation buttons for journey mode */}
+          {isJourney && renderBlocks.length > 0 && (
+            <div className="mt-6 flex gap-3">
+              {clampedStep > 0 ? (
+                <GradientButton variant="secondary" size="lg" icon={<ArrowLeft className="w-4 h-4" />} onClick={() => setCurrentStep(clampedStep - 1)} className="flex-1">
+                  Previous
+                </GradientButton>
+              ) : (
+                <div className="flex-1" />
+              )}
+              {!isLastStep ? (
+                <GradientButton variant="primary" size="lg" onClick={() => setCurrentStep(clampedStep + 1)} className="flex-1">
+                  Next
+                </GradientButton>
+              ) : !completed ? (
+                <GradientButton variant="success" size="lg" icon={<CheckCircle2 className="w-5 h-5" />} onClick={handleComplete} disabled={completing} className="flex-1">
+                  {completing ? (
+                    <span className="flex items-center gap-2">
+                      <span className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full spinner" />
+                      Completing...
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      Complete Lesson
+                      {xp > 0 && (
+                        <span className="bg-white/20 px-2.5 py-0.5 rounded-lg text-xs font-bold flex items-center gap-1">
+                          <Zap className="w-3 h-3" /> +{xp} XP
+                        </span>
+                      )}
+                    </span>
+                  )}
+                </GradientButton>
+              ) : (
+                <GradientButton variant="secondary" size="lg" icon={<ArrowLeft className="w-4 h-4" />} onClick={() => { setViewing(false); setShowCelebration(false); setCurrentStep(0); }} className="flex-1">
+                  Back to Quest
+                </GradientButton>
+              )}
+            </div>
+          )}
+
+          {/* Bottom complete button for array mode (non-journey) */}
+          {!isJourney && !completed && renderBlocks.length > 0 && (
             <div className="mt-6">
-              <GradientButton
-                variant="success"
-                size="lg"
-                icon={<CheckCircle2 className="w-5 h-5" />}
-                onClick={handleComplete}
-                disabled={completing}
-                className="w-full"
-              >
+              <GradientButton variant="success" size="lg" icon={<CheckCircle2 className="w-5 h-5" />} onClick={handleComplete} disabled={completing} className="w-full">
                 {completing ? (
                   <span className="flex items-center gap-2">
                     <span className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full spinner" />
@@ -528,7 +578,7 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
                 ) : (
                   <span className="flex items-center gap-2">
                     Complete Lesson
-                    {xp && (
+                    {xp > 0 && (
                       <span className="bg-white/20 px-2.5 py-0.5 rounded-lg text-xs font-bold flex items-center gap-1">
                         <Zap className="w-3 h-3" /> +{xp} XP
                       </span>
@@ -539,16 +589,10 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
             </div>
           )}
 
-          {/* Review mode: exit button */}
-          {completed && (
+          {/* Review mode: exit button (non-journey) */}
+          {!isJourney && completed && (
             <div className="mt-6">
-              <GradientButton
-                variant="secondary"
-                size="md"
-                icon={<ArrowLeft className="w-4 h-4" />}
-                onClick={() => { setViewing(false); setShowCelebration(false); }}
-                className="w-full"
-              >
+              <GradientButton variant="secondary" size="md" icon={<ArrowLeft className="w-4 h-4" />} onClick={() => { setViewing(false); setShowCelebration(false); }} className="w-full">
                 Back to Quest
               </GradientButton>
             </div>
@@ -740,6 +784,41 @@ function ContentBlock({ block, isHeading }: { block: any; isHeading?: boolean })
   }
 }
 
+// Owl teacher helper texts for each journey step type
+const OwlHelperMessages: Record<string, string> = {
+  "journey-mission": "Let's see what you'll be able to do by the end.",
+  "journey-warmup": "Before we learn, try thinking about this.",
+  "journey-learn": "Watch how the idea works.",
+  "journey-try": "Now use counters, drawings, or examples.",
+  "journey-check": "Let's see if the idea makes sense.",
+  "journey-reflect": "Tell what you noticed in your own words.",
+};
+
+// Split long text into paragraphs for readability
+function splitIntoParagraphs(text: string): string[] {
+  if (!text) return [];
+  // If text already has double newlines, split on those
+  if (text.includes("\n\n")) return text.split("\n\n").filter(Boolean);
+  // If text has single newlines, split on those
+  if (text.includes("\n")) return text.split("\n").filter(Boolean);
+  // For long single-paragraph text, split at ~200 chars on sentence boundaries
+  if (text.length > 250) {
+    const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+    const paragraphs: string[] = [];
+    let current = "";
+    for (const s of sentences) {
+      current += s;
+      if (current.length > 200) {
+        paragraphs.push(current.trim());
+        current = "";
+      }
+    }
+    if (current.trim()) paragraphs.push(current.trim());
+    return paragraphs;
+  }
+  return [text];
+}
+
 // Journey step color themes
 const journeyThemes: Record<string, { accent: string; bg: string; border: string }> = {
   "journey-mission":  { accent: "text-indigo-600",   bg: "bg-indigo-50",   border: "border-indigo-200" },
@@ -759,8 +838,11 @@ function JourneyStep({ block }: { block: any }) {
   const icon = block.icon || "📌";
   const title = block.title || "Step";
   const content = block.content || block.text || block.body || "";
+  const owlMessage = OwlHelperMessages[type] || "";
 
   if (!content) return null;
+
+  const paragraphs = splitIntoParagraphs(content);
 
   return (
     <div className={`rounded-xl border ${theme.border} ${theme.bg} p-4 lg:p-5`}>
@@ -770,10 +852,22 @@ function JourneyStep({ block }: { block: any }) {
           {step}
         </div>
         <div className="flex-1 min-w-0">
-          <h4 className={`font-bold text-sm ${theme.accent} flex items-center gap-1.5 mb-1`}>
+          <h4 className={`font-bold text-sm ${theme.accent} flex items-center gap-1.5 mb-2`}>
             <span>{icon}</span> {title}
           </h4>
-          <p className="text-text text-sm leading-relaxed whitespace-pre-wrap">{content}</p>
+          {/* Owl teacher guide */}
+          {owlMessage && (
+            <div className="flex items-start gap-2 mb-3 px-3 py-2 rounded-lg bg-white/70 border border-white/40">
+              <span className="text-base flex-shrink-0">🦉</span>
+              <p className="text-text-muted text-xs italic leading-relaxed">{owlMessage}</p>
+            </div>
+          )}
+          {/* Content paragraphs */}
+          <div className="flex flex-col gap-2">
+            {paragraphs.map((p, i) => (
+              <p key={i} className="text-text text-sm leading-relaxed">{p}</p>
+            ))}
+          </div>
         </div>
       </div>
     </div>

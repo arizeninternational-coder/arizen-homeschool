@@ -128,7 +128,7 @@ export default function SubjectsPage() {
                     </div>
                     <h3 className="text-sm font-extrabold text-text leading-tight mb-0.5">{subject.name}</h3>
                     <p className="text-[10px] text-text-muted font-semibold">
-                      {hasLessons ? `${subject.lessonCount} lesson${subject.lessonCount !== 1 ? "s" : ""}` : "Coming soon"}
+                      {subject.lessonCount} lesson{subject.lessonCount !== 1 ? "s" : ""}
                     </p>
                   </FloatingCard>
                 </Link>
@@ -138,7 +138,7 @@ export default function SubjectsPage() {
                     <Icon size={22} className={color.textColor} />
                   </div>
                   <h3 className="text-sm font-extrabold text-text leading-tight mb-0.5">{subject.name}</h3>
-                  <p className="text-[10px] text-text-muted font-semibold">Coming soon</p>
+                  <p className="text-[10px] text-text-muted font-semibold">No published lessons yet</p>
                 </FloatingCard>
               )}
             </div>

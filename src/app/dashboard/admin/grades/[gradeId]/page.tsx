@@ -5,98 +5,11 @@ export const dynamic = "force-dynamic";
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { CBC_SUBJECTS_BY_GRADE } from "@/lib/cbc-subjects";
 
 const C = { page: "#F7FBF7", teal: "#047A70", tealSoft: "#E6F5F1", dark: "#0F172A", body: "#64748B", white: "#FFFFFF", border: "#E2E8F0" };
 
-const SUBJECTS_BY_GRADE: Record<number, { name: string; slug: string; icon: string; color: string }[]> = {
-  1: [
-    { name: "Mathematics", slug: "mathematics", icon: "\uD83D\uDCCA", color: "#EDE9FE" },
-    { name: "English", slug: "english", icon: "\uD83D\uDCD6", color: "#FFF4D8" },
-    { name: "Kiswahili", slug: "kiswahili", icon: "\uD83C\uDF0D", color: "#ECFDF5" },
-    { name: "Environmental", slug: "environmental", icon: "\uD83C\uDF31", color: "#EAF3FF" },
-    { name: "Movement", slug: "movement", icon: "\uD83C\uDFC3", color: "#FFF1F2" },
-    { name: "Hygiene & Nutrition", slug: "hygiene", icon: "\uD83D\uDEBF", color: "#FEF3C7" },
-  ],
-  2: [
-    { name: "Mathematical Activities", slug: "mathematics", icon: "\uD83D\uDCCA", color: "#EDE9FE" },
-    { name: "English Language", slug: "english", icon: "\uD83D\uDCD6", color: "#FFF4D8" },
-    { name: "Kiswahili Language", slug: "kiswahili", icon: "\uD83C\uDF0D", color: "#ECFDF5" },
-    { name: "Environmental Activities", slug: "environmental", icon: "\uD83C\uDF31", color: "#EAF3FF" },
-    { name: "Hygiene & Nutrition", slug: "hygiene", icon: "\uD83D\uDEBF", color: "#FEF3C7" },
-    { name: "Movement Activities", slug: "movement", icon: "\uD83C\uDFC3", color: "#FFF1F2" },
-  ],
-  3: [
-    { name: "Mathematics", slug: "mathematics", icon: "\uD83D\uDCCA", color: "#EDE9FE" },
-    { name: "English", slug: "english", icon: "\uD83D\uDCD6", color: "#FFF4D8" },
-    { name: "Science", slug: "science", icon: "\uD83D\uDD2C", color: "#ECFDF5" },
-    { name: "Social Studies", slug: "social-studies", icon: "\uD83C\uDF0D", color: "#EAF3FF" },
-    { name: "Kiswahili", slug: "kiswahili", icon: "\uD83D\uDCDA", color: "#FEF3C7" },
-    { name: "Creative Arts", slug: "creative-arts", icon: "\uD83C\uDFA8", color: "#FFF1F2" },
-  ],
-  4: [
-    { name: "Mathematics", slug: "mathematics", icon: "\uD83D\uDCCA", color: "#EDE9FE" },
-    { name: "English", slug: "english", icon: "\uD83D\uDCD6", color: "#FFF4D8" },
-    { name: "Science", slug: "science", icon: "\uD83D\uDD2C", color: "#ECFDF5" },
-    { name: "Social Studies", slug: "social-studies", icon: "\uD83C\uDF0D", color: "#EAF3FF" },
-    { name: "Kiswahili", slug: "kiswahili", icon: "\uD83D\uDCDA", color: "#FEF3C7" },
-    { name: "Agriculture", slug: "agriculture", icon: "\uD83C\uDF3E", color: "#ECFDF5" },
-  ],
-  5: [
-    { name: "Mathematics", slug: "mathematics", icon: "\uD83D\uDCCA", color: "#EDE9FE" },
-    { name: "English", slug: "english", icon: "\uD83D\uDCD6", color: "#FFF4D8" },
-    { name: "Science & Technology", slug: "science", icon: "\uD83D\uDD2C", color: "#ECFDF5" },
-    { name: "Social Studies", slug: "social-studies", icon: "\uD83C\uDF0D", color: "#EAF3FF" },
-    { name: "Kiswahili", slug: "kiswahili", icon: "\uD83D\uDCDA", color: "#FEF3C7" },
-    { name: "Agriculture & Nutrition", slug: "agriculture", icon: "\uD83C\uDF3E", color: "#ECFDF5" },
-    { name: "Creative Arts", slug: "creative-arts", icon: "\uD83C\uDFA8", color: "#FFF1F2" },
-  ],
-  6: [
-    { name: "Mathematics", slug: "mathematics", icon: "\uD83D\uDCCA", color: "#EDE9FE" },
-    { name: "English", slug: "english", icon: "\uD83D\uDCD6", color: "#FFF4D8" },
-    { name: "Science", slug: "science", icon: "\uD83D\uDD2C", color: "#ECFDF5" },
-    { name: "Social Studies", slug: "social-studies", icon: "\uD83C\uDF0D", color: "#EAF3FF" },
-    { name: "Kiswahili", slug: "kiswahili", icon: "\uD83D\uDCDA", color: "#FEF3C7" },
-    { name: "Agriculture", slug: "agriculture", icon: "\uD83C\uDF3E", color: "#ECFDF5" },
-    { name: "Creative Arts", slug: "creative-arts", icon: "\uD83C\uDFA8", color: "#FFF1F2" },
-    { name: "IRE / CRE", slug: "religious-education", icon: "\uD83D\uDED0", color: "#FEF3C7" },
-  ],
-  7: [
-    { name: "Mathematics", slug: "mathematics", icon: "\uD83D\uDCCA", color: "#EDE9FE" },
-    { name: "English", slug: "english", icon: "\uD83D\uDCD6", color: "#FFF4D8" },
-    { name: "Science", slug: "science", icon: "\uD83D\uDD2C", color: "#ECFDF5" },
-    { name: "Social Studies", slug: "social-studies", icon: "\uD83C\uDF0D", color: "#EAF3FF" },
-    { name: "Kiswahili", slug: "kiswahili", icon: "\uD83D\uDCDA", color: "#FEF3C7" },
-    { name: "Agriculture", slug: "agriculture", icon: "\uD83C\uDF3E", color: "#ECFDF5" },
-    { name: "Creative Arts", slug: "creative-arts", icon: "\uD83C\uDFA8", color: "#FFF1F2" },
-    { name: "IRE / CRE", slug: "religious-education", icon: "\uD83D\uDED0", color: "#FEF3C7" },
-    { name: "Business Studies", slug: "business", icon: "\uD83D\uDCC8", color: "#EAF3FF" },
-    { name: "Computing", slug: "computing", icon: "\uD83D\uDCBB", color: "#EDE9FE" },
-  ],
-  8: [
-    { name: "Mathematics", slug: "mathematics", icon: "\uD83D\uDCCA", color: "#EDE9FE" },
-    { name: "English", slug: "english", icon: "\uD83D\uDCD6", color: "#FFF4D8" },
-    { name: "Science", slug: "science", icon: "\uD83D\uDD2C", color: "#ECFDF5" },
-    { name: "Social Studies", slug: "social-studies", icon: "\uD83C\uDF0D", color: "#EAF3FF" },
-    { name: "Kiswahili", slug: "kiswahili", icon: "\uD83D\uDCDA", color: "#FEF3C7" },
-    { name: "Agriculture", slug: "agriculture", icon: "\uD83C\uDF3E", color: "#ECFDF5" },
-    { name: "Creative Arts", slug: "creative-arts", icon: "\uD83C\uDFA8", color: "#FFF1F2" },
-    { name: "IRE / CRE", slug: "religious-education", icon: "\uD83D\uDED0", color: "#FEF3C7" },
-    { name: "Business Studies", slug: "business", icon: "\uD83D\uDCC8", color: "#EAF3FF" },
-    { name: "Computing", slug: "computing", icon: "\uD83D\uDCBB", color: "#EDE9FE" },
-  ],
-  9: [
-    { name: "Mathematics", slug: "mathematics", icon: "\uD83D\uDCCA", color: "#EDE9FE" },
-    { name: "English", slug: "english", icon: "\uD83D\uDCD6", color: "#FFF4D8" },
-    { name: "Science", slug: "science", icon: "\uD83D\uDD2C", color: "#ECFDF5" },
-    { name: "Social Studies", slug: "social-studies", icon: "\uD83C\uDF0D", color: "#EAF3FF" },
-    { name: "Kiswahili", slug: "kiswahili", icon: "\uD83D\uDCDA", color: "#FEF3C7" },
-    { name: "Agriculture", slug: "agriculture", icon: "\uD83C\uDF3E", color: "#ECFDF5" },
-    { name: "Creative Arts", slug: "creative-arts", icon: "\uD83C\uDFA8", color: "#FFF1F2" },
-    { name: "IRE / CRE", slug: "religious-education", icon: "\uD83D\uDED0", color: "#FEF3C7" },
-    { name: "Business Studies", slug: "business", icon: "\uD83D\uDCC8", color: "#EAF3FF" },
-    { name: "Computing", slug: "computing", icon: "\uD83D\uDCBB", color: "#EDE9FE" },
-  ],
-};
+const SUBJECTS_BY_GRADE = CBC_SUBJECTS_BY_GRADE;
 
 export default function GradeSubjectsPage() {
   const params = useParams();
