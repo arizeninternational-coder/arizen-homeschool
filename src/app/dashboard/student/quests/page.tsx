@@ -38,9 +38,12 @@ export default function QuestsPage() {
     );
   }
 
+  // Filter to only PUBLISHED quests, with friendly empty state
   const allQuests = themes.flatMap((theme: any) =>
-    (theme.quests || []).map((q: any) => ({ ...q, themeSlug: theme.slug, themeTitle: theme.title }))
-  );
+    (theme.quests || [])
+      .filter((q: any) => q.status === "PUBLISHED" || !q.status) // only show published
+      .map((q: any) => ({ ...q, themeSlug: theme.slug, themeTitle: theme.title }))
+  ).filter(Boolean);
 
   const activeQuests = allQuests.filter((q: any) => !q.isCompleted);
   const completedQuests = allQuests.filter((q: any) => q.isCompleted);

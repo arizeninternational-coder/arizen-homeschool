@@ -125,7 +125,19 @@ function normalizeContentBlocks(input: any): any[] {
       });
     }
 
-    // D. Try It — Activity instructions
+    // D. Example — From activity instructions (if different from suggested experience)
+    const exampleContent = (activityInstructions && activityInstructions !== suggestedExperience) ? activityInstructions : offlineActivity;
+    if (exampleContent && exampleContent !== suggestedExperience) {
+      blocks.push({
+        type: "journey-example",
+        step: step++,
+        title: "Example",
+        icon: "💡",
+        content: exampleContent
+      });
+    }
+
+    // E. Try It — Activity instructions or offline activity
     const tryContent = activityInstructions || offlineActivity;
     if (tryContent) {
       blocks.push({
@@ -526,6 +538,18 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
             </div>
           )}
 
+          {/* Completed state — show reflection prompt */}
+          {completed && (
+            <div className="mt-6 rounded-2xl border border-primary/20 bg-primary-soft/30 p-5 text-center">
+              <CheckCircle2 className="w-10 h-10 text-secondary mx-auto mb-2" />
+              <h3 className="font-bold text-text text-base mb-1">Lesson Complete! 🎉</h3>
+              <p className="text-text-muted text-sm mb-4">Take a moment to write a reflection on what you learned.</p>
+              <GradientButton variant="primary" size="md" icon={<BookOpen className="w-4 h-4" />} onClick={() => window.location.href = "/dashboard/student/reflections"}>
+                Write a Reflection
+              </GradientButton>
+            </div>
+          )}
+
           {/* Navigation buttons for journey mode */}
           {isJourney && renderBlocks.length > 0 && (
             <div className="mt-6 flex gap-3">
@@ -786,12 +810,13 @@ function ContentBlock({ block, isHeading }: { block: any; isHeading?: boolean })
 
 // Owl teacher helper texts for each journey step type
 const OwlHelperMessages: Record<string, string> = {
-  "journey-mission": "Let's see what you'll be able to do by the end.",
-  "journey-warmup": "Before we learn, try thinking about this.",
-  "journey-learn": "Watch how the idea works.",
-  "journey-try": "Now use counters, drawings, or examples.",
-  "journey-check": "Let's see if the idea makes sense.",
-  "journey-reflect": "Tell what you noticed in your own words.",
+  "journey-mission": "📖 This is what you'll be able to do by the end. Read it carefully!",
+  "journey-warmup": "🤔 Think about this question before we start. Your first idea matters!",
+  "journey-learn": "👀 Watch how it works step by step. Don't worry if it's new — we'll practice next.",
+  "journey-example": "✨ See? Here's how someone else did it. This can be your guide!",
+  "journey-try": "✏️ Now it's your turn! Use counters, drawings, or examples to try it yourself.",
+  "journey-check": "🎯 Let's see if the idea makes sense. Can you answer this?",
+  "journey-reflect": "🪞 What did you notice? Write it in your own words — that's how you remember!",
 };
 
 // Split long text into paragraphs for readability
@@ -824,6 +849,7 @@ const journeyThemes: Record<string, { accent: string; bg: string; border: string
   "journey-mission":  { accent: "text-indigo-600",   bg: "bg-indigo-50",   border: "border-indigo-200" },
   "journey-warmup":   { accent: "text-amber-600",    bg: "bg-amber-50",    border: "border-amber-200" },
   "journey-learn":    { accent: "text-emerald-600",  bg: "bg-emerald-50",  border: "border-emerald-200" },
+  "journey-example":  { accent: "text-cyan-600",    bg: "bg-cyan-50",    border: "border-cyan-200" },
   "journey-try":      { accent: "text-sky-600",      bg: "bg-sky-50",      border: "border-sky-200" },
   "journey-check":    { accent: "text-violet-600",   bg: "bg-violet-50",   border: "border-violet-200" },
   "journey-reflect":  { accent: "text-rose-600",     bg: "bg-rose-50",     border: "border-rose-200" },

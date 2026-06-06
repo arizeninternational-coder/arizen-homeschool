@@ -11,6 +11,8 @@ import { PageHeader, SectionHeader, GradientButton, StatCard, EmptyStateCard } f
 import { CoinIcon, StreakIcon, BookIcon } from "@/components/ui/Illustrations";
 import AvatarRenderer from "@/components/AvatarRenderer";
 
+export const dynamic = "force-dynamic";
+
 export default function ParentDashboard() {
   const [children, setChildren] = useState<any[]>([]);
   const [checkins, setCheckins] = useState<Record<string, any>>({});
@@ -221,22 +223,32 @@ export default function ParentDashboard() {
                         <span className="text-[11px] font-extrabold text-accent-blue">{child.lessonsCompleted || 0} lessons</span>
                       </div>
                     </div>
-                    {/* Emotional check-in */}
-                    <div className="px-3 py-2 rounded-xl bg-bg-main/60 border border-white/40">
-                      {checkins[child.learnerProfileId || child.id] ? (
-                        <div className="flex items-center gap-2">
-                          <Heart className="w-3.5 h-3.5 text-secondary flex-shrink-0" />
-                          <span className="text-[11px] font-bold text-text">
-                            Feeling <span className="text-secondary-dark">{checkins[child.learnerProfileId || child.id].emotionLabel || "good"}</span> today
-                          </span>
+                    {/* Emotional check-in — prominent */}
+                    {(() => {
+                      const ci = checkins[child.learnerProfileId || child.id];
+                      return (
+                        <div className={`px-3 py-2.5 rounded-xl border ${ci ? "bg-pink-soft/30 border-pink/15" : "bg-bg-main/60 border-white/40"}`}>
+                          {ci ? (
+                            <div>
+                              <div className="flex items-center gap-2 mb-1">
+                                <Heart className="w-3.5 h-3.5 text-pink flex-shrink-0" />
+                                <span className="text-[11px] font-bold text-text">
+                                  Feeling <span className="text-pink">{ci.emotionLabel || ci.emotion || "good"}</span> today
+                                </span>
+                              </div>
+                              {ci.note && (
+                                <p className="text-[10px] text-text-muted italic pl-5">"{ci.note}"</p>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <Heart className="w-3.5 h-3.5 text-text-muted flex-shrink-0" />
+                              <span className="text-[11px] text-text-muted italic">No check-in yet today</span>
+                            </div>
+                          )}
                         </div>
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          <Heart className="w-3.5 h-3.5 text-text-muted flex-shrink-0" />
-                          <span className="text-[11px] text-text-muted italic">No check-in yet today</span>
-                        </div>
-                      )}
-                    </div>
+                      );
+                    })()}
                     <div className="flex gap-2">
                       <Link href="/dashboard/parent/progress" className="flex-1">
                         <GradientButton variant="outline" size="sm" className="w-full" icon={<Award className="w-4 h-4" />}>

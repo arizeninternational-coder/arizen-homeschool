@@ -14,6 +14,8 @@ import { GradientButton } from "@/components/ui/Pill";
 import { FloatingCard, SectionTitle, StatPill, BrowseGrid, CARD_COLORS } from "@/components/ui/FloatingCard";
 import AvatarRenderer from "@/components/AvatarRenderer";
 
+export const dynamic = "force-dynamic";
+
 export default function StudentDashboard() {
   const [data, setData] = useState<any>({});
   const [loading, setLoading] = useState(true);
@@ -59,11 +61,12 @@ export default function StudentDashboard() {
   }
 
   const s = data.summary || {};
-  const studentName = s?.profile?.name || s?.profile?.displayName || "Learner";
-  const totalXp = s.totalXp || s?.profile?.totalXp || 0;
+  // API returns: displayName, xp, coins, streak, lessonsCompleted at top level
+  const studentName = s.displayName || s?.profile?.name || s?.profile?.displayName || "Learner";
+  const totalXp = s.xp || s.totalXp || s?.profile?.totalXp || 0;
   const coins = s.coins || s?.wallet?.balance || 0;
-  const currentStreak = s.currentStreak || s?.profile?.currentStreak || 0;
-  const completedLessons = s.completedLessons || 0;
+  const currentStreak = s.streak || s.currentStreak || s?.profile?.currentStreak || 0;
+  const completedLessons = s.lessonsCompleted || s.completedLessons || 0;
   const avatarLevel = Math.floor(totalXp / 100) + 1;
   const xpProgress = totalXp % 100;
   const hour = new Date().getHours();
@@ -101,20 +104,31 @@ export default function StudentDashboard() {
       </div>
 
       {/* ── Today's Lesson Hero ── */}
-      <Link
-        href="/dashboard/student/lessons"
-        className="block rounded-[1.5rem] border border-primary/10 p-5 bg-gradient-to-br from-primary/[0.04] to-accent-purple/[0.03] hover:shadow-[0_8px_25px_rgba(79,70,229,0.1)] hover:-translate-y-0.5 transition-all duration-200"
-      >
-        <div className="flex items-center gap-2 mb-2">
-          <span className="text-[9px] font-extrabold uppercase tracking-[0.12em] text-primary bg-primary/10 px-2.5 py-0.5 rounded-full">Today's Lesson</span>
-          <span className="text-[9px] font-semibold text-text-muted bg-white/60 px-2 py-0.5 rounded-full flex items-center gap-1"><Clock size={10} /> 12 min</span>
-        </div>
-        <h2 className="text-lg lg:text-xl font-extrabold text-text mb-1">Adding Fractions</h2>
-        <span className="inline-block text-[10px] font-bold text-accent-blue bg-accent-blue-soft/50 px-2.5 py-0.5 rounded-full mb-3">Mathematics</span>
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-bold text-primary flex items-center gap-1">Continue Lesson <ArrowRight size={14} /></span>
-        </div>
-      </Link>
+      {(() => {
+        // Use real lesson data from API, or fall back to lessons page link
+        const recentLesson = data.lessons?.lessons?.[0] || data.lessons?.nextLesson;
+        const lessonTitle = recentLesson?.title || recentLesson?.quest?.title;
+        const lessonSubject = recentLesson?.subject || recentLesson?.quest?.subjectName || "Lesson";
+        const lessonHref = recentLesson?.slug
+          ? `/dashboard/student/lessons/${recentLesson.themeSlug || recentLesson.quest?.themeSlug || ""}/${recentLesson.questSlug || recentLesson.quest?.slug || ""}/${recentLesson.slug}`
+          : "/dashboard/student/lessons";
+        return (
+          <Link
+            href={lessonHref}
+            className="block rounded-[1.5rem] border border-primary/10 p-5 bg-gradient-to-br from-primary/[0.04] to-accent-purple/[0.03] hover:shadow-[0_8px_25px_rgba(79,70,229,0.1)] hover:-translate-y-0.5 transition-all duration-200"
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-[9px] font-extrabold uppercase tracking-[0.12em] text-primary bg-primary/10 px-2.5 py-0.5 rounded-full">Today's Lesson</span>
+              {totalXp > 0 && <span className="text-[9px] font-semibold text-gold bg-gold-soft/50 px-2 py-0.5 rounded-full flex items-center gap-1"><Zap size={10} /> {totalXp} XP</span>}
+            </div>
+            <h2 className="text-lg lg:text-xl font-extrabold text-text mb-1">{lessonTitle || "Continue Learning"}</h2>
+            <span className="inline-block text-[10px] font-bold text-accent-blue bg-accent-blue-soft/50 px-2.5 py-0.5 rounded-full mb-3">{lessonSubject}</span>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-bold text-primary flex items-center gap-1">{recentLesson?.isCompleted ? "Review Lesson" : "Start Lesson"} <ArrowRight size={14} /></span>
+            </div>
+          </Link>
+        );
+      })()}
 
       {/* ── Compact Modules Row ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -137,8 +151,8 @@ export default function StudentDashboard() {
                 { key: "OKAY", label: "Okay", icon: Meh, bg: "bg-slate-100 hover:bg-slate-200", text: "text-slate-600" },
                 { key: "SAD", label: "Sad", icon: CloudRain, bg: "bg-pink-100 hover:bg-pink-200", text: "text-pink-700" },
                 { key: "WORRIED", label: "Worried", icon: AlertTriangle, bg: "bg-purple-100 hover:bg-purple-200", text: "text-purple-700" },
-                { key: "FRUSTRATED", label: "Angry", icon: FlameIcon, bg: "bg-orange-100 hover:bg-orange-200", text: "text-orange-700" },
-                { key: "TIRED", label: "Excited", icon: Zap, bg: "bg-yellow-100 hover:bg-yellow-200", text: "text-yellow-700" },
+                { key: "FRUSTRATED", label: "Frustrated", icon: FlameIcon, bg: "bg-orange-100 hover:bg-orange-200", text: "text-orange-700" },
+                { key: "TIRED", label: "Tired", icon: Zap, bg: "bg-yellow-100 hover:bg-yellow-200", text: "text-yellow-700" },
               ] as const).map(({ key, label, icon: Icon, bg, text }) => (
                 <button key={key} onClick={() => submitCheckin(key)} disabled={checkinSaving}
                   className={cn("inline-flex items-center gap-0.5 px-2 py-1 rounded-full text-[10px] font-bold transition-all cursor-pointer active:scale-95 disabled:opacity-50", bg, text)}>
@@ -209,6 +223,23 @@ export default function StudentDashboard() {
           })}
         </BrowseGrid>
       </div>
+
+      {/* ── Streak + Lessons Completed ── */}
+      {currentStreak > 0 && (
+        <div className="rounded-2xl border border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50 p-4 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center shadow-[0_4px_15px_rgba(249,115,22,0.3)]">
+            <Flame size={24} className="text-white" />
+          </div>
+          <div className="flex-1">
+            <p className="text-2xl font-extrabold text-orange-700">{currentStreak}-day streak</p>
+            <p className="text-xs font-semibold text-orange-600/70">Keep it going! You're on fire! 🔥</p>
+          </div>
+          <div className="text-right">
+            <p className="text-lg font-extrabold text-primary">{completedLessons}</p>
+            <p className="text-[10px] font-semibold text-text-muted">lessons done</p>
+          </div>
+        </div>
+      )}
 
       {/* ── Avatar + XP ── */}
       <FloatingCard className="!p-5">

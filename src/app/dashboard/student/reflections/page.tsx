@@ -60,6 +60,7 @@ export default function ReflectionsPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/learner/reflections", { credentials: "include" })
@@ -72,6 +73,7 @@ export default function ReflectionsPage() {
   const handleSave = async () => {
     if (!text.trim() || saving) return;
     setSaving(true);
+    setSaveError(null);
     try {
       const res = await fetch("/api/learner/reflections", {
         method: "POST",
@@ -79,7 +81,8 @@ export default function ReflectionsPage() {
         credentials: "include",
         body: JSON.stringify({ prompt, response: text }),
       });
-      if (res.ok) {
+      const data = await res.json();
+      if (res.ok && data.success) {
         setSaved(true);
         setText("");
         setReflections(prev => [{
@@ -88,8 +91,13 @@ export default function ReflectionsPage() {
           createdAt: new Date().toISOString(),
         }, ...prev]);
         setTimeout(() => setSaved(false), 2000);
+      } else {
+        setSaveError(data.error || "Failed to save reflection. Please try again.");
       }
-    } catch (e) { console.error("[REFLECTION] Save error:", e); }
+    } catch (e: any) {
+      console.error("[REFLECTION] Save error:", e);
+      setSaveError("Network error. Please check your connection and try again.");
+    }
     setSaving(false);
   };
 
@@ -138,6 +146,16 @@ export default function ReflectionsPage() {
             className="w-full min-h-[90px] p-4 rounded-2xl border border-pink/10 bg-white/80 text-sm text-text placeholder:text-text-muted resize-vertical focus:outline-none focus:ring-2 focus:ring-pink/20 transition-all"
           />
           <div className="flex items-center justify-between mt-4 gap-3 flex-wrap">
+            {saveError && (
+              <div className="flex-1 min-w-[200px] rounded-lg border border-red-300 bg-red-50 px-3 py-2">
+                <p className="text-xs font-semibold text-red-700">{saveError}</p>
+              </div>
+            )}
+            {saved && !saveError && (
+              <div className="flex-1 min-w-[200px] rounded-lg border border-green-300 bg-green-50 px-3 py-2">
+                <p className="text-xs font-semibold text-green-700">✅ Reflection saved! Great work thinking about what you learned.</p>
+              </div>
+            )}
             <button
               onClick={() => setPrompt(PROMPTS[Math.floor(Math.random() * PROMPTS.length)])}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-pink/20 bg-white/80 text-xs font-bold text-text-muted hover:bg-white hover:text-text transition-all"
