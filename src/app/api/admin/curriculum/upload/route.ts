@@ -86,9 +86,10 @@ function mapRow(raw: string[], headers: string[]): ParsedRow {
   if (!row.subject) { row.warnings.push("Missing subject (will use page subject)"); }
 
   // Default difficulty
+  // Default difficulty using shared VALID_DIFFICULTIES
   if (row.difficulty) {
     const d = row.difficulty.toLowerCase();
-    if (!["easy", "medium", "hard"].includes(d)) {
+    if (!VALID_DIFFICULTIES.includes(d)) {
       row.warnings.push(`Invalid difficulty "${row.difficulty}", using "medium"`);
       row.difficulty = "medium";
     }
@@ -267,24 +268,28 @@ export async function POST(req: NextRequest) {
       // Normalize headers: remove BOM, trim, lowercase, replace spaces/hyphens with underscores
       const normalizedHeaders = headers.map(normalizeHeader);
 
-      // Check for required columns — normalize the same way for comparison
-      const requiredCols = ["lesson_title", "lesson"];
-      const missingRequired = requiredCols.filter(rc => {
-        const rcNorm = rc.replace(/[_\s-]/g, "");
-        return !normalizedHeaders.some(h => h.replace(/[_\s-]/g, "") === rcNorm);
+      // Check for required columns using shared REQUIRED_FIELDS
+      const headerFields = normalizedHeaders.flatMap(h => COLUMN_MAP[h] || COLUMN_MAP[h.replace(/\s/g, "")]).filter(Boolean);
+      const missingRequired: string[] = [];
+      REQUIRED_FIELDS.forEach(req => {
+        const found = headerFields.includes(req as string);
+        if (!found) {
+          if (req === "specificLearningOutcome") {
+            // allow legacy learningOutcome as fallback
+            if (!headerFields.includes("learningOutcome" as string)) {
+              missingRequired.push(req as string);
+            }
+          } else {
+            missingRequired.push(req as string);
+          }
+        }
       });
-      // "lesson" alone is a fallback alias; if lesson_title exists, "lesson" is not missing
-      const trulyMissing = missingRequired.length > 0
-        ? missingRequired.filter(rc => {
-            if (rc === "lesson") return !normalizedHeaders.some(h => h.replace(/[_\s-]/g, "").includes("lesson"));
-            return true;
-          })
-        : [];
-      if (trulyMissing.length > 0) {
+      if (missingRequired.length > 0) {
         return NextResponse.json({
-          error: `Missing required column: ${trulyMissing.join(", ")}. Found columns: ${normalizedHeaders.join(", ")}`,
+          error: `Missing required column(s): ${missingRequired.join(", ")}`,
         }, { status: 400 });
       }
+
 
       const dataRows = rows.slice(1);
       const parsed: ParsedRow[] = dataRows.map(r => mapRow(r, headers));
