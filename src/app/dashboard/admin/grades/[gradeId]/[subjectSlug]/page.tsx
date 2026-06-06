@@ -1,10 +1,9 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { generateCsvTemplate } from "@/lib/curriculum/cbc-template";
 import {
   Upload, FileSpreadsheet, CheckCircle2, AlertTriangle, X, Eye,
   Search, Download, BookOpen, ChevronRight
