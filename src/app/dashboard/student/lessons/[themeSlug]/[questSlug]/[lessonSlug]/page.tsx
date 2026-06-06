@@ -28,11 +28,108 @@ interface LessonData {
   title: string;
   slug: string;
   description: string;
-  contentBlocks: any[];
+  contentBlocks: any;
   difficulty?: string;
   xpReward?: { base: number } | number;
   progress: number;
   isCompleted: boolean;
+}
+
+/**
+ * Normalize contentBlocks so the student lesson page can safely render
+ * regardless of how contentBlocks was stored (array, JSON string,
+ * structured CBC-rich object, or null/undefined).
+ */
+function normalizeContentBlocks(input: any): any[] {
+  if (Array.isArray(input)) return input;
+
+  if (!input) return [];
+
+  if (typeof input === "string") {
+    try {
+      return normalizeContentBlocks(JSON.parse(input));
+    } catch {
+      return [];
+    }
+  }
+
+  if (typeof input === "object") {
+    const blocks: any[] = [];
+
+    const curriculum = input.curriculum || {};
+    const shell = input.lessonShell || {};
+
+    const learningGoal =
+      curriculum.specificLearningOutcome ||
+      input.learningOutcome;
+
+    const keyInquiry =
+      curriculum.keyInquiryQuestion ||
+      input.keyInquiryQuestion;
+
+    const activityTitle =
+      shell.activityTitle ||
+      input.activityTitle ||
+      "Learning Activity";
+
+    const activityInstructions =
+      shell.activityInstructions ||
+      input.activityInstructions;
+
+    const assessment =
+      shell.assessmentCriteria ||
+      shell.assessmentMethod ||
+      input.assessmentCriteria ||
+      input.assessmentMethod;
+
+    const reflection =
+      shell.reflectionPrompt ||
+      input.reflectionPrompt;
+
+    if (learningGoal) {
+      blocks.push({
+        type: "overview",
+        title: "Learning Goal",
+        content: learningGoal
+      });
+    }
+
+    if (keyInquiry) {
+      blocks.push({
+        type: "inquiry",
+        title: "Key Inquiry Question",
+        content: keyInquiry
+      });
+    }
+
+    if (activityInstructions) {
+      blocks.push({
+        type: "activity",
+        title: activityTitle,
+        content: activityInstructions
+      });
+    }
+
+    if (assessment) {
+      blocks.push({
+        type: "assessment",
+        title: "Check Your Understanding",
+        content: assessment
+      });
+    }
+
+    if (reflection) {
+      blocks.push({
+        type: "reflection",
+        title: "Reflection",
+        content: reflection
+      });
+    }
+
+    return blocks;
+  }
+
+  return [];
 }
 
 interface Badge {
@@ -169,6 +266,9 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
 
   const xp = typeof lesson?.xpReward === "object" ? (lesson?.xpReward as any)?.base : lesson?.xpReward;
 
+  // Normalize contentBlocks to a safe array regardless of storage shape
+  const renderBlocks = normalizeContentBlocks(lesson?.contentBlocks);
+
   // Lesson viewer overlay
   if (viewing) {
     return (
@@ -285,14 +385,14 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
           )}
 
           {/* Content blocks */}
-          {lesson?.contentBlocks && lesson.contentBlocks.length > 0 ? (
+          {renderBlocks.length > 0 ? (
             <div className="flex flex-col gap-4">
               {(() => {
                 // Group content blocks so headings and their body content share the same card
-                const cardGroups: { heading?: typeof lesson.contentBlocks extends (infer T)[] ? T : never; items: typeof lesson.contentBlocks }[] = [];
+                const cardGroups: { heading?: any; items: any[] }[] = [];
                 let currentGroup: typeof cardGroups[number] | null = null;
 
-                (lesson.contentBlocks as any[]).forEach((block: any) => {
+                renderBlocks.forEach((block: any) => {
                   const type = block?.type || block?.blockType || "text";
                   if (type === "heading" || type === "h1" || type === "h2" || type === "h3" || type === "subheading") {
                     if (currentGroup) cardGroups.push(currentGroup);
@@ -319,13 +419,13 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
           ) : (
             <div className="rounded-2xl border border-white/60 bg-white/90 backdrop-blur-sm text-center p-12">
               <BookOpen className="w-10 h-10 text-text-muted/30 mx-auto mb-3" />
-              <h3 className="text-lg font-bold text-text mb-2">Lesson content coming soon</h3>
-              <p className="text-text-muted text-sm">This lesson is being prepared. Check back soon!</p>
+              <h3 className="text-lg font-bold text-text mb-2">This lesson is being prepared</h3>
+              <p className="text-text-muted text-sm">Please check back soon.</p>
             </div>
           )}
 
           {/* Bottom complete button */}
-          {!completed && lesson?.contentBlocks && lesson.contentBlocks.length > 0 && (
+          {!completed && renderBlocks.length > 0 && (
             <div className="mt-6">
               <GradientButton
                 variant="success"
@@ -441,13 +541,13 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
       )}
 
       {/* ── Content preview ── */}
-      {lesson?.contentBlocks && lesson.contentBlocks.length > 0 && (
+      {renderBlocks.length > 0 && (
         <div className="rounded-2xl border border-white/60 bg-white/90 backdrop-blur-sm p-5 lg:p-6 mb-5">
           <h3 className="font-extrabold text-text text-base mb-4 flex items-center gap-2">
             <BookOpen className="w-5 h-5 text-primary" /> What you'll learn
           </h3>
           <div className="flex flex-col gap-3">
-            {(lesson.contentBlocks as any[]).slice(0, 3).map((block: any, i: number) => (
+            {renderBlocks.slice(0, 3).map((block: any, i: number) => (
               <div key={i} className="flex items-center gap-3 text-sm text-text-muted">
                 <div className="w-7 h-7 rounded-xl bg-primary-soft flex items-center justify-center flex-shrink-0">
                   <span className="font-extrabold text-primary text-xs">{i + 1}</span>
@@ -457,9 +557,9 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
                 </span>
               </div>
             ))}
-            {lesson.contentBlocks.length > 3 && (
+            {renderBlocks.length > 3 && (
               <span className="text-xs text-text-muted font-semibold pl-10">
-                +{lesson.contentBlocks.length - 3} more sections
+                +{renderBlocks.length - 3} more sections
               </span>
             )}
           </div>
