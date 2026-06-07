@@ -42,34 +42,57 @@ interface ParsedRow {
   strand: string;
   subStrand: string;
   learningOutcome: string;
+  specificLearningOutcome: string;
+  keyInquiryQuestion: string;
+  suggestedLearningExperience: string;
   lessonTitle: string;
+  lessonOrder: string;
   term: string;
   week: string;
   activityTitle: string;
   activityInstructions: string;
+  assessmentMethod: string;
+  assessmentCriteria: string;
   questTitle: string;
   questInstructions: string;
   reflectionPrompt: string;
+  learningResources: string;
+  coreCompetencies: string;
+  values: string;
+  parentalEngagement: string;
   rewardCoins: string;
   rewardStars: string;
+  rewardXp: string;
   estimatedDuration: string;
   difficulty: string;
+  videoSearchKeywords: string;
+  illustrationNotes: string;
+  sourceReference: string;
   valid: boolean;
   errors: string[];
   warnings: string[];
   isDuplicate: boolean;
+  completenessScore: number;
 }
 
 function mapRow(raw: string[], headers: string[]): ParsedRow {
   const row: ParsedRow = {
     grade: "", subject: "", strand: "", subStrand: "",
-    learningOutcome: "", lessonTitle: "", term: "", week: "",
+    learningOutcome: "", specificLearningOutcome: "", keyInquiryQuestion: "",
+    suggestedLearningExperience: "",
+    lessonTitle: "", lessonOrder: "",
+    term: "", week: "",
     activityTitle: "", activityInstructions: "",
+    assessmentMethod: "", assessmentCriteria: "",
     questTitle: "", questInstructions: "",
     reflectionPrompt: "",
-    rewardCoins: "10", rewardStars: "0",
+    learningResources: "", coreCompetencies: "", values: "",
+    parentalEngagement: "",
+    rewardCoins: "10", rewardStars: "0", rewardXp: "0",
     estimatedDuration: "", difficulty: "medium",
+    videoSearchKeywords: "", illustrationNotes: "", sourceReference: "",
     valid: true, errors: [], warnings: [], isDuplicate: false,
+    completenessScore: 0,
   };
 
   headers.forEach((h, i) => {
@@ -104,9 +127,60 @@ function mapRow(raw: string[], headers: string[]): ParsedRow {
     row.warnings.push("reward_stars is not a number, using 0");
     row.rewardStars = "0";
   }
+  if (row.rewardXp && isNaN(Number(row.rewardXp))) {
+    row.warnings.push("reward_xp is not a number, using 0");
+    row.rewardXp = "0";
+  }
   if (row.estimatedDuration && isNaN(Number(row.estimatedDuration))) {
     row.warnings.push("estimated_duration is not a number, ignoring");
     row.estimatedDuration = "";
+  }
+  if (row.lessonOrder && isNaN(Number(row.lessonOrder))) {
+    row.warnings.push("lesson_order is not a number, ignoring");
+    row.lessonOrder = "";
+  }
+
+  // ── Completeness scoring for AI generation quality ──
+  // Hard required: lesson_title, grade (already validated above)
+  // Recommended for strong AI generation:
+  const recommendedFields: { key: string; label: string; weight: number }[] = [
+    { key: "strand", label: "strand", weight: 10 },
+    { key: "subStrand", label: "sub-strand", weight: 10 },
+    { key: "specificLearningOutcome", label: "specific_learning_outcome", weight: 15 },
+    { key: "learningOutcome", label: "learning_outcome (fallback)", weight: 10 },
+    { key: "keyInquiryQuestion", label: "key_inquiry_question", weight: 10 },
+    { key: "suggestedLearningExperience", label: "suggested_learning_experience", weight: 10 },
+    { key: "activityInstructions", label: "activity_instructions", weight: 10 },
+    { key: "assessmentCriteria", label: "assessment_criteria", weight: 10 },
+    { key: "assessmentMethod", label: "assessment_method", weight: 5 },
+    { key: "reflectionPrompt", label: "reflection_prompt", weight: 10 },
+  ];
+
+  let score = 0;
+  let maxScore = 0;
+  const missingRecommended: string[] = [];
+
+  for (const field of recommendedFields) {
+    maxScore += field.weight;
+    const val = (row as any)[field.key];
+    if (val && String(val).trim().length > 0) {
+      score += field.weight;
+    } else {
+      missingRecommended.push(field.label);
+    }
+  }
+
+  row.completenessScore = Math.round((score / maxScore) * 100);
+
+  // Warn if weak shell
+  if (row.completenessScore < 50 && row.valid) {
+    row.warnings.push(
+      `Low completeness (${row.completenessScore}%). AI generation may be weaker because key CBC fields are missing: ${missingRecommended.slice(0, 4).join(", ")}`
+    );
+  } else if (missingRecommended.length > 0 && row.valid) {
+    row.warnings.push(
+      `Missing recommended fields: ${missingRecommended.slice(0, 3).join(", ")}${missingRecommended.length > 3 ? ` +${missingRecommended.length - 3} more` : ""}`
+    );
   }
 
   return row;
@@ -430,7 +504,17 @@ export async function POST(req: NextRequest) {
                       subStrand: row.subStrand,
                       term: row.term,
                       week: row.week,
+                      lessonOrder: row.lessonOrder,
                       learningOutcome: row.specificLearningOutcome || row.learningOutcome,
+                      specificLearningOutcome: row.specificLearningOutcome,
+                      keyInquiryQuestion: row.keyInquiryQuestion,
+                      suggestedLearningExperience: row.suggestedLearningExperience,
+                      assessmentMethod: row.assessmentMethod,
+                      assessmentCriteria: row.assessmentCriteria,
+                      learningResources: row.learningResources,
+                      coreCompetencies: row.coreCompetencies,
+                      values: row.values,
+                      parentalEngagement: row.parentalEngagement,
                       activityTitle: row.activityTitle,
                       activityInstructions: row.activityInstructions,
                       questTitle: row.questTitle,
@@ -438,8 +522,13 @@ export async function POST(req: NextRequest) {
                       reflectionPrompt: row.reflectionPrompt,
                       rewardCoins: row.rewardCoins,
                       rewardStars: row.rewardStars,
+                      rewardXp: row.rewardXp,
                       estimatedDuration: row.estimatedDuration,
                       difficulty: row.difficulty,
+                      videoSearchKeywords: row.videoSearchKeywords,
+                      illustrationNotes: row.illustrationNotes,
+                      sourceReference: row.sourceReference,
+                      completenessScore: row.completenessScore,
                     };
                     const contentBlocks = JSON.stringify(contentBlocksObj);
 
@@ -447,12 +536,12 @@ export async function POST(req: NextRequest) {
             questId,
             title: row.lessonTitle,
             slug: lessonSlug,
-            description: row.learningOutcome || row.lessonTitle,
+            description: row.specificLearningOutcome || row.learningOutcome || row.lessonTitle,
             contentBlocks,
-            xpReward: JSON.stringify({ base: parseInt(row.rewardCoins) || 10 }),
+            xpReward: JSON.stringify({ base: parseInt(row.rewardXp) || parseInt(row.rewardCoins) || 10 }),
             difficulty: JSON.stringify({ level: row.difficulty || "medium", complexityScore: row.difficulty === "hard" ? 3 : row.difficulty === "easy" ? 1 : 2 }),
             estimatedDurationMinutes: parseInt(row.estimatedDuration) || null,
-            orderIndex: lessonsCreated + 1,
+            orderIndex: parseInt(row.lessonOrder) || (lessonsCreated + 1),
             status: "DRAFT",
           });
 

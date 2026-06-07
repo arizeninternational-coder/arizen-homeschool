@@ -18,16 +18,27 @@ interface LessonData {
   strand: string;
   subStrand: string;
   learningOutcome: string;
+  specificLearningOutcome: string;
+  keyInquiryQuestion: string;
+  suggestedLearningExperience: string;
+  assessmentMethod: string;
+  assessmentCriteria: string;
   term: string;
   week: string;
+  lessonOrder: number;
   activityTitle: string;
   questTitle: string;
   rewardCoins: number;
   rewardStars: number;
+  rewardXp: number;
   estimatedDurationMinutes: number;
   difficulty: string;
   createdAt: string;
   orderIndex: number;
+  completenessScore: number;
+  videoSearchKeywords: string;
+  illustrationNotes: string;
+  sourceReference: string;
   readiness?: {
     score: number;
     isReady: boolean;
@@ -37,16 +48,26 @@ interface LessonData {
     draftReviewStatus?: string | null;
   } | null;
   generationStatus?: string;
+  reviewStatus?: string;
 }
 
 interface ParsedRow {
   grade: string; subject: string; strand: string; subStrand: string;
-  learningOutcome: string; lessonTitle: string; term: string; week: string;
+  learningOutcome: string; specificLearningOutcome: string;
+  keyInquiryQuestion: string; suggestedLearningExperience: string;
+  lessonTitle: string; lessonOrder: string;
+  term: string; week: string;
   activityTitle: string; activityInstructions: string;
+  assessmentMethod: string; assessmentCriteria: string;
   questTitle: string; questInstructions: string;
-  reflectionPrompt: string; rewardCoins: string; rewardStars: string;
+  reflectionPrompt: string;
+  learningResources: string; coreCompetencies: string; values: string;
+  parentalEngagement: string;
+  rewardCoins: string; rewardStars: string; rewardXp: string;
   estimatedDuration: string; difficulty: string;
+  videoSearchKeywords: string; illustrationNotes: string; sourceReference: string;
   valid: boolean; errors: string[]; warnings: string[]; isDuplicate: boolean;
+  completenessScore: number;
 }
 
 interface Toast {
@@ -56,12 +77,22 @@ interface Toast {
 }
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  DRAFT:          { label: "Content Missing", color: "#92400E", bg: "#FEF3C7" },
-  content_missing:{ label: "Content Missing", color: "#92400E", bg: "#FEF3C7" },
-  draft:          { label: "Draft",          color: "#1E40AF", bg: "#DBEAFE" },
-  generated:      { label: "Generated",      color: "#6B21A8", bg: "#EDE9FE" },
-  reviewed:       { label: "Reviewed",       color: "#0F766E", bg: "#CCFBF1" },
-  published:      { label: "Published",      color: "#065F46", bg: "#D1FAE5" },
+  // Lesson shell statuses
+  DRAFT:           { label: "Shell Only",      color: "#6B7280", bg: "#F3F4F6" },
+  shell:           { label: "Shell Only",      color: "#6B7280", bg: "#F3F4F6" },
+  // Generation statuses
+  not_generated:   { label: "Not Generated",   color: "#6B7280", bg: "#F3F4F6" },
+  draft_generated: { label: "Draft Generated", color: "#B45309", bg: "#FEF3C7" },
+  needs_review:    { label: "Needs Review",    color: "#B45309", bg: "#FEF3C7" },
+  approved:        { label: "Approved",        color: "#0F766E", bg: "#CCFBF1" },
+  published:       { label: "Published",       color: "#065F46", bg: "#D1FAE5" },
+  rejected:        { label: "Rejected",        color: "#DC2626", bg: "#FEE2E2" },
+  failed:          { label: "Failed",          color: "#DC2626", bg: "#FEE2E2" },
+  // Legacy
+  content_missing: { label: "Shell Only",      color: "#6B7280", bg: "#F3F4F6" },
+  draft:           { label: "Shell Only",      color: "#6B7280", bg: "#F3F4F6" },
+  generated:       { label: "Draft Generated", color: "#B45309", bg: "#FEF3C7" },
+  reviewed:        { label: "Approved",        color: "#0F766E", bg: "#CCFBF1" },
 };
 
 const SUBJECT_NAMES: Record<string, string> = {
@@ -244,7 +275,7 @@ export default function SubjectCurriculumPage() {
       </div>
 
       {/* Header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "2rem", flexWrap: "wrap", gap: 12 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1rem", flexWrap: "wrap", gap: 12 }}>
         <div>
           <h1 style={{ fontSize: "1.75rem", fontWeight: 900, color: colors.text, margin: "0 0 4px" }}>
             Grade {gradeId} {subjectName}
@@ -259,15 +290,31 @@ export default function SubjectCurriculumPage() {
             background: "white", color: colors.text, fontWeight: 700, fontSize: "0.8125rem",
             cursor: "pointer", display: "flex", alignItems: "center", gap: 6,
           }}>
-            <Download size={15} /> Template
+            <Download size={15} /> Download Lesson Shell Template
           </button>
           <button onClick={() => { setShowModal(true); setStep("upload"); setImportResult(null); setPreviewRows(null); setFile(null); }} style={{
             padding: "9px 18px", borderRadius: 10, border: "none",
             background: colors.primary, color: "#fff", fontWeight: 700, fontSize: "0.8125rem",
             cursor: "pointer", display: "flex", alignItems: "center", gap: 6,
           }}>
-            <Upload size={15} /> Upload CSV
+            <Upload size={15} /> Upload Lesson Shells
           </button>
+        </div>
+      </div>
+
+      {/* Workflow info banner */}
+      <div style={{
+        padding: "12px 16px", borderRadius: 12, marginBottom: "1.5rem",
+        background: "#EFF6FF", border: "1px solid #BFDBFE",
+        fontSize: "0.8125rem", color: "#1E40AF", lineHeight: 1.5,
+      }}>
+        <div style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+          <span style={{ fontSize: "1rem", flexShrink: 0 }}>📋</span>
+          <div>
+            <strong>Lesson Shell Workflow:</strong> Upload a CSV containing all lesson shells for this subject. AI will later generate student journeys from these shells.
+            <br />⚠️ <strong>Do not use AI to create the official lesson list.</strong> Use CBC/KICD-backed lesson shells.
+            <br />📝 <strong>Batch generation coming later.</strong> For now, generate and review one lesson at a time.
+          </div>
         </div>
       </div>
 
@@ -293,7 +340,7 @@ export default function SubjectCurriculumPage() {
             No lessons imported yet
           </h3>
           <p style={{ color: colors.textMuted, fontSize: "0.875rem", maxWidth: 420, margin: "0 auto 1.5rem" }}>
-            Upload a CSV file to create lesson shells for {subjectName}. You can add content to each lesson after import.
+            Upload a CSV file to create lesson shells for {subjectName}. Shells store CBC curriculum data. You will generate and review AI journeys for each shell one at a time.
           </p>
           <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
             <button onClick={() => { setShowModal(true); setStep("upload"); }} style={{
@@ -301,7 +348,7 @@ export default function SubjectCurriculumPage() {
               background: colors.primary, color: "#fff", fontWeight: 700,
               fontSize: "0.875rem", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6,
             }}>
-              <Upload size={16} /> Upload Curriculum
+              <Upload size={16} /> Upload Lesson Shells
             </button>
             <button onClick={downloadTemplate} style={{
               padding: "10px 22px", borderRadius: 10, border: `1.5px solid ${colors.border}`,
@@ -333,11 +380,12 @@ export default function SubjectCurriculumPage() {
               background: "white", fontSize: "0.8125rem", color: colors.text, cursor: "pointer",
             }}>
               <option value="all">All Status</option>
-              <option value="DRAFT">Content Missing</option>
-              <option value="draft">Draft</option>
-              <option value="generated">Generated</option>
-              <option value="reviewed">Reviewed</option>
-              <option value="published">Published</option>
+              <option value="DRAFT">Shell Only</option>
+              <option value="not_generated">Not Generated</option>
+              <option value="draft_generated">Draft Generated</option>
+              <option value="approved">Approved</option>
+              <option value="PUBLISHED">Published</option>
+              <option value="rejected">Rejected</option>
             </select>
           </div>
 
@@ -347,9 +395,9 @@ export default function SubjectCurriculumPage() {
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.8125rem" }}>
                 <thead>
                   <tr style={{ background: "#F8FAFC", borderBottom: `1px solid ${colors.border}` }}>
-                    {["#", "Lesson", "Strand", "Term", "Week", "Quest", "Readiness", "Journey", "Status", "Coins", ""].map(h => (
+                    {["#", "Lesson", "Strand", "Sub-strand", "Term", "Week", "Order", "Completeness", "Journey", "Status", "Review", "Coins", ""].map(h => (
                       <th key={h} style={{
-                        padding: "10px 14px", textAlign: "left", fontWeight: 700,
+                        padding: "10px 10px", textAlign: "left", fontWeight: 700,
                         color: colors.text, whiteSpace: "nowrap", fontSize: "0.75rem",
                         textTransform: "uppercase", letterSpacing: "0.04em",
                       }}>{h}</th>
@@ -357,47 +405,77 @@ export default function SubjectCurriculumPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredLessons.map((l, i) => (
+                  {filteredLessons.map((l, i) => {
+                    const journeyLabel = l.generationStatus || "Not generated";
+                    const journeyColor = journeyLabel === "Approved" ? "#065F46" :
+                                      journeyLabel === "Draft generated" || journeyLabel === "Draft Generated" ? "#B45309" :
+                                      journeyLabel === "Rejected" ? "#DC2626" : "#6B7280";
+                    const journeyBg = journeyLabel === "Approved" ? "#D1FAE5" :
+                                     journeyLabel === "Draft generated" || journeyLabel === "Draft Generated" ? "#FEF3C7" :
+                                     journeyLabel === "Rejected" ? "#FEE2E2" : "#F3F4F6";
+
+                    const reviewLabel = l.reviewStatus || "—";
+                    const reviewKey = Object.keys(STATUS_CONFIG).find(k =>
+                      STATUS_CONFIG[k]?.label?.toLowerCase() === reviewLabel?.toLowerCase()
+                    ) || reviewLabel.toLowerCase().replace(/\s+/g, "_");
+                    const reviewCfg = STATUS_CONFIG[reviewKey] || { label: reviewLabel, color: "#6B7280", bg: "#F3F4F6" };
+
+                    return (
                     <tr key={l.id} style={{
                       borderBottom: "1px solid #F1F5F9",
                       background: i % 2 === 0 ? "white" : "#FAFBFC",
                     }}>
-                      <td style={{ padding: "10px 14px", color: colors.textMuted, fontWeight: 600 }}>{i + 1}</td>
-                      <td style={{ padding: "10px 14px" }}>
+                      <td style={{ padding: "10px 10px", color: colors.textMuted, fontWeight: 600 }}>{i + 1}</td>
+                      <td style={{ padding: "10px 10px", minWidth: 180 }}>
                         <div style={{ fontWeight: 700, color: colors.text }}>{l.title}</div>
-                        {l.learningOutcome && (
+                        {l.specificLearningOutcome && (
                           <div style={{ color: colors.textMuted, fontSize: "0.75rem", marginTop: 2 }}>
-                            {l.learningOutcome.slice(0, 60)}{l.learningOutcome.length > 60 ? "…" : ""}
+                            {l.specificLearningOutcome.slice(0, 60)}{l.specificLearningOutcome.length > 60 ? "…" : ""}
                           </div>
                         )}
                       </td>
-                      <td style={{ padding: "10px 14px", color: colors.text }}>{l.strand || "—"}</td>
-                      <td style={{ padding: "10px 14px", color: colors.textMuted }}>{l.term || "—"}</td>
-                      <td style={{ padding: "10px 14px", color: colors.textMuted }}>{l.week || "—"}</td>
-                      <td style={{ padding: "10px 14px", color: colors.textMuted }}>{l.questTitle || "—"}</td>
-                      <td style={{ padding: "10px 14px" }}>{getReadinessBadge(l.readiness)}</td>
-                      <td style={{ padding: "10px 14px" }}>
+                      <td style={{ padding: "10px 10px", color: colors.text }}>{l.strand || "—"}</td>
+                      <td style={{ padding: "10px 10px", color: colors.textMuted }}>{l.subStrand || "—"}</td>
+                      <td style={{ padding: "10px 10px", color: colors.textMuted }}>{l.term || "—"}</td>
+                      <td style={{ padding: "10px 10px", color: colors.textMuted }}>{l.week || "—"}</td>
+                      <td style={{ padding: "10px 10px", color: colors.textMuted, fontWeight: 600 }}>{l.lessonOrder || i + 1}</td>
+                      <td style={{ padding: "10px 10px" }}>
                         {(() => {
-                          const gs = l.generationStatus || "Not generated";
-                          const color = gs === "Approved" ? "#065F46" :
-                                        gs === "Draft generated" ? "#B45309" :
-                                        gs === "Rejected" ? "#DC2626" : "#6B7280";
-                          const bg = gs === "Approved" ? "#D1FAE5" :
-                                     gs === "Draft generated" ? "#FEF3C7" :
-                                     gs === "Rejected" ? "#FEE2E2" : "#F3F4F6";
+                          const score = l.completenessScore || 0;
+                          const c = score >= 70 ? "#065F46" : score >= 42 ? "#92400E" : score >= 28 ? "#B45309" : "#DC2626";
+                          const bg = score >= 70 ? "#D1FAE5" : score >= 42 ? "#FEF3C7" : score >= 28 ? "#FDE68A" : "#FEE2E2";
                           return (
                             <span style={{
                               display: "inline-block", padding: "2px 8px", borderRadius: 6,
                               fontSize: "0.625rem", fontWeight: 700,
-                              color, background: bg,
-                            }}>{gs}</span>
+                              color: c, background: bg,
+                            }}>{score}%</span>
                           );
                         })()}
                       </td>
-                      <td style={{ padding: "10px 14px" }}>{getStatusBadge(l.status)}</td>
-                      <td style={{ padding: "10px 14px", color: colors.textMuted, fontWeight: 600 }}>🪙 {l.rewardCoins}</td>
-                      <td style={{ padding: "10px 14px" }}>
+                      <td style={{ padding: "10px 10px" }}>
+                        <span style={{
+                          display: "inline-block", padding: "2px 8px", borderRadius: 6,
+                          fontSize: "0.625rem", fontWeight: 700,
+                          color: journeyColor, background: journeyBg,
+                        }}>{journeyLabel}</span>
+                      </td>
+                      <td style={{ padding: "10px 10px" }}>{getStatusBadge(l.status)}</td>
+                      <td style={{ padding: "10px 10px" }}>
+                        <span style={{
+                          display: "inline-block", padding: "2px 8px", borderRadius: 6,
+                          fontSize: "0.625rem", fontWeight: 700,
+                          color: reviewCfg.color, background: reviewCfg.bg,
+                        }}>{reviewCfg.label}</span>
+                      </td>
+                      <td style={{ padding: "10px 10px", color: colors.textMuted, fontWeight: 600 }}>🪙 {l.rewardCoins}</td>
+                      <td style={{ padding: "10px 10px" }}>
                         <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+                          <Link href={`/dashboard/admin/lessons/${l.id}`} style={{
+                            padding: "3px 8px", borderRadius: 6, border: `1px solid ${colors.border}`,
+                            background: "white", color: colors.text,
+                            fontSize: "0.625rem", fontWeight: 700, textDecoration: "none", display: "inline-block",
+                          }}>Edit Shell</Link>
                           {(!l.generationStatus || l.generationStatus === "Not generated" || l.generationStatus === "Rejected") && (
                             <button
                               onClick={async () => {
@@ -424,14 +502,14 @@ export default function SubjectCurriculumPage() {
                                 background: colors.primary, color: "#fff",
                                 fontSize: "0.625rem", fontWeight: 700, cursor: "pointer",
                               }}
-                            >Generate</button>
+                            >Generate Journey Draft</button>
                           )}
-                          {l.generationStatus === "Draft generated" && (
+                          {(l.generationStatus === "Draft generated" || l.generationStatus === "Draft Generated") && (
                             <Link href={`/dashboard/admin/lessons/${l.id}`} style={{
                               padding: "3px 8px", borderRadius: 6, border: `1px solid ${colors.warning}`,
                               background: "#FEF3C7", color: "#92400E",
                               fontSize: "0.625rem", fontWeight: 700, textDecoration: "none", display: "inline-block",
-                            }}>Review</Link>
+                            }}>Review Draft</Link>
                           )}
                           {l.generationStatus === "Approved" && l.status !== "PUBLISHED" && (
                             <button
@@ -467,7 +545,7 @@ export default function SubjectCurriculumPage() {
                         </div>
                       </td>
                     </tr>
-                  ))}
+                  )})}
                 </tbody>
               </table>
             </div>
@@ -503,7 +581,7 @@ export default function SubjectCurriculumPage() {
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <FileSpreadsheet size={22} style={{ color: colors.primary }} />
                 <h2 style={{ fontSize: "1.125rem", fontWeight: 800, color: colors.text, margin: 0 }}>
-                  {step === "upload" && "Upload Curriculum"}
+                  {step === "upload" && "Upload Lesson Shells"}
                   {step === "preview" && "Preview Import"}
                   {step === "result" && "Import Complete"}
                 </h2>
@@ -559,13 +637,16 @@ export default function SubjectCurriculumPage() {
                     border: "1px solid #E2E8F0", marginBottom: 16,
                   }}>
                     <p style={{ fontSize: "0.8125rem", fontWeight: 700, color: colors.text, margin: "0 0 8px" }}>
-                      Required columns: <code style={{ background: "#E2E8F0", padding: "1px 6px", borderRadius: 4, fontSize: "0.75rem" }}>lesson_title</code>
+                      Required columns: <code style={{ background: "#E2E8F0", padding: "1px 6px", borderRadius: 4, fontSize: "0.75rem" }}>lesson_title</code> <code style={{ background: "#E2E8F0", padding: "1px 6px", borderRadius: 4, fontSize: "0.75rem" }}>grade</code>
                     </p>
                     <p style={{ fontSize: "0.75rem", color: colors.textMuted, margin: "0 0 6px" }}>
-                      <strong style={{ color: colors.text }}>Optional:</strong> grade, subject, strand, sub_strand, learning_outcome, term, week, activity_title, activity_instructions, quest_title, quest_instructions, reflection_prompt, reward_coins, reward_stars, estimated_duration, difficulty
+                      <strong style={{ color: colors.text }}>Recommended for strong AI generation:</strong> strand, sub_strand, specific_learning_outcome (or learning_outcome), key_inquiry_question, suggested_learning_experience, activity_instructions, assessment_criteria, reflection_prompt
                     </p>
-                    <p style={{ fontSize: "0.75rem", color: colors.textMuted, margin: 0 }}>
-                      💡 Download the template below for the correct format.
+                    <p style={{ fontSize: "0.75rem", color: colors.textMuted, margin: "0 0 6px" }}>
+                      <strong style={{ color: colors.text }}>Also supported:</strong> term, week, lesson_order, assessment_method, learning_resources, core_competencies, values, parental_engagement, reward_xp, reward_coins, quest_title, quest_instructions, video_search_keywords, illustration_notes, source_reference
+                    </p>
+                    <p style={{ fontSize: "0.75rem", color: "#92400E", margin: 0, fontWeight: 600 }}>
+                      ⚠️ Do not use AI to create the official lesson list. Use CBC/KICD-backed lesson shells.
                     </p>
                   </div>
 
@@ -611,19 +692,19 @@ export default function SubjectCurriculumPage() {
                     <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.75rem" }}>
                       <thead>
                         <tr style={{ background: "#F8FAFC", position: "sticky", top: 0 }}>
-                          {["#", "Grade", "Subject", "Strand", "Sub-strand", "Lesson Title", "Term", "Week", "Quest", "Status"].map(h => (
-                            <th key={h} style={{
-                              padding: "10px 12px", textAlign: "left", fontWeight: 700,
-                              color: colors.text, borderBottom: `1px solid ${colors.border}`,
-                              whiteSpace: "nowrap",
-                            }}>{h}</th>
-                          ))}
+                          {[ "#", "Grade", "Subject", "Strand", "Sub-strand", "Lesson Title", "Term", "Week", "Completeness", "Status" ].map(h => (
+                                  <th key={h} style={{
+                                    padding: "10px 12px", textAlign: "left", fontWeight: 700,
+                                    color: colors.text, borderBottom: `1px solid ${colors.border}`,
+                                    whiteSpace: "nowrap",
+                                  }}>{h}</th>
+                                ))}
                         </tr>
                       </thead>
                       <tbody>
                         {previewRows.map((row, i) => (
                           <tr key={i} style={{
-                            background: !row.valid ? "#FEF2F2" : row.isDuplicate ? "#FEF3C7" : row.warnings.length > 0 ? "#FFFBEB" : "white",
+                            background: !row.valid ? "#FEF2F2" : row.isDuplicate ? "#FEF3C7" : row.warnings && row.warnings.length > 0 ? "#FFFBEB" : "white",
                             borderBottom: "1px solid #F1F5F9",
                           }}>
                             <td style={{ padding: "8px 12px", color: colors.textMuted }}>{i + 1}</td>
@@ -634,12 +715,29 @@ export default function SubjectCurriculumPage() {
                             <td style={{ padding: "8px 12px", color: row.lessonTitle ? colors.text : "#DC2626", fontWeight: row.lessonTitle ? 500 : 700 }}>{row.lessonTitle || "MISSING"}</td>
                             <td style={{ padding: "8px 12px", color: colors.textMuted }}>{row.term || "—"}</td>
                             <td style={{ padding: "8px 12px", color: colors.textMuted }}>{row.week || "—"}</td>
-                            <td style={{ padding: "8px 12px", color: colors.textMuted }}>{row.questTitle || "—"}</td>
+                            <td style={{ padding: "8px 12px" }}>
+                              {(() => {
+                                const score = row.completenessScore || 0;
+                                const c = score >= 70 ? "#065F46" : score >= 42 ? "#92400E" : score >= 28 ? "#B45309" : "#DC2626";
+                                const bg = score >= 70 ? "#D1FAE5" : score >= 42 ? "#FEF3C7" : score >= 28 ? "#FDE68A" : "#FEE2E2";
+                                return (
+                                  <span style={{
+                                    display: "inline-block", padding: "2px 8px", borderRadius: 6,
+                                    fontSize: "0.625rem", fontWeight: 700,
+                                    color: c, background: bg,
+                                  }}>{score}%</span>
+                                );
+                              })()}
+                            </td>
                             <td style={{ padding: "8px 12px" }}>
                               {row.valid ? (
                                 row.isDuplicate ? (
                                   <span style={{ color: "#D97706", fontWeight: 700 }} title={row.warnings.join(", ")}>
                                     🔄 Duplicate
+                                  </span>
+                                ) : row.warnings && row.warnings.length > 0 ? (
+                                  <span style={{ color: "#B45309", fontWeight: 700, fontSize: "0.6875rem" }} title={row.warnings.join("; ")}>
+                                    ⚠ Valid · {row.warnings.length} warning{row.warnings.length !== 1 ? "s" : ""}
                                   </span>
                                 ) : (
                                   <span style={{ color: "#059669", fontWeight: 700 }}>✓ Valid</span>

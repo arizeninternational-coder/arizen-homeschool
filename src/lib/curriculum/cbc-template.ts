@@ -120,6 +120,10 @@ export const COLUMN_MAP: Record<string, string> = {
   lessontitle: "lessonTitle",
   "lesson-title": "lessonTitle",
   lesson: "lessonTitle",
+  lesson_order: "lessonOrder",
+  lessonorder: "lessonOrder",
+  "lesson-order": "lessonOrder",
+  order: "lessonOrder",
 
   // Quest
   quest_title: "questTitle",
@@ -172,6 +176,12 @@ export const COLUMN_MAP: Record<string, string> = {
   video_required: "videoRequired",
   videorequired: "videoRequired",
   "video-required": "videoRequired",
+
+  // Illustration
+  illustration_notes: "illustrationNotes",
+  illustrationnotes: "illustrationNotes",
+  "illustration-notes": "illustrationNotes",
+  illustration_prompt: "illustrationNotes",
 
   // Offline
   offline_activity: "offlineActivity",
@@ -284,6 +294,8 @@ export interface CbcContentBlocks {
     reference: string;
     reviewStatus: string;
   };
+  lessonOrder: number;
+  illustrationNotes: string;
 }
 
 export function buildContentBlocks(row: {
@@ -318,6 +330,8 @@ export function buildContentBlocks(row: {
   videoRequired?: string;
   sourceReference?: string;
   reviewStatus?: string;
+  lessonOrder?: string;
+  illustrationNotes?: string;
 }): CbcContentBlocks {
   return {
     importSource: "csv",
@@ -362,6 +376,8 @@ export function buildContentBlocks(row: {
       reference: row.sourceReference || "",
       reviewStatus: row.reviewStatus || "DRAFT",
     },
+    lessonOrder: parseInt(row.lessonOrder || "0", 10) || 0,
+    illustrationNotes: row.illustrationNotes || "",
   };
 }
 
@@ -379,15 +395,14 @@ export function generateCsvTemplate(
     return s;
   };
   const headers = [
-    "curriculum_version",
-    "country",
-    "system",
     "grade",
-    "term",
-    "week",
     "subject",
     "strand",
     "sub_strand",
+    "term",
+    "week",
+    "lesson_order",
+    "lesson_title",
     "specific_learning_outcome",
     "key_inquiry_question",
     "suggested_learning_experience",
@@ -395,36 +410,31 @@ export function generateCsvTemplate(
     "activity_instructions",
     "assessment_method",
     "assessment_criteria",
+    "reflection_prompt",
+    "learning_resources",
     "core_competencies",
     "values",
-    "pertinent_and_contemporary_issues",
-    "learning_resources",
     "parental_engagement",
-    "lesson_title",
-    "quest_title",
-    "quest_instructions",
-    "reflection_prompt",
-    "difficulty",
     "estimated_duration",
+    "difficulty",
     "reward_xp",
     "reward_coins",
-    "source_reference",
-    "review_status",
+    "quest_title",
+    "quest_instructions",
     "video_search_keywords",
-    "video_required",
-    "offline_activity",
+    "illustration_notes",
+    "source_reference",
   ];
 
   const example = [
-    escapeCsv("1"),
-    escapeCsv("Kenya"),
-    escapeCsv("CBC"),
     escapeCsv(String(gradeNum)),
-    escapeCsv("Term 1"),
-    escapeCsv("Week 1"),
     escapeCsv(subjectName),
     escapeCsv("Number Concept"),
     escapeCsv("Counting"),
+    escapeCsv("Term 1"),
+    escapeCsv("Week 1"),
+    escapeCsv("1"),
+    escapeCsv("Counting to 100"),
     escapeCsv("Learners should be able to count objects up to 100"),
     escapeCsv("How do we count things around us?"),
     escapeCsv("Use physical objects like beads and stones for counting"),
@@ -432,24 +442,20 @@ export function generateCsvTemplate(
     escapeCsv("Provide beads in groups of 10. Learners count aloud."),
     escapeCsv("Observation and oral questioning"),
     escapeCsv("Learner counts accurately up to 100"),
+    escapeCsv("What numbers did you see today?"),
+    escapeCsv("Beads, number charts, exercise books"),
     escapeCsv("Communication and Collaboration, Critical Thinking"),
     escapeCsv("Responsibility, Respect"),
-    escapeCsv("Environmental awareness"),
-    escapeCsv("Beads, number charts, exercise books"),
     escapeCsv("Parents help children count household items"),
-    escapeCsv("Counting to 100"),
-    escapeCsv("Numbers Quest"),
-    escapeCsv("Explore numbers in daily life"),
-    escapeCsv("What numbers did you see today?"),
-    escapeCsv("easy"),
     escapeCsv("30"),
+    escapeCsv("easy"),
     escapeCsv("50"),
     escapeCsv("10"),
-    escapeCsv("CBC Grade " + gradeNum + " " + subjectName),
-    escapeCsv("DRAFT"),
+    escapeCsv("Numbers Quest"),
+    escapeCsv("Explore numbers in daily life"),
     escapeCsv("counting numbers kindergarten"),
-    escapeCsv("no"),
-    escapeCsv("Count items at home and write the total"),
+    escapeCsv("Children counting objects in a bright classroom"),
+    escapeCsv("CBC Grade " + gradeNum + " " + subjectName),
   ];
 
   return [headers.join(","), example.join(",")].join("\n");

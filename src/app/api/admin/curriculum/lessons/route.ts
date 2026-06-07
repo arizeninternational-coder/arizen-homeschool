@@ -74,12 +74,13 @@ export async function GET(req: NextRequest) {
     const questIds = quests.map(q => q.id);
     const questMap = new Map(quests.map(q => [q.id, q.title]));
 
-    // Get all lessons for these quests
+    // Get all lessons for these quests — sort by term/week/lessonOrder/createdAt
     const { data: lessons } = await supabase
       .from("Lesson")
       .select("*")
       .in("questId", questIds)
-      .order("orderIndex", { ascending: true });
+      .order("orderIndex", { ascending: true })
+      .order("createdAt", { ascending: true });
 
     if (!lessons || lessons.length === 0) {
       return NextResponse.json({ lessons: [], theme });
@@ -130,15 +131,30 @@ export async function GET(req: NextRequest) {
         // Enriched fields from contentBlocks
         strand: meta.strand || "",
         subStrand: meta.subStrand || "",
-        learningOutcome: meta.learningOutcome || "",
+        learningOutcome: meta.learningOutcome || meta.specificLearningOutcome || "",
+        specificLearningOutcome: meta.specificLearningOutcome || "",
+        keyInquiryQuestion: meta.keyInquiryQuestion || "",
+        suggestedLearningExperience: meta.suggestedLearningExperience || "",
+        assessmentMethod: meta.assessmentMethod || "",
+        assessmentCriteria: meta.assessmentCriteria || "",
+        learningResources: meta.learningResources || "",
+        coreCompetencies: meta.coreCompetencies || "",
+        values: meta.values || "",
+        parentalEngagement: meta.parentalEngagement || "",
         term: meta.term || "",
         week: meta.week || "",
+        lessonOrder: meta.lessonOrder || 0,
         activityTitle: meta.activityTitle || "",
         activityInstructions: meta.activityInstructions || "",
         questInstructions: meta.questInstructions || "",
         reflectionPrompt: meta.reflectionPrompt || "",
         rewardCoins: meta.rewardCoins || 10,
         rewardStars: meta.rewardStars || 0,
+        rewardXp: meta.rewardXp || 0,
+        videoSearchKeywords: meta.videoSearchKeywords || "",
+        illustrationNotes: meta.illustrationNotes || "",
+        sourceReference: meta.sourceReference || "",
+        completenessScore: meta.completenessScore || 0,
         readiness,
         generationStatus,
       };
