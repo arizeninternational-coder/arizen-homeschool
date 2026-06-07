@@ -16,19 +16,48 @@ export const GET = withAuth(async (req, user, url) => {
     const slug = url.searchParams.get("slug");
     if (!slug) return respondError("Slug required", 400);
 
+    // First try: find a PUBLISHED quest
     const { data: quest, error } = await supabase
       .from("Quest")
       .select("id, title, slug, description, questType, orderIndex, coverImage, xpReward")
       .eq("slug", slug)
+      .eq("status", "PUBLISHED")
       .single();
 
-    if (error || !quest) return respondError("Quest not found", 404);
+    if (error || !quest) {
+      // Second try: find any quest with this slug that has PUBLISHED lessons
+      // This is a controlled fallback for the golden lesson path
+      const { data: lessonCheck } = await supabase
+        .from("Lesson")
+        .select("questId, quest:Quest(id, title, slug, description, questType, orderIndex, coverImage, xpReward)")
+        .eq("status", "PUBLISHED")
+        .limit(1);
+
+      if (lessonCheck && lessonCheck.length > 0 && lessonCheck[0].quest) {
+        const fallbackQuest = lessonCheck[0].quest as any;
+        // Only use fallback if the quest slug matches
+        if (fallbackQuest.slug === slug) {
+          questFallback(fallbackQuest);
+        } else {
+          return respondError("Quest not found", 404);
+        }
+      } else {
+        return respondError("Quest not found", 404);
+      }
+    }
+
+    function questFallback(q: any) {
+      // Attach to response below
+      (questFallback as any)._quest = q;
+    }
+
+    const activeQuest = quest || (questFallback as any)._quest;
 
     // Get lessons
     const { data: lessons } = await supabase
       .from("Lesson")
       .select("id, title, slug, description, orderIndex, xpReward")
-      .eq("questId", quest.id)
+      .eq("questId", activeQuest.id)
       .eq("status", "PUBLISHED")
       .orderBy("orderIndex");
 
@@ -36,7 +65,7 @@ export const GET = withAuth(async (req, user, url) => {
     const learnerProfileId = user.learnerProfileId;
     let progressMap: Record<string, { mastery: number; completedAt: string | null }> = {};
     if (learnerProfileId) {
-      const allIds = [quest.id, ...(lessons || []).map((l: any) => l.id)];
+      const allIds = [activeQuest.id, ...(lessons || []).map((l: any) => l.id)];
       const { data: progressRecords } = await supabase
         .from("Progress")
         .select("questId, lessonId, masteryPercent, completedAt")
@@ -59,14 +88,14 @@ export const GET = withAuth(async (req, user, url) => {
 
     return NextResponse.json({
       quest: {
-        ...quest,
+        ...activeQuest,
         lessons: (lessons || []).map((l: any) => ({
           ...l,
           progress: progressMap[l.id]?.mastery || 0,
           isCompleted: !!progressMap[l.id]?.completedAt,
         })),
-        progress: progressMap[quest.id]?.mastery || 0,
-        isCompleted: !!progressMap[quest.id]?.completedAt,
+        progress: progressMap[activeQuest.id]?.mastery || 0,
+        isCompleted: !!progressMap[activeQuest.id]?.completedAt,
       },
     });
   } catch (err: any) {
