@@ -20,7 +20,6 @@ export const GET = withAuth(async (req, user, url) => {
       .from("Quest")
       .select("id, title, slug, description, questType, orderIndex, coverImage, xpReward")
       .eq("slug", slug)
-      .eq("status", "PUBLISHED")
       .single();
 
     if (error || !quest) return respondError("Quest not found", 404);

@@ -17,7 +17,7 @@ export const GET = withAuth(async (req, user, url) => {
 
     const { data: lesson, error } = await supabase
       .from("Lesson")
-      .select("id, title, slug, description, contentBlocks, difficulty, xpReward, cbcMapping, questId")
+      .select("id, title, slug, description, contentBlocks, difficulty, xpReward, cbcMapping, questId, quest:Quest(id, title, slug, theme:Theme(id, title, slug, grade, themeSubjects:ThemeSubject(subject)))")
       .eq("slug", slug)
       .eq("status", "PUBLISHED")
       .single();
