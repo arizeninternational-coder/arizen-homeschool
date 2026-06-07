@@ -852,6 +852,149 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
           )}
         </div>
 
+        {/* Media Preparation — per-step illustration & video controls */}
+        {(hasApprovedJourney || (aiDraft && aiDraft.length > 0)) && (() => {
+          const journeyForMedia = hasApprovedJourney
+            ? (() => {
+                try {
+                  const cb = typeof lesson?.contentBlocks === "string"
+                    ? JSON.parse(lesson.contentBlocks)
+                    : lesson?.contentBlocks;
+                  return cb?.studentJourney || [];
+                } catch { return []; }
+              })()
+            : (aiDraft || []);
+
+          const stepIcons: Record<string, string> = {
+            welcome: "🦉", mission: "🎯", think_first: "💭", learn: "📖",
+            connect: "🔗", example: "💡", practice: "✏️", quick_check: "✅",
+            reflect: "🪞", complete: "🏆",
+          };
+
+          return (
+            <div style={{ ...ds.card, padding: "1.25rem 1.5rem", marginBottom: "1.5rem" }}>
+              <h3 style={{ fontSize: "0.9375rem", fontWeight: 800, color: colors.text, display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1rem" }}>
+                🎨 Media Preparation
+                <span style={{ fontSize: "0.6875rem", fontWeight: 600, color: colors.textMuted, background: colors.bgSoft, padding: "2px 8px", borderRadius: 6 }}>
+                  {journeyForMedia.length} steps
+                </span>
+              </h3>
+              <p style={{ fontSize: "0.75rem", color: colors.textMuted, marginBottom: "1rem" }}>
+                Manage illustration prompts and video search keywords for each journey step. Media is stored inside contentBlocks and is only visible to students after approval.
+              </p>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                {journeyForMedia.map((step: any, i: number) => {
+                  // Determine media status for this step
+                  const illusStatus = step.illustrationPrompt
+                    ? (step.media?.illustration?.status || "prompt_ready")
+                    : "missing";
+                  const videoStatus = step.video?.approvedByAdmin
+                    ? "approved"
+                    : step.video?.searchKeywords
+                      ? "keywords_set"
+                      : "missing";
+
+                  const illusColors: Record<string, { color: string; bg: string; label: string }> = {
+                    missing:        { color: "#6B7280", bg: "#F3F4F6", label: "No prompt" },
+                    prompt_ready:   { color: "#B45309", bg: "#FEF3C7", label: "Prompt ready" },
+                    generated:      { color: "#1E40AF", bg: "#DBEAFE", label: "Generated" },
+                    uploaded:       { color: "#1E40AF", bg: "#DBEAFE", label: "Uploaded" },
+                    approved:       { color: "#065F46", bg: "#D1FAE5", label: "Approved ✓" },
+                    failed:         { color: "#DC2626", bg: "#FEE2E2", label: "Failed" },
+                  };
+                  const vidColors: Record<string, { color: string; bg: string; label: string }> = {
+                    missing:        { color: "#6B7280", bg: "#F3F4F6", label: "No video" },
+                    keywords_set:   { color: "#B45309", bg: "#FEF3C7", label: "Keywords set" },
+                    approved:       { color: "#065F46", bg: "#D1FAE5", label: "Approved ✓" },
+                  };
+
+                  const ic = illusColors[illusStatus] || illusColors.missing;
+                  const vc = vidColors[videoStatus] || vidColors.missing;
+
+                  return (
+                    <div key={i} style={{
+                      padding: "10px 12px", borderRadius: 8,
+                      border: `1px solid ${colors.border}`,
+                      background: "white",
+                    }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                        <span style={{ fontSize: "0.875rem" }}>{stepIcons[step.stepType] || "📌"}</span>
+                        <span style={{ fontSize: "0.75rem", fontWeight: 700, color: colors.text, flex: 1 }}>
+                          Step {i + 1}: {step.title || step.stepType}
+                        </span>
+
+                        {/* Illustration status */}
+                        <span style={{
+                          fontSize: "0.625rem", fontWeight: 700,
+                          color: ic.color, background: ic.bg,
+                          padding: "2px 8px", borderRadius: 4,
+                        }}>🎨 {ic.label}</span>
+
+                        {/* Video status */}
+                        <span style={{
+                          fontSize: "0.625rem", fontWeight: 700,
+                          color: vc.color, background: vc.bg,
+                          padding: "2px 8px", borderRadius: 4,
+                        }}>🎬 {vc.label}</span>
+
+                        {/* Admin controls (placeholders for future backend) */}
+                        <div style={{ display: "flex", gap: 4 }}>
+                          <button
+                            disabled
+                            title="Illustration generation coming soon"
+                            style={{
+                              padding: "2px 8px", borderRadius: 4, border: `1px solid ${colors.border}`,
+                              background: colors.bgSoft, color: colors.textMuted,
+                              fontSize: "0.625rem", fontWeight: 600, cursor: "not-allowed",
+                            }}
+                          >Gen Img</button>
+                          <button
+                            disabled
+                            title="Image upload coming soon"
+                            style={{
+                              padding: "2px 8px", borderRadius: 4, border: `1px solid ${colors.border}`,
+                              background: colors.bgSoft, color: colors.textMuted,
+                              fontSize: "0.625rem", fontWeight: 600, cursor: "not-allowed",
+                            }}
+                          >Upload</button>
+                          <button
+                            disabled
+                            title="Approve media coming soon"
+                            style={{
+                              padding: "2px 8px", borderRadius: 4, border: `1px solid ${colors.border}`,
+                              background: colors.bgSoft, color: colors.textMuted,
+                              fontSize: "0.625rem", fontWeight: 600, cursor: "not-allowed",
+                            }}
+                          >Approve</button>
+                        </div>
+                      </div>
+
+                      {/* Show illustration prompt if exists (admin only) */}
+                      {step.illustrationPrompt && (
+                        <div style={{ marginTop: 6, padding: "4px 8px", borderRadius: 4, background: "#F8FAFC", fontSize: "0.6875rem", color: colors.textMuted }}>
+                          <span style={{ fontWeight: 600 }}>Prompt:</span> {step.illustrationPrompt.slice(0, 80)}{step.illustrationPrompt.length > 80 ? "…" : ""}
+                        </div>
+                      )}
+
+                      {/* Show video keywords if exists (admin only) */}
+                      {step.video?.searchKeywords && (
+                        <div style={{ marginTop: 4, padding: "4px 8px", borderRadius: 4, background: "#F8FAFC", fontSize: "0.6875rem", color: colors.textMuted }}>
+                          <span style={{ fontWeight: 600 }}>Video keywords:</span> {step.video.searchKeywords}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div style={{ marginTop: "0.75rem", padding: "8px 12px", borderRadius: 8, background: "#FFFBEB", border: "1px solid #FDE68A", fontSize: "0.6875rem", color: "#92400E" }}>
+                <strong>Note:</strong> Generate / Upload / Approve buttons are disabled until backend API routes are connected. Currently, illustration prompts and video keywords are set during journey generation.
+              </div>
+            </div>
+          );
+        })()}
+
         {/* Edit form */}
         <div style={{ display: "grid", gap: "1.5rem" }}>
           {/* Basic Info */}
