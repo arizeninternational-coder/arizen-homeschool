@@ -162,3 +162,77 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     return NextResponse.json({ error: err.message || "Failed to update lesson" }, { status: 500 });
   }
 }
+
+// DELETE /api/admin/lessons/[id]
+// Safe deletion: archives if student progress exists, hard deletes if not
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const auth = await requireAdmin(req);
+  if (auth instanceof NextResponse) return auth;
+
+  try {
+    const body = await req.json().catch(() => ({}));
+    const { forceDelete } = body;
+
+    // Check for student progress
+    const { data: progressRecords } = await supabase
+      .from("Progress")
+      .select("id")
+      .eq("lessonId", params.id)
+      .limit(1);
+
+    const hasStudentProgress = progressRecords && progressRecords.length > 0;
+
+    if (hasStudentProgress) {
+      // Archive instead of delete
+      const { data: archived, error: archiveErr } = await supabase
+        .from("Lesson")
+        .update({ status: "DRAFT", updatedAt: new Date().toISOString() })
+        .eq("id", params.id)
+        .select("id, title, status")
+        .single();
+
+      if (archiveErr) {
+        return NextResponse.json({ error: "Failed to archive lesson" }, { status: 500 });
+      }
+
+      return NextResponse.json({
+        success: true,
+        action: "archived",
+        message: "Lesson has student progress. Archived (set to DRAFT) instead of deleted.",
+        lesson: archived,
+      });
+    }
+
+    if (!forceDelete) {
+      return NextResponse.json({
+        success: false,
+        requiresConfirmation: true,
+        message: "No student progress found. Send forceDelete: true to permanently delete.",
+      });
+    }
+
+    const { data: deleted, error: deleteErr } = await supabase
+      .from("Lesson")
+      .delete()
+      .eq("id", params.id)
+      .select("id, title")
+      .single();
+
+    if (deleteErr) {
+      return NextResponse.json({ error: "Failed to delete lesson" }, { status: 500 });
+    }
+
+    return NextResponse.json({
+      success: true,
+      action: "deleted",
+      message: "Lesson permanently deleted.",
+      lesson: deleted,
+    });
+  } catch (err: any) {
+    console.error("[DELETE_LESSON] Error:", err);
+    return NextResponse.json({ error: err.message || "Failed to delete lesson" }, { status: 500 });
+  }
+}
