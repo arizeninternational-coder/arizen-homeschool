@@ -521,11 +521,15 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
                 ✓ Completed
               </span>
             )}
-            {lesson?.difficulty && (
-              <span className="text-[10px] font-extrabold uppercase tracking-wider bg-white/20 text-white px-2.5 py-1 rounded-full">
-                {lesson.difficulty}
-              </span>
-            )}
+            {lesson?.difficulty && (() => {
+              const d = typeof lesson.difficulty === "string" ? lesson.difficulty : JSON.stringify(lesson.difficulty);
+              const label = d.includes("{") ? (JSON.parse(d)?.level || d) : d;
+              return (
+                <span className="text-[10px] font-extrabold uppercase tracking-wider bg-white/20 text-white px-2.5 py-1 rounded-full">
+                  {label}
+                </span>
+              );
+            })()}
             {xp && (
               <span className="text-[10px] font-extrabold uppercase tracking-wider bg-gold/80 text-white px-2.5 py-1 rounded-full flex items-center gap-1">
                 <Zap className="w-3 h-3" /> {xp} XP
