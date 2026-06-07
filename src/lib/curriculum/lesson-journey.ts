@@ -671,7 +671,7 @@ export interface LessonReadiness {
 }
 
 export function checkLessonReadiness(contentBlocks: any): LessonReadiness {
-  const blocks = contentBlocks || {};
+  const blocks = parseContentBlocks(contentBlocks);
 
   // ── First: check if an approved student journey exists ──
   const hasApprovedJourney = Array.isArray(blocks.studentJourney) && blocks.studentJourney.length > 0;
@@ -952,25 +952,34 @@ export interface StudentJourneyContent {
   aiMetadata?: AiMetadata;
 }
 
+/** Safely parse contentBlocks — handles both JSON string and object */
+function parseContentBlocks(contentBlocks: any): any {
+  if (!contentBlocks) return {};
+  if (typeof contentBlocks === "string") {
+    try { return JSON.parse(contentBlocks); } catch { return {}; }
+  }
+  return contentBlocks;
+}
+
 /** Helper: Get the student journey from contentBlocks, with fallback */
 export function getStudentJourney(contentBlocks: any): JourneyStep[] | null {
-  if (!contentBlocks) return null;
-  const approved = contentBlocks.studentJourney;
+  const blocks = parseContentBlocks(contentBlocks);
+  const approved = blocks.studentJourney;
   if (Array.isArray(approved) && approved.length > 0) return approved;
   return null;
 }
 
 /** Helper: Check if contentBlocks has an AI-generated draft */
 export function hasAiDraft(contentBlocks: any): boolean {
-  if (!contentBlocks) return false;
-  const draft = contentBlocks.studentJourneyDraft;
+  const blocks = parseContentBlocks(contentBlocks);
+  const draft = blocks.studentJourneyDraft;
   return Array.isArray(draft) && draft.length > 0;
 }
 
 /** Helper: Check if contentBlocks has an approved student journey */
 export function hasApprovedJourney(contentBlocks: any): boolean {
-  if (!contentBlocks) return false;
-  const journey = contentBlocks.studentJourney;
+  const blocks = parseContentBlocks(contentBlocks);
+  const journey = blocks.studentJourney;
   return Array.isArray(journey) && journey.length > 0;
 }
 
@@ -1101,23 +1110,25 @@ export function buildUniversalJourney(
     parentNote?: string;
   }
 ): { steps: JourneyStep[]; source: "ai_journey" | "legacy_array" | "cbc_fallback" } {
+  const blocks = parseContentBlocks(contentBlocks);
+
   // 1. Check for AI-approved student journey first
-  const aiJourney = getStudentJourney(contentBlocks);
+  const aiJourney = getStudentJourney(blocks);
   if (aiJourney) {
     return { steps: aiJourney, source: "ai_journey" };
   }
 
   // 2. Check for old array contentBlocks
-  if (Array.isArray(contentBlocks)) {
+  if (Array.isArray(blocks)) {
     return {
-      steps: convertLegacyBlocksToJourney(contentBlocks, title),
+      steps: convertLegacyBlocksToJourney(blocks, title),
       source: "legacy_array",
     };
   }
 
   // 3. Build from structured CBC fields
   try {
-    const journey = buildJourneyFromCbcBlocks(lessonId, title, contentBlocks, meta);
+    const journey = buildJourneyFromCbcBlocks(lessonId, title, blocks, meta);
     return { steps: journey.steps, source: "cbc_fallback" };
   } catch {
     return { steps: [], source: "cbc_fallback" };

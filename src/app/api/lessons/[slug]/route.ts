@@ -36,9 +36,16 @@ export const GET = withAuth(async (req, user, url) => {
       progress = p;
     }
 
+    // Parse contentBlocks if it's a JSON string (written by admin APIs)
+    let parsedContentBlocks = lesson.contentBlocks;
+    if (typeof parsedContentBlocks === "string") {
+      try { parsedContentBlocks = JSON.parse(parsedContentBlocks); } catch {}
+    }
+
     return NextResponse.json({
       lesson: {
         ...lesson,
+        contentBlocks: parsedContentBlocks,
         progress: progress?.masteryPercent || 0,
         isCompleted: !!progress?.completedAt,
       },
