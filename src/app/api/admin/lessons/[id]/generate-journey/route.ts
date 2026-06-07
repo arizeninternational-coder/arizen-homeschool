@@ -89,8 +89,26 @@ export async function POST(
     const hasMinimumFields = missingFields.length <= 2; // Allow up to 2 missing fields
 
     // Build the AI prompt
-    const prompt = `You are creating a student learning journey for a Kenyan CBC lesson.
+    const subjectLower = subject.toLowerCase();
+    const isMath = subjectLower.includes("math");
+    const isMeasurement = strand.toLowerCase().includes("measurement") || subStrand.toLowerCase().includes("measurement") || title.toLowerCase().includes("measurement") || title.toLowerCase().includes("length") || title.toLowerCase().includes("mass") || title.toLowerCase().includes("capacity") || title.toLowerCase().includes("time") || title.toLowerCase().includes("money");
 
+    const mathContext = isMath && isMeasurement
+      ? `MEASUREMENT LESSON — Use these concrete examples:
+- Compare lengths: "A desk is about 1 metre long. A doorway is about 2 metres tall."
+- Use real objects: desks, books, ropes, doorways, classroom walls, metre sticks, strings, rulers
+- Language: longer, shorter, taller, equal, about, estimate, measure
+- Activities: "Use a metre stick to measure your desk", "Estimate then measure the length of a book"
+- Kenyan context: "The distance from your seat to the door is about 3 metres"`
+      : `MATH LESSON — Use these concrete learning objects:
+- Counters, bottle tops, fruits, pencils, books, cups, plates, shapes, drawings
+- Home/classroom objects for counting, sorting, grouping
+- Kenyan coins where relevant (1, 5, 10, 20 shillings)
+- Step-by-step worked examples with objects the child can touch`;
+
+    const prompt = `You are creating a student learning journey for ONE Kenyan CBC lesson. You are NOT creating a lesson plan or curriculum — only the student-facing journey for this single lesson.
+
+LESSON CONTEXT (do not change these):
 Grade: ${grade}
 Subject: ${subject}
 Strand: ${strand}
@@ -99,6 +117,7 @@ Lesson title: ${title}
 ${term ? `Term: ${term}` : ""}
 ${week ? `Week: ${week}` : ""}
 
+LESSON CONTENT:
 Learning outcome: ${learningOutcome || "(not provided)"}
 Key inquiry question: ${keyInquiryQuestion || "(not provided)"}
 Suggested learning experience: ${suggestedLearningExperience || "(not provided)"}
@@ -110,26 +129,34 @@ Core competencies: ${coreCompetencies || ""}
 Learning resources: ${learningResources || ""}
 Reflection prompt: ${reflectionPrompt || "(not provided)"}
 
-${missingFields.length > 0 ? `WARNING: The following fields are missing: ${missingFields.join(", ")}. Create the best journey possible with available content, but note that the lesson shell is incomplete.` : ""}
+${missingFields.length > 0 ? `⚠️ INCOMPLETE SHELL: Missing: ${missingFields.join(", ")}. Generate the best journey possible but note the draft may be weaker.` : ""}
 
-Create a child-friendly student journey with these rules:
-- One idea per step
-- Short child-friendly text (Grade 2 to Grade 5 level)
-- Use simple, concrete examples
-- For math: use counters, fruits, bottle tops, books, plates, cups, drawings, or home objects
-- Include warm Owl Teacher guidance in every step
-- Include one worked example with step-by-step reasoning
-- Include multiple learner practice moments:
-  * Think First: an open-response or self-check question to activate curiosity
-  * Guided Practice: a practice task with hints and Owl Teacher support
-  * Independent Practice: a task the student does on their own with objects, drawings, or fingers
-- Include one quick check to verify understanding
-- Include reflection options (premade chips the student can select)
-- Do NOT include unsafe content
-- Do NOT include unapproved video links
-- Create illustration prompts (not images)
-- Video search keywords are allowed, but approvedUrl must remain empty
-- No long paragraphs — keep each step focused and brief
+JOURNEY DESIGN RULES:
+- This is for ONE lesson only. Do NOT create other lesson titles or change the curriculum sequence.
+- One idea per screen. Short child-friendly text (Grade 2–5 reading level).
+- NO generic "Welcome to..." filler. Start with something that makes the student curious or excited.
+- NO long paragraphs. No raw JSON-like output. No database-looking metadata.
+- Every step MUST have warm Owl Teacher guidance (owlText) — encouraging, practical, specific.
+- The student should DO things, not just read. Every step should have an action or question.
+
+INTERACTION DENSITY (required):
+1. THINK FIRST: An open-response or self-check question to activate curiosity.
+   Example: "Which object do you think is longer — your desk or the classroom door?"
+2. LEARN IT MICRO-ACTION: A small question while learning.
+   Example: "Look at the two objects. Which one would need a metre stick to measure?"
+3. WORKED EXAMPLE: One fully worked example with step-by-step reasoning.
+   ${mathContext}
+4. GUIDED PRACTICE (title: "Try Together"): Practice with hints and Owl support.
+5. INDEPENDENT PRACTICE (title: "Try It Yourself"): Student does it alone with objects, drawings, or fingers.
+6. QUICK CHECK: Multiple choice or self-check with immediate feedback.
+7. REFLECTION: Premade chip options the student can tap/select, plus optional writing.
+
+PRACTICE MOMENTS: Include at least 2 distinct practice steps (Guided + Independent).
+Use duplicate practice stepTypes with different titles if needed.
+
+ILLUSTRATIONS: Include illustrationPrompt on every step (describe what would help the student see the idea).
+VIDEOS: Include video.searchKeywords only. approvedUrl MUST remain empty. approvedByAdmin MUST be false.
+SAFETY: No unsafe content. No unapproved video links.
 
 Return ONLY valid JSON in this exact shape:
 {
@@ -142,12 +169,15 @@ Return ONLY valid JSON in this exact shape:
       "owlText": "...",
       "visualType": "owl_teacher",
       "illustrationPrompt": "...",
-      "interaction": { "type": "none" }
+      "interaction": { "type": "none" },
+      "materials": ["..."],
+      "video": { "required": false, "searchKeywords": "...", "approvedUrl": null, "approvedByAdmin": false }
     }
   ]
 }
 
-Required step types (all 10): welcome, mission, think_first, learn, connect, example, practice, quick_check, reflect, complete`;
+Required step types (all 10): welcome, mission, think_first, learn, connect, example, practice, quick_check, reflect, complete
+Minimum 8 total steps. At least 2 practice steps (one guided, one independent).`;
 
     // Call OpenRouter
     const response = await fetch(
@@ -219,6 +249,35 @@ Required step types (all 10): welcome, mission, think_first, learn, connect, exa
         },
         { status: 502 }
       );
+    }
+
+    // Validate minimum step count
+    if (parsed.studentJourney.length < 8) {
+      return NextResponse.json(
+        {
+          error: `AI generated only ${parsed.studentJourney.length} steps. At least 8 steps required. Try again.`,
+        },
+        { status: 502 }
+      );
+    }
+
+    // Validate at least 2 practice steps
+    const practiceSteps = parsed.studentJourney.filter((s: any) => s.stepType === "practice");
+    if (practiceSteps.length < 2) {
+      return NextResponse.json(
+        {
+          error: `AI generated only ${practiceSteps.length} practice step(s). At least 2 practice steps required (guided + independent). Try again.`,
+        },
+        { status: 502 }
+      );
+    }
+
+    // Validate no approvedUrl unless approvedByAdmin is true
+    for (const step of parsed.studentJourney) {
+      if (step.video?.approvedUrl && !step.video?.approvedByAdmin) {
+        step.video.approvedUrl = null;
+        step.video.approvedByAdmin = false;
+      }
     }
 
     // Build new contentBlocks with draft journey

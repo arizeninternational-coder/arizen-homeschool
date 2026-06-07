@@ -387,27 +387,35 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
                 {lesson.readiness.score}/100
               </span>
             </div>
-            {lesson.readiness.missingSteps.length > 0 && (
-              <div style={{ marginBottom: "0.5rem" }}>
-                <p style={{ fontSize: "0.6875rem", fontWeight: 700, color: colors.textMuted, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "0.35rem" }}>
-                  Missing steps
+
+            {/* Missing CBC fields warning */}
+            {lesson.readiness.missingSteps && lesson.readiness.missingSteps.length > 0 && (
+              <div style={{ marginBottom: "0.5rem", padding: "0.5rem 0.75rem", borderRadius: 8, background: "#FEF3C7", border: "1px solid #FDE68A" }}>
+                <p style={{ fontSize: "0.6875rem", fontWeight: 700, color: "#92400E", marginBottom: "0.25rem", display: "flex", alignItems: "center", gap: "0.35rem" }}>
+                  <AlertTriangle style={{ width: 12, height: 12 }} />
+                  Missing CBC fields ({lesson.readiness.missingSteps.length}):
                 </p>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
                   {lesson.readiness.missingSteps.map((step, i) => (
                     <span key={i} style={{
                       fontSize: "0.6875rem", fontWeight: 600,
-                      color: colors.textMuted,
-                      background: colors.bgSoft,
+                      color: "#92400E",
+                      background: "#FDE68A",
                       padding: "0.15rem 0.4rem", borderRadius: 4,
                     }}>
                       {step.replace(/_/g, " ")}
                     </span>
                   ))}
                 </div>
+                <p style={{ fontSize: "0.625rem", color: "#B45309", marginTop: "0.25rem" }}>
+                  AI drafts may be weaker than expected. Fill these fields for better quality.
+                </p>
               </div>
             )}
-            {lesson.readiness.recommendations.length > 0 && (
-              <div style={{ borderTop: `1px solid ${colors.border}`, paddingTop: "0.5rem", marginTop: "0.25rem" }}>
+
+            {/* Recommendations */}
+            {lesson.readiness.recommendations && lesson.readiness.recommendations.length > 0 && (
+              <div style={{ borderTop: `1px solid ${colors.border}`, paddingTop: "0.5rem" }}>
                 {lesson.readiness.recommendations.slice(0, 3).map((rec, i) => (
                   <p key={i} style={{ fontSize: "0.75rem", color: colors.textMuted, marginBottom: "0.2rem", display: "flex", alignItems: "flex-start", gap: "0.35rem" }}>
                     <span style={{ color: colors.warning, flexShrink: 0 }}>•</span>
@@ -416,12 +424,23 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
                 ))}
               </div>
             )}
+
             {/* Draft warning */}
             {aiDraft && aiDraft.length > 0 && aiMetadata?.reviewStatus === "NEEDS_REVIEW" && (
               <div style={{ marginTop: "0.5rem", padding: "0.5rem 0.75rem", borderRadius: 8, background: "#FEF3C7", border: "1px solid #FDE68A", display: "flex", alignItems: "center", gap: "0.5rem" }}>
                 <AlertTriangle style={{ width: 14, height: 14, color: "#D97706", flexShrink: 0 }} />
                 <span style={{ fontSize: "0.75rem", fontWeight: 600, color: "#92400E" }}>
                   Generated journey needs review. Approve below to make it student-visible.
+                </span>
+              </div>
+            )}
+
+            {/* Unapproved video warning */}
+            {lesson.readiness.hasUnapprovedVideo && (
+              <div style={{ marginTop: "0.5rem", padding: "0.5rem 0.75rem", borderRadius: 8, background: "#FEE2E2", border: "1px solid #FECACA", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <AlertTriangle style={{ width: 14, height: 14, color: "#DC2626", flexShrink: 0 }} />
+                <span style={{ fontSize: "0.75rem", fontWeight: 600, color: "#991B1B" }}>
+                  Lesson has unapproved video. Approve or remove video before publishing.
                 </span>
               </div>
             )}

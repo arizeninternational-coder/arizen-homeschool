@@ -652,11 +652,18 @@ const STEP_THEME_COLORS: Record<JourneyStepType, { accent: string; bg: string; b
 };
 
 function JourneyStepView({ step, stepNumber, totalSteps }: { step: JourneyStep; stepNumber: number; totalSteps: number }) {
+  const [selectedReflection, setSelectedReflection] = useState<number | null>(null);
+  const [openResponse, setOpenResponse] = useState("");
+  const [selectedChoice, setSelectedChoice] = useState<number | null>(null);
+  const [selfChecked, setSelfChecked] = useState<boolean | null>(null);
+
   if (!step) return null;
 
   const theme = STEP_THEME_COLORS[step.stepType] || STEP_THEME_COLORS.welcome;
   const icon = STEP_TYPE_ICONS[step.stepType] || theme.icon;
   const paragraphs = splitIntoParagraphs(step.studentText);
+  const isComplete = step.stepType === "complete";
+  const hasApprovedVideo = step.video?.approvedUrl && step.video?.approvedByAdmin;
 
   return (
     <div className={`rounded-2xl border-2 ${theme.border} ${theme.bg} p-5 lg:p-6 shadow-[0_2px_12px_rgba(0,0,0,0.03)]`}>
@@ -695,6 +702,34 @@ function JourneyStepView({ step, stepNumber, totalSteps }: { step: JourneyStep; 
         ))}
       </div>
 
+      {/* Illustration placeholder */}
+      {step.illustrationPrompt && (
+        <div className="mb-4 rounded-xl bg-gradient-to-br from-indigo-50/80 to-purple-50/60 border border-indigo-200/40 p-4 flex flex-col items-center gap-2">
+          <div className="w-full h-32 rounded-lg bg-white/60 border-2 border-dashed border-indigo-200 flex items-center justify-center">
+            <span className="text-4xl">{icon}</span>
+          </div>
+          <p className="text-[10px] text-indigo-400 font-medium text-center">📸 Illustration: {step.illustrationPrompt}</p>
+        </div>
+      )}
+
+      {/* Video placeholder — only for approved videos */}
+      {hasApprovedVideo && (
+        <div className="mb-4 rounded-xl bg-gradient-to-br from-blue-50/80 to-cyan-50/60 border border-blue-200/40 p-4 flex flex-col items-center gap-2">
+          <div className="w-full h-36 rounded-lg bg-white/60 border-2 border-dashed border-blue-200 flex flex-col items-center justify-center gap-1">
+            <span className="text-3xl">▶️</span>
+            <span className="text-xs font-semibold text-blue-600">Video</span>
+          </div>
+          {step.video?.approvedUrl && (
+            <a href={step.video.approvedUrl} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-blue-600 underline hover:text-blue-800">
+              Watch video →
+            </a>
+          )}
+        </div>
+      )}
+
+      {/* Video search keywords (admin-only info, not shown to students) */}
+      {/* Search keywords are for admin reference only — not rendered to students */}
+
       {/* Materials list */}
       {step.materials && step.materials.length > 0 && (
         <div className="mt-3 px-4 py-3 rounded-xl bg-amber-50/60 border border-amber-200/50">
@@ -709,26 +744,25 @@ function JourneyStepView({ step, stepNumber, totalSteps }: { step: JourneyStep; 
         </div>
       )}
 
-      {/* Interaction / Quick check */}
-      {step.interaction && step.interaction.type !== "none" && (
+      {/* Interactive: Multiple choice */}
+      {step.interaction?.type === "multiple_choice" && step.interaction.question && (
         <div className="mt-3 px-4 py-3 rounded-xl bg-blue-50/60 border border-blue-200/50">
-          <p className="text-[10px] font-extrabold uppercase tracking-wider text-blue-700 mb-1">
-            {step.interaction.type === "open_response" ? "✏️ Your turn:" :
-             step.interaction.type === "multiple_choice" ? "🔘 Choose one:" :
-             step.interaction.type === "self_check" ? "✅ Check yourself:" :
-             step.interaction.type === "draw_or_use_objects" ? "🎨 Try it:" :
-             step.interaction.type === "parent_assisted" ? "👨‍👩‍👧 With a parent:" :
-             step.interaction.type === "offline_activity" ? "🏠 Offline activity:" : "📝"}
-          </p>
-          {step.interaction.question && (
-            <p className="text-sm font-medium text-blue-900">{step.interaction.question}</p>
-          )}
+          <p className="text-[10px] font-extrabold uppercase tracking-wider text-blue-700 mb-1">🔘 Choose one:</p>
+          <p className="text-sm font-medium text-blue-900 mb-2">{step.interaction.question}</p>
           {step.interaction.options && step.interaction.options.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-2">
+            <div className="flex flex-col gap-2">
               {step.interaction.options.map((opt: string, i: number) => (
-                <span key={i} className="px-3 py-1 rounded-full bg-white border border-blue-200 text-blue-800 text-xs font-semibold">
+                <button
+                  key={i}
+                  onClick={() => setSelectedChoice(i)}
+                  className={`text-left px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                    selectedChoice === i
+                      ? "bg-blue-600 text-white shadow-sm"
+                      : "bg-white border border-blue-200 text-blue-800 hover:bg-blue-50"
+                  }`}
+                >
                   {opt}
-                </span>
+                </button>
               ))}
             </div>
           )}
@@ -738,25 +772,116 @@ function JourneyStepView({ step, stepNumber, totalSteps }: { step: JourneyStep; 
         </div>
       )}
 
-      {/* Reflection options */}
-      {step.reflectionOptions && step.reflectionOptions.length > 0 && (
-        <div className="mt-3 px-4 py-3 rounded-xl bg-rose-50/60 border border-rose-200/50">
-          <p className="text-[10px] font-extrabold uppercase tracking-wider text-rose-700 mb-2">🪞 Reflection — tap to select:</p>
-          <div className="flex flex-wrap gap-1.5">
-            {step.reflectionOptions.map((opt: string, i: number) => (
-              <span key={i} className="px-2.5 py-1 rounded-full bg-white border border-rose-200 text-rose-700 text-[11px] font-semibold">
-                {opt}
-              </span>
-            ))}
-          </div>
+      {/* Interactive: Open response */}
+      {step.interaction?.type === "open_response" && step.interaction.question && (
+        <div className="mt-3 px-4 py-3 rounded-xl bg-blue-50/60 border border-blue-200/50">
+          <p className="text-[10px] font-extrabold uppercase tracking-wider text-blue-700 mb-1">✏️ Your answer:</p>
+          <p className="text-sm font-medium text-blue-900 mb-2">{step.interaction.question}</p>
+          <textarea
+            value={openResponse}
+            onChange={e => setOpenResponse(e.target.value)}
+            placeholder="Type your answer here..."
+            className="w-full px-3 py-2 rounded-lg border border-blue-200 bg-white text-sm text-text placeholder:text-text-muted/50 resize-none focus:outline-none focus:ring-2 focus:ring-blue-300"
+            rows={3}
+          />
         </div>
       )}
 
-      {/* Illustration prompt (admin-only, not shown to students yet) */}
-      {step.illustrationPrompt && (
-        <div className="mt-3 px-3 py-2 rounded-lg bg-gray-50 border border-gray-200">
-          <p className="text-[9px] font-semibold text-gray-400 uppercase">Illustration prompt (admin only)</p>
-          <p className="text-[11px] text-gray-500 italic">{step.illustrationPrompt}</p>
+      {/* Interactive: Self check */}
+      {step.interaction?.type === "self_check" && step.interaction.question && (
+        <div className="mt-3 px-4 py-3 rounded-xl bg-lime-50/60 border border-lime-200/50">
+          <p className="text-[10px] font-extrabold uppercase tracking-wider text-lime-700 mb-1">✅ Check yourself:</p>
+          <p className="text-sm font-medium text-lime-900 mb-2">{step.interaction.question}</p>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setSelfChecked(true)}
+              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+                selfChecked === true ? "bg-lime-600 text-white" : "bg-white border border-lime-200 text-lime-700 hover:bg-lime-50"
+              }`}
+            >✓ Yes, I got it!</button>
+            <button
+              onClick={() => setSelfChecked(false)}
+              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+                selfChecked === false ? "bg-orange-500 text-white" : "bg-white border border-orange-200 text-orange-600 hover:bg-orange-50"
+              }`}
+            >↺ I need more practice</button>
+          </div>
+          {step.interaction.hint && (
+            <p className="text-[11px] text-lime-600 mt-2 italic">💡 Hint: {step.interaction.hint}</p>
+          )}
+        </div>
+      )}
+
+      {/* Interactive: Draw or use objects */}
+      {step.interaction?.type === "draw_or_use_objects" && (
+        <div className="mt-3 px-4 py-3 rounded-xl bg-orange-50/60 border border-orange-200/50">
+          <p className="text-[10px] font-extrabold uppercase tracking-wider text-orange-700 mb-1">🎨 Try it with objects or drawings:</p>
+          {step.interaction.question && (
+            <p className="text-sm font-medium text-orange-900">{step.interaction.question}</p>
+          )}
+          {!step.interaction.question && (
+            <p className="text-sm font-medium text-orange-900">Use objects at home — like counters, bottle tops, fruits, or drawings — to try this yourself!</p>
+          )}
+        </div>
+      )}
+
+      {/* Interactive: Offline activity */}
+      {step.interaction?.type === "offline_activity" && (
+        <div className="mt-3 px-4 py-3 rounded-xl bg-teal-50/60 border border-teal-200/50">
+          <p className="text-[10px] font-extrabold uppercase tracking-wider text-teal-700 mb-1">🏠 Offline activity:</p>
+          {step.interaction.question && (
+            <p className="text-sm font-medium text-teal-900">{step.interaction.question}</p>
+          )}
+          <p className="text-xs text-teal-600 mt-1">Put your device aside and try this with real objects at home.</p>
+        </div>
+      )}
+
+      {/* Interactive: Parent assisted */}
+      {step.interaction?.type === "parent_assisted" && (
+        <div className="mt-3 px-4 py-3 rounded-xl bg-purple-50/60 border border-purple-200/50">
+          <p className="text-[10px] font-extrabold uppercase tracking-wider text-purple-700 mb-1">👨‍👩‍👧 Try with a parent or guardian:</p>
+          {step.interaction.question && (
+            <p className="text-sm font-medium text-purple-900">{step.interaction.question}</p>
+          )}
+        </div>
+      )}
+
+      {/* Reflection options — selectable chips */}
+      {step.reflectionOptions && step.reflectionOptions.length > 0 && (
+        <div className="mt-3 px-4 py-3 rounded-xl bg-rose-50/60 border border-rose-200/50">
+          <p className="text-[10px] font-extrabold uppercase tracking-wider text-rose-700 mb-2">🪞 How did this lesson feel? Tap one:</p>
+          <div className="flex flex-wrap gap-1.5">
+            {step.reflectionOptions.map((opt: string, i: number) => (
+              <button
+                key={i}
+                onClick={() => setSelectedReflection(selectedReflection === i ? null : i)}
+                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                  selectedReflection === i
+                    ? "bg-rose-600 text-white shadow-sm"
+                    : "bg-white border border-rose-200 text-rose-700 hover:bg-rose-50"
+                }`}
+              >
+                {opt}
+              </button>
+            ))}
+          </div>
+          {selectedReflection !== null && (
+            <textarea
+              value={openResponse}
+              onChange={e => setOpenResponse(e.target.value)}
+              placeholder="Want to write more? (optional)"
+              className="w-full mt-2 px-3 py-2 rounded-lg border border-rose-200 bg-white text-sm text-text placeholder:text-text-muted/50 resize-none focus:outline-none focus:ring-2 focus:ring-rose-300"
+              rows={2}
+            />
+          )}
+        </div>
+      )}
+
+      {/* Reward summary on complete step */}
+      {isComplete && step.materials && step.materials.length === 0 && (
+        <div className="mt-3 px-4 py-3 rounded-xl bg-yellow-50/60 border border-yellow-200/50">
+          <p className="text-[10px] font-extrabold uppercase tracking-wider text-yellow-700 mb-1">🏆 Lesson Complete!</p>
+          <p className="text-sm font-medium text-yellow-900">Great job! You've finished this lesson.</p>
         </div>
       )}
     </div>

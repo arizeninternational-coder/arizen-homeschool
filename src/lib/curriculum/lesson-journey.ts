@@ -666,6 +666,8 @@ export interface LessonReadiness {
   hasDraftJourney?: boolean;
   /** Draft review status: NEEDS_REVIEW, APPROVED, REJECTED */
   draftReviewStatus?: string | null;
+  /** Whether any step has an unapproved video */
+  hasUnapprovedVideo?: boolean;
 }
 
 export function checkLessonReadiness(contentBlocks: any): LessonReadiness {

@@ -50,10 +50,15 @@ export default function QuestDetailPage({ params }: { params: Promise<{ themeSlu
     <div className="text-center py-12">
       <Target className="w-9 h-9 text-text-muted mx-auto mb-3 opacity-40" />
       <h3 className="text-lg font-extrabold text-text mb-1">Quest not found</h3>
-      <p className="text-sm text-text-muted mb-4">This quest may not exist or isn't published yet.</p>
-      <Link href="/dashboard/student/lessons" className="inline-flex items-center gap-1.5 text-sm font-bold text-primary hover:text-primary-dark transition-colors">
-        ← Back to Themes
-      </Link>
+      <p className="text-sm text-text-muted mb-4">This quest may not exist, isn't published yet, or is still being prepared by your admin.</p>
+      <div className="flex flex-col gap-2 items-center">
+        <Link href="/dashboard/student/lessons" className="inline-flex items-center gap-1.5 text-sm font-bold text-primary hover:text-primary-dark transition-colors">
+          ← Back to Subjects
+        </Link>
+        <Link href="/dashboard/student/quests" className="inline-flex items-center gap-1.5 text-sm font-semibold text-text-muted hover:text-text transition-colors">
+          ← Browse Available Quests
+        </Link>
+      </div>
     </div>
   );
 
