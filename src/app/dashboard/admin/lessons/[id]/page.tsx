@@ -473,22 +473,39 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
             </div>
           </div>
 
-          {/* Generate button */}
-          <button
-            onClick={handleGenerateJourney}
-            disabled={generating}
-            style={{
-              display: "inline-flex", alignItems: "center", gap: "0.5rem",
-              padding: "8px 16px", borderRadius: 8, border: "none",
-              background: generating ? colors.textMuted : colors.primary,
-              color: "#fff", fontWeight: 700, fontSize: "0.8125rem",
-              cursor: generating ? "not-allowed" : "pointer",
-              marginBottom: "1rem",
-            }}
-          >
-            <Sparkles style={{ width: 14, height: 14 }} />
-            {generating ? "Generating..." : "Generate Journey Draft"}
-          </button>
+          {/* Generate + Preview buttons */}
+          <div style={{ display: "flex", gap: 8, marginBottom: "1rem", flexWrap: "wrap" }}>
+            <button
+              onClick={handleGenerateJourney}
+              disabled={generating}
+              style={{
+                display: "inline-flex", alignItems: "center", gap: "0.5rem",
+                padding: "8px 16px", borderRadius: 8, border: "none",
+                background: generating ? colors.textMuted : colors.primary,
+                color: "#fff", fontWeight: 700, fontSize: "0.8125rem",
+                cursor: generating ? "not-allowed" : "pointer",
+              }}
+            >
+              <Sparkles style={{ width: 14, height: 14 }} />
+              {generating ? "Generating..." : "Generate Journey Draft"}
+            </button>
+            {(hasApprovedJourney || (aiDraft && aiDraft.length > 0)) && (
+              <button
+                onClick={() => setShowJourneyPreview(!showJourneyPreview)}
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: "0.5rem",
+                  padding: "8px 16px", borderRadius: 8, border: `1.5px solid ${colors.primary}`,
+                  background: showJourneyPreview ? colors.primary : "#fff",
+                  color: showJourneyPreview ? "#fff" : colors.primary,
+                  fontWeight: 700, fontSize: "0.8125rem",
+                  cursor: "pointer",
+                }}
+              >
+                <Eye style={{ width: 14, height: 14 }} />
+                {showJourneyPreview ? "Hide Preview" : "Preview as Student"}
+              </button>
+            )}
+          </div>
 
           {generateError && (
             <div style={{ ...ds.alertError, marginBottom: "0.75rem", fontSize: "0.8125rem" }}>
@@ -609,7 +626,61 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
             );
           })()}
 
-          {/* Approve / Reject buttons for draft */}
+          {/* Student Journey Preview — renders the actual student experience */}
+          {showJourneyPreview && (hasApprovedJourney || (aiDraft && aiDraft.length > 0)) && (() => {
+            const previewJourney = hasApprovedJourney
+              ? (() => {
+                  try {
+                    const cb = typeof lesson?.contentBlocks === "string"
+                      ? JSON.parse(lesson.contentBlocks)
+                      : lesson?.contentBlocks;
+                    return cb?.studentJourney || [];
+                  } catch { return []; }
+                })()
+              : (aiDraft || []);
+            return (
+              <div style={{ marginTop: "1rem", border: `2px solid ${colors.primary}`, borderRadius: 12, overflow: "hidden" }}>
+                <div style={{ padding: "10px 16px", background: colors.primary, color: "#fff", fontWeight: 700, fontSize: "0.8125rem", display: "flex", alignItems: "center", gap: 8 }}>
+                  <Eye style={{ width: 14, height: 14 }} />
+                  Student Preview — {previewJourney.length} steps
+                </div>
+                <div style={{ padding: "12px 16px", background: "#fff" }}>
+                  {previewJourney.map((step: any, i: number) => {
+                    const stepIcons: Record<string, string> = {
+                      welcome: "🦉", mission: "🎯", think_first: "💭", learn: "📖",
+                      connect: "🔗", example: "💡", practice: "✏️", quick_check: "✅",
+                      reflect: "🪞", complete: "🏆",
+                    };
+                    return (
+                      <div key={i} style={{ marginBottom: 8, padding: "8px 10px", borderRadius: 8, background: colors.bgSoft, border: `1px solid ${colors.border}` }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+                          <span style={{ fontSize: "1rem" }}>{stepIcons[step.stepType] || "📌"}</span>
+                          <span style={{ fontSize: "0.75rem", fontWeight: 700, color: colors.text }}>
+                            Step {i + 1}: {step.title || step.stepType}
+                          </span>
+                          {step.interaction?.type && step.interaction.type !== "none" && (
+                            <span style={{ fontSize: "0.625rem", fontWeight: 600, color: colors.primary, background: `${colors.primary}15`, padding: "1px 6px", borderRadius: 4 }}>
+                              ✋ {step.interaction.type.replace(/_/g, " ")}
+                            </span>
+                          )}
+                        </div>
+                        {step.studentText && (
+                          <p style={{ fontSize: "0.75rem", color: colors.text, lineHeight: 1.4, margin: "4px 0 0 22px" }}>
+                            {step.studentText.length > 150 ? step.studentText.slice(0, 150) + "…" : step.studentText}
+                          </p>
+                        )}
+                        {step.owlText && (
+                          <p style={{ fontSize: "0.6875rem", color: colors.textMuted, fontStyle: "italic", margin: "2px 0 0 22px" }}>
+                            🦉 {step.owlText.length > 100 ? step.owlText.slice(0, 100) + "…" : step.owlText}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
           {aiDraft && aiDraft.length > 0 && aiMetadata?.reviewStatus === "NEEDS_REVIEW" && (
             <div style={{ display: "flex", gap: 8, marginTop: "1rem", paddingTop: "1rem", borderTop: `1px solid ${colors.border}` }}>
               <button

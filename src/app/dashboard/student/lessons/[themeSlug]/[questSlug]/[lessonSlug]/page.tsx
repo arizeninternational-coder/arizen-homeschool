@@ -563,8 +563,8 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
         </div>
       )}
 
-      {/* ── Content preview ── */}
-      {renderBlocks.length > 0 && (
+      {/* ── Content preview — only show when NO approved journey exists */}
+      {!isJourney && renderBlocks.length > 0 && (
         <div className="rounded-2xl border border-white/60 bg-white/90 backdrop-blur-sm p-5 lg:p-6 mb-5">
           <h3 className="font-extrabold text-text text-base mb-4 flex items-center gap-2">
             <BookOpen className="w-5 h-5 text-primary" /> What you'll learn
@@ -585,6 +585,19 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
                 +{renderBlocks.length - 3} more sections
               </span>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Journey step count badge (when journey exists) */}
+      {isJourney && (
+        <div className="rounded-2xl border border-primary/20 bg-primary-soft/30 p-4 mb-5 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+            <Sparkles className="w-5 h-5 text-primary" />
+          </div>
+          <div>
+            <p className="text-sm font-bold text-primary">{totalSteps}-step interactive lesson</p>
+            <p className="text-[10px] text-text-muted">Work through each step to complete the lesson</p>
           </div>
         </div>
       )}

@@ -672,9 +672,146 @@ export interface LessonReadiness {
 
 export function checkLessonReadiness(contentBlocks: any): LessonReadiness {
   const blocks = contentBlocks || {};
+
+  // ── First: check if an approved student journey exists ──
+  const hasApprovedJourney = Array.isArray(blocks.studentJourney) && blocks.studentJourney.length > 0;
+  const hasDraftJourney = Array.isArray(blocks.studentJourneyDraft) && blocks.studentJourneyDraft.length > 0;
+  const aiMeta = blocks.aiMetadata || {};
+  const reviewStatus = aiMeta.reviewStatus || null;
+
+  // If we have an approved journey, evaluate its quality directly
+  if (hasApprovedJourney) {
+    return evaluateJourneyReadiness(blocks.studentJourney, reviewStatus, hasDraftJourney);
+  }
+
+  // ── No approved journey yet — evaluate CBC shell completeness ──
+  return evaluateShellReadiness(blocks, hasDraftJourney, reviewStatus);
+}
+
+/**
+ * Evaluate readiness based on the actual approved student journey.
+ * This is the source of truth for lessons that have been AI-generated and approved.
+ */
+function evaluateJourneyReadiness(
+  journey: any[],
+  reviewStatus: string | null,
+  hasDraftJourney: boolean
+): LessonReadiness {
+  const recommendations: string[] = [];
+  const missing: JourneyStepType[] = [];
+  const available: JourneyStepType[] = [];
+
+  const stepTypes = journey.map((s: any) => s.stepType);
+  const uniqueTypes = Array.from(new Set(stepTypes));
+
+  // Check required step types for a complete journey
+  const requiredTypes: JourneyStepType[] = [
+    "welcome", "mission", "think_first", "learn", "example",
+    "practice", "quick_check", "reflect", "complete"
+  ];
+
+  for (const rt of requiredTypes) {
+    if (uniqueTypes.includes(rt)) {
+      available.push(rt);
+    } else {
+      missing.push(rt);
+    }
+  }
+
+  // Count interactive moments (steps with interaction.type !== "none")
+  let interactiveCount = 0;
+  let hasIllustrationPrompts = true;
+  let hasUnapprovedVideo = false;
+  let practiceCount = 0;
+
+  for (const step of journey) {
+    if (step.interaction && step.interaction.type !== "none") {
+      interactiveCount++;
+    }
+    if (!step.illustrationPrompt || step.illustrationPrompt.trim() === "") {
+      hasIllustrationPrompts = false;
+    }
+    if (step.video?.required && !step.video?.approvedByAdmin) {
+      hasUnapprovedVideo = true;
+    }
+    if (step.stepType === "practice") {
+      practiceCount++;
+    }
+  }
+
+  // Calculate score based on journey quality
+  let score = 0;
+
+  // Base: step count (up to 30 points for 8+ steps)
+  score += Math.min(30, journey.length * 3);
+
+  // Required types present (up to 30 points)
+  score += Math.min(30, available.length * 3);
+
+  // Interactive moments (up to 15 points, need at least 3)
+  score += Math.min(15, interactiveCount * 5);
+
+  // Practice steps (up to 10 points, need at least 2)
+  score += Math.min(10, practiceCount * 5);
+
+  // Illustration prompts (up to 10 points)
+  if (hasIllustrationPrompts) score += 10;
+
+  // Penalties
+  if (hasUnapprovedVideo) {
+    score -= 15;
+    recommendations.push("Lesson has unapproved video. Approve or remove video before publishing.");
+  }
+
+  score = Math.max(0, Math.min(100, score));
+
+  const isReady = score >= 60 && missing.length <= 2 && !hasUnapprovedVideo && interactiveCount >= 2;
+
+  // Build recommendations
+  if (isReady && missing.length === 0) {
+    recommendations.unshift("✅ Approved journey is complete and ready to publish.");
+  } else if (isReady && missing.length > 0) {
+    recommendations.unshift(`✅ Approved journey is publishable. Missing optional steps: ${missing.join(", ")}.`);
+  } else {
+    recommendations.unshift("⚠️ Approved journey needs improvement before publishing.");
+  }
+
+  if (interactiveCount < 2) {
+    recommendations.push(`Add more interactive moments (currently ${interactiveCount}, need at least 2).`);
+  }
+  if (practiceCount < 2) {
+    recommendations.push(`Add more practice steps (currently ${practiceCount}, need at least 2).`);
+  }
+  if (!hasIllustrationPrompts) {
+    recommendations.push("Add illustration prompts to all steps for better visual learning.");
+  }
+  if (journey.length < 8) {
+    recommendations.push(`Journey has ${journey.length} steps. Aim for at least 10 steps for a complete experience.`);
+  }
+
+  return {
+    score,
+    isReady,
+    availableSteps: available,
+    missingSteps: missing,
+    recommendations,
+    hasApprovedJourney: true,
+    hasDraftJourney,
+    draftReviewStatus: reviewStatus,
+    hasUnapprovedVideo,
+  };
+}
+
+/**
+ * Evaluate readiness based on CBC shell fields (no approved journey yet).
+ */
+function evaluateShellReadiness(
+  blocks: any,
+  hasDraftJourney: boolean,
+  reviewStatus: string | null
+): LessonReadiness {
   const curriculum = blocks.curriculum || {};
   const shell = blocks.lessonShell || {};
-  const rewards = blocks.rewards || {};
 
   const available: JourneyStepType[] = [];
   const missing: JourneyStepType[] = [];
@@ -684,10 +821,7 @@ export function checkLessonReadiness(contentBlocks: any): LessonReadiness {
   available.push("welcome");
 
   // Mission
-  const learningGoal =
-    curriculum.specificLearningOutcome ||
-    blocks.specificLearningOutcome ||
-    blocks.learningOutcome;
+  const learningGoal = curriculum.specificLearningOutcome || blocks.specificLearningOutcome || blocks.learningOutcome;
   if (learningGoal) {
     available.push("mission");
   } else {
@@ -696,9 +830,7 @@ export function checkLessonReadiness(contentBlocks: any): LessonReadiness {
   }
 
   // Think First
-  const keyInquiry =
-    curriculum.keyInquiryQuestion ||
-    blocks.keyInquiryQuestion;
+  const keyInquiry = curriculum.keyInquiryQuestion || blocks.keyInquiryQuestion;
   if (keyInquiry) {
     available.push("think_first");
   } else {
@@ -707,9 +839,7 @@ export function checkLessonReadiness(contentBlocks: any): LessonReadiness {
   }
 
   // Learn
-  const suggestedExperience =
-    curriculum.suggestedLearningExperience ||
-    blocks.suggestedLearningExperience;
+  const suggestedExperience = curriculum.suggestedLearningExperience || blocks.suggestedLearningExperience;
   if (suggestedExperience) {
     available.push("learn");
   } else {
@@ -725,13 +855,7 @@ export function checkLessonReadiness(contentBlocks: any): LessonReadiness {
   }
 
   // Example
-  const example =
-    shell.example ||
-    blocks.example ||
-    shell.workedExample ||
-    blocks.workedExample ||
-    shell.activityInstructions ||
-    blocks.activityInstructions;
+  const example = shell.example || blocks.example || shell.workedExample || blocks.workedExample || shell.activityInstructions || blocks.activityInstructions;
   if (example) {
     available.push("example");
   } else {
@@ -740,11 +864,7 @@ export function checkLessonReadiness(contentBlocks: any): LessonReadiness {
   }
 
   // Practice
-  const tryContent =
-    shell.activityInstructions ||
-    blocks.activityInstructions ||
-    shell.offlineActivity ||
-    blocks.offlineActivity;
+  const tryContent = shell.activityInstructions || blocks.activityInstructions || shell.offlineActivity || blocks.offlineActivity;
   if (tryContent) {
     available.push("practice");
   } else {
@@ -753,11 +873,7 @@ export function checkLessonReadiness(contentBlocks: any): LessonReadiness {
   }
 
   // Quick Check
-  const assessment =
-    shell.assessmentCriteria ||
-    blocks.assessmentCriteria ||
-    shell.assessmentMethod ||
-    blocks.assessmentMethod;
+  const assessment = shell.assessmentCriteria || blocks.assessmentCriteria || shell.assessmentMethod || blocks.assessmentMethod;
   if (assessment) {
     available.push("quick_check");
   } else {
@@ -766,9 +882,7 @@ export function checkLessonReadiness(contentBlocks: any): LessonReadiness {
   }
 
   // Reflect
-  const reflection =
-    shell.reflectionPrompt ||
-    blocks.reflectionPrompt;
+  const reflection = shell.reflectionPrompt || blocks.reflectionPrompt;
   if (reflection) {
     available.push("reflect");
   } else {
@@ -783,47 +897,18 @@ export function checkLessonReadiness(contentBlocks: any): LessonReadiness {
   const coreSteps: JourneyStepType[] = ["mission", "learn", "example", "practice", "quick_check"];
   const coreAvailable = coreSteps.filter((s) => available.includes(s)).length;
   const bonusAvailable = available.filter((s) => !coreSteps.includes(s)).length;
-  let score = Math.min(100, coreAvailable * 14 + bonusAvailable * 4);
+  const score = Math.min(100, coreAvailable * 14 + bonusAvailable * 4);
 
-  // Bonus: approved student journey adds significant readiness
-  const hasApprovedJourney = Array.isArray(blocks.studentJourney) && blocks.studentJourney.length > 0;
-  const hasDraftJourney = Array.isArray(blocks.studentJourneyDraft) && blocks.studentJourneyDraft.length > 0;
-  const aiMeta = blocks.aiMetadata || {};
-  const draftIsUnapproved = hasDraftJourney && aiMeta.reviewStatus === "NEEDS_REVIEW";
+  const isReady = score >= 70;
 
-  if (hasApprovedJourney) {
-    // Approved journey adds up to 20 bonus points (capped at 100)
-    score = Math.min(100, score + 20);
-  }
-
-  // Check for unapproved video in any journey step
-  const allSteps = hasApprovedJourney ? blocks.studentJourney : [];
-  let hasUnapprovedVideo = false;
-  for (const step of allSteps) {
-    if (step.video?.required && !step.video?.approvedByAdmin) {
-      hasUnapprovedVideo = true;
-      break;
-    }
-  }
-
-  const isReady = score >= 70 && !hasUnapprovedVideo;
-
-  if (hasApprovedJourney && missing.length === 0 && !hasUnapprovedVideo) {
-    recommendations.unshift("Lesson has an approved student journey and is ready to publish.");
-  } else if (isReady && missing.length > 0) {
-    recommendations.unshift("Lesson is ready to publish but could be improved by adding the missing steps above.");
+  if (hasDraftJourney && reviewStatus === "NEEDS_REVIEW") {
+    recommendations.unshift("📝 AI journey draft generated — review and approve to make it student-visible.");
+  } else if (isReady) {
+    recommendations.unshift("Shell is complete — generate an AI journey draft to create the student experience.");
   } else if (score >= 42) {
-    recommendations.unshift("Lesson is almost ready — add more content to reach the publish threshold.");
+    recommendations.unshift("Shell is almost complete — add missing fields, then generate a journey draft.");
   } else {
-    recommendations.unshift("Lesson needs more content before it is ready to publish.");
-  }
-
-  // Draft warnings
-  if (draftIsUnapproved) {
-    recommendations.push("Generated journey draft needs admin review before students can see it.");
-  }
-  if (hasUnapprovedVideo) {
-    recommendations.push("Lesson has unapproved video. Approve or remove video before publishing.");
+    recommendations.unshift("Shell needs more content before generating a journey draft.");
   }
 
   return {
@@ -832,9 +917,10 @@ export function checkLessonReadiness(contentBlocks: any): LessonReadiness {
     availableSteps: available,
     missingSteps: missing,
     recommendations,
-    hasApprovedJourney: hasApprovedJourney,
-    hasDraftJourney: hasDraftJourney,
-    draftReviewStatus: aiMeta.reviewStatus || null,
+    hasApprovedJourney: false,
+    hasDraftJourney,
+    draftReviewStatus: reviewStatus,
+    hasUnapprovedVideo: false,
   };
 }
 
