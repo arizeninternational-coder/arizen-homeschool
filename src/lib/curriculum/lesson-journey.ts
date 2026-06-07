@@ -406,6 +406,175 @@ export function createJourneyStep(params: {
 
 // ── Helper: Build a complete journey from CBC contentBlocks ─────────────────
 
+/**
+ * Generate child-friendly journey content from lesson title/subject/grade.
+ * This ensures every lesson gets a rich 8-step journey even when CBC fields are empty.
+ */
+function generateJourneyContent(title: string, subject: string, grade: number) {
+  const subjectLower = subject.toLowerCase();
+  const isMath = subjectLower.includes("math");
+  const isScience = subjectLower.includes("science");
+  const isEnglish = subjectLower.includes("english") || subjectLower.includes("language");
+  const isKiswahili = subjectLower.includes("kiswahili");
+  const isSocial = subjectLower.includes("social") || subjectLower.includes("history");
+  const isLowerPrimary = grade <= 3;
+
+  // Clean title: remove trailing /slug artifacts like "Metres/m" → "Metres"
+  const cleanTitle = title.replace(/\/[a-z]+$/i, "").replace(/\/m$/i, "").trim() || title;
+
+  // ── Welcome ──
+  const welcomeText = isLowerPrimary
+    ? `Welcome, young explorer! 🌟 Today we're going to learn about "${cleanTitle}". It's a really cool topic and I think you're going to love it!`
+    : `Welcome! Today's lesson is about "${cleanTitle}". Let's dive in and discover something new together.`;
+
+  const welcomeOwl = isLowerPrimary
+    ? `Hi there! I'm Owl Teacher 🦉. Today we're going to learn about "${cleanTitle}". It's going to be so much fun! Are you ready to begin?`
+    : `Hello! I'm Owl Teacher 🦉. Let's explore "${cleanTitle}" together. I'll guide you through every step!`;
+
+  // ── Mission ──
+  const missionText = isMath
+    ? `By the end of this lesson, you'll be able to understand and use "${cleanTitle}" in your daily life. You'll be a maths detective!`
+    : isScience
+    ? `By the end of this lesson, you'll understand how "${cleanTitle}" works in the world around you. You'll be a little scientist!`
+    : `By the end of this lesson, you'll know all about "${cleanTitle}" and be able to use what you've learned!`;
+
+  const missionOwl = `This is your mission! 🎯 ${missionText} Let's do this together — I believe in you!`;
+
+  // ── Think First ──
+  const thinkQuestion = isMath
+    ? `Have you ever had to measure something at home? What did you use? Think about it for a moment!`
+    : isScience
+    ? `What do you already know about "${cleanTitle}"? Have you seen it in your daily life?`
+    : `What comes to mind when you hear "${cleanTitle}"? What do you think we'll learn today?`;
+
+  const thinkOwl = `Before we start, think about this: ${thinkQuestion} There's no wrong answer — just think about what you already know! 💭`;
+
+  // ── Learn ──
+  let learnText: string;
+  let learnVisual: VisualType = "concept_illustration";
+  let learnIllustration: string;
+
+  if (isMath && cleanTitle.toLowerCase().includes("metre")) {
+    learnText = `A **metre** is a unit we use to measure how long or tall things are.\n\nImagine a big step you take — that's about 1 metre! A door is about 2 metres tall. A pencil is much smaller, so we don't use metres for it.\n\nWe use metres to measure things like:\n- The height of a wall\n- The length of a room\n- How tall your mum or dad is\n- The length of a football field\n\nA metre is the same as 100 centimetres. That's a lot of centimetres!`;
+    learnVisual = "measurement_objects";
+    learnIllustration = "A child measuring a table with a metre stick, showing the 1m mark";
+  } else if (isMath && cleanTitle.toLowerCase().includes("length")) {
+    learnText = `**Length** tells us how long something is — from one end to the other.\n\nWe can measure length in different units:\n- **Millimetres (mm)** — for very small things like a button\n- **Centimetres (cm)** — for things like a book\n- **Metres (m)** — for big things like a room\n- **Kilometres (km)** — for very long distances like from home to school\n\nThe most common unit for everyday measuring is the **metre**.`;
+    learnVisual = "measurement_objects";
+    learnIllustration = "Objects of different sizes with measurement labels: button (mm), book (cm), room (m)";
+  } else if (isMath) {
+    learnText = `Let's learn about "${cleanTitle}"! 📖\n\nThis is an important maths concept that you'll use every day. We'll start with the basics and build up your understanding step by step.\n\nRead this part slowly. If something is new, that's okay — we'll practice it together!`;
+    learnVisual = "counters";
+    learnIllustration = `Colourful illustration showing "${cleanTitle}" with maths objects like counters and number lines`;
+  } else if (isScience) {
+    learnText = `Let's discover "${cleanTitle}"! 🔬\n\nScience helps us understand the world around us. Today we're going to explore this topic and see how it connects to things you see every day.\n\nPay attention to the examples — they'll help you understand!`;
+    learnIllustration = `Science illustration showing "${cleanTitle}" with labelled diagrams`;
+  } else {
+    learnText = `Let's learn about "${cleanTitle}"! 📖\n\nWe're going to explore this topic together. Read through the content below and see what you can discover.\n\nTake your time — understanding is more important than speed!`;
+    learnIllustration = `Illustration showing "${cleanTitle}" in a child-friendly scene`;
+  }
+
+  const learnOwl = DEFAULT_OWL_MESSAGES.learn;
+
+  // ── Connect ──
+  const connectText = isMath
+    ? `You know what? You already use maths every day! When you help mum measure ingredients, or when you see how tall you've grown — that's "${cleanTitle}" in real life!`
+    : isScience
+    ? `This is just like things you see every day! "${cleanTitle}" is all around us — at home, at school, and in nature. Once you start looking, you'll see it everywhere!`
+    : `"${cleanTitle}" connects to things you already know. Think about what you've learned before — this builds on that knowledge!`;
+
+  // ── Example ──
+  let exampleText: string;
+  if (isMath && cleanTitle.toLowerCase().includes("metre")) {
+    exampleText = `Let's look at some examples:\n\n🏠 **A door** is about **2 metres** tall. That's two big steps!\n✏️ **A pencil** is about **15 centimetres** — too small for metres.\n🏫 **A classroom** is about **8 metres** long.\n📏 **A metre ruler** is a tool we use to measure in metres.\n\nRemember: We use metres for BIG things and centimetres for small things!`;
+  } else if (isMath) {
+    exampleText = `Let's see how "${cleanTitle}" works with a real example:\n\nImagine you have objects at home — like fruits, books, or bottle tops. We can use these to practice what we're learning today.\n\nWatch how this works step by step. This is like a recipe — you can follow these steps when you try it yourself! 💡`;
+  } else {
+    exampleText = `Let's look at an example of "${cleanTitle}" in action:\n\nThink about something from your daily life that connects to this topic. The more you can connect it to real life, the better you'll understand it!`;
+  }
+
+  // ── Try It (interactive multiple choice) ──
+  let tryQuestion: string;
+  let tryOptions: string[];
+  let tryCorrect: number;
+  let tryHint: string;
+
+  if (isMath && cleanTitle.toLowerCase().includes("metre")) {
+    tryQuestion = "Which object is BEST measured in metres?";
+    tryOptions = ["A pencil", "A classroom wall", "A spoon", "An eraser"];
+    tryCorrect = 1;
+    tryHint = "Think about which object is the BIGGEST! We use metres for big things.";
+  } else if (isMath && cleanTitle.toLowerCase().includes("length")) {
+    tryQuestion = "What unit would you use to measure a room?";
+    tryOptions = ["Millimetres", "Centimetres", "Metres", "Grams"];
+    tryCorrect = 2;
+    tryHint = "A room is quite big! Which unit is used for big measurements?";
+  } else if (isMath) {
+    tryQuestion = `Which of these best relates to "${cleanTitle}"?`;
+    tryOptions = ["Counting objects", "Measuring length", "Telling time", "Drawing shapes"];
+    tryCorrect = 0;
+    tryHint = "Think about what we've been learning about in this lesson!";
+  } else {
+    tryQuestion = `What is the main idea of "${cleanTitle}"?`;
+    tryOptions = ["Something we can observe and learn about", "Only found in books", "Too hard to understand", "Not useful in real life"];
+    tryCorrect = 0;
+    tryHint = "Think about what we've been discussing. The main idea is something you can see and use!";
+  }
+
+  // ── Practice ──
+  const practiceText = isMath
+    ? `Now it's YOUR turn! ✏️\n\nUse objects at home — like a metre stick, a tape measure, or even your hands — to measure 3 things. Write down what you measured and how long each one is.\n\nYou can also draw pictures of the things you measured!`
+    : `Now it's YOUR turn! ✏️\n\nTry this activity: Find 3 examples of "${cleanTitle}" in your home or school. Write or draw what you discover.\n\nThe more you look for it, the more you'll understand it!`;
+
+  const practiceMaterials = isMath
+    ? ["metre stick or tape measure", "paper", "pencil", "objects at home to measure"]
+    : ["paper", "pencil", "crayons", "your eyes and curiosity"];
+
+  // ── Mini Quest ──
+  const questText = isMath && cleanTitle.toLowerCase().includes("metre")
+    ? `🗺️ **Mini Quest: The Metre Detective!**\n\nYour mission: Find and measure 3 things around your home or school that are LONGER than 1 metre.\n\n**How to complete your quest:**\n1. Look around for big things — walls, tables, beds, doors\n2. Use a metre stick, tape measure, or even your arms to measure\n3. Write down each thing and how many metres long it is\n4. Ask a parent or teacher to help if needed\n\n**Success criteria:**\n✅ You found 3 things longer than 1 metre\n✅ You recorded your measurements\n✅ You can explain why metres were the right unit to use\n\nGood luck, Detective! 🔍`
+    : `🗺️ **Mini Quest: Real-World Explorer!**\n\nYour mission: Find 3 real-world examples of "${cleanTitle}" in your daily life.\n\n**How to complete your quest:**\n1. Look around your home, school, or neighbourhood\n2. Find 3 things that connect to what you learned today\n3. Write or draw what you discovered\n4. Share what you found with someone!\n\n**Success criteria:**\n✅ You found 3 real-world examples\n✅ You can explain how they connect to the lesson\n✅ You shared your discoveries\n\nHappy exploring! 🔍`;
+
+  // ── Quick Check ──
+  const quickCheckQuestion = isMath && cleanTitle.toLowerCase().includes("metre")
+    ? "Can you name one thing at home that you would measure in metres?"
+    : `Can you explain "${cleanTitle}" in your own words?`;
+
+  // ── Reflect ──
+  const reflectPrompt = isMath && cleanTitle.toLowerCase().includes("metre")
+    ? "What did you learn about measuring in metres? What was the most interesting thing? Write your thoughts below!"
+    : `What did you learn about "${cleanTitle}" today? What was your favourite part? Write your thoughts below!`;
+
+  const reflectOwl = `What did you notice? What was easy? What was a little hard? Writing it down helps you remember! 🪞`;
+
+  return {
+    cleanTitle,
+    welcomeText,
+    welcomeOwl,
+    missionText,
+    missionOwl,
+    thinkQuestion,
+    thinkOwl,
+    learnText,
+    learnVisual,
+    learnIllustration,
+    learnOwl,
+    connectText,
+    exampleText,
+    tryQuestion,
+    tryOptions,
+    tryCorrect,
+    tryHint,
+    practiceText,
+    practiceMaterials,
+    questText,
+    quickCheckQuestion,
+    reflectPrompt,
+    reflectOwl,
+  };
+}
+
+
 export function buildJourneyFromCbcBlocks(
   lessonId: string,
   title: string,
@@ -424,102 +593,85 @@ export function buildJourneyFromCbcBlocks(
   const curriculum = blocks.curriculum || {};
   const shell = blocks.lessonShell || {};
   const rewards = blocks.rewards || {};
-  const video = blocks.video || {};
 
   const subject = meta?.subject || curriculum.subject || "";
   const grade = meta?.grade || parseInt(curriculum.grade, 10) || 0;
   const xpReward = meta?.xpReward || rewards.xp || 50;
   const coinReward = meta?.coinReward || rewards.coins || Math.floor(xpReward / 2);
 
+  // Generate rich content from title/subject/grade
+  const gen = generateJourneyContent(title, subject, grade);
+
   const steps: JourneyStep[] = [];
   let stepNum = 1;
-
-  // Helper to create step ID
   const sid = (type: JourneyStepType) => `step-${stepNum++}-${type}`;
 
-  // 1. Welcome
+  // ── Step 1: Welcome ──
   steps.push(
     createJourneyStep({
       id: sid("welcome"),
       stepType: "welcome",
-      studentText: `Welcome to "${title}"! Today we're going to learn something exciting together.`,
-      owlText: `Hi there! I'm Owl Teacher. Today we're going to learn about "${title}". It's going to be fun! Are you ready?`,
+      studentText: gen.welcomeText,
+      owlText: gen.welcomeOwl,
       visualType: "owl_teacher",
+      illustrationPrompt: `A friendly owl teacher welcoming a ${grade <= 2 ? "young" : ""} student to a lesson about ${gen.cleanTitle}`,
       estimatedMinutes: 1,
     })
   );
 
-  // 2. Mission
+  // ── Step 2: Mission ──
   const learningGoal =
     curriculum.specificLearningOutcome ||
     blocks.specificLearningOutcome ||
     blocks.learningOutcome;
-  if (learningGoal) {
-    steps.push(
-      createJourneyStep({
-        id: sid("mission"),
-        stepType: "mission",
-        studentText: learningGoal,
-        owlText: `This is your mission! By the end of this lesson, you'll be able to: ${learningGoal}`,
-        estimatedMinutes: 1,
-      })
-    );
-  }
+  steps.push(
+    createJourneyStep({
+      id: sid("mission"),
+      stepType: "mission",
+      studentText: learningGoal || gen.missionText,
+      owlText: learningGoal
+        ? `This is your mission! By the end of this lesson, you'll be able to: ${learningGoal}`
+        : gen.missionOwl,
+      illustrationPrompt: `A mission banner for "${gen.cleanTitle}" with a ${grade <= 2 ? "child" : "student"} looking at a goal`,
+      estimatedMinutes: 1,
+    })
+  );
 
-  // 3. Think First
+  // ── Step 3: Think First ──
   const keyInquiry =
     curriculum.keyInquiryQuestion ||
     blocks.keyInquiryQuestion;
-  if (keyInquiry) {
-    steps.push(
-      createJourneyStep({
-        id: sid("think_first"),
-        stepType: "think_first",
-        studentText: keyInquiry,
-        owlText: `Before we start, think about this: ${keyInquiry} There's no wrong answer — just think about what you already know!`,
-        interaction: { type: "open_response" },
-        estimatedMinutes: 2,
-      })
-    );
-  }
+  steps.push(
+    createJourneyStep({
+      id: sid("think_first"),
+      stepType: "think_first",
+      studentText: keyInquiry || gen.thinkQuestion,
+      owlText: keyInquiry
+        ? `Before we start, think about this: ${keyInquiry} There's no wrong answer — just think about what you already know!`
+        : gen.thinkOwl,
+      interaction: { type: "open_response", question: keyInquiry || gen.thinkQuestion },
+      illustrationPrompt: `A ${grade <= 2 ? "child" : "student"} thinking with a thought bubble about ${gen.cleanTitle}`,
+      estimatedMinutes: 2,
+    })
+  );
 
-  // 4. Learn It
+  // ── Step 4: Learn It ──
   const suggestedExperience =
     curriculum.suggestedLearningExperience ||
     blocks.suggestedLearningExperience;
-  if (suggestedExperience) {
-    steps.push(
-      createJourneyStep({
-        id: sid("learn"),
-        stepType: "learn",
-        studentText: suggestedExperience,
-        owlText: DEFAULT_OWL_MESSAGES.learn,
-        visualType: "concept_illustration",
-        estimatedMinutes: 4,
-      })
-    );
-  }
+  steps.push(
+    createJourneyStep({
+      id: sid("learn"),
+      stepType: "learn",
+      studentText: suggestedExperience || gen.learnText,
+      owlText: gen.learnOwl,
+      visualType: gen.learnVisual,
+      illustrationPrompt: suggestedExperience ? `Illustration showing ${gen.cleanTitle}` : gen.learnIllustration,
+      estimatedMinutes: 4,
+    })
+  );
 
-  // 5. Connect
-  if (suggestedExperience || learningGoal) {
-    const connectText = `This is connected to what you already know about ${subject || "this topic"}. ${
-      grade <= 2
-        ? "You can see this in everyday life — at home, at school, and in your community!"
-        : "Let's connect this idea to what you've learned before and see how it fits together."
-    }`;
-    steps.push(
-      createJourneyStep({
-        id: sid("connect"),
-        stepType: "connect",
-        studentText: connectText,
-        owlText: DEFAULT_OWL_MESSAGES.connect,
-        visualType: "home_objects",
-        estimatedMinutes: 2,
-      })
-    );
-  }
-
-  // 6. Example
+  // ── Step 5: Observe (Example) ──
   const exampleContent =
     shell.example ||
     blocks.example ||
@@ -528,99 +680,107 @@ export function buildJourneyFromCbcBlocks(
     (shell.activityInstructions && shell.activityInstructions !== suggestedExperience
       ? shell.activityInstructions
       : null);
+  steps.push(
+    createJourneyStep({
+      id: sid("example"),
+      stepType: "example",
+      studentText: exampleContent || gen.exampleText,
+      owlText: DEFAULT_OWL_MESSAGES.example,
+      visualType: subject.toLowerCase().includes("math") ? "counters" : "concept_illustration",
+      illustrationPrompt: `Visual examples of ${gen.cleanTitle} in everyday life`,
+      estimatedMinutes: 3,
+    })
+  );
 
-  if (exampleContent) {
-    steps.push(
-      createJourneyStep({
-        id: sid("example"),
-        stepType: "example",
-        studentText: exampleContent,
-        owlText: DEFAULT_OWL_MESSAGES.example,
-        visualType: "counters",
-        estimatedMinutes: 3,
-      })
-    );
-  } else {
-    // Derive a simple example from the title
-    steps.push(
-      createJourneyStep({
-        id: sid("example"),
-        stepType: "example",
-        studentText: `Let's think about "${title}" with something from everyday life. Imagine you have a group of objects at home — like fruits, books, or bottle tops. We can use these to practice what we're learning today.`,
-        owlText: "Let me show you with something you know! Imagine you have objects at home — we can use them to practice.",
-        visualType: "home_objects",
-        estimatedMinutes: 3,
-      })
-    );
-  }
-
-  // 7. Practice
+  // ── Step 6: Try It (Interactive) ──
   const tryContent =
     shell.activityInstructions ||
     blocks.activityInstructions ||
     shell.offlineActivity ||
     blocks.offlineActivity;
-  if (tryContent) {
-    steps.push(
-      createJourneyStep({
-        id: sid("practice"),
-        stepType: "practice",
-        studentText: tryContent,
-        owlText: DEFAULT_OWL_MESSAGES.practice,
-        interaction: { type: "draw_or_use_objects" },
-        materials: subject.toLowerCase().includes("math") ? MATH_MATERIALS : GENERAL_MATERIALS,
-        estimatedMinutes: 7,
-      })
-    );
-  }
+  steps.push(
+    createJourneyStep({
+      id: sid("practice"),
+      stepType: "practice",
+      studentText: tryContent || gen.tryQuestion,
+      owlText: DEFAULT_OWL_MESSAGES.practice,
+      interaction: {
+        type: "multiple_choice",
+        question: gen.tryQuestion,
+        options: gen.tryOptions,
+        correctAnswer: gen.tryCorrect,
+        hint: gen.tryHint,
+      },
+      materials: gen.practiceMaterials,
+      illustrationPrompt: `A ${grade <= 2 ? "child" : "student"} choosing an answer about ${gen.cleanTitle}`,
+      estimatedMinutes: 3,
+    })
+  );
 
-  // 8. Quick Check
-  const assessment =
-    shell.assessmentCriteria ||
-    blocks.assessmentCriteria ||
-    shell.assessmentMethod ||
-    blocks.assessmentMethod;
-  if (assessment) {
+  // ── Step 7: Mini Quest ──
+  steps.push(
+    createJourneyStep({
+      id: sid("quick_check"),
+      stepType: "quick_check",
+      studentText: gen.questText,
+      owlText: `Time for your mini quest! 🗺️ This is where you take what you've learned and use it in the real world. I know you can do it!`,
+      interaction: {
+        type: "self_check",
+        question: "Have you completed your mini quest? Check when you're done!",
+        hint: "Take your time with the quest. You can come back to this step after you've finished exploring!",
+      },
+      illustrationPrompt: `A ${grade <= 2 ? "child" : "student"} on a quest, exploring and measuring things`,
+      estimatedMinutes: 5,
+    })
+  );
+
+  // ── Step 8: Practice (offline activity) ──
+  if (tryContent) {
     steps.push(
       createJourneyStep({
         id: sid("quick_check"),
         stepType: "quick_check",
-        studentText: assessment,
-        owlText: DEFAULT_OWL_MESSAGES.quick_check,
-        interaction: { type: "self_check" },
-        estimatedMinutes: 2,
+        studentText: gen.practiceText,
+        owlText: DEFAULT_OWL_MESSAGES.practice,
+        interaction: { type: "draw_or_use_objects", question: gen.tryQuestion },
+        materials: gen.practiceMaterials,
+        illustrationPrompt: `Hands-on practice with ${gen.cleanTitle}`,
+        estimatedMinutes: 5,
       })
     );
   }
 
-  // 9. Reflect
+  // ── Step 9: Reflect ──
   const reflection =
     shell.reflectionPrompt ||
     blocks.reflectionPrompt;
-  if (reflection) {
-    steps.push(
-      createJourneyStep({
-        id: sid("reflect"),
-        stepType: "reflect",
-        studentText: reflection,
-        owlText: DEFAULT_OWL_MESSAGES.reflect,
-        interaction: { type: "open_response" },
-        reflectionOptions: subject.toLowerCase().includes("math")
-          ? MATH_REFLECTION_OPTIONS
-          : GENERAL_REFLECTION_OPTIONS,
-        estimatedMinutes: 2,
-      })
-    );
-  }
+  steps.push(
+    createJourneyStep({
+      id: sid("reflect"),
+      stepType: "reflect",
+      studentText: reflection || gen.reflectPrompt,
+      owlText: gen.reflectOwl,
+      interaction: {
+        type: "open_response",
+        question: reflection || gen.reflectPrompt,
+      },
+      reflectionOptions: subject.toLowerCase().includes("math")
+        ? MATH_REFLECTION_OPTIONS
+        : GENERAL_REFLECTION_OPTIONS,
+      illustrationPrompt: `A ${grade <= 2 ? "child" : "student"} writing a reflection`,
+      estimatedMinutes: 2,
+    })
+  );
 
-  // 10. Complete
+  // ── Step 10: Complete ──
   steps.push(
     createJourneyStep({
       id: sid("complete"),
       stepType: "complete",
-      studentText: `Congratulations! You've completed "${title}". You earned ${xpReward} XP and ${coinReward} coins!`,
-      owlText: `Amazing work! You've completed the lesson. You earned ${xpReward} XP and ${coinReward} coins! You're becoming a real ${subject || "learning"} expert!`,
+      studentText: `🎉 Congratulations! You've completed "${gen.cleanTitle}"!\n\nYou worked hard, learned something new, and completed your mini quest. You earned ${xpReward} XP and ${coinReward} coins!\n\nYou're becoming a real ${subject || "learning"} expert!`,
+      owlText: `Amazing work! 🌟 You've completed the lesson. You earned ${xpReward} XP and ${coinReward} coins! You're becoming a real ${subject || "learning"} expert! I'm so proud of you!`,
       visualType: "owl_teacher",
+      illustrationPrompt: `A celebration scene with the owl teacher and a ${grade <= 2 ? "happy child" : "student"} with stars and confetti`,
       estimatedMinutes: 1,
     })
   );
@@ -632,7 +792,7 @@ export function buildJourneyFromCbcBlocks(
 
   return {
     lessonId,
-    title,
+    title: gen.cleanTitle,
     subject,
     grade,
     steps,

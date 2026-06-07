@@ -23,14 +23,46 @@ export default function QuestDetailPage({ params }: { params: Promise<{ themeSlu
   const [slugs, setSlugs] = useState<{ themeSlug: string; questSlug: string } | null>(null);
   const [quest, setQuest] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
     params.then(p => {
       setSlugs(p);
+      // Try fetching the published quest
       fetch(`/api/quests/${p.questSlug}?slug=${p.questSlug}`)
         .then(r => r.json())
-        .then(data => setQuest(data.quest))
-        .catch(console.error)
+        .then(data => {
+          if (data.quest) {
+            setQuest(data.quest);
+          } else {
+            // Quest not found as PUBLISHED — try fetching lessons directly
+            // by questSlug to build a fallback quest view
+            fetch(`/api/lessons/by-quest/${p.questSlug}`)
+              .then(r => r.json())
+              .then(lessonData => {
+                if (lessonData.lessons && lessonData.lessons.length > 0) {
+                  // Build a fallback quest from lesson data
+                  const firstLesson = lessonData.lessons[0];
+                  setQuest({
+                    id: firstLesson.questId || p.questSlug,
+                    title: p.questSlug.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase()),
+                    slug: p.questSlug,
+                    description: "",
+                    questType: "MAIN",
+                    lessons: lessonData.lessons,
+                    progress: 0,
+                    isCompleted: false,
+                    xpReward: { base: 100 },
+                    _fallback: true,
+                  });
+                } else {
+                  setNotFound(true);
+                }
+              })
+              .catch(() => setNotFound(true));
+          }
+        })
+        .catch(() => setNotFound(true))
         .finally(() => setLoading(false));
     });
   }, [params]);
@@ -46,7 +78,7 @@ export default function QuestDetailPage({ params }: { params: Promise<{ themeSlu
       </div>
     </div>
   );
-  if (!quest) return (
+  if (notFound || !quest) return (
     <div className="text-center py-12">
       <Target className="w-9 h-9 text-text-muted mx-auto mb-3 opacity-40" />
       <h3 className="text-lg font-extrabold text-text mb-1">Quest not found</h3>

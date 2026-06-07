@@ -37,17 +37,21 @@ interface LessonData {
   xpReward?: { base: number } | number;
   progress: number;
   isCompleted: boolean;
+  quest?: { id: string; title: string; slug: string; theme?: { grade?: number; themeSubjects?: { subject: string }[] } };
 }
 
 function buildLessonJourney(lesson: any): { steps: JourneyStep[]; source: string } | null {
   if (!lesson?.id) return null;
+  // Extract subject and grade from the joined quest/theme data
+  const subject = lesson.quest?.theme?.themeSubjects?.[0]?.subject || "";
+  const grade = lesson.quest?.theme?.grade || 0;
   return buildUniversalJourney(
     lesson.id,
     lesson.title || "Lesson",
     lesson.contentBlocks,
     {
-      subject: lesson.subject,
-      grade: lesson.grade,
+      subject,
+      grade,
       xpReward: getRewardValue(lesson?.xpReward),
       coinReward: lesson?.coinReward,
     }
@@ -618,11 +622,12 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
               });
             } catch (e) { /* non-blocking */ }
           }
+          setCurrentStep(0);
           setViewing(true);
         }}
         className="w-full"
       >
-        {completed ? "Review Lesson" : "Start Lesson"}
+        {completed ? "🔄 Review Lesson" : isJourney ? `🚀 Begin ${totalSteps}-Step Journey` : "📖 Start Lesson"}
       </GradientButton>
     </div>
   );
@@ -890,6 +895,33 @@ function JourneyStepView({ step, stepNumber, totalSteps }: { step: JourneyStep; 
               className="w-full mt-2 px-3 py-2 rounded-lg border border-rose-200 bg-white text-sm text-text placeholder:text-text-muted/50 resize-none focus:outline-none focus:ring-2 focus:ring-rose-300"
               rows={2}
             />
+          )}
+          {/* Save reflection button */}
+          {(openResponse.trim() || selectedReflection !== null) && (
+            <button
+              onClick={async () => {
+                const text = openResponse.trim() || (selectedReflection !== null ? step.reflectionOptions?.[selectedReflection] : "");
+                if (!text) return;
+                try {
+                  await fetch("/api/learner/reflections", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                    body: JSON.stringify({
+                      prompt: step.interaction?.question || "Reflection",
+                      response: text,
+                      lessonId: (lesson as any)?.id || null,
+                      questId: (lesson as any)?.questId || null,
+                    }),
+                  });
+                } catch (e) {
+                  console.error("Failed to save reflection:", e);
+                }
+              }}
+              className="mt-2 px-4 py-1.5 rounded-lg bg-rose-600 text-white text-xs font-bold hover:bg-rose-700 transition-colors"
+            >
+              💾 Save Reflection
+            </button>
           )}
         </div>
       )}
