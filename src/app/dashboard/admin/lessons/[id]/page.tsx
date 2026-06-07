@@ -720,6 +720,88 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
           )}
         </div>
 
+        {/* ── Illustrations Section ── */}
+        {(() => {
+          const journeyForIllustrations = (() => {
+            try {
+              const cb = typeof lesson?.contentBlocks === "string" ? JSON.parse(lesson.contentBlocks) : lesson?.contentBlocks;
+              return (cb?.studentJourney || cb?.studentJourneyDraft || []).filter((s: any) => s.illustrationPrompt);
+            } catch { return []; }
+          })();
+
+          if (journeyForIllustrations.length === 0) return null;
+
+          const stepIcons: Record<string, string> = {
+            welcome: "🦉", mission: "🎯", think_first: "💭", learn: "📖",
+            connect: "🔗", example: "💡", practice: "✏️", quick_check: "✅",
+            reflect: "🪞", complete: "🏆",
+          };
+
+          return (
+            <div style={{ ...ds.card, padding: "1.25rem 1.5rem", marginBottom: "1.5rem" }}>
+              <h3 style={{ fontSize: "0.9375rem", fontWeight: 800, color: colors.text, display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1rem" }}>
+                <Sparkles style={{ width: 16, height: 16, color: colors.primary }} />
+                Illustrations
+                <span style={{ fontSize: "0.6875rem", fontWeight: 600, color: colors.textMuted, background: colors.bgSoft, padding: "0.15rem 0.5rem", borderRadius: 6 }}>
+                  {journeyForIllustrations.length} steps
+                </span>
+              </h3>
+              <p style={{ fontSize: "0.75rem", color: colors.textMuted, marginBottom: "1rem" }}>
+                Generate or upload images for each lesson step. Students will see these illustrations during their journey.
+              </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                {journeyForIllustrations.map((step: any, i: number) => (
+                  <div key={i} style={{ border: `1px solid ${colors.border}`, borderRadius: 10, padding: "12px 14px", background: "#fff" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                      <span style={{ fontSize: "1.1rem" }}>{stepIcons[step.stepType] || "📌"}</span>
+                      <span style={{ fontSize: "0.8125rem", fontWeight: 700, color: colors.text }}>
+                        Step {i + 1}: {step.title || step.stepType}
+                      </span>
+                      <span style={{ fontSize: "0.625rem", fontWeight: 600, color: colors.textMuted, background: colors.bgSoft, padding: "1px 6px", borderRadius: 4, textTransform: "uppercase" }}>
+                        {step.stepType}
+                      </span>
+                    </div>
+                    <div style={{ background: colors.bgSoft, borderRadius: 8, padding: "8px 10px", marginBottom: "8px" }}>
+                      <p style={{ fontSize: "0.625rem", fontWeight: 700, color: colors.textMuted, textTransform: "uppercase", marginBottom: "2px" }}>Illustration Prompt</p>
+                      <p style={{ fontSize: "0.75rem", color: colors.text, fontStyle: "italic" }}>{step.illustrationPrompt}</p>
+                    </div>
+                    <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                      <button
+                        disabled
+                        style={{
+                          display: "inline-flex", alignItems: "center", gap: "0.35rem",
+                          padding: "5px 12px", borderRadius: 6, border: "none",
+                          background: colors.primary, color: "#fff",
+                          fontWeight: 700, fontSize: "0.6875rem",
+                          cursor: "not-allowed", opacity: 0.5,
+                        }}
+                      >
+                        <Sparkles style={{ width: 12, height: 12 }} />
+                        Generate with AI
+                      </button>
+                      <button
+                        disabled
+                        style={{
+                          display: "inline-flex", alignItems: "center", gap: "0.35rem",
+                          padding: "5px 12px", borderRadius: 6, border: `1.5px solid ${colors.border}`,
+                          background: "#fff", color: colors.textMuted,
+                          fontWeight: 700, fontSize: "0.6875rem",
+                          cursor: "not-allowed", opacity: 0.5,
+                        }}
+                      >
+                        Upload Image
+                      </button>
+                    </div>
+                    <p style={{ fontSize: "0.625rem", color: colors.textMuted, marginTop: "6px", fontStyle: "italic" }}>
+                      💡 AI image generation coming soon. For now, illustrations will use placeholder graphics.
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
+
         {/* Edit form */}
         <div style={{ display: "grid", gap: "1.5rem" }}>
           {/* Basic Info */}
