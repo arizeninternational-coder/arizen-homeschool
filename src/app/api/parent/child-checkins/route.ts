@@ -19,18 +19,25 @@ export const GET = withAuth(async (req: NextRequest, user: any) => {
     }
 
     const childIds = links.map((l: any) => l.childUserId);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
 
-    // Get today's check-ins for all linked children
+    // Use Africa/Nairobi timezone for "today" boundaries
+    const NAIROBI_TZ = "Africa/Nairobi";
+    const now = new Date();
+    const nairobiDateStr = new Intl.DateTimeFormat("en-CA", {
+      timeZone: NAIROBI_TZ, year: "numeric", month: "2-digit", day: "2-digit",
+    }).format(now);
+    // Build today/tomorrow in Nairobi time by parsing the date string
+    const todayStart = new Date(nairobiDateStr + "T00:00:00+03:00");
+    const tomorrowStart = new Date(nairobiDateStr + "T23:59:59+03:00");
+
+    // Get today's check-ins for all linked children (Nairobi day boundaries)
     const { data: checkins } = await supabase
       .from("EmotionalCheckin")
       .select(`
         id,
         emotion,
         emotionLabel,
+        note,
         createdAt,
         learner:LearnerProfile(
           id,
@@ -39,8 +46,8 @@ export const GET = withAuth(async (req: NextRequest, user: any) => {
         )
       `)
       .in("learnerId", childIds)
-      .gte("createdAt", today.toISOString())
-      .lt("createdAt", tomorrow.toISOString());
+      .gte("createdAt", todayStart.toISOString())
+      .lt("createdAt", tomorrowStart.toISOString());
 
     // Also get child names for those without check-ins
     const { data: children } = await supabase
