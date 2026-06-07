@@ -28,6 +28,15 @@ interface LessonData {
   difficulty: string;
   createdAt: string;
   orderIndex: number;
+  readiness?: {
+    score: number;
+    isReady: boolean;
+    missingSteps: string[];
+    hasApprovedJourney?: boolean;
+    hasDraftJourney?: boolean;
+    draftReviewStatus?: string | null;
+  } | null;
+  generationStatus?: string;
 }
 
 interface ParsedRow {
@@ -199,6 +208,28 @@ export default function SubjectCurriculumPage() {
     );
   };
 
+  const getReadinessBadge = (readiness: LessonData["readiness"]) => {
+    if (!readiness) return <span style={{ fontSize: "0.6875rem", color: colors.textMuted }}>—</span>;
+    const label = readiness.score >= 70 ? "Ready" :
+                  readiness.score >= 42 ? "Almost" :
+                  readiness.score >= 28 ? "Needs work" : "Not ready";
+    const color = readiness.score >= 70 ? "#065F46" :
+                  readiness.score >= 42 ? "#92400E" :
+                  readiness.score >= 28 ? "#B45309" : "#DC2626";
+    const bg = readiness.score >= 70 ? "#D1FAE5" :
+               readiness.score >= 42 ? "#FEF3C7" :
+               readiness.score >= 28 ? "#FDE68A" : "#FEE2E2";
+    return (
+      <span style={{
+        display: "inline-block", padding: "2px 8px", borderRadius: 6,
+        fontSize: "0.625rem", fontWeight: 700,
+        color, background: bg,
+      }}>
+        {label} ({readiness.score})
+      </span>
+    );
+  };
+
   if (loading) return <div style={{ padding: "2rem", color: colors.textMuted }}>Loading curriculum...</div>;
 
   return (
@@ -316,7 +347,7 @@ export default function SubjectCurriculumPage() {
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.8125rem" }}>
                 <thead>
                   <tr style={{ background: "#F8FAFC", borderBottom: `1px solid ${colors.border}` }}>
-                    {["#", "Lesson", "Strand", "Term", "Week", "Quest", "Status", "Coins", ""].map(h => (
+                    {["#", "Lesson", "Strand", "Term", "Week", "Quest", "Readiness", "Journey", "Status", "Coins", ""].map(h => (
                       <th key={h} style={{
                         padding: "10px 14px", textAlign: "left", fontWeight: 700,
                         color: colors.text, whiteSpace: "nowrap", fontSize: "0.75rem",
@@ -344,14 +375,96 @@ export default function SubjectCurriculumPage() {
                       <td style={{ padding: "10px 14px", color: colors.textMuted }}>{l.term || "—"}</td>
                       <td style={{ padding: "10px 14px", color: colors.textMuted }}>{l.week || "—"}</td>
                       <td style={{ padding: "10px 14px", color: colors.textMuted }}>{l.questTitle || "—"}</td>
+                      <td style={{ padding: "10px 14px" }}>{getReadinessBadge(l.readiness)}</td>
+                      <td style={{ padding: "10px 14px" }}>
+                        {(() => {
+                          const gs = l.generationStatus || "Not generated";
+                          const color = gs === "Approved" ? "#065F46" :
+                                        gs === "Draft generated" ? "#B45309" :
+                                        gs === "Rejected" ? "#DC2626" : "#6B7280";
+                          const bg = gs === "Approved" ? "#D1FAE5" :
+                                     gs === "Draft generated" ? "#FEF3C7" :
+                                     gs === "Rejected" ? "#FEE2E2" : "#F3F4F6";
+                          return (
+                            <span style={{
+                              display: "inline-block", padding: "2px 8px", borderRadius: 6,
+                              fontSize: "0.625rem", fontWeight: 700,
+                              color, background: bg,
+                            }}>{gs}</span>
+                          );
+                        })()}
+                      </td>
                       <td style={{ padding: "10px 14px" }}>{getStatusBadge(l.status)}</td>
                       <td style={{ padding: "10px 14px", color: colors.textMuted, fontWeight: 600 }}>🪙 {l.rewardCoins}</td>
                       <td style={{ padding: "10px 14px" }}>
-                        <Link href={`/dashboard/admin/lessons/${l.id}`} style={{
-                          padding: "4px 10px", borderRadius: 6, border: `1px solid ${colors.border}`,
-                          background: "white", color: colors.textMuted, fontSize: "0.75rem",
-                          cursor: "pointer", fontWeight: 600, textDecoration: "none", display: "inline-block",
-                        }}>Edit</Link>
+                        <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+                          {(!l.generationStatus || l.generationStatus === "Not generated" || l.generationStatus === "Rejected") && (
+                            <button
+                              onClick={async () => {
+                                try {
+                                  const res = await fetch(`/api/admin/lessons/${l.id}/generate-journey`, {
+                                    method: "POST", credentials: "include",
+                                  });
+                                  const data = await res.json();
+                                  if (!res.ok) {
+                                    alert(data.error || "Generation failed");
+                                    return;
+                                  }
+                                  const msg = data.warnings && data.warnings.length > 0
+                                    ? `Journey draft generated with warnings:\n${data.warnings.join("\n")}\n\nReview in lesson editor.`
+                                    : "Journey draft generated! Review in lesson editor.";
+                                  alert(msg);
+                                  loadLessons();
+                                } catch (err: any) {
+                                  alert(err.message || "Generation failed");
+                                }
+                              }}
+                              style={{
+                                padding: "3px 8px", borderRadius: 6, border: "none",
+                                background: colors.primary, color: "#fff",
+                                fontSize: "0.625rem", fontWeight: 700, cursor: "pointer",
+                              }}
+                            >Generate</button>
+                          )}
+                          {l.generationStatus === "Draft generated" && (
+                            <Link href={`/dashboard/admin/lessons/${l.id}`} style={{
+                              padding: "3px 8px", borderRadius: 6, border: `1px solid ${colors.warning}`,
+                              background: "#FEF3C7", color: "#92400E",
+                              fontSize: "0.625rem", fontWeight: 700, textDecoration: "none", display: "inline-block",
+                            }}>Review</Link>
+                          )}
+                          {l.generationStatus === "Approved" && l.status !== "PUBLISHED" && (
+                            <button
+                              onClick={async () => {
+                                if (!confirm("Publish this lesson? Students will be able to access it.")) return;
+                                try {
+                                  const res = await fetch(`/api/admin/lessons/${l.id}`, {
+                                    method: "PATCH",
+                                    headers: { "Content-Type": "application/json" },
+                                    credentials: "include",
+                                    body: JSON.stringify({ status: "PUBLISHED" }),
+                                  });
+                                  if (!res.ok) throw new Error("Publish failed");
+                                  loadLessons();
+                                } catch (err: any) {
+                                  alert(err.message || "Publish failed");
+                                }
+                              }}
+                              style={{
+                                padding: "3px 8px", borderRadius: 6, border: "none",
+                                background: colors.success, color: "#fff",
+                                fontSize: "0.625rem", fontWeight: 700, cursor: "pointer",
+                              }}
+                            >Publish</button>
+                          )}
+                          {l.status === "PUBLISHED" && (
+                            <span style={{
+                              padding: "3px 8px", borderRadius: 6,
+                              background: "#D1FAE5", color: "#065F46",
+                              fontSize: "0.625rem", fontWeight: 700,
+                            }}>Live</span>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}

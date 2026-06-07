@@ -660,6 +660,12 @@ export interface LessonReadiness {
   missingSteps: JourneyStepType[];
   /** Human-readable recommendations */
   recommendations: string[];
+  /** Whether an approved student journey exists */
+  hasApprovedJourney?: boolean;
+  /** Whether a draft journey exists */
+  hasDraftJourney?: boolean;
+  /** Draft review status: NEEDS_REVIEW, APPROVED, REJECTED */
+  draftReviewStatus?: string | null;
 }
 
 export function checkLessonReadiness(contentBlocks: any): LessonReadiness {
@@ -775,16 +781,47 @@ export function checkLessonReadiness(contentBlocks: any): LessonReadiness {
   const coreSteps: JourneyStepType[] = ["mission", "learn", "example", "practice", "quick_check"];
   const coreAvailable = coreSteps.filter((s) => available.includes(s)).length;
   const bonusAvailable = available.filter((s) => !coreSteps.includes(s)).length;
-  const score = Math.min(100, coreAvailable * 14 + bonusAvailable * 4);
+  let score = Math.min(100, coreAvailable * 14 + bonusAvailable * 4);
 
-  const isReady = score >= 70; // Ready to publish only at 70+
+  // Bonus: approved student journey adds significant readiness
+  const hasApprovedJourney = Array.isArray(blocks.studentJourney) && blocks.studentJourney.length > 0;
+  const hasDraftJourney = Array.isArray(blocks.studentJourneyDraft) && blocks.studentJourneyDraft.length > 0;
+  const aiMeta = blocks.aiMetadata || {};
+  const draftIsUnapproved = hasDraftJourney && aiMeta.reviewStatus === "NEEDS_REVIEW";
 
-  if (isReady && missing.length > 0) {
+  if (hasApprovedJourney) {
+    // Approved journey adds up to 20 bonus points (capped at 100)
+    score = Math.min(100, score + 20);
+  }
+
+  // Check for unapproved video in any journey step
+  const allSteps = hasApprovedJourney ? blocks.studentJourney : [];
+  let hasUnapprovedVideo = false;
+  for (const step of allSteps) {
+    if (step.video?.required && !step.video?.approvedByAdmin) {
+      hasUnapprovedVideo = true;
+      break;
+    }
+  }
+
+  const isReady = score >= 70 && !hasUnapprovedVideo;
+
+  if (hasApprovedJourney && missing.length === 0 && !hasUnapprovedVideo) {
+    recommendations.unshift("Lesson has an approved student journey and is ready to publish.");
+  } else if (isReady && missing.length > 0) {
     recommendations.unshift("Lesson is ready to publish but could be improved by adding the missing steps above.");
   } else if (score >= 42) {
     recommendations.unshift("Lesson is almost ready — add more content to reach the publish threshold.");
   } else {
     recommendations.unshift("Lesson needs more content before it is ready to publish.");
+  }
+
+  // Draft warnings
+  if (draftIsUnapproved) {
+    recommendations.push("Generated journey draft needs admin review before students can see it.");
+  }
+  if (hasUnapprovedVideo) {
+    recommendations.push("Lesson has unapproved video. Approve or remove video before publishing.");
   }
 
   return {
@@ -793,6 +830,9 @@ export function checkLessonReadiness(contentBlocks: any): LessonReadiness {
     availableSteps: available,
     missingSteps: missing,
     recommendations,
+    hasApprovedJourney: hasApprovedJourney,
+    hasDraftJourney: hasDraftJourney,
+    draftReviewStatus: aiMeta.reviewStatus || null,
   };
 }
 

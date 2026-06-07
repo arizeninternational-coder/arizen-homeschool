@@ -2,9 +2,12 @@
 
 export const dynamic = "force-dynamic";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { ArrowLeft, AlertCircle, Save, BookOpen, CheckCircle2, AlertTriangle, Info } from "lucide-react";
+import {
+  ArrowLeft, AlertCircle, Save, BookOpen, CheckCircle2, AlertTriangle, Info,
+  Sparkles, Eye, ThumbsUp, ThumbsDown, ChevronDown, ChevronUp, Play,
+} from "lucide-react";
 import { ds, colors } from "@/lib/design-system";
 
 interface LessonDetail {
@@ -40,6 +43,9 @@ interface LessonDetail {
     availableSteps: string[];
     missingSteps: string[];
     recommendations: string[];
+    hasApprovedJourney?: boolean;
+    hasDraftJourney?: boolean;
+    draftReviewStatus?: string | null;
   } | null;
 }
 
@@ -55,6 +61,36 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
+
+  // Journey state
+  const [generating, setGenerating] = useState(false);
+  const [generateError, setGenerateError] = useState<string | null>(null);
+  const [generateSuccess, setGenerateSuccess] = useState(false);
+  const [showJourneyPreview, setShowJourneyPreview] = useState(false);
+  const [expandedStep, setExpandedStep] = useState<number | null>(null);
+  const [aiDraft, setAiDraft] = useState<any[] | null>(null);
+  const [aiMetadata, setAiMetadata] = useState<any>(null);
+  const [hasApprovedJourney, setHasApprovedJourney] = useState(false);
+
+  // Extract journey info from lesson data
+  useEffect(() => {
+    if (lesson?.contentBlocks) {
+      try {
+        const cb = typeof lesson.contentBlocks === "string"
+          ? JSON.parse(lesson.contentBlocks)
+          : lesson.contentBlocks;
+        setAiDraft(cb?.studentJourneyDraft || null);
+        setAiMetadata(cb?.aiMetadata || null);
+        setHasApprovedJourney(
+          Array.isArray(cb?.studentJourney) && cb.studentJourney.length > 0
+        );
+      } catch {
+        setAiDraft(null);
+        setAiMetadata(null);
+        setHasApprovedJourney(false);
+      }
+    }
+  }, [lesson?.contentBlocks]);
 
   // Form state
   const [form, setForm] = useState({
@@ -145,6 +181,82 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
       setSaving(false);
     }
   };
+
+  // Generate journey draft
+  const handleGenerateJourney = useCallback(async () => {
+    setGenerating(true);
+    setGenerateError(null);
+    setGenerateSuccess(false);
+    try {
+      const res = await fetch(`/api/admin/lessons/${params.id}/generate-journey`, {
+        method: "POST",
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Generation failed");
+      setGenerateSuccess(true);
+      setAiDraft(data.studentJourneyDraft || []);
+      setAiMetadata(data.aiMetadata || null);
+      // Reload lesson to get updated readiness
+      const lessonRes = await fetch(`/api/admin/lessons/${params.id}`, { credentials: "include" });
+      if (lessonRes.ok) {
+        const lessonData = await lessonRes.json();
+        if (lessonData.lesson) {
+          setLesson((prev: any) => prev ? { ...prev, ...lessonData.lesson } : prev);
+        }
+      }
+      setTimeout(() => setGenerateSuccess(false), 5000);
+    } catch (err: any) {
+      setGenerateError(err.message || "Failed to generate journey");
+    } finally {
+      setGenerating(false);
+    }
+  }, [params.id]);
+
+  // Approve draft journey
+  const handleApproveJourney = useCallback(async () => {
+    if (!aiDraft) return;
+    try {
+      const res = await fetch(`/api/admin/lessons/${params.id}/review-journey`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ action: "approve" }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to approve journey");
+      setHasApprovedJourney(true);
+      setAiDraft(null);
+      setAiMetadata({ ...aiMetadata, reviewStatus: "APPROVED" });
+      // Reload lesson to get updated readiness
+      const lessonRes = await fetch(`/api/admin/lessons/${params.id}`, { credentials: "include" });
+      if (lessonRes.ok) {
+        const lessonData = await lessonRes.json();
+        if (lessonData.lesson) {
+          setLesson((prev: any) => prev ? { ...prev, ...lessonData.lesson } : prev);
+        }
+      }
+    } catch (err: any) {
+      setError(err.message || "Failed to approve journey");
+    }
+  }, [params.id, aiDraft, aiMetadata]);
+
+  // Reject draft journey
+  const handleRejectJourney = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/admin/lessons/${params.id}/review-journey`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ action: "reject" }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to reject journey");
+      setAiMetadata({ ...aiMetadata, reviewStatus: "REJECTED" });
+    } catch (err: any) {
+      setError(err.message || "Failed to reject journey");
+    }
+  }, [params.id, aiMetadata]);
 
   if (loading) {
     return (
@@ -304,8 +416,219 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
                 ))}
               </div>
             )}
+            {/* Draft warning */}
+            {aiDraft && aiDraft.length > 0 && aiMetadata?.reviewStatus === "NEEDS_REVIEW" && (
+              <div style={{ marginTop: "0.5rem", padding: "0.5rem 0.75rem", borderRadius: 8, background: "#FEF3C7", border: "1px solid #FDE68A", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <AlertTriangle style={{ width: 14, height: 14, color: "#D97706", flexShrink: 0 }} />
+                <span style={{ fontSize: "0.75rem", fontWeight: 600, color: "#92400E" }}>
+                  Generated journey needs review. Approve below to make it student-visible.
+                </span>
+              </div>
+            )}
           </div>
         )}
+
+        {/* Student Journey Review */}
+        <div style={{ ...ds.card, padding: "1.25rem 1.5rem", marginBottom: "1.5rem" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem", flexWrap: "wrap", gap: 8 }}>
+            <h3 style={{ fontSize: "0.9375rem", fontWeight: 800, color: colors.text, display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <BookOpen style={{ width: 16, height: 16, color: colors.primary }} />
+              Student Journey
+            </h3>
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+              {hasApprovedJourney && (
+                <span style={{ fontSize: "0.6875rem", fontWeight: 700, color: colors.success, background: `${colors.success}15`, padding: "0.15rem 0.5rem", borderRadius: 6 }}>
+                  ✓ Approved
+                </span>
+              )}
+              {aiMetadata?.reviewStatus === "NEEDS_REVIEW" && (
+                <span style={{ fontSize: "0.6875rem", fontWeight: 700, color: "#D97706", background: "#FEF3C7", padding: "0.15rem 0.5rem", borderRadius: 6 }}>
+                  Draft pending review
+                </span>
+              )}
+              {aiMetadata?.reviewStatus === "REJECTED" && (
+                <span style={{ fontSize: "0.6875rem", fontWeight: 700, color: "#DC2626", background: "#FEF2F2", padding: "0.15rem 0.5rem", borderRadius: 6 }}>
+                  Draft rejected
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Generate button */}
+          <button
+            onClick={handleGenerateJourney}
+            disabled={generating}
+            style={{
+              display: "inline-flex", alignItems: "center", gap: "0.5rem",
+              padding: "8px 16px", borderRadius: 8, border: "none",
+              background: generating ? colors.textMuted : colors.primary,
+              color: "#fff", fontWeight: 700, fontSize: "0.8125rem",
+              cursor: generating ? "not-allowed" : "pointer",
+              marginBottom: "1rem",
+            }}
+          >
+            <Sparkles style={{ width: 14, height: 14 }} />
+            {generating ? "Generating..." : "Generate Journey Draft"}
+          </button>
+
+          {generateError && (
+            <div style={{ ...ds.alertError, marginBottom: "0.75rem", fontSize: "0.8125rem" }}>
+              <AlertCircle style={{ width: 14, height: 14, flexShrink: 0 }} />
+              <span>{generateError}</span>
+            </div>
+          )}
+          {generateSuccess && (
+            <div style={{ ...ds.alertSuccess, marginBottom: "0.75rem", fontSize: "0.8125rem" }}>
+              ✓ Journey draft generated! Review below and approve when ready.
+            </div>
+          )}
+
+          {/* Journey steps display */}
+          {(() => {
+            // Determine which journey to show: approved > draft > fallback
+            const journeyToShow = hasApprovedJourney
+              ? (() => {
+                  try {
+                    const cb = typeof lesson?.contentBlocks === "string"
+                      ? JSON.parse(lesson.contentBlocks)
+                      : lesson?.contentBlocks;
+                    return cb?.studentJourney || [];
+                  } catch { return []; }
+                })()
+              : (aiDraft || []);
+
+            if (journeyToShow.length === 0) {
+              return (
+                <div style={{ textAlign: "center", padding: "1.5rem", color: colors.textMuted, fontSize: "0.8125rem" }}>
+                  <p style={{ marginBottom: "0.5rem" }}>No student journey yet.</p>
+                  <p>Fill in curriculum fields above, then click <strong>Generate Journey Draft</strong> to create one.</p>
+                  <p style={{ marginTop: "0.5rem", fontSize: "0.75rem" }}>
+                    Or add content manually — a fallback journey will be built from your CBC fields.
+                  </p>
+                </div>
+              );
+            }
+
+            const stepIcons: Record<string, string> = {
+              welcome: "🦉", mission: "🎯", think_first: "💭", learn: "📖",
+              connect: "🔗", example: "💡", practice: "✏️", quick_check: "✅",
+              reflect: "🪞", complete: "🏆",
+            };
+
+            return (
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                {journeyToShow.map((step: any, i: number) => {
+                  const isExpanded = expandedStep === i;
+                  return (
+                    <div key={i} style={{
+                      border: `1px solid ${colors.border}`,
+                      borderRadius: 8,
+                      overflow: "hidden",
+                    }}>
+                      <button
+                        onClick={() => setExpandedStep(isExpanded ? null : i)}
+                        style={{
+                          width: "100%", display: "flex", alignItems: "center", gap: 8,
+                          padding: "8px 12px", background: isExpanded ? colors.bgSoft : "#fff",
+                          border: "none", cursor: "pointer", textAlign: "left",
+                        }}
+                      >
+                        <span style={{ fontSize: "1rem" }}>{stepIcons[step.stepType] || "📌"}</span>
+                        <span style={{ fontSize: "0.75rem", fontWeight: 700, color: colors.text, flex: 1 }}>
+                          {i + 1}. {step.title || step.stepType}
+                        </span>
+                        <span style={{ fontSize: "0.625rem", color: colors.textMuted, textTransform: "uppercase" }}>
+                          {step.stepType}
+                        </span>
+                        {isExpanded ? <ChevronUp size={14} style={{ color: colors.textMuted }} /> : <ChevronDown size={14} style={{ color: colors.textMuted }} />}
+                      </button>
+                      {isExpanded && (
+                        <div style={{ padding: "10px 12px", borderTop: `1px solid ${colors.border}`, background: "#fff" }}>
+                          {step.studentText && (
+                            <div style={{ marginBottom: "0.5rem" }}>
+                              <p style={{ fontSize: "0.625rem", fontWeight: 700, color: colors.textMuted, textTransform: "uppercase", marginBottom: 2 }}>Student text</p>
+                              <p style={{ fontSize: "0.8125rem", color: colors.text }}>{step.studentText}</p>
+                            </div>
+                          )}
+                          {step.owlText && (
+                            <div style={{ marginBottom: "0.5rem" }}>
+                              <p style={{ fontSize: "0.625rem", fontWeight: 700, color: colors.textMuted, textTransform: "uppercase", marginBottom: 2 }}>Owl Teacher</p>
+                              <p style={{ fontSize: "0.8125rem", color: colors.text, fontStyle: "italic" }}>{step.owlText}</p>
+                            </div>
+                          )}
+                          {step.interaction?.type && step.interaction.type !== "none" && (
+                            <div style={{ marginBottom: "0.5rem" }}>
+                              <p style={{ fontSize: "0.625rem", fontWeight: 700, color: colors.textMuted, textTransform: "uppercase", marginBottom: 2 }}>Interaction</p>
+                              <span style={{ fontSize: "0.75rem", fontWeight: 600, color: colors.primary, background: `${colors.primary}10`, padding: "2px 8px", borderRadius: 4 }}>
+                                {step.interaction.type}
+                              </span>
+                              {step.interaction.question && (
+                                <p style={{ fontSize: "0.75rem", color: colors.textMuted, marginTop: 4 }}>{step.interaction.question}</p>
+                              )}
+                            </div>
+                          )}
+                          {step.illustrationPrompt && (
+                            <div style={{ marginBottom: "0.5rem" }}>
+                              <p style={{ fontSize: "0.625rem", fontWeight: 700, color: colors.textMuted, textTransform: "uppercase", marginBottom: 2 }}>Illustration</p>
+                              <p style={{ fontSize: "0.75rem", color: colors.textMuted, fontStyle: "italic" }}>{step.illustrationPrompt}</p>
+                            </div>
+                          )}
+                          {step.video?.required && (
+                            <div>
+                              <p style={{ fontSize: "0.625rem", fontWeight: 700, color: colors.textMuted, textTransform: "uppercase", marginBottom: 2 }}>Video</p>
+                              <span style={{ fontSize: "0.6875rem", fontWeight: 600, color: step.video.approvedByAdmin ? colors.success : "#D97706", background: step.video.approvedByAdmin ? `${colors.success}10` : "#FEF3C7", padding: "2px 8px", borderRadius: 4 }}>
+                                {step.video.approvedByAdmin ? "✓ Approved" : "⚠ Not approved"}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
+
+          {/* Approve / Reject buttons for draft */}
+          {aiDraft && aiDraft.length > 0 && aiMetadata?.reviewStatus === "NEEDS_REVIEW" && (
+            <div style={{ display: "flex", gap: 8, marginTop: "1rem", paddingTop: "1rem", borderTop: `1px solid ${colors.border}` }}>
+              <button
+                onClick={handleApproveJourney}
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: "0.5rem",
+                  padding: "8px 16px", borderRadius: 8, border: "none",
+                  background: colors.success, color: "#fff",
+                  fontWeight: 700, fontSize: "0.8125rem", cursor: "pointer",
+                }}
+              >
+                <ThumbsUp style={{ width: 14, height: 14 }} />
+                Approve Journey
+              </button>
+              <button
+                onClick={handleRejectJourney}
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: "0.5rem",
+                  padding: "8px 16px", borderRadius: 8, border: `1.5px solid ${colors.border}`,
+                  background: "#fff", color: colors.textMuted,
+                  fontWeight: 700, fontSize: "0.8125rem", cursor: "pointer",
+                }}
+              >
+                <ThumbsDown style={{ width: 14, height: 14 }} />
+                Reject Draft
+              </button>
+            </div>
+          )}
+
+          {/* AI metadata */}
+          {aiMetadata && (
+            <div style={{ marginTop: "0.75rem", padding: "0.5rem 0.75rem", borderRadius: 6, background: colors.bgSoft, fontSize: "0.6875rem", color: colors.textMuted }}>
+              {aiMetadata.model && <span>Model: {aiMetadata.model} · </span>}
+              {aiMetadata.generatedAt && <span>Generated: {new Date(aiMetadata.generatedAt).toLocaleString()} · </span>}
+              <span>Status: {aiMetadata.reviewStatus}</span>
+            </div>
+          )}
+        </div>
 
         {/* Edit form */}
         <div style={{ display: "grid", gap: "1.5rem" }}>

@@ -86,9 +86,35 @@ export async function GET(req: NextRequest) {
     }
 
     // Parse contentBlocks and enrich
+    const { checkLessonReadiness } = await import("@/lib/curriculum/lesson-journey");
     const enriched = lessons.map(lesson => {
       let meta: any = {};
       try { meta = JSON.parse(lesson.contentBlocks || "{}"); } catch {}
+
+      // Calculate readiness
+      let readiness: any = null;
+      try {
+        const r = checkLessonReadiness(meta);
+        readiness = {
+          score: r.score,
+          isReady: r.isReady,
+          missingSteps: r.missingSteps,
+          hasApprovedJourney: r.hasApprovedJourney || false,
+          hasDraftJourney: r.hasDraftJourney || false,
+          draftReviewStatus: r.draftReviewStatus || null,
+        };
+      } catch {}
+
+      // Extract generation status for quick reference
+      const aiMeta = meta.aiMetadata || {};
+      const generationStatus = aiMeta.reviewStatus
+        ? (aiMeta.reviewStatus === "NEEDS_REVIEW" ? "Draft generated" :
+           aiMeta.reviewStatus === "APPROVED" ? "Approved" :
+           aiMeta.reviewStatus === "REJECTED" ? "Rejected" : "Not generated")
+        : (Array.isArray(meta.studentJourneyDraft) && meta.studentJourneyDraft.length > 0)
+          ? "Draft generated"
+          : "Not generated";
+
       return {
         id: lesson.id,
         title: lesson.title,
@@ -113,6 +139,8 @@ export async function GET(req: NextRequest) {
         reflectionPrompt: meta.reflectionPrompt || "",
         rewardCoins: meta.rewardCoins || 10,
         rewardStars: meta.rewardStars || 0,
+        readiness,
+        generationStatus,
       };
     });
 
