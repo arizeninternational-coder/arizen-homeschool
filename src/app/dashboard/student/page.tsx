@@ -109,13 +109,18 @@ export default function StudentDashboard() {
 
       {/* ── Today's Lesson Hero ── */}
       {(() => {
-        // Use real lesson data from API, or fall back to lessons page link
-        const recentLesson = data.lessons?.lessons?.[0] || data.lessons?.nextLesson;
-        const lessonTitle = recentLesson?.title || recentLesson?.quest?.title;
-        const lessonSubject = recentLesson?.subject || recentLesson?.quest?.subjectName || "Lesson";
-        const lessonHref = recentLesson?.slug
-          ? `/dashboard/student/lessons/${recentLesson.themeSlug || recentLesson.quest?.themeSlug || ""}/${recentLesson.questSlug || recentLesson.quest?.slug || ""}/${recentLesson.slug}`
+        // Use real lesson data from API
+        const recentLesson = data.lessons?.lessons?.[0];
+        const lessonTitle = recentLesson?.title || "Continue Learning";
+        const lessonSubject = recentLesson?.subject || "Lesson";
+        // API returns nested quest.slug and quest.theme.slug
+        const themeSlug = recentLesson?.quest?.theme?.slug || "";
+        const questSlug = recentLesson?.quest?.slug || "";
+        const lessonSlug = recentLesson?.slug || "";
+        const lessonHref = (themeSlug && questSlug && lessonSlug)
+          ? `/dashboard/student/lessons/${themeSlug}/${questSlug}/${lessonSlug}`
           : "/dashboard/student/lessons";
+        const isCompleted = recentLesson?.progress?.completedAt != null;
         return (
           <Link
             href={lessonHref}
@@ -125,10 +130,10 @@ export default function StudentDashboard() {
               <span className="text-[9px] font-extrabold uppercase tracking-[0.12em] text-primary bg-primary/10 px-2.5 py-0.5 rounded-full">Today's Lesson</span>
               {totalXp > 0 && <span className="text-[9px] font-semibold text-gold bg-gold-soft/50 px-2 py-0.5 rounded-full flex items-center gap-1"><Zap size={10} /> {totalXp} XP</span>}
             </div>
-            <h2 className="text-lg lg:text-xl font-extrabold text-text mb-1">{lessonTitle || "Continue Learning"}</h2>
+            <h2 className="text-lg lg:text-xl font-extrabold text-text mb-1">{lessonTitle}</h2>
             <span className="inline-block text-[10px] font-bold text-accent-blue bg-accent-blue-soft/50 px-2.5 py-0.5 rounded-full mb-3">{lessonSubject}</span>
             <div className="flex items-center gap-2">
-              <span className="text-sm font-bold text-primary flex items-center gap-1">{recentLesson?.isCompleted ? "Review Lesson" : "Start Lesson"} <ArrowRight size={14} /></span>
+              <span className="text-sm font-bold text-primary flex items-center gap-1">{isCompleted ? "Review Lesson" : "Start Lesson"} <ArrowRight size={14} /></span>
             </div>
           </Link>
         );
