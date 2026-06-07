@@ -155,7 +155,19 @@ function OwlGuideCard({ step }: { step: JourneyStep }) {
 
 /* ─── Compact Illustration Placeholder ─── */
 
-function IllustrationPlaceholder({ prompt, icon, stepType }: { prompt?: string; icon: string; stepType: JourneyStepType }) {
+function IllustrationPlaceholder({ step, icon, stepType }: { step: JourneyStep; icon: string; stepType: JourneyStepType }) {
+  // If there's an approved image, render it directly
+  const approvedUrl = step.media?.illustration?.approvedUrl;
+  if (approvedUrl) {
+    return (
+      <div className="my-4 rounded-2xl overflow-hidden border border-slate-200/50">
+        <img src={approvedUrl} alt="Lesson illustration" className="w-full h-auto max-h-[200px] object-cover" />
+      </div>
+    );
+  }
+
+  // Otherwise show the placeholder
+  const prompt = step.illustrationPrompt;
   if (!prompt) return null;
   const theme = STEP_THEME[stepType];
 
@@ -196,11 +208,13 @@ function IllustrationPlaceholder({ prompt, icon, stepType }: { prompt?: string; 
 /* ─── Video Card ─── */
 
 function VideoCard({ step }: { step: JourneyStep }) {
-  const hasApproved = step.video?.approvedUrl && step.video?.approvedByAdmin === true;
-  const hasSearchKeywords = step.video?.searchKeywords && step.video.searchKeywords.trim().length > 0;
+  // Support both old (step.video) and new (step.media.video) structures
+  const videoData = step.media?.video || step.video;
+  const hasApproved = videoData?.approvedUrl && videoData?.approvedByAdmin === true;
+  const hasSearchKeywords = videoData?.searchKeywords && videoData.searchKeywords.trim().length > 0;
 
   if (hasApproved) {
-    const videoId = extractYouTubeId(step.video!.approvedUrl!);
+    const videoId = extractYouTubeId(videoData!.approvedUrl!);
     const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}` : null;
 
     return (
@@ -213,15 +227,15 @@ function VideoCard({ step }: { step: JourneyStep }) {
           <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
             <iframe
               src={embedUrl}
-              title={step.video!.approvedTitle || "Lesson video"}
+              title={videoData!.approvedTitle || "Lesson video"}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
               className="absolute inset-0 w-full h-full"
             />
           </div>
         ) : (
-          <div className="p-6 text-center">
-            <a href={step.video!.approvedUrl!} target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-blue-600 underline hover:text-blue-800">
+          <div className="p-4 text-center">
+            <a href={videoData!.approvedUrl!} target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-blue-600 underline hover:text-blue-800">
               Watch video →
             </a>
           </div>
@@ -889,7 +903,7 @@ function LessonStepView({ step, stepNumber, totalSteps, interaction, setInteract
       </div>
 
       {/* Illustration */}
-      <IllustrationPlaceholder prompt={step.illustrationPrompt} icon={icon} stepType={step.stepType} />
+      <IllustrationPlaceholder step={step} icon={icon} stepType={step.stepType} />
 
       {/* Video */}
       <VideoCard step={step} />

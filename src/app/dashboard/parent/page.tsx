@@ -98,54 +98,7 @@ export default function ParentDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-bg-main">
-      {/* Header — floating glass, no hard border */}
-      <header className="sticky top-0 z-30 bg-white/60 backdrop-blur-2xl">
-        <div className="max-w-[1400px] mx-auto px-4 lg:px-8 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#00A884] to-[#047A70] flex items-center justify-center shadow-[0_0_16px_rgba(0,168,132,0.15)]">
-              <GraduationCap className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <span className="font-extrabold text-base text-[#0F172A] tracking-tight">Arizen</span>
-              <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#64748B] ml-2">Parent</span>
-            </div>
-          </div>
-          <button
-            onClick={() => fetch("/api/auth/logout", { method: "POST", credentials: "include" }).then(() => window.location.href = "/")}
-            className="p-2 rounded-xl hover:bg-red-50/80 text-text-muted hover:text-danger transition-colors"
-            title="Sign Out"
-          >
-            <LogOut className="w-4 h-4" />
-          </button>
-        </div>
-        {/* Tabs */}
-        <div className="max-w-[1400px] mx-auto px-4 lg:px-8 flex gap-0 overflow-x-auto">
-          {[
-            { label: "Dashboard", href: "/dashboard/parent" },
-            { label: "Children", href: "/dashboard/parent/children" },
-            { label: "Progress", href: "/dashboard/parent/progress" },
-            { label: "Lessons", href: "/dashboard/parent/lessons" },
-            { label: "Reports", href: "/dashboard/parent/reports" },
-            { label: "Settings", href: "/dashboard/parent/settings" },
-          ].map((tab) => (
-            <Link
-              key={tab.href}
-              href={tab.href}
-              className={cn(
-                "px-4 py-2.5 text-sm font-bold border-b-2 transition-colors whitespace-nowrap",
-                tab.href === "/dashboard/parent"
-                  ? "border-secondary text-secondary-dark"
-                  : "border-transparent text-text-muted hover:text-text"
-              )}
-            >
-              {tab.label}
-            </Link>
-          ))}
-        </div>
-      </header>
-
-      <main className="max-w-[1400px] mx-auto px-4 lg:px-8 py-6 space-y-5 fade-in">
+    <div className="space-y-5 fade-in">
         {error ? (
           <div className="rounded-[1.75rem] border border-red-200/60 bg-red-50/80 backdrop-blur-sm p-12 text-center">
             <div className="w-16 h-16 rounded-3xl bg-red-100 flex items-center justify-center mx-auto mb-4">
@@ -299,7 +252,6 @@ export default function ParentDashboard() {
             )}
           </>
         )}
-      </main>
     </div>
   );
 }

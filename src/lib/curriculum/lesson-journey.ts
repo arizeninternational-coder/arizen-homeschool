@@ -179,8 +179,59 @@ export interface JourneyStep {
   materials?: string[];
   /** Video metadata */
   video?: JourneyVideo;
+  /** Media assets for this step (illustration, video, audio, etc.) */
+  media?: StepMedia;
   /** Estimated time in minutes */
   estimatedMinutes?: number;
+}
+
+// ── Step Media ────────────────────────────────────────────────────────────────
+
+export interface StepIllustration {
+  /** The prompt used to generate or describe this illustration */
+  prompt: string;
+  /** URL of AI-generated image (not yet approved) */
+  generatedUrl: string | null;
+  /** URL of admin-uploaded image (not yet approved) */
+  uploadedUrl: string | null;
+  /** URL of approved image (visible to students) */
+  approvedUrl: string | null;
+  /** Whether the image has been approved by an admin */
+  approvedByAdmin: boolean;
+  /** Current status of the illustration */
+  status: "MISSING" | "GENERATING" | "GENERATED" | "UPLOADED" | "APPROVED" | "FAILED";
+  /** Error message if generation/upload failed */
+  errorMessage?: string | null;
+  /** When the image was generated */
+  generatedAt?: string | null;
+  /** When the image was uploaded */
+  uploadedAt?: string | null;
+  /** When the image was approved */
+  approvedAt?: string | null;
+  /** Style preset used for generation */
+  stylePreset?: string | null;
+  /** AI-generated description of the image */
+  description?: string | null;
+}
+
+export interface StepVideo {
+  /** Search keywords for finding relevant YouTube videos */
+  searchKeywords: string[];
+  /** URL of a suggested video (not yet approved) */
+  suggestedUrl: string | null;
+  /** URL of admin-approved YouTube video */
+  approvedUrl: string | null;
+  /** Whether the video has been approved by an admin */
+  approvedByAdmin: boolean;
+  /** Title of the video */
+  approvedTitle?: string | null;
+}
+
+export interface StepMedia {
+  /** Illustration for this step */
+  illustration?: StepIllustration;
+  /** Video for this step (extends the top-level video field) */
+  video?: StepVideo;
 }
 
 // ── Full Lesson Journey ─────────────────────────────────────────────────────

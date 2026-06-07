@@ -303,16 +303,67 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
           <Link href="/dashboard/admin/lessons" style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", color: colors.textMuted, textDecoration: "none", fontSize: "0.875rem", fontWeight: 600 }}>
             <ArrowLeft style={{ width: 16, height: 16 }} /> Back to Lessons
           </Link>
-          <button onClick={handleSave} disabled={saving} style={{
-            display: "inline-flex", alignItems: "center", gap: "0.5rem",
-            padding: "10px 22px", borderRadius: 10, border: "none",
-            background: saveSuccess ? "#22C55E" : colors.primary,
-            color: "#fff", fontWeight: 700, fontSize: "0.875rem",
-            cursor: "pointer",
-          }}>
-            <Save style={{ width: 16, height: 16 }} />
-            {saving ? "Saving..." : saveSuccess ? "Saved ✓" : "Save Changes"}
-          </button>
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <button
+              onClick={async () => {
+                if (!confirm("Are you sure you want to delete this lesson? If students have progress, it will be archived instead.")) return;
+                try {
+                  const res = await fetch(`/api/admin/lessons/${params.id}`, {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                    body: JSON.stringify({ forceDelete: false }),
+                  });
+                  const data = await res.json();
+                  if (data.requiresConfirmation) {
+                    if (confirm("This lesson has no student progress. Permanently delete it? This cannot be undone.")) {
+                      const res2 = await fetch(`/api/admin/lessons/${params.id}`, {
+                        method: "DELETE",
+                        headers: { "Content-Type": "application/json" },
+                        credentials: "include",
+                        body: JSON.stringify({ forceDelete: true }),
+                      });
+                      const data2 = await res2.json();
+                      if (data2.success) {
+                        alert(data2.message);
+                        window.location.href = "/dashboard/admin/lessons";
+                        return;
+                      }
+                    }
+                    return;
+                  }
+                  if (data.success) {
+                    alert(data.message);
+                    window.location.href = "/dashboard/admin/lessons";
+                    return;
+                  }
+                  alert(data.error || "Failed to delete lesson");
+                } catch (err: any) {
+                  alert(err.message || "Failed to delete lesson");
+                }
+              }}
+              style={{
+                display: "inline-flex", alignItems: "center", gap: "0.35rem",
+                padding: "8px 14px", borderRadius: 8, border: `1.5px solid ${colors.border}`,
+                background: "#fff", color: "#DC2626",
+                fontWeight: 700, fontSize: "0.8125rem",
+                cursor: "pointer",
+              }}
+            >
+              <Trash2 style={{ width: 14, height: 14 }} />
+              Delete
+            </button>
+            <button onClick={handleSave} disabled={saving} style={{
+              display: "inline-flex", alignItems: "center", gap: "0.5rem",
+              padding: "10px 22px", borderRadius: 10, border: "none",
+              background: saveSuccess ? "#22C55E" : colors.primary,
+              color: "#fff", fontWeight: 700, fontSize: "0.875rem",
+              cursor: "pointer",
+            }}>
+              <Save style={{ width: 16, height: 16 }} />
+              {saving ? "Saving..." : saveSuccess ? "Saved ✓" : "Save Changes"}
+            </button>
+          </div>
         </div>
 
         {error && (
@@ -488,8 +539,11 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
                 cursor: generating ? "not-allowed" : "pointer",
               }}
             >
-              <Sparkles style={{ width: 14, height: 14 }} />
-              {generating ? "Generating..." : "Generate Journey Draft"}
+              {generating ? (
+                <><span className="spinner" style={{ width: 14, height: 14, border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%", display: "inline-block" }} /> Generating...</>
+              ) : (
+                <><Sparkles style={{ width: 14, height: 14 }} /> Generate Journey Draft</>
+              )}
             </button>
             {(hasApprovedJourney || (aiDraft && aiDraft.length > 0)) && (
               <div style={{ display: "flex", gap: 6 }}>
@@ -702,24 +756,18 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
                         </span>
                       )}
                     </div>
-
-                    {/* Student-facing content */}
                     {step.studentText && (
                       <div style={{ marginBottom: 12, padding: "12px 16px", borderRadius: 10, background: "#F0F9FF", border: "1px solid #BAE6FD" }}>
                         <p style={{ fontSize: "0.6875rem", fontWeight: 700, color: "#0369A1", textTransform: "uppercase", marginBottom: 4 }}>Student Text</p>
                         <p style={{ fontSize: "0.875rem", color: colors.text, lineHeight: 1.6 }}>{step.studentText}</p>
                       </div>
                     )}
-
-                    {/* Owl Teacher */}
                     {step.owlText && (
                       <div style={{ marginBottom: 12, padding: "12px 16px", borderRadius: 10, background: "#FFFBEB", border: "1px solid #FDE68A" }}>
                         <p style={{ fontSize: "0.6875rem", fontWeight: 700, color: "#92400E", textTransform: "uppercase", marginBottom: 4 }}>🦉 Owl Teacher</p>
                         <p style={{ fontSize: "0.875rem", color: colors.text, lineHeight: 1.6, fontStyle: "italic" }}>{step.owlText}</p>
                       </div>
                     )}
-
-                    {/* Interaction details */}
                     {step.interaction?.type && step.interaction.type !== "none" && (
                       <div style={{ marginBottom: 12, padding: "10px 16px", borderRadius: 10, background: colors.bgSoft, border: `1px solid ${colors.border}` }}>
                         <p style={{ fontSize: "0.6875rem", fontWeight: 700, color: colors.textMuted, textTransform: "uppercase", marginBottom: 4 }}>Interaction: {step.interaction.type}</p>
@@ -735,8 +783,6 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
                         )}
                       </div>
                     )}
-
-                    {/* Illustration status (admin-only metadata) */}
                     <div style={{ marginBottom: 8, padding: "8px 16px", borderRadius: 8, background: "#F8FAFC", border: "1px solid #E2E8F0", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                       <span style={{ fontSize: "0.6875rem", fontWeight: 700, color: colors.textMuted, textTransform: "uppercase" }}>Media (admin only):</span>
                       <span style={{ fontSize: "0.6875rem", fontWeight: 600, color: step.illustrationPrompt ? "#92400E" : "#6B7280", background: step.illustrationPrompt ? "#FEF3C7" : "#F3F4F6", padding: "2px 8px", borderRadius: 4 }}>
@@ -746,8 +792,6 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
                         {step.video?.approvedByAdmin ? "🎬 Video approved" : step.video?.searchKeywords ? "🎬 Video keywords set" : "🎬 No video"}
                       </span>
                     </div>
-
-                    {/* Navigation */}
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 16, paddingTop: 12, borderTop: `1px solid ${colors.border}` }}>
                       <button
                         onClick={() => setCurrentPreviewStep(Math.max(0, currentPreviewStep - 1))}
@@ -852,18 +896,17 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
           )}
         </div>
 
-        {/* Media Preparation — per-step illustration & video controls */}
-        {(hasApprovedJourney || (aiDraft && aiDraft.length > 0)) && (() => {
-          const journeyForMedia = hasApprovedJourney
-            ? (() => {
-                try {
-                  const cb = typeof lesson?.contentBlocks === "string"
-                    ? JSON.parse(lesson.contentBlocks)
-                    : lesson?.contentBlocks;
-                  return cb?.studentJourney || [];
-                } catch { return []; }
-              })()
-            : (aiDraft || []);
+        {/* ── Illustrations Section ── */}
+        {(() => {
+          const [illustrationStates, setIllustrationStates] = useState<Record<number, { loading: boolean; error: string | null }>>({});
+          const journeyForIllustrations = (() => {
+            try {
+              const cb = typeof lesson?.contentBlocks === "string" ? JSON.parse(lesson.contentBlocks) : lesson?.contentBlocks;
+              return (cb?.studentJourney || cb?.studentJourneyDraft || []).map((s: any, i: number) => ({ ...s, _index: i })).filter((s: any) => s.illustrationPrompt);
+            } catch { return []; }
+          })();
+
+          if (journeyForIllustrations.length === 0) return null;
 
           const stepIcons: Record<string, string> = {
             welcome: "🦉", mission: "🎯", think_first: "💭", learn: "📖",
@@ -871,125 +914,227 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
             reflect: "🪞", complete: "🏆",
           };
 
+          const getStatusLabel = (step: any) => {
+            const ill = step.media?.illustration;
+            if (!ill) return "Missing";
+            return ill.status || "Missing";
+          };
+
+          const getStatusColor = (status: string) => {
+            switch (status) {
+              case "APPROVED": return colors.success;
+              case "GENERATED": case "UPLOADED": return "#D97706";
+              case "FAILED": return "#DC2626";
+              case "GENERATING": return colors.primary;
+              default: return colors.textMuted;
+            }
+          };
+
+          const handleGenerate = async (step: any) => {
+            const idx = step._index;
+            setIllustrationStates(prev => ({ ...prev, [idx]: { loading: true, error: null } }));
+            try {
+              const res = await fetch(`/api/admin/lessons/${params.id}/illustrations/generate`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({
+                  stepIndex: idx,
+                  illustrationPrompt: step.illustrationPrompt,
+                  stylePreset: "warm, child-friendly, Kenyan classroom/home context, clear objects, not too busy, Grade 2 appropriate, visually consistent",
+                }),
+              });
+              const data = await res.json();
+              if (!res.ok) throw new Error(data.error || "Generation failed");
+              // Reload lesson to get updated data
+              const lessonRes = await fetch(`/api/admin/lessons/${params.id}`, { credentials: "include" });
+              if (lessonRes.ok) {
+                const lessonData = await lessonRes.json();
+                if (lessonData.lesson) {
+                  setLesson((prev: any) => prev ? { ...prev, ...lessonData.lesson } : prev);
+                }
+              }
+              setSaveSuccess(true);
+              setTimeout(() => setSaveSuccess(false), 3000);
+            } catch (err: any) {
+              setIllustrationStates(prev => ({ ...prev, [idx]: { loading: false, error: err.message || "Generation failed" } }));
+            } finally {
+              setIllustrationStates(prev => ({ ...prev, [idx]: { loading: false, error: prev[idx]?.error || null } }));
+            }
+          };
+
+          const handleUpload = async (step: any) => {
+            const idx = step._index;
+            setIllustrationStates(prev => ({ ...prev, [idx]: { loading: true, error: null } }));
+            try {
+              // In a real implementation, this would open a file picker and upload
+              // For now, show a message that file upload is coming soon
+              throw new Error("File upload coming soon. Use AI generation for now.");
+            } catch (err: any) {
+              setIllustrationStates(prev => ({ ...prev, [idx]: { loading: false, error: err.message || "Upload failed" } }));
+            } finally {
+              setIllustrationStates(prev => ({ ...prev, [idx]: { loading: false, error: prev[idx]?.error || null } }));
+            }
+          };
+
+          const handleApprove = async (step: any) => {
+            const idx = step._index;
+            setIllustrationStates(prev => ({ ...prev, [idx]: { loading: true, error: null } }));
+            try {
+              const res = await fetch(`/api/admin/lessons/${params.id}/illustrations/approve`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ stepIndex: idx, action: "approve" }),
+              });
+              const data = await res.json();
+              if (!res.ok) throw new Error(data.error || "Approval failed");
+              const lessonRes = await fetch(`/api/admin/lessons/${params.id}`, { credentials: "include" });
+              if (lessonRes.ok) {
+                const lessonData = await lessonRes.json();
+                if (lessonData.lesson) {
+                  setLesson((prev: any) => prev ? { ...prev, ...lessonData.lesson } : prev);
+                }
+              }
+            } catch (err: any) {
+              setIllustrationStates(prev => ({ ...prev, [idx]: { loading: false, error: err.message } }));
+            } finally {
+              setIllustrationStates(prev => ({ ...prev, [idx]: { loading: false, error: prev[idx]?.error || null } }));
+            }
+          };
+
+          const handleRemove = async (step: any) => {
+            const idx = step._index;
+            setIllustrationStates(prev => ({ ...prev, [idx]: { loading: true, error: null } }));
+            try {
+              const res = await fetch(`/api/admin/lessons/${params.id}/illustrations/approve`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ stepIndex: idx, action: "remove" }),
+              });
+              const data = await res.json();
+              if (!res.ok) throw new Error(data.error || "Remove failed");
+              const lessonRes = await fetch(`/api/admin/lessons/${params.id}`, { credentials: "include" });
+              if (lessonRes.ok) {
+                const lessonData = await lessonRes.json();
+                if (lessonData.lesson) {
+                  setLesson((prev: any) => prev ? { ...prev, ...lessonData.lesson } : prev);
+                }
+              }
+            } catch (err: any) {
+              setIllustrationStates(prev => ({ ...prev, [idx]: { loading: false, error: err.message } }));
+            } finally {
+              setIllustrationStates(prev => ({ ...prev, [idx]: { loading: false, error: prev[idx]?.error || null } }));
+            }
+          };
+
           return (
             <div style={{ ...ds.card, padding: "1.25rem 1.5rem", marginBottom: "1.5rem" }}>
               <h3 style={{ fontSize: "0.9375rem", fontWeight: 800, color: colors.text, display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1rem" }}>
-                🎨 Media Preparation
-                <span style={{ fontSize: "0.6875rem", fontWeight: 600, color: colors.textMuted, background: colors.bgSoft, padding: "2px 8px", borderRadius: 6 }}>
-                  {journeyForMedia.length} steps
+                <Sparkles style={{ width: 16, height: 16, color: colors.primary }} />
+                Illustrations
+                <span style={{ fontSize: "0.6875rem", fontWeight: 600, color: colors.textMuted, background: colors.bgSoft, padding: "0.15rem 0.5rem", borderRadius: 6 }}>
+                  {journeyForIllustrations.length} steps
                 </span>
               </h3>
               <p style={{ fontSize: "0.75rem", color: colors.textMuted, marginBottom: "1rem" }}>
-                Manage illustration prompts and video search keywords for each journey step. Media is stored inside contentBlocks and is only visible to students after approval.
+                Generate or upload images for each lesson step. Students only see approved images.
               </p>
-
-              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                {journeyForMedia.map((step: any, i: number) => {
-                  // Determine media status for this step
-                  const illusStatus = step.illustrationPrompt
-                    ? (step.media?.illustration?.status || "prompt_ready")
-                    : "missing";
-                  const videoStatus = step.video?.approvedByAdmin
-                    ? "approved"
-                    : step.video?.searchKeywords
-                      ? "keywords_set"
-                      : "missing";
-
-                  const illusColors: Record<string, { color: string; bg: string; label: string }> = {
-                    missing:        { color: "#6B7280", bg: "#F3F4F6", label: "No prompt" },
-                    prompt_ready:   { color: "#B45309", bg: "#FEF3C7", label: "Prompt ready" },
-                    generated:      { color: "#1E40AF", bg: "#DBEAFE", label: "Generated" },
-                    uploaded:       { color: "#1E40AF", bg: "#DBEAFE", label: "Uploaded" },
-                    approved:       { color: "#065F46", bg: "#D1FAE5", label: "Approved ✓" },
-                    failed:         { color: "#DC2626", bg: "#FEE2E2", label: "Failed" },
-                  };
-                  const vidColors: Record<string, { color: string; bg: string; label: string }> = {
-                    missing:        { color: "#6B7280", bg: "#F3F4F6", label: "No video" },
-                    keywords_set:   { color: "#B45309", bg: "#FEF3C7", label: "Keywords set" },
-                    approved:       { color: "#065F46", bg: "#D1FAE5", label: "Approved ✓" },
-                  };
-
-                  const ic = illusColors[illusStatus] || illusColors.missing;
-                  const vc = vidColors[videoStatus] || vidColors.missing;
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                {journeyForIllustrations.map((step: any) => {
+                  const idx = step._index;
+                  const state = illustrationStates[idx] || { loading: false, error: null };
+                  const status = getStatusLabel(step);
+                  const statusColor = getStatusColor(status);
+                  const isApproved = status === "APPROVED";
+                  const hasGenerated = status === "GENERATED" || status === "UPLOADED";
 
                   return (
-                    <div key={i} style={{
-                      padding: "10px 12px", borderRadius: 8,
-                      border: `1px solid ${colors.border}`,
-                      background: "white",
-                    }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                        <span style={{ fontSize: "0.875rem" }}>{stepIcons[step.stepType] || "📌"}</span>
-                        <span style={{ fontSize: "0.75rem", fontWeight: 700, color: colors.text, flex: 1 }}>
-                          Step {i + 1}: {step.title || step.stepType}
+                    <div key={idx} style={{ border: `1px solid ${colors.border}`, borderRadius: 10, padding: "12px 14px", background: "#fff" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                        <span style={{ fontSize: "1.1rem" }}>{stepIcons[step.stepType] || "📌"}</span>
+                        <span style={{ fontSize: "0.8125rem", fontWeight: 700, color: colors.text }}>
+                          Step {idx + 1}: {step.title || step.stepType}
                         </span>
-
-                        {/* Illustration status */}
-                        <span style={{
-                          fontSize: "0.625rem", fontWeight: 700,
-                          color: ic.color, background: ic.bg,
-                          padding: "2px 8px", borderRadius: 4,
-                        }}>🎨 {ic.label}</span>
-
-                        {/* Video status */}
-                        <span style={{
-                          fontSize: "0.625rem", fontWeight: 700,
-                          color: vc.color, background: vc.bg,
-                          padding: "2px 8px", borderRadius: 4,
-                        }}>🎬 {vc.label}</span>
-
-                        {/* Admin controls (placeholders for future backend) */}
-                        <div style={{ display: "flex", gap: 4 }}>
-                          <button
-                            disabled
-                            title="Illustration generation coming soon"
-                            style={{
-                              padding: "2px 8px", borderRadius: 4, border: `1px solid ${colors.border}`,
-                              background: colors.bgSoft, color: colors.textMuted,
-                              fontSize: "0.625rem", fontWeight: 600, cursor: "not-allowed",
-                            }}
-                          >Gen Img</button>
-                          <button
-                            disabled
-                            title="Image upload coming soon"
-                            style={{
-                              padding: "2px 8px", borderRadius: 4, border: `1px solid ${colors.border}`,
-                              background: colors.bgSoft, color: colors.textMuted,
-                              fontSize: "0.625rem", fontWeight: 600, cursor: "not-allowed",
-                            }}
-                          >Upload</button>
-                          <button
-                            disabled
-                            title="Approve media coming soon"
-                            style={{
-                              padding: "2px 8px", borderRadius: 4, border: `1px solid ${colors.border}`,
-                              background: colors.bgSoft, color: colors.textMuted,
-                              fontSize: "0.625rem", fontWeight: 600, cursor: "not-allowed",
-                            }}
-                          >Approve</button>
-                        </div>
+                        <span style={{ fontSize: "0.625rem", fontWeight: 600, color: statusColor, background: `${statusColor}15`, padding: "1px 6px", borderRadius: 4 }}>
+                          {status}
+                        </span>
                       </div>
-
-                      {/* Show illustration prompt if exists (admin only) */}
-                      {step.illustrationPrompt && (
-                        <div style={{ marginTop: 6, padding: "4px 8px", borderRadius: 4, background: "#F8FAFC", fontSize: "0.6875rem", color: colors.textMuted }}>
-                          <span style={{ fontWeight: 600 }}>Prompt:</span> {step.illustrationPrompt.slice(0, 80)}{step.illustrationPrompt.length > 80 ? "…" : ""}
+                      <div style={{ background: colors.bgSoft, borderRadius: 8, padding: "8px 10px", marginBottom: "8px" }}>
+                        <p style={{ fontSize: "0.625rem", fontWeight: 700, color: colors.textMuted, textTransform: "uppercase", marginBottom: "2px" }}>Prompt</p>
+                        <p style={{ fontSize: "0.75rem", color: colors.text, fontStyle: "italic" }}>{step.illustrationPrompt}</p>
+                      </div>
+                      {state.error && (
+                        <div style={{ marginBottom: "8px", padding: "6px 10px", borderRadius: 6, background: "#FEE2E2", border: "1px solid #FECACA" }}>
+                          <p style={{ fontSize: "0.6875rem", color: "#DC2626", fontWeight: 600 }}>⚠ {state.error}</p>
                         </div>
                       )}
-
-                      {/* Show video keywords if exists (admin only) */}
-                      {step.video?.searchKeywords && (
-                        <div style={{ marginTop: 4, padding: "4px 8px", borderRadius: 4, background: "#F8FAFC", fontSize: "0.6875rem", color: colors.textMuted }}>
-                          <span style={{ fontWeight: 600 }}>Video keywords:</span> {step.video.searchKeywords}
-                        </div>
-                      )}
+                      <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                        <button
+                          onClick={() => handleGenerate(step)}
+                          disabled={state.loading}
+                          style={{
+                            display: "inline-flex", alignItems: "center", gap: "0.35rem",
+                            padding: "5px 12px", borderRadius: 6, border: "none",
+                            background: state.loading ? colors.textMuted : colors.primary,
+                            color: "#fff", fontWeight: 700, fontSize: "0.6875rem",
+                            cursor: state.loading ? "not-allowed" : "pointer",
+                          }}
+                        >
+                          {state.loading ? (
+                            <><span className="spinner" style={{ width: 12, height: 12, border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%", display: "inline-block" }} /> Generating...</>
+                          ) : (
+                            <><Sparkles style={{ width: 12, height: 12 }} /> Generate with AI</>
+                          )}
+                        </button>
+                        <button
+                          onClick={() => handleUpload(step)}
+                          disabled={state.loading}
+                          style={{
+                            display: "inline-flex", alignItems: "center", gap: "0.35rem",
+                            padding: "5px 12px", borderRadius: 6, border: `1.5px solid ${colors.border}`,
+                            background: "#fff", color: colors.textMuted,
+                            fontWeight: 700, fontSize: "0.6875rem",
+                            cursor: state.loading ? "not-allowed" : "pointer",
+                          }}
+                        >
+                          Upload Image
+                        </button>
+                        {hasGenerated && !isApproved && (
+                          <button
+                            onClick={() => handleApprove(step)}
+                            disabled={state.loading}
+                            style={{
+                              display: "inline-flex", alignItems: "center", gap: "0.35rem",
+                              padding: "5px 12px", borderRadius: 6, border: "none",
+                              background: colors.success, color: "#fff",
+                              fontWeight: 700, fontSize: "0.6875rem",
+                              cursor: state.loading ? "not-allowed" : "pointer",
+                            }}
+                          >
+                            <CheckCircle2 style={{ width: 12, height: 12 }} /> Approve
+                          </button>
+                        )}
+                        {(hasGenerated || isApproved) && (
+                          <button
+                            onClick={() => handleRemove(step)}
+                            disabled={state.loading}
+                            style={{
+                              display: "inline-flex", alignItems: "center", gap: "0.35rem",
+                              padding: "5px 12px", borderRadius: 6, border: `1.5px solid ${colors.border}`,
+                              background: "#fff", color: "#DC2626",
+                              fontWeight: 700, fontSize: "0.6875rem",
+                              cursor: state.loading ? "not-allowed" : "pointer",
+                            }}
+                          >
+                            Remove
+                          </button>
+                        )}
+                      </div>
                     </div>
                   );
                 })}
-              </div>
-
-              <div style={{ marginTop: "0.75rem", padding: "8px 12px", borderRadius: 8, background: "#FFFBEB", border: "1px solid #FDE68A", fontSize: "0.6875rem", color: "#92400E" }}>
-                <strong>Note:</strong> Generate / Upload / Approve buttons are disabled until backend API routes are connected. Currently, illustration prompts and video keywords are set during journey generation.
               </div>
             </div>
           );
