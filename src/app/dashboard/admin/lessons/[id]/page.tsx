@@ -67,6 +67,8 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
   const [generateError, setGenerateError] = useState<string | null>(null);
   const [generateSuccess, setGenerateSuccess] = useState(false);
   const [showJourneyPreview, setShowJourneyPreview] = useState(false);
+  const [previewMode, setPreviewMode] = useState<"list" | "step">("list");
+  const [currentPreviewStep, setCurrentPreviewStep] = useState(0);
   const [expandedStep, setExpandedStep] = useState<number | null>(null);
   const [aiDraft, setAiDraft] = useState<any[] | null>(null);
   const [aiMetadata, setAiMetadata] = useState<any>(null);
@@ -490,20 +492,44 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
               {generating ? "Generating..." : "Generate Journey Draft"}
             </button>
             {(hasApprovedJourney || (aiDraft && aiDraft.length > 0)) && (
-              <button
-                onClick={() => setShowJourneyPreview(!showJourneyPreview)}
-                style={{
-                  display: "inline-flex", alignItems: "center", gap: "0.5rem",
-                  padding: "8px 16px", borderRadius: 8, border: `1.5px solid ${colors.primary}`,
-                  background: showJourneyPreview ? colors.primary : "#fff",
-                  color: showJourneyPreview ? "#fff" : colors.primary,
-                  fontWeight: 700, fontSize: "0.8125rem",
-                  cursor: "pointer",
-                }}
-              >
-                <Eye style={{ width: 14, height: 14 }} />
-                {showJourneyPreview ? "Hide Preview" : "Preview as Student"}
-              </button>
+              <div style={{ display: "flex", gap: 6 }}>
+                <button
+                  onClick={() => {
+                    setShowJourneyPreview(!showJourneyPreview);
+                    setPreviewMode("list");
+                    setCurrentPreviewStep(0);
+                  }}
+                  style={{
+                    display: "inline-flex", alignItems: "center", gap: "0.5rem",
+                    padding: "8px 16px", borderRadius: 8, border: `1.5px solid ${colors.primary}`,
+                    background: showJourneyPreview && previewMode === "list" ? colors.primary : "#fff",
+                    color: showJourneyPreview && previewMode === "list" ? "#fff" : colors.primary,
+                    fontWeight: 700, fontSize: "0.8125rem",
+                    cursor: "pointer",
+                  }}
+                >
+                  <Eye style={{ width: 14, height: 14 }} />
+                  {showJourneyPreview && previewMode === "list" ? "Hide Preview" : "Preview Steps"}
+                </button>
+                <button
+                  onClick={() => {
+                    setShowJourneyPreview(!showJourneyPreview);
+                    setPreviewMode("step");
+                    setCurrentPreviewStep(0);
+                  }}
+                  style={{
+                    display: "inline-flex", alignItems: "center", gap: "0.5rem",
+                    padding: "8px 16px", borderRadius: 8, border: `1.5px solid ${colors.success}`,
+                    background: showJourneyPreview && previewMode === "step" ? colors.success : "#fff",
+                    color: showJourneyPreview && previewMode === "step" ? "#fff" : colors.success,
+                    fontWeight: 700, fontSize: "0.8125rem",
+                    cursor: "pointer",
+                  }}
+                >
+                  <Play style={{ width: 14, height: 14 }} />
+                  {showJourneyPreview && previewMode === "step" ? "Exit Walkthrough" : "Walkthrough"}
+                </button>
+              </div>
             )}
           </div>
 
@@ -626,7 +652,7 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
             );
           })()}
 
-          {/* Student Journey Preview — renders the actual student experience */}
+          {/* Student Journey Preview — list + step-by-step walkthrough */}
           {showJourneyPreview && (hasApprovedJourney || (aiDraft && aiDraft.length > 0)) && (() => {
             const previewJourney = hasApprovedJourney
               ? (() => {
@@ -638,6 +664,119 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
                   } catch { return []; }
                 })()
               : (aiDraft || []);
+
+            const stepIcons: Record<string, string> = {
+              welcome: "🦉", mission: "🎯", think_first: "💭", learn: "📖",
+              connect: "🔗", example: "💡", practice: "✏️", quick_check: "✅",
+              reflect: "🪞", complete: "🏆",
+            };
+
+            // ── Step-by-step walkthrough mode ──
+            if (previewMode === "step" && previewJourney.length > 0) {
+              const step = previewJourney[currentPreviewStep] || previewJourney[0];
+              const isFirst = currentPreviewStep === 0;
+              const isLast = currentPreviewStep === previewJourney.length - 1;
+              return (
+                <div style={{ marginTop: "1rem", border: `2px solid ${colors.success}`, borderRadius: 12, overflow: "hidden" }}>
+                  <div style={{ padding: "10px 16px", background: colors.success, color: "#fff", fontWeight: 700, fontSize: "0.8125rem", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <Play style={{ width: 14, height: 14 }} />
+                      Student Walkthrough — Step {currentPreviewStep + 1} of {previewJourney.length}
+                    </div>
+                    <button onClick={() => { setShowJourneyPreview(false); setPreviewMode("list"); }} style={{ background: "none", border: "none", color: "#fff", cursor: "pointer", fontSize: "0.75rem", fontWeight: 600 }}>
+                      ✕ Exit
+                    </button>
+                  </div>
+                  <div style={{ padding: "20px 24px", background: "#fff", minHeight: 200 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                      <span style={{ fontSize: "1.5rem" }}>{stepIcons[step.stepType] || "📌"}</span>
+                      <span style={{ fontSize: "1rem", fontWeight: 800, color: colors.text }}>
+                        {step.title || step.stepType}
+                      </span>
+                      <span style={{ fontSize: "0.6875rem", fontWeight: 600, color: colors.textMuted, background: colors.bgSoft, padding: "2px 8px", borderRadius: 4, textTransform: "uppercase" }}>
+                        {step.stepType}
+                      </span>
+                      {step.interaction?.type && step.interaction.type !== "none" && (
+                        <span style={{ fontSize: "0.6875rem", fontWeight: 600, color: colors.primary, background: `${colors.primary}15`, padding: "2px 8px", borderRadius: 4 }}>
+                          ✋ {step.interaction.type.replace(/_/g, " ")}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Student-facing content */}
+                    {step.studentText && (
+                      <div style={{ marginBottom: 12, padding: "12px 16px", borderRadius: 10, background: "#F0F9FF", border: "1px solid #BAE6FD" }}>
+                        <p style={{ fontSize: "0.6875rem", fontWeight: 700, color: "#0369A1", textTransform: "uppercase", marginBottom: 4 }}>Student Text</p>
+                        <p style={{ fontSize: "0.875rem", color: colors.text, lineHeight: 1.6 }}>{step.studentText}</p>
+                      </div>
+                    )}
+
+                    {/* Owl Teacher */}
+                    {step.owlText && (
+                      <div style={{ marginBottom: 12, padding: "12px 16px", borderRadius: 10, background: "#FFFBEB", border: "1px solid #FDE68A" }}>
+                        <p style={{ fontSize: "0.6875rem", fontWeight: 700, color: "#92400E", textTransform: "uppercase", marginBottom: 4 }}>🦉 Owl Teacher</p>
+                        <p style={{ fontSize: "0.875rem", color: colors.text, lineHeight: 1.6, fontStyle: "italic" }}>{step.owlText}</p>
+                      </div>
+                    )}
+
+                    {/* Interaction details */}
+                    {step.interaction?.type && step.interaction.type !== "none" && (
+                      <div style={{ marginBottom: 12, padding: "10px 16px", borderRadius: 10, background: colors.bgSoft, border: `1px solid ${colors.border}` }}>
+                        <p style={{ fontSize: "0.6875rem", fontWeight: 700, color: colors.textMuted, textTransform: "uppercase", marginBottom: 4 }}>Interaction: {step.interaction.type}</p>
+                        {step.interaction.question && <p style={{ fontSize: "0.8125rem", color: colors.text }}>{step.interaction.question}</p>}
+                        {step.interaction.options && (
+                          <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 4 }}>
+                            {step.interaction.options.map((opt: string, oi: number) => (
+                              <span key={oi} style={{ fontSize: "0.75rem", padding: "2px 8px", borderRadius: 4, background: "white", border: `1px solid ${colors.border}`, color: colors.text }}>
+                                {String.fromCharCode(65 + oi)}. {opt}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Illustration status (admin-only metadata) */}
+                    <div style={{ marginBottom: 8, padding: "8px 16px", borderRadius: 8, background: "#F8FAFC", border: "1px solid #E2E8F0", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                      <span style={{ fontSize: "0.6875rem", fontWeight: 700, color: colors.textMuted, textTransform: "uppercase" }}>Media (admin only):</span>
+                      <span style={{ fontSize: "0.6875rem", fontWeight: 600, color: step.illustrationPrompt ? "#92400E" : "#6B7280", background: step.illustrationPrompt ? "#FEF3C7" : "#F3F4F6", padding: "2px 8px", borderRadius: 4 }}>
+                        {step.illustrationPrompt ? "🎨 Illustration prompt set" : "🎨 No illustration"}
+                      </span>
+                      <span style={{ fontSize: "0.6875rem", fontWeight: 600, color: step.video?.approvedByAdmin ? "#065F46" : step.video?.searchKeywords ? "#92400E" : "#6B7280", background: step.video?.approvedByAdmin ? "#D1FAE5" : step.video?.searchKeywords ? "#FEF3C7" : "#F3F4F6", padding: "2px 8px", borderRadius: 4 }}>
+                        {step.video?.approvedByAdmin ? "🎬 Video approved" : step.video?.searchKeywords ? "🎬 Video keywords set" : "🎬 No video"}
+                      </span>
+                    </div>
+
+                    {/* Navigation */}
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 16, paddingTop: 12, borderTop: `1px solid ${colors.border}` }}>
+                      <button
+                        onClick={() => setCurrentPreviewStep(Math.max(0, currentPreviewStep - 1))}
+                        disabled={isFirst}
+                        style={{
+                          padding: "8px 16px", borderRadius: 8, border: `1px solid ${colors.border}`,
+                          background: isFirst ? colors.bgSoft : "white", color: isFirst ? colors.textMuted : colors.text,
+                          fontWeight: 700, fontSize: "0.8125rem", cursor: isFirst ? "default" : "pointer",
+                        }}
+                      >← Back</button>
+                      <span style={{ fontSize: "0.75rem", color: colors.textMuted, fontWeight: 600 }}>
+                        {currentPreviewStep + 1} / {previewJourney.length}
+                      </span>
+                      <button
+                        onClick={() => setCurrentPreviewStep(Math.min(previewJourney.length - 1, currentPreviewStep + 1))}
+                        disabled={isLast}
+                        style={{
+                          padding: "8px 16px", borderRadius: 8, border: "none",
+                          background: isLast ? colors.bgSoft : colors.success, color: isLast ? colors.textMuted : "#fff",
+                          fontWeight: 700, fontSize: "0.8125rem", cursor: isLast ? "default" : "pointer",
+                        }}
+                      >Next →</button>
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
+            // ── List mode (default) ──
             return (
               <div style={{ marginTop: "1rem", border: `2px solid ${colors.primary}`, borderRadius: 12, overflow: "hidden" }}>
                 <div style={{ padding: "10px 16px", background: colors.primary, color: "#fff", fontWeight: 700, fontSize: "0.8125rem", display: "flex", alignItems: "center", gap: 8 }}>
@@ -645,38 +784,31 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
                   Student Preview — {previewJourney.length} steps
                 </div>
                 <div style={{ padding: "12px 16px", background: "#fff" }}>
-                  {previewJourney.map((step: any, i: number) => {
-                    const stepIcons: Record<string, string> = {
-                      welcome: "🦉", mission: "🎯", think_first: "💭", learn: "📖",
-                      connect: "🔗", example: "💡", practice: "✏️", quick_check: "✅",
-                      reflect: "🪞", complete: "🏆",
-                    };
-                    return (
-                      <div key={i} style={{ marginBottom: 8, padding: "8px 10px", borderRadius: 8, background: colors.bgSoft, border: `1px solid ${colors.border}` }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
-                          <span style={{ fontSize: "1rem" }}>{stepIcons[step.stepType] || "📌"}</span>
-                          <span style={{ fontSize: "0.75rem", fontWeight: 700, color: colors.text }}>
-                            Step {i + 1}: {step.title || step.stepType}
+                  {previewJourney.map((step: any, i: number) => (
+                    <div key={i} style={{ marginBottom: 8, padding: "8px 10px", borderRadius: 8, background: colors.bgSoft, border: `1px solid ${colors.border}` }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+                        <span style={{ fontSize: "1rem" }}>{stepIcons[step.stepType] || "📌"}</span>
+                        <span style={{ fontSize: "0.75rem", fontWeight: 700, color: colors.text }}>
+                          Step {i + 1}: {step.title || step.stepType}
+                        </span>
+                        {step.interaction?.type && step.interaction.type !== "none" && (
+                          <span style={{ fontSize: "0.625rem", fontWeight: 600, color: colors.primary, background: `${colors.primary}15`, padding: "1px 6px", borderRadius: 4 }}>
+                            ✋ {step.interaction.type.replace(/_/g, " ")}
                           </span>
-                          {step.interaction?.type && step.interaction.type !== "none" && (
-                            <span style={{ fontSize: "0.625rem", fontWeight: 600, color: colors.primary, background: `${colors.primary}15`, padding: "1px 6px", borderRadius: 4 }}>
-                              ✋ {step.interaction.type.replace(/_/g, " ")}
-                            </span>
-                          )}
-                        </div>
-                        {step.studentText && (
-                          <p style={{ fontSize: "0.75rem", color: colors.text, lineHeight: 1.4, margin: "4px 0 0 22px" }}>
-                            {step.studentText.length > 150 ? step.studentText.slice(0, 150) + "…" : step.studentText}
-                          </p>
-                        )}
-                        {step.owlText && (
-                          <p style={{ fontSize: "0.6875rem", color: colors.textMuted, fontStyle: "italic", margin: "2px 0 0 22px" }}>
-                            🦉 {step.owlText.length > 100 ? step.owlText.slice(0, 100) + "…" : step.owlText}
-                          </p>
                         )}
                       </div>
-                    );
-                  })}
+                      {step.studentText && (
+                        <p style={{ fontSize: "0.75rem", color: colors.text, lineHeight: 1.4, margin: "4px 0 0 22px" }}>
+                          {step.studentText.length > 150 ? step.studentText.slice(0, 150) + "…" : step.studentText}
+                        </p>
+                      )}
+                      {step.owlText && (
+                        <p style={{ fontSize: "0.6875rem", color: colors.textMuted, fontStyle: "italic", margin: "2px 0 0 22px" }}>
+                          🦉 {step.owlText.length > 100 ? step.owlText.slice(0, 100) + "…" : step.owlText}
+                        </p>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
             );
