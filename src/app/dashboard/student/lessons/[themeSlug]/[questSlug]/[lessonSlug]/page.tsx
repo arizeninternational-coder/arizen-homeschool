@@ -265,6 +265,11 @@ function SlideStepView({ step, stepNumber, totalSteps, interaction, setInteracti
   const paragraphs = splitIntoParagraphs(step.studentText);
   const isComplete = step.stepType === "complete";
 
+  // Determine if student text adds value beyond the owl message
+  // For welcome/mission steps, the owl text IS the main content — skip redundant body
+  const isOwlPrimaryStep = ["welcome", "mission", "complete"].includes(step.stepType);
+  const studentTextAddsValue = !isOwlPrimaryStep && paragraphs.length > 0;
+
   return (
     <div className="flex flex-col">
       {/* Step header badge */}
@@ -278,22 +283,36 @@ function SlideStepView({ step, stepNumber, totalSteps, interaction, setInteracti
         </div>
       </div>
 
-      {/* Owl guide — only once, inline */}
-      <OwlGuideInline step={step} />
+      {/* For owl-primary steps (welcome, mission, complete), show owl as the main content */}
+      {isOwlPrimaryStep && step.owlText ? (
+        <div className="flex items-start gap-3 px-5 py-4 rounded-2xl bg-gradient-to-br from-sky-50/90 via-indigo-50/60 to-purple-50/40 border border-sky-200/50 shadow-sm">
+          <div className="flex-shrink-0 mt-0.5">
+            <OwlTeacher size={48} expression={OWL_EXPRESSIONS[step.stepType] || 'happy'} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] font-extrabold uppercase tracking-[0.12em] text-sky-600/70 mb-1">Owl Teacher says:</p>
+            <p className="text-slate-700 text-base lg:text-lg leading-relaxed font-medium">{step.owlText}</p>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* For other steps, show owl guidance inline (compact) */}
+          <OwlGuideInline step={step} />
+          {/* Student text is the main content for non-owl-primary steps */}
+          {studentTextAddsValue && (
+            <div className="mt-4 flex flex-col gap-3">
+              {paragraphs.map((p, i) => (
+                <p key={i} className="text-slate-700 text-base lg:text-lg leading-relaxed whitespace-pre-line">{p}</p>
+              ))}
+            </div>
+          )}
+        </>
+      )}
 
       {/* Math display */}
       {step.mathDisplay && (
         <div className="mt-4 px-5 py-4 rounded-xl bg-slate-50 border border-slate-200/60 text-center">
           <span className="text-xl font-mono font-bold text-slate-800">{step.mathDisplay}</span>
-        </div>
-      )}
-
-      {/* Content paragraphs */}
-      {paragraphs.length > 0 && (
-        <div className="mt-4 flex flex-col gap-3">
-          {paragraphs.map((p, i) => (
-            <p key={i} className="text-slate-700 text-base lg:text-lg leading-relaxed whitespace-pre-line">{p}</p>
-          ))}
         </div>
       )}
 

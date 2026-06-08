@@ -123,6 +123,11 @@ export default function AdminStudentLessonEditor({ params }: { params: Promise<{
   const subject = lesson?.quest?.theme?.themeSubjects?.[0]?.subject || "";
   const grade = lesson?.quest?.theme?.grade || 0;
 
+  // Next step label — defined at component scope so bottom nav can use it
+  const nextStepLabel = !isLastStep && journey[clampedStep + 1]
+    ? getMeta(journey[clampedStep + 1].stepType).label
+    : null;
+
   // Missing media counts
   const missingIllustrations = journey.filter(s => s.illustrationPrompt && !s.media?.illustration?.approvedUrl).length;
   const missingVideos = journey.filter(s => {
@@ -408,7 +413,6 @@ export default function AdminStudentLessonEditor({ params }: { params: Promise<{
     }
 
     const meta = getMeta(currentJourneyStep.stepType);
-    const nextStepLabel = !isLastStep && journey[clampedStep + 1] ? getMeta(journey[clampedStep + 1].stepType).label : null;
 
     return (
       <div className="max-w-[1200px] mx-auto px-4 py-5 flex gap-5">
@@ -616,10 +620,14 @@ export default function AdminStudentLessonEditor({ params }: { params: Promise<{
             {!isLastStep && (
               <button onClick={() => setCurrentStep(clampedStep + 1)}
                 className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all active:scale-[0.97] bg-gradient-to-r ${getMeta(currentJourneyStep.stepType).gradient} text-white shadow-lg hover:brightness-110`}>
-                <span>{getMeta(currentJourneyStep.stepType).label}</span>
-                {nextStepLabel && <span className="text-xs opacity-75 hidden sm:inline">— {nextStepLabel}</span>}
+                <span>Next{nextStepLabel ? `: ${nextStepLabel}` : ""}</span>
                 <ChevronRight className="w-4 h-4" />
               </button>
+            )}
+            {isLastStep && (
+              <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-50 text-emerald-700 font-bold text-sm">
+                <Trophy className="w-4 h-4" /> Lesson Complete
+              </span>
             )}
           </div>
         </div>
