@@ -167,6 +167,17 @@ export default function SubjectCurriculumPage() {
     return matchesSearch && matchesStatus;
   });
 
+  // Group lessons by quest
+  const lessonsByQuest = new Map<string, { title: string; lessons: typeof lessons }>();
+  for (const l of filteredLessons) {
+    const questKey = l.questTitle || "Ungrouped";
+    if (!lessonsByQuest.has(questKey)) lessonsByQuest.set(questKey, { title: questKey, lessons: [] });
+    lessonsByQuest.get(questKey)!.lessons.push(l);
+  }
+  const questGroups = Array.from(lessonsByQuest.entries());
+  const [expandedQuests, setExpandedQuests] = useState<Set<string>>(new Set(lessonsByQuest.keys()));
+  const toggleQuest = (key: string) => { setExpandedQuests(prev => { const n = new Set(prev); if (n.has(key)) n.delete(key); else n.add(key); return n; }); };
+
   // File handlers
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
@@ -388,6 +399,58 @@ export default function SubjectCurriculumPage() {
               <option value="rejected">Rejected</option>
             </select>
           </div>
+
+          {/* Grouped by Quest view */}
+          {questGroups.length > 0 && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", marginBottom: "1.5rem" }}>
+              {questGroups.map(([questKey, quest]) => {
+                const isExpanded = expandedQuests.has(questKey);
+                const qp = quest.lessons.filter(l => l.status === "PUBLISHED").length;
+                const qt = quest.lessons.length;
+                return (
+                  <div key={questKey} style={{ background: "white", borderRadius: 14, border: `1px solid ${colors.border}`, overflow: "hidden" }}>
+                    <button onClick={() => toggleQuest(questKey)} style={{ width: "100%", padding: "14px 16px", display: "flex", alignItems: "center", gap: 12, background: "white", border: "none", cursor: "pointer", textAlign: "left" }}>
+                      <ChevronRight size={16} style={{ color: colors.textMuted, transition: "transform 0.2s", transform: isExpanded ? "rotate(90deg)" : "rotate(0deg)", flexShrink: 0 }} />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: 800, color: colors.text, fontSize: "0.875rem" }}>{quest.title}</div>
+                        <div style={{ fontSize: "0.6875rem", color: colors.textMuted, marginTop: 2 }}>{qt} lesson{qt !== 1 ? "s" : ""} · {qp} published</div>
+                      </div>
+                      <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
+                        {qp > 0 && <span style={{ padding: "2px 8px", borderRadius: 6, fontSize: "0.625rem", fontWeight: 700, color: "#065F46", background: "#D1FAE5" }}>{qp} Live</span>}
+                        {qt - qp > 0 && <span style={{ padding: "2px 8px", borderRadius: 6, fontSize: "0.625rem", fontWeight: 700, color: "#92400E", background: "#FEF3C7" }}>{qt - qp} Draft</span>}
+                      </div>
+                    </button>
+                    {isExpanded && (
+                      <div style={{ borderTop: `1px solid ${colors.border}` }}>
+                        {quest.lessons.map((l, li) => {
+                          const jl = l.generationStatus || "Not generated";
+                          const jc = jl === "Approved" ? "#065F46" : jl === "Draft generated" || jl === "Draft Generated" ? "#B45309" : jl === "Rejected" ? "#DC2626" : "#6B7280";
+                          const jb = jl === "Approved" ? "#D1FAE5" : jl === "Draft generated" || jl === "Draft Generated" ? "#FEF3C7" : jl === "Rejected" ? "#FEE2E2" : "#F3F4F6";
+                          return (
+                            <div key={l.id} style={{ padding: "10px 16px", display: "flex", alignItems: "center", gap: 12, borderBottom: li < quest.lessons.length - 1 ? "1px solid #F8FAFC" : "none", background: li % 2 === 0 ? "white" : "#FAFBFC" }}>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ fontWeight: 700, color: colors.text, fontSize: "0.8125rem" }}>{l.title}</div>
+                                <div style={{ display: "flex", gap: 6, marginTop: 4, flexWrap: "wrap" }}>
+                                  {l.strand && <span style={{ fontSize: "0.625rem", color: colors.textMuted }}>{l.strand}</span>}
+                                  {l.term && <span style={{ fontSize: "0.625rem", color: colors.textMuted }}>· {l.term}</span>}
+                                </div>
+                              </div>
+                              <span style={{ padding: "2px 6px", borderRadius: 4, fontSize: "0.6rem", fontWeight: 700, color: jc, background: jb, flexShrink: 0 }}>{jl}</span>
+                              {getStatusBadge(l.status)}
+                              <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
+                                <Link href={`/dashboard/admin/lessons/${l.id}`} style={{ padding: "3px 8px", borderRadius: 6, border: `1px solid ${colors.border}`, background: "white", color: colors.text, fontSize: "0.625rem", fontWeight: 700, textDecoration: "none" }}>Edit</Link>
+                                <Link href={`/dashboard/admin/lessons/${l.id}/student-view`} style={{ padding: "3px 8px", borderRadius: 6, border: "none", background: "#4F46E5", color: "#fff", fontSize: "0.625rem", fontWeight: 700, textDecoration: "none" }}>Preview</Link>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
           {/* Lesson table */}
           <div style={{ background: "white", borderRadius: 14, border: `1px solid ${colors.border}`, overflow: "hidden" }}>

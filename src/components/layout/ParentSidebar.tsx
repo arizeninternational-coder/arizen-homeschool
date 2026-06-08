@@ -15,10 +15,10 @@ const NAV_ITEMS = [
   { icon: BarChart3, label: "Progress", href: "/dashboard/parent/progress" },
   { icon: BookOpen, label: "Lessons", href: "/dashboard/parent/lessons" },
   { icon: Award, label: "Reports", href: "/dashboard/parent/reports" },
-  { icon: MessageCircle, label: "Messages", href: "/dashboard/parent/messages", comingSoon: true },
-  { icon: CalendarDays, label: "Calendar", href: "/dashboard/parent/calendar", comingSoon: true },
+  { icon: MessageCircle, label: "Messages", href: "/dashboard/parent/messages" },
+  { icon: CalendarDays, label: "Calendar", href: "/dashboard/parent/calendar" },
   { icon: Settings, label: "Settings", href: "/dashboard/parent/settings" },
-  { icon: HelpCircle, label: "Support", href: "/dashboard/parent/support", comingSoon: true },
+  { icon: HelpCircle, label: "Support", href: "/dashboard/parent/support" },
 ];
 
 export function ParentSidebar({ children }: { children: React.ReactNode }) {
@@ -62,9 +62,6 @@ export function ParentSidebar({ children }: { children: React.ReactNode }) {
             >
               <item.icon className="w-[18px] h-[18px] flex-shrink-0" />
               <span className="flex-1">{item.label}</span>
-              {item.comingSoon && (
-                <span className="text-[9px] font-bold uppercase tracking-wider text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">Soon</span>
-              )}
             </Link>
           );
         })}

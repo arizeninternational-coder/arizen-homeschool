@@ -41,6 +41,16 @@ export default function ParentMessagesPage() {
   const myId = useRef<string>("");
 
   useEffect(() => {
+    // Fetch current user ID
+    fetch("/api/auth/session", { credentials: "include" })
+      .then(r => r.json())
+      .then(data => {
+        if (data?.user?.id) myId.current = data.user.id;
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
     fetchConversations();
     fetchMembers();
   }, []);

@@ -40,6 +40,16 @@ export default function StudentMessagesPage() {
   const myId = useRef<string>("");
 
   useEffect(() => {
+    // Fetch current user ID for message ownership
+    fetch("/api/auth/session", { credentials: "include" })
+      .then(r => r.json())
+      .then(data => {
+        if (data?.user?.id) myId.current = data.user.id;
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
     fetchConversations();
     fetchMembers();
   }, []);
