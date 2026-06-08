@@ -12,6 +12,7 @@ import {
   RefreshCw, MessageCircle, Send
 } from "lucide-react";
 import confetti from "canvas-confetti";
+import { convertLegacyBlocksToJourney } from "@/lib/curriculum/lesson-journey";
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Admin Student-Style Lesson Editor
@@ -90,10 +91,16 @@ function buildLessonJourney(lesson: LessonData | null): JourneyStep[] {
   if (!lesson?.contentBlocks) return [];
   try {
     const cb = typeof lesson.contentBlocks === "string" ? JSON.parse(lesson.contentBlocks) : lesson.contentBlocks;
+    // Handle both dict format {studentJourney: [...]} and legacy array format [{type: "text", ...}]
+    if (Array.isArray(cb)) {
+      // Legacy array format — convert to journey steps
+      return convertLegacyBlocksToJourney(cb, lesson.title || "Lesson");
+    }
+    // Dict format — use approved journey first, then draft
     return cb?.studentJourney || cb?.studentJourneyDraft || [];
-  } catch { return []; }
+  } catch { return [];
+  }
 }
-
 export default function AdminStudentLessonEditor({ params }: { params: Promise<{ id: string }> }) {
   const [lessonId, setLessonId] = useState<string>("");
   const [lesson, setLesson] = useState<LessonData | null>(null);
