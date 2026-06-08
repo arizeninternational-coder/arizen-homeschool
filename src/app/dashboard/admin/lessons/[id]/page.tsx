@@ -7,6 +7,7 @@ import Link from "next/link";
 import {
   ArrowLeft, AlertCircle, Save, BookOpen, CheckCircle2, AlertTriangle, Info,
   Sparkles, Eye, ThumbsUp, ThumbsDown, ChevronDown, ChevronUp, Play,
+  Trash2, ExternalLink, Video, Link2, X,
 } from "lucide-react";
 import { ds, colors } from "@/lib/design-system";
 
@@ -73,6 +74,9 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
   const [aiDraft, setAiDraft] = useState<any[] | null>(null);
   const [aiMetadata, setAiMetadata] = useState<any>(null);
   const [hasApprovedJourney, setHasApprovedJourney] = useState(false);
+
+  // Video state
+  const [videoStates, setVideoStates] = useState<Record<number, { loading: boolean; error: string | null; url: string; title: string }>>({});
 
   // Extract journey info from lesson data
   useEffect(() => {
@@ -259,6 +263,83 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
       setError(err.message || "Failed to reject journey");
     }
   }, [params.id, aiMetadata]);
+
+  // ── Video handlers ──
+  const handleAddVideo = useCallback(async (step: any, videoUrl: string, videoTitle: string) => {
+    const idx = step._index;
+    setVideoStates(prev => ({ ...prev, [idx]: { ...prev[idx], loading: true, error: null, url: videoUrl, title: videoTitle } }));
+    try {
+      const res = await fetch(`/api/admin/lessons/${params.id}/video`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ stepIndex: idx, action: "add", videoUrl, videoTitle }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to add video");
+      // Reload lesson
+      const lessonRes = await fetch(`/api/admin/lessons/${params.id}`, { credentials: "include" });
+      if (lessonRes.ok) {
+        const lessonData = await lessonRes.json();
+        if (lessonData.lesson) {
+          setLesson((prev: any) => prev ? { ...prev, ...lessonData.lesson } : prev);
+        }
+      }
+      setVideoStates(prev => ({ ...prev, [idx]: { ...prev[idx], loading: false, error: null } }));
+    } catch (err: any) {
+      setVideoStates(prev => ({ ...prev, [idx]: { ...prev[idx], loading: false, error: err.message || "Failed to add video" } }));
+    }
+  }, [params.id]);
+
+  const handleApproveVideo = useCallback(async (step: any) => {
+    const idx = step._index;
+    setVideoStates(prev => ({ ...prev, [idx]: { ...prev[idx], loading: true, error: null } }));
+    try {
+      const res = await fetch(`/api/admin/lessons/${params.id}/video`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ stepIndex: idx, action: "approve" }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to approve video");
+      const lessonRes = await fetch(`/api/admin/lessons/${params.id}`, { credentials: "include" });
+      if (lessonRes.ok) {
+        const lessonData = await lessonRes.json();
+        if (lessonData.lesson) {
+          setLesson((prev: any) => prev ? { ...prev, ...lessonData.lesson } : prev);
+        }
+      }
+      setVideoStates(prev => ({ ...prev, [idx]: { ...prev[idx], loading: false, error: null } }));
+    } catch (err: any) {
+      setVideoStates(prev => ({ ...prev, [idx]: { ...prev[idx], loading: false, error: err.message || "Failed to approve video" } }));
+    }
+  }, [params.id]);
+
+  const handleRemoveVideo = useCallback(async (step: any) => {
+    const idx = step._index;
+    setVideoStates(prev => ({ ...prev, [idx]: { ...prev[idx], loading: true, error: null } }));
+    try {
+      const res = await fetch(`/api/admin/lessons/${params.id}/video`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ stepIndex: idx, action: "remove" }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to remove video");
+      const lessonRes = await fetch(`/api/admin/lessons/${params.id}`, { credentials: "include" });
+      if (lessonRes.ok) {
+        const lessonData = await lessonRes.json();
+        if (lessonData.lesson) {
+          setLesson((prev: any) => prev ? { ...prev, ...lessonData.lesson } : prev);
+        }
+      }
+      setVideoStates(prev => ({ ...prev, [idx]: { loading: false, error: null, url: "", title: "" } }));
+    } catch (err: any) {
+      setVideoStates(prev => ({ ...prev, [idx]: { ...prev[idx], loading: false, error: err.message || "Failed to remove video" } }));
+    }
+  }, [params.id]);
 
   if (loading) {
     return (
@@ -583,6 +664,36 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
                   <Play style={{ width: 14, height: 14 }} />
                   {showJourneyPreview && previewMode === "step" ? "Exit Walkthrough" : "Walkthrough"}
                 </button>
+                <button
+                  onClick={() => {
+                    const journeyToShow = hasApprovedJourney
+                      ? (() => {
+                          try {
+                            const cb = typeof lesson?.contentBlocks === "string"
+                              ? JSON.parse(lesson.contentBlocks)
+                              : lesson?.contentBlocks;
+                            return cb?.studentJourney || [];
+                          } catch { return []; }
+                        })()
+                      : (aiDraft || []);
+                    const lessonSlug = lesson?.slug || "";
+                    const themeSlug = lesson?.quest?.theme?.slug || "theme";
+                    const questSlug = lesson?.quest?.slug || "quest";
+                    const url = `/dashboard/student/lessons/${themeSlug}/${questSlug}/${lessonSlug}?adminPreview=true`;
+                    window.open(url, "_blank");
+                  }}
+                  style={{
+                    display: "inline-flex", alignItems: "center", gap: "0.5rem",
+                    padding: "8px 16px", borderRadius: 8, border: "none",
+                    background: "#4F46E5",
+                    color: "#fff",
+                    fontWeight: 700, fontSize: "0.8125rem",
+                    cursor: "pointer",
+                  }}
+                >
+                  <ExternalLink style={{ width: 14, height: 14 }} />
+                  Preview Student Journey
+                </button>
               </div>
             )}
           </div>
@@ -788,9 +899,20 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
                       <span style={{ fontSize: "0.6875rem", fontWeight: 600, color: step.illustrationPrompt ? "#92400E" : "#6B7280", background: step.illustrationPrompt ? "#FEF3C7" : "#F3F4F6", padding: "2px 8px", borderRadius: 4 }}>
                         {step.illustrationPrompt ? "🎨 Illustration prompt set" : "🎨 No illustration"}
                       </span>
-                      <span style={{ fontSize: "0.6875rem", fontWeight: 600, color: step.video?.approvedByAdmin ? "#065F46" : step.video?.searchKeywords ? "#92400E" : "#6B7280", background: step.video?.approvedByAdmin ? "#D1FAE5" : step.video?.searchKeywords ? "#FEF3C7" : "#F3F4F6", padding: "2px 8px", borderRadius: 4 }}>
-                        {step.video?.approvedByAdmin ? "🎬 Video approved" : step.video?.searchKeywords ? "🎬 Video keywords set" : "🎬 No video"}
-                      </span>
+                      {(() => {
+                        const vData = step.media?.video || step.video;
+                        const vApproved = vData?.approvedUrl && vData?.approvedByAdmin;
+                        const vSuggested = vData?.suggestedUrl && !vData?.approvedByAdmin;
+                        const vKeywords = vData?.searchKeywords && (Array.isArray(vData.searchKeywords) ? vData.searchKeywords.length > 0 : vData.searchKeywords.trim().length > 0);
+                        const vColor = vApproved ? "#065F46" : vSuggested ? "#B45309" : vKeywords ? "#92400E" : "#6B7280";
+                        const vBg = vApproved ? "#D1FAE5" : vSuggested ? "#FEF3C7" : vKeywords ? "#FEF3C7" : "#F3F4F6";
+                        const vLabel = vApproved ? "🎬 Video approved" : vSuggested ? "🎬 Video pending approval" : vKeywords ? "🎬 Video keywords set" : "🎬 No video";
+                        return (
+                          <span style={{ fontSize: "0.6875rem", fontWeight: 600, color: vColor, background: vBg, padding: "2px 8px", borderRadius: 4 }}>
+                            {vLabel}
+                          </span>
+                        );
+                      })()}
                     </div>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 16, paddingTop: 12, borderTop: `1px solid ${colors.border}` }}>
                       <button
@@ -1126,6 +1248,198 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
                               background: "#fff", color: "#DC2626",
                               fontWeight: 700, fontSize: "0.6875rem",
                               cursor: state.loading ? "not-allowed" : "pointer",
+                            }}
+                          >
+                            Remove
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* ── Video Section ── */}
+        {(() => {
+          const journeyForVideos = (() => {
+            try {
+              const cb = typeof lesson?.contentBlocks === "string" ? JSON.parse(lesson.contentBlocks) : lesson?.contentBlocks;
+              return (cb?.studentJourney || cb?.studentJourneyDraft || []).map((s: any, i: number) => ({ ...s, _index: i }));
+            } catch { return []; }
+          })();
+
+          if (journeyForVideos.length === 0) return null;
+
+          const stepIcons: Record<string, string> = {
+            welcome: "🦉", mission: "🎯", think_first: "💭", learn: "📖",
+            connect: "🔗", example: "💡", practice: "✏️", quick_check: "✅",
+            reflect: "🪞", complete: "🏆",
+          };
+
+          return (
+            <div style={{ ...ds.card, padding: "1.25rem 1.5rem", marginBottom: "1.5rem" }}>
+              <h3 style={{ fontSize: "0.9375rem", fontWeight: 800, color: colors.text, display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1rem" }}>
+                <Video style={{ width: 16, height: 16, color: colors.primary }} />
+                Videos
+                <span style={{ fontSize: "0.6875rem", fontWeight: 600, color: colors.textMuted, background: colors.bgSoft, padding: "0.15rem 0.5rem", borderRadius: 6 }}>
+                  {journeyForVideos.length} steps
+                </span>
+              </h3>
+              <p style={{ fontSize: "0.75rem", color: colors.textMuted, marginBottom: "1rem" }}>
+                Add YouTube videos to lesson steps. Students only see approved videos. Supports youtube.com/watch, youtu.be, youtube.com/shorts, and youtube.com/embed links.
+              </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                {journeyForVideos.map((step: any) => {
+                  const idx = step._index;
+                  const vState = videoStates[idx] || { loading: false, error: null, url: "", title: "" };
+                  const videoData = step.media?.video;
+                  const hasApproved = videoData?.approvedUrl && videoData?.approvedByAdmin;
+                  const hasSuggested = videoData?.suggestedUrl && !videoData?.approvedByAdmin;
+                  const hasSearchKeywords = videoData?.searchKeywords && videoData.searchKeywords.length > 0;
+
+                  return (
+                    <div key={idx} style={{ border: `1px solid ${colors.border}`, borderRadius: 10, padding: "12px 14px", background: "#fff" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                        <span style={{ fontSize: "1.1rem" }}>{stepIcons[step.stepType] || "📌"}</span>
+                        <span style={{ fontSize: "0.8125rem", fontWeight: 700, color: colors.text }}>
+                          Step {idx + 1}: {step.title || step.stepType}
+                        </span>
+                        {hasApproved && (
+                          <span style={{ fontSize: "0.625rem", fontWeight: 600, color: colors.success, background: `${colors.success}15`, padding: "1px 6px", borderRadius: 4 }}>
+                            ✓ Approved
+                          </span>
+                        )}
+                        {hasSuggested && (
+                          <span style={{ fontSize: "0.625rem", fontWeight: 600, color: "#D97706", background: "#FEF3C7", padding: "1px 6px", borderRadius: 4 }}>
+                            Pending approval
+                          </span>
+                        )}
+                        {!hasApproved && !hasSuggested && hasSearchKeywords && (
+                          <span style={{ fontSize: "0.625rem", fontWeight: 600, color: colors.textMuted, background: colors.bgSoft, padding: "1px 6px", borderRadius: 4 }}>
+                            No video
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Show approved video preview */}
+                      {hasApproved && videoData.approvedUrl && (
+                        <div style={{ marginBottom: "8px", borderRadius: 8, overflow: "hidden", border: `1px solid ${colors.border}` }}>
+                          <div style={{ position: "relative", width: "100%", paddingBottom: "40%", background: "#f1f5f9" }}>
+                            <iframe
+                              src={`https://www.youtube.com/embed/${(() => {
+                                const patterns = [
+                                  /(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/,
+                                  /(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/,
+                                  /(?:youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+                                  /(?:youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/,
+                                ];
+                                for (const p of patterns) { const m = videoData.approvedUrl.match(p); if (m) return m[1]; }
+                                return "";
+                              })()}`}
+                              title={videoData.approvedTitle || "Lesson video"}
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: "none" }}
+                            />
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Show suggested video link */}
+                      {hasSuggested && videoData.suggestedUrl && (
+                        <div style={{ marginBottom: "8px", padding: "6px 10px", borderRadius: 6, background: "#FEF3C7", border: "1px solid #FDE68A", display: "flex", alignItems: "center", gap: 6 }}>
+                          <Link2 style={{ width: 12, height: 12, color: "#D97706", flexShrink: 0 }} />
+                          <a href={videoData.suggestedUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: "0.6875rem", color: "#92400E", fontWeight: 600, textDecoration: "underline" }}>
+                            {videoData.suggestedUrl}
+                          </a>
+                        </div>
+                      )}
+
+                      {vState.error && (
+                        <div style={{ marginBottom: "8px", padding: "6px 10px", borderRadius: 6, background: "#FEE2E2", border: "1px solid #FECACA" }}>
+                          <p style={{ fontSize: "0.6875rem", color: "#DC2626", fontWeight: 600 }}>⚠ {vState.error}</p>
+                        </div>
+                      )}
+
+                      {/* URL input */}
+                      <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", alignItems: "flex-end" }}>
+                        <div style={{ flex: 1, minWidth: 200 }}>
+                          <label style={{ fontSize: "0.625rem", fontWeight: 700, color: colors.textMuted, textTransform: "uppercase", marginBottom: 2, display: "block" }}>YouTube URL</label>
+                          <input
+                            type="url"
+                            placeholder="https://www.youtube.com/watch?v=..."
+                            value={vState.url || ""}
+                            onChange={e => setVideoStates(prev => ({ ...prev, [idx]: { ...prev[idx], url: e.target.value, error: null } }))}
+                            style={{ width: "100%", padding: "6px 10px", borderRadius: 6, border: `1px solid ${colors.border}`, fontSize: "0.75rem", color: colors.text, outline: "none" }}
+                          />
+                        </div>
+                        <div style={{ width: 140 }}>
+                          <label style={{ fontSize: "0.625rem", fontWeight: 700, color: colors.textMuted, textTransform: "uppercase", marginBottom: 2, display: "block" }}>Title (optional)</label>
+                          <input
+                            type="text"
+                            placeholder="Video title"
+                            value={vState.title || ""}
+                            onChange={e => setVideoStates(prev => ({ ...prev, [idx]: { ...prev[idx], title: e.target.value } }))}
+                            style={{ width: "100%", padding: "6px 10px", borderRadius: 6, border: `1px solid ${colors.border}`, fontSize: "0.75rem", color: colors.text, outline: "none" }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Action buttons */}
+                      <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginTop: "8px" }}>
+                        <button
+                          onClick={() => {
+                            if (!vState.url.trim()) {
+                              setVideoStates(prev => ({ ...prev, [idx]: { ...prev[idx], error: "Please enter a YouTube URL" } }));
+                              return;
+                            }
+                            handleAddVideo(step, vState.url.trim(), vState.title.trim());
+                          }}
+                          disabled={vState.loading}
+                          style={{
+                            display: "inline-flex", alignItems: "center", gap: "0.35rem",
+                            padding: "5px 12px", borderRadius: 6, border: "none",
+                            background: vState.loading ? colors.textMuted : colors.primary,
+                            color: "#fff", fontWeight: 700, fontSize: "0.6875rem",
+                            cursor: vState.loading ? "not-allowed" : "pointer",
+                          }}
+                        >
+                          {vState.loading ? (
+                            <><span className="spinner" style={{ width: 12, height: 12, border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%", display: "inline-block" }} /> Saving...</>
+                          ) : hasApproved || hasSuggested ? (
+                            <><Link2 style={{ width: 12, height: 12 }} /> Replace Video</>
+                          ) : (
+                            <><Link2 style={{ width: 12, height: 12 }} /> Add Video</>
+                          )}
+                        </button>
+                        {hasSuggested && !hasApproved && (
+                          <button
+                            onClick={() => handleApproveVideo(step)}
+                            disabled={vState.loading}
+                            style={{
+                              display: "inline-flex", alignItems: "center", gap: "0.35rem",
+                              padding: "5px 12px", borderRadius: 6, border: "none",
+                              background: colors.success, color: "#fff",
+                              fontWeight: 700, fontSize: "0.6875rem",
+                              cursor: vState.loading ? "not-allowed" : "pointer",
+                            }}
+                          >
+                            <CheckCircle2 style={{ width: 12, height: 12 }} /> Approve
+                          </button>
+                        )}
+                        {(hasApproved || hasSuggested) && (
+                          <button
+                            onClick={() => handleRemoveVideo(step)}
+                            disabled={vState.loading}
+                            style={{
+                              display: "inline-flex", alignItems: "center", gap: "0.35rem",
+                              padding: "5px 12px", borderRadius: 6, border: `1.5px solid ${colors.border}`,
+                              background: "#fff", color: "#DC2626",
+                              fontWeight: 700, fontSize: "0.6875rem",
+                              cursor: vState.loading ? "not-allowed" : "pointer",
                             }}
                           >
                             Remove

@@ -945,6 +945,10 @@ function evaluateJourneyReadiness(
     if (step.video?.required && !step.video?.approvedByAdmin) {
       hasUnapprovedVideo = true;
     }
+    const vData = step.media?.video || step.video;
+    if (vData && !vData.approvedByAdmin && (vData.suggestedUrl || vData.approvedUrl)) {
+      hasUnapprovedVideo = true;
+    }
     if (step.stepType === "practice") {
       practiceCount++;
     }

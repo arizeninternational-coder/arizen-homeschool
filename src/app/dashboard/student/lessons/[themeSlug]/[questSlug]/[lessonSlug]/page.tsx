@@ -6,9 +6,10 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import {
-  Sparkles, ArrowLeft, CheckCircle2, Zap, BookOpen, Flame, Award,
-  Target, Star, ChevronRight, ChevronLeft, RotateCcw, Eye, Lightbulb,
-  Pencil, CheckCircle, HelpCircle, Trophy, Heart, MessageCircle, Play
+  ArrowLeft, CheckCircle2, Zap, BookOpen, Flame,
+  Target, Star, ChevronRight, ChevronLeft, RotateCcw, Eye,
+  Pencil, HelpCircle, Trophy, MessageCircle, Play,
+  Map, Sparkles
 } from "lucide-react";
 import { GradientButton } from "@/components/ui/Pill";
 import OwlTeacher from "@/components/ui/OwlTeacher";
@@ -62,6 +63,7 @@ function extractYouTubeId(url: string): string | null {
     /(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/,
     /(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/,
     /(?:youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+    /(?:youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/,
   ];
   for (const p of patterns) {
     const m = url.match(p);
@@ -77,10 +79,10 @@ const STEP_LABELS: Record<JourneyStepType, string> = {
 };
 
 const NEXT_BUTTON_LABELS: Record<JourneyStepType, string> = {
-  welcome: "Start Mission →", mission: "I'm Ready →", think_first: "Save My Guess →",
-  learn: "I Understand →", connect: "Continue →", example: "Show Practice →",
-  practice: "Save Measurements →", quick_check: "Check Answer",
-  reflect: "Continue to Finish →", complete: "",
+  welcome: "Start Mission", mission: "I'm Ready", think_first: "Save My Guess",
+  learn: "I Understand", connect: "Continue", example: "Show Practice",
+  practice: "Save Measurements", quick_check: "Check Answer",
+  reflect: "Continue to Finish", complete: "",
 };
 
 const OWL_EXPRESSIONS: Record<JourneyStepType, 'happy' | 'thinking' | 'encouraging' | 'celebrating'> = {
@@ -89,17 +91,17 @@ const OWL_EXPRESSIONS: Record<JourneyStepType, 'happy' | 'thinking' | 'encouragi
   practice: "encouraging", quick_check: "thinking", reflect: "happy", complete: "celebrating",
 };
 
-const STEP_THEME: Record<JourneyStepType, { accent: string; bg: string; border: string; gradient: string; softBg: string; iconBg: string }> = {
-  welcome:    { accent: "text-indigo-700", bg: "bg-indigo-50/60",   border: "border-indigo-200/60", gradient: "from-indigo-500 to-purple-500", softBg: "from-indigo-50/80 to-purple-50/50", iconBg: "bg-indigo-100" },
-  mission:    { accent: "text-violet-700",  bg: "bg-violet-50/60",   border: "border-violet-200/60", gradient: "from-violet-500 to-purple-500", softBg: "from-violet-50/80 to-purple-50/50", iconBg: "bg-violet-100" },
-  think_first:{ accent: "text-amber-700",   bg: "bg-amber-50/60",    border: "border-amber-200/60",  gradient: "from-amber-500 to-orange-500", softBg: "from-amber-50/80 to-orange-50/50", iconBg: "bg-amber-100" },
-  learn:      { accent: "text-emerald-700", bg: "bg-emerald-50/60",  border: "border-emerald-200/60", gradient: "from-emerald-500 to-teal-500", softBg: "from-emerald-50/80 to-teal-50/50", iconBg: "bg-emerald-100" },
-  connect:    { accent: "text-teal-700",    bg: "bg-teal-50/60",     border: "border-teal-200/60",    gradient: "from-teal-500 to-cyan-500", softBg: "from-teal-50/80 to-cyan-50/50", iconBg: "bg-teal-100" },
-  example:    { accent: "text-cyan-700",    bg: "bg-cyan-50/60",     border: "border-cyan-200/60",    gradient: "from-cyan-500 to-blue-500", softBg: "from-cyan-50/80 to-blue-50/50", iconBg: "bg-cyan-100" },
-  practice:   { accent: "text-sky-700",     bg: "bg-sky-50/60",      border: "border-sky-200/60",     gradient: "from-sky-500 to-blue-500", softBg: "from-sky-50/80 to-blue-50/50", iconBg: "bg-sky-100" },
-  quick_check:{ accent: "text-lime-700",    bg: "bg-lime-50/60",     border: "border-lime-200/60",    gradient: "from-lime-500 to-green-500", softBg: "from-lime-50/80 to-green-50/50", iconBg: "bg-lime-100" },
-  reflect:    { accent: "text-rose-700",    bg: "bg-rose-50/60",     border: "border-rose-200/60",    gradient: "from-rose-500 to-pink-500", softBg: "from-rose-50/80 to-pink-50/50", iconBg: "bg-rose-100" },
-  complete:   { accent: "text-yellow-700",  bg: "bg-yellow-50/60",   border: "border-yellow-200/60",  gradient: "from-yellow-500 to-amber-500", softBg: "from-yellow-50/80 to-amber-50/50", iconBg: "bg-yellow-100" },
+const STEP_THEME: Record<JourneyStepType, { accent: string; bg: string; border: string; gradient: string; softBg: string; iconBg: string; iconColor: string }> = {
+  welcome:    { accent: "text-indigo-700", bg: "bg-indigo-50/60",   border: "border-indigo-200/60", gradient: "from-indigo-500 to-purple-500", softBg: "from-indigo-50/80 to-purple-50/50", iconBg: "bg-indigo-100", iconColor: "text-indigo-600" },
+  mission:    { accent: "text-violet-700",  bg: "bg-violet-50/60",   border: "border-violet-200/60", gradient: "from-violet-500 to-purple-500", softBg: "from-violet-50/80 to-purple-50/50", iconBg: "bg-violet-100", iconColor: "text-violet-600" },
+  think_first:{ accent: "text-amber-700",   bg: "bg-amber-50/60",    border: "border-amber-200/60",  gradient: "from-amber-500 to-orange-500", softBg: "from-amber-50/80 to-orange-50/50", iconBg: "bg-amber-100", iconColor: "text-amber-600" },
+  learn:      { accent: "text-emerald-700", bg: "bg-emerald-50/60",  border: "border-emerald-200/60", gradient: "from-emerald-500 to-teal-500", softBg: "from-emerald-50/80 to-teal-50/50", iconBg: "bg-emerald-100", iconColor: "text-emerald-600" },
+  connect:    { accent: "text-teal-700",    bg: "bg-teal-50/60",     border: "border-teal-200/60",    gradient: "from-teal-500 to-cyan-500", softBg: "from-teal-50/80 to-cyan-50/50", iconBg: "bg-teal-100", iconColor: "text-teal-600" },
+  example:    { accent: "text-cyan-700",    bg: "bg-cyan-50/60",     border: "border-cyan-200/60",    gradient: "from-cyan-500 to-blue-500", softBg: "from-cyan-50/80 to-blue-50/50", iconBg: "bg-cyan-100", iconColor: "text-cyan-600" },
+  practice:   { accent: "text-sky-700",     bg: "bg-sky-50/60",      border: "border-sky-200/60",     gradient: "from-sky-500 to-blue-500", softBg: "from-sky-50/80 to-blue-50/50", iconBg: "bg-sky-100", iconColor: "text-sky-600" },
+  quick_check:{ accent: "text-lime-700",    bg: "bg-lime-50/60",     border: "border-lime-200/60",    gradient: "from-lime-500 to-green-500", softBg: "from-lime-50/80 to-green-50/50", iconBg: "bg-lime-100", iconColor: "text-lime-600" },
+  reflect:    { accent: "text-rose-700",    bg: "bg-rose-50/60",     border: "border-rose-200/60",    gradient: "from-rose-500 to-pink-500", softBg: "from-rose-50/80 to-pink-50/50", iconBg: "bg-rose-100", iconColor: "text-rose-600" },
+  complete:   { accent: "text-yellow-700",  bg: "bg-yellow-50/60",   border: "border-yellow-200/60",  gradient: "from-yellow-500 to-amber-500", softBg: "from-yellow-50/80 to-amber-50/50", iconBg: "bg-yellow-100", iconColor: "text-yellow-600" },
 };
 
 const CELEBRATION_CSS = `
@@ -109,41 +111,18 @@ const CELEBRATION_CSS = `
 @keyframes shimmer { 0% { background-position: -200% 0 } 100% { background-position: 200% 0 } }
 @keyframes slideUp { 0% { transform: translateY(20px); opacity: 0 } 100% { transform: translateY(0); opacity: 1 } }
 @keyframes pulse-glow { 0%,100% { box-shadow: 0 0 0 0 rgba(79,70,229,.3) } 50% { box-shadow: 0 0 0 8px rgba(79,70,229,0) } }
-@keyframes blobFloat1 { 0%,100% { transform: translate(0,0) scale(1) } 33% { transform: translate(30px,-20px) scale(1.05) } 66% { transform: translate(-20px,15px) scale(0.95) } }
-@keyframes blobFloat2 { 0%,100% { transform: translate(0,0) scale(1) } 33% { transform: translate(-25px,20px) scale(1.08) } 66% { transform: translate(15px,-25px) scale(0.92) } }
-@keyframes blobFloat3 { 0%,100% { transform: translate(0,0) scale(1) } 33% { transform: translate(20px,25px) scale(0.96) } 66% { transform: translate(-30px,-10px) scale(1.04) } }
-@keyframes countUp { 0% { transform: scale(0.5); opacity:0 } 60% { transform: scale(1.2) } 100% { transform: scale(1); opacity:1 } }
 @keyframes sparkle { 0%,100% { opacity:0; transform: scale(0) rotate(0deg) } 50% { opacity:1; transform: scale(1) rotate(180deg) } }
 `;
 
-/* ─── Floating Blobs Background ─── */
+/* ─── Sub-components ─── */
 
-function FloatingBlobs() {
-  return (
-    <div aria-hidden="true" className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-      <div className="absolute -top-[10%] -right-[5%] w-[700px] h-[700px] rounded-full bg-[radial-gradient(circle,rgba(79,70,229,0.10)_0%,transparent_60%)]" style={{ animation: "blobFloat1 20s ease-in-out infinite" }} />
-      <div className="absolute top-[15%] -left-[8%] w-[500px] h-[500px] rounded-full bg-[radial-gradient(circle,rgba(139,92,246,0.09)_0%,transparent_60%)]" style={{ animation: "blobFloat2 25s ease-in-out infinite" }} />
-      <div className="absolute bottom-[-5%] right-[10%] w-[450px] h-[450px] rounded-full bg-[radial-gradient(circle,rgba(245,165,36,0.08)_0%,transparent_60%)]" style={{ animation: "blobFloat3 22s ease-in-out infinite" }} />
-      <div className="absolute top-[50%] left-[5%] w-[350px] h-[350px] rounded-full bg-[radial-gradient(circle,rgba(255,92,138,0.07)_0%,transparent_60%)]" style={{ animation: "blobFloat1 18s ease-in-out infinite reverse" }} />
-      <div className="absolute top-[30%] right-[40%] w-[400px] h-[400px] rounded-full bg-[radial-gradient(circle,rgba(0,168,132,0.06)_0%,transparent_60%)]" style={{ animation: "blobFloat2 28s ease-in-out infinite" }} />
-      <div className="absolute top-[15%] right-[25%] float-slow opacity-[0.06]"><Sparkles className="w-14 h-14 text-indigo-500" /></div>
-      <div className="absolute top-[55%] right-[10%] float-medium opacity-[0.05]"><Star className="w-11 h-11 text-amber-500" /></div>
-      <div className="absolute bottom-[25%] left-[8%] float-fast opacity-[0.05]"><Heart className="w-10 h-10 text-pink-500" /></div>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(79,70,229,0.03),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(139,92,246,0.03),transparent_35%),linear-gradient(180deg,rgba(247,249,255,0.85)_0%,rgba(247,249,255,0.95)_100%)]" />
-    </div>
-  );
-}
-
-/* ─── Compact Owl Guide Card ─── */
-
-function OwlGuideCard({ step }: { step: JourneyStep }) {
+function OwlGuideInline({ step }: { step: JourneyStep }) {
   if (!step.owlText) return null;
   const expression = OWL_EXPRESSIONS[step.stepType] || 'happy';
-
   return (
-    <div className="flex items-start gap-3 px-4 py-3 rounded-2xl bg-gradient-to-br from-sky-50/90 via-indigo-50/60 to-purple-50/40 border border-sky-200/50 shadow-[0_2px_12px_rgba(59,167,255,0.06)]">
-      <div className="flex-shrink-0">
-        <OwlTeacher size={56} expression={expression} />
+    <div className="flex items-start gap-3 px-4 py-3 rounded-2xl bg-gradient-to-br from-sky-50/90 via-indigo-50/60 to-purple-50/40 border border-sky-200/50 shadow-sm">
+      <div className="flex-shrink-0 mt-0.5">
+        <OwlTeacher size={44} expression={expression} />
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-[10px] font-extrabold uppercase tracking-[0.12em] text-sky-600/70 mb-0.5">Owl Teacher says:</p>
@@ -153,23 +132,21 @@ function OwlGuideCard({ step }: { step: JourneyStep }) {
   );
 }
 
-/* ─── Compact Illustration Placeholder ─── */
-
-function IllustrationPlaceholder({ step, icon, stepType }: { step: JourneyStep; icon: string; stepType: JourneyStepType }) {
-  // If there's an approved image, render it directly
+function IllustrationArea({ step, stepType }: { step: JourneyStep; stepType: JourneyStepType }) {
   const approvedUrl = step.media?.illustration?.approvedUrl;
+  const theme = STEP_THEME[stepType];
+  const icon = STEP_TYPE_ICONS[stepType] || "📖";
+
   if (approvedUrl) {
     return (
-      <div className="my-4 rounded-2xl overflow-hidden border border-slate-200/50">
-        <img src={approvedUrl} alt="Lesson illustration" className="w-full h-auto max-h-[200px] object-cover" />
+      <div className="rounded-2xl overflow-hidden border border-slate-200/50 shadow-sm">
+        <img src={approvedUrl} alt="Lesson illustration" className="w-full h-auto max-h-[220px] object-cover" />
       </div>
     );
   }
 
-  // Otherwise show the placeholder
   const prompt = step.illustrationPrompt;
   if (!prompt) return null;
-  const theme = STEP_THEME[stepType];
 
   const friendlyDesc = prompt
     .replace(/^A (child|student|young learner) (measuring|choosing|writing|looking at|thinking about|on a quest|celebrating with)/i, (_, _p, action) => action.charAt(0).toUpperCase() + action.slice(1))
@@ -193,35 +170,33 @@ function IllustrationPlaceholder({ step, icon, stepType }: { step: JourneyStep; 
     .trim() || "A helpful picture for this lesson";
 
   return (
-    <div className={`my-4 rounded-2xl border-2 border-dashed ${theme.border} overflow-hidden max-h-[200px]`}>
-      <div className={`bg-gradient-to-br ${theme.softBg} p-4 flex flex-col items-center gap-2`}>
-        <div className={`w-14 h-14 rounded-xl ${theme.iconBg} flex items-center justify-center`}>
-          <span className="text-2xl">{icon}</span>
+    <div className={`rounded-2xl border-2 border-dashed ${theme.border} overflow-hidden`}>
+      <div className={`bg-gradient-to-br ${theme.softBg} p-5 flex flex-col items-center gap-2.5`}>
+        <div className={`w-12 h-12 rounded-xl ${theme.iconBg} flex items-center justify-center`}>
+          <span className="text-xl">{icon}</span>
         </div>
-        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Picture coming soon</p>
-        <p className={`text-sm font-semibold ${theme.accent} text-center max-w-md line-clamp-2`}>{friendlyDesc}</p>
+        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Illustration</p>
+        <p className={`text-sm font-semibold ${theme.accent} text-center max-w-xs leading-snug`}>{friendlyDesc}</p>
       </div>
     </div>
   );
 }
 
-/* ─── Video Card ─── */
-
-function VideoCard({ step }: { step: JourneyStep }) {
-  // Support both old (step.video) and new (step.media.video) structures
+function VideoArea({ step }: { step: JourneyStep }) {
   const videoData = step.media?.video || step.video;
   const hasApproved = videoData?.approvedUrl && videoData?.approvedByAdmin === true;
   const hasSearchKeywords = videoData?.searchKeywords && videoData.searchKeywords.trim().length > 0;
+  const hasSuggestedUrl = videoData?.suggestedUrl;
 
   if (hasApproved) {
     const videoId = extractYouTubeId(videoData!.approvedUrl!);
     const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}` : null;
 
     return (
-      <div className="mt-4 rounded-2xl border border-blue-200/50 overflow-hidden bg-gradient-to-br from-blue-50/80 to-cyan-50/60">
-        <div className="px-4 py-2 flex items-center gap-2 border-b border-blue-200/40">
-          <Play className="w-3.5 h-3.5 text-blue-600" />
-          <span className="text-xs font-bold text-blue-700">▶ Watch Example</span>
+      <div className="rounded-2xl border border-blue-200/50 overflow-hidden bg-gradient-to-br from-blue-50/80 to-cyan-50/60 shadow-sm">
+        <div className="px-4 py-2.5 flex items-center gap-2 border-b border-blue-200/40">
+          <Play className="w-4 h-4 text-blue-600" />
+          <span className="text-xs font-bold text-blue-700">Watch</span>
         </div>
         {embedUrl ? (
           <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
@@ -244,649 +219,67 @@ function VideoCard({ step }: { step: JourneyStep }) {
     );
   }
 
+  if (hasSuggestedUrl) {
+    const videoId = extractYouTubeId(videoData!.suggestedUrl!);
+    if (videoId) {
+      return (
+        <div className="rounded-2xl border border-amber-200/50 overflow-hidden bg-gradient-to-br from-amber-50/80 to-yellow-50/60 shadow-sm">
+          <div className="px-4 py-2.5 flex items-center gap-2 border-b border-amber-200/40">
+            <Play className="w-4 h-4 text-amber-600" />
+            <span className="text-xs font-bold text-amber-700">Suggested Video (pending approval)</span>
+          </div>
+          <div className="p-4 text-center">
+            <a href={videoData!.suggestedUrl!} target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-amber-600 underline hover:text-amber-800">
+              Preview on YouTube →
+            </a>
+          </div>
+        </div>
+      );
+    }
+  }
+
   if (hasSearchKeywords) {
     return (
-      <p className="mt-4 text-xs text-slate-400 italic">📺 Video example coming soon</p>
+      <div className="rounded-2xl border border-slate-200/50 bg-slate-50/60 p-4 flex items-center gap-3">
+        <Play className="w-5 h-5 text-slate-400 flex-shrink-0" />
+        <div>
+          <p className="text-xs font-bold text-slate-500">Video coming soon</p>
+          <p className="text-[10px] text-slate-400 mt-0.5">Search: {videoData.searchKeywords}</p>
+        </div>
+      </div>
     );
   }
 
   return null;
 }
 
-/* ─── main page component ─── */
+/* ─── Slide Step View ─── */
 
-export default function LessonPlayerPage({ params }: { params: Promise<{ themeSlug: string; questSlug: string; lessonSlug: string }> }) {
-  const { data: session, status } = useSession();
-  const [slugs, setSlugs] = useState<{ themeSlug: string; questSlug: string; lessonSlug: string } | null>(null);
-  const [lesson, setLesson] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [viewing, setViewing] = useState(false);
-  const [currentStep, setCurrentStep] = useState(0);
-  const [completed, setCompleted] = useState(false);
-  const [justCompleted, setJustCompleted] = useState(false);
-  const [completing, setCompleting] = useState(false);
-  const [xpEarned, setXpEarned] = useState(0);
-  const [streakCount, setStreakCount] = useState(0);
-  const [newBadges, setNewBadges] = useState<string[]>([]);
-  const [showCelebration, setShowCelebration] = useState(false);
-  const [completeError, setCompleteError] = useState<string | null>(null);
-  const hasCompletedRef = useRef(false);
-
-  const [interaction, setInteraction] = useState({
-    predictionText: "",
-    practiceEntries: ["", "", ""] as string[],
-    selectedChoice: null as number | null,
-    choiceFeedback: null as "correct" | "incorrect" | null,
-    selfChecked: null as boolean | null,
-    reflectionText: "",
-    reflectionChip: null as number | null,
-    reflectionSaved: false,
-  });
-
-  const journey = buildLessonJourney(lesson);
-  const journeySteps = journey?.steps || [];
-  const journeySource = journey?.source || "cbc_fallback";
-  const isJourney = journeySteps.length >= 5 && journeySource !== "legacy_array";
-  const totalSteps = journeySteps.length;
-  const isLastStep = currentStep >= totalSteps - 1;
-  const clampedStep = Math.min(currentStep, Math.max(totalSteps - 1, 0));
-  const currentJourneyStep = isJourney && totalSteps > 0 ? journeySteps[clampedStep] : null;
-  const xp = getRewardValue(lesson?.xpReward);
-  const subject = lesson?.quest?.theme?.themeSubjects?.[0]?.subject || "";
-  const grade = lesson?.quest?.theme?.grade || 0;
-
-  useEffect(() => {
-    setInteraction({
-      predictionText: "", practiceEntries: ["", "", ""], selectedChoice: null,
-      choiceFeedback: null, selfChecked: null, reflectionText: "",
-      reflectionChip: null, reflectionSaved: false,
-    });
-  }, [currentStep]);
-
-  useEffect(() => {
-    if (status === "unauthenticated") window.location.replace("/auth/login");
-  }, [status]);
-
-  useEffect(() => {
-    params.then(p => {
-      setSlugs(p);
-      fetch(`/api/lessons/${p.lessonSlug}?slug=${p.lessonSlug}`)
-        .then(r => r.json())
-        .then(data => {
-          if (data.lesson) {
-            setLesson(data.lesson);
-            setCompleted(data.lesson.isCompleted);
-          }
-        })
-        .catch(console.error)
-        .finally(() => setLoading(false));
-    });
-  }, [params]);
-
-  const fireConfetti = useCallback(() => {
-    confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 }, colors: ["#2DD4BF", "#F59E0B", "#3B82F6", "#EC4899", "#10B981"] });
-    setTimeout(() => confetti({ particleCount: 40, angle: 60, spread: 55, origin: { x: 0, y: 0.6 }, colors: ["#2DD4BF", "#F59E0B", "#3B82F6"] }), 150);
-    setTimeout(() => confetti({ particleCount: 40, angle: 120, spread: 55, origin: { x: 1, y: 0.6 }, colors: ["#EC4899", "#10B981", "#F59E0B"] }), 300);
-    setTimeout(() => confetti({ particleCount: 30, spread: 100, origin: { y: 0.5 }, shapes: ["star"], colors: ["#FFD700", "#FFA500"], scalar: 1.5 }), 500);
-  }, []);
-
-  const handleComplete = useCallback(async () => {
-    if (!slugs || completing || hasCompletedRef.current) return;
-    hasCompletedRef.current = true;
-    setCompleting(true);
-    setCompleteError(null);
-    try {
-      const questId = lesson?.questId || slugs.questSlug || null;
-      const res = await fetch("/api/learner/progress", {
-        method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include",
-        body: JSON.stringify({ lessonId: lesson?.id, questId, action: "complete" }),
-      });
-      const data = await res.json();
-      if (!res.ok) { setCompleteError(data.error || `Could not complete (status ${res.status})`); hasCompletedRef.current = false; return; }
-      if (data.success || data.completed) {
-        const xpAmt = getRewardValue(data.rewards?.xp);
-        setCompleted(true); setJustCompleted(true); setXpEarned(xpAmt); setStreakCount(data.streak || 0);
-        setShowCelebration(true);
-        if (data.newBadges?.length) setNewBadges(data.newBadges);
-        fireConfetti();
-      } else if (data.alreadyCompleted) {
-        setCompleted(true); setShowCelebration(false);
-      } else {
-        setCompleteError("Unexpected response. Please try again.");
-        hasCompletedRef.current = false;
-      }
-    } catch {
-      setCompleteError("Network error. Please check your connection.");
-      hasCompletedRef.current = false;
-    } finally { setCompleting(false); }
-  }, [slugs, completing, lesson, fireConfetti]);
-
-  const handleSaveReflection = useCallback(async () => {
-    const text = interaction.reflectionText.trim() || (interaction.reflectionChip !== null && currentJourneyStep?.reflectionOptions?.[interaction.reflectionChip]) || "";
-    if (!text) return;
-    try {
-      await fetch("/api/learner/reflections", {
-        method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include",
-        body: JSON.stringify({ prompt: currentJourneyStep?.interaction?.question || "Reflection", response: text, lessonId: lesson?.id || null, questId: lesson?.questId || null }),
-      });
-      setInteraction((prev: any) => ({ ...prev, reflectionSaved: true }));
-    } catch { /* non-blocking */ }
-  }, [interaction.reflectionText, interaction.reflectionChip, currentJourneyStep, lesson]);
-
-  /* ─── loading state ─── */
-  if (loading) return (
-    <div className="min-h-screen bg-bg-main">
-      <FloatingBlobs />
-      <div className="relative z-10 flex items-center justify-center min-h-[70vh]">
-        <div className="flex flex-col items-center gap-5 bg-white/80 backdrop-blur-sm rounded-[2rem] p-12 shadow-[0_4px_24px_rgba(0,0,0,0.04)] border border-white/60">
-          <OwlTeacher size={80} expression="happy" />
-          <p className="text-lg font-bold text-text-muted">Loading your lesson...</p>
-          <div className="relative w-8 h-8"><div className="absolute inset-0 rounded-full border-[3px] border-indigo-200/30" /><div className="absolute inset-0 rounded-full border-[3px] border-transparent border-t-indigo-500 animate-spin" /></div>
-        </div>
-      </div>
-    </div>
-  );
-
-  /* ─── journey overlay ─── */
-  if (viewing) {
-    const stepLabel = currentJourneyStep ? (STEP_LABELS[currentJourneyStep.stepType] || "Next") : "Next";
-
-    return (
-      <div className="fixed inset-0 z-50 bg-bg-main flex flex-col overflow-hidden">
-        <style>{CELEBRATION_CSS}</style>
-        <FloatingBlobs />
-
-        {/* ── Compact Top Bar ── */}
-        <div className="relative z-10 bg-white/60 backdrop-blur-2xl border-b border-white/50 shadow-[0_1px_0_rgba(255,255,255,0.5)] px-4 py-2 flex-shrink-0">
-          <div className="max-w-[1280px] mx-auto flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <button onClick={() => { setViewing(false); setShowCelebration(false); setCurrentStep(0); }}
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white/80 backdrop-blur-sm border border-white/60 hover:bg-white text-slate-600 font-bold text-xs transition-all shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)]">
-                <ArrowLeft className="w-3.5 h-3.5" /> {completed ? "Exit" : "Back"}
-              </button>
-              <div className="min-w-0">
-                <h1 className="font-extrabold text-slate-900 text-sm lg:text-base truncate tracking-tight">{cleanTitle(lesson?.title)}</h1>
-                {subject && <p className="text-[10px] text-slate-500 font-semibold">{subject}{grade ? ` · Grade ${grade}` : ""}</p>}
-              </div>
-            </div>
-            <div className="flex items-center gap-2 flex-shrink-0">
-              {isJourney && <span className="text-[10px] font-bold text-slate-500 hidden sm:inline bg-white/80 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-white/60">{clampedStep + 1}/{totalSteps}</span>}
-              {xp > 0 && (
-                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-50/90 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-amber-200/50">
-                  <Zap className="w-3 h-3" /> +{xp} XP
-                </span>
-              )}
-              {justCompleted ? (
-                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50/90 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-emerald-200/50">
-                  <CheckCircle2 className="w-3 h-3" /> Done
-                </span>
-              ) : completed ? (
-                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-blue-700 bg-blue-50/90 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-blue-200/50">
-                  <Eye className="w-3 h-3" /> Review
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-50/90 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-amber-200/50">
-                  <Pencil className="w-3 h-3" /> In Progress
-                </span>
-              )}
-              {/* Compact review pill */}
-              {completed && !showCelebration && !justCompleted && (
-                <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full">✓ Reviewing</span>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* ── Compact Progress Bar ── */}
-        {isJourney && totalSteps > 0 && (
-          <div className="relative z-10 bg-white/40 backdrop-blur-sm border-b border-white/40 px-4 py-1.5 flex-shrink-0">
-            <div className="max-w-[1280px] mx-auto">
-              <div className="flex items-center gap-0.5">
-                {journeySteps.map((s, i) => (
-                  <button key={i} onClick={() => setCurrentStep(i)} className="flex-1 flex flex-col items-center gap-0.5 group" title={STEP_LABELS[s.stepType] || s.title}>
-                    <div className={`w-6 h-6 rounded-lg flex items-center justify-center text-[10px] transition-all duration-300 ${
-                      i === clampedStep
-                        ? "bg-gradient-to-br from-indigo-500 to-purple-500 text-white shadow-[0_2px_8px_rgba(79,70,229,0.25)] scale-110"
-                        : i < clampedStep
-                        ? "bg-emerald-100 text-emerald-600 shadow-sm"
-                        : "bg-white/60 text-slate-400 group-hover:bg-white/80"
-                    }`}>
-                      {STEP_TYPE_ICONS[s.stepType] || "•"}
-                    </div>
-                  </button>
-                ))}
-              </div>
-              <div className="flex gap-1 mt-1">
-                {journeySteps.map((_, i) => (
-                  <div key={i} className={`h-1 rounded-full flex-1 transition-all duration-500 ${
-                    i < clampedStep
-                      ? "bg-gradient-to-r from-emerald-400 to-teal-400"
-                      : i === clampedStep
-                      ? "bg-gradient-to-r from-indigo-500 to-purple-500 shadow-[0_0_8px_rgba(99,102,241,0.4)]"
-                      : "bg-slate-200/60"
-                  }`} />
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ── Main Content Area ── */}
-        <div className="flex-1 overflow-auto relative z-10">
-          <div className="max-w-[1280px] mx-auto flex gap-4 px-4 py-4">
-
-            {/* ── Left Side Nav (desktop) ── */}
-            <div className="hidden lg:flex w-[60px] flex-shrink-0 flex-col items-center pt-2">
-              <button
-                onClick={() => clampedStep > 0 && setCurrentStep(clampedStep - 1)}
-                disabled={clampedStep <= 0}
-                className="w-[48px] h-full min-h-[120px] max-h-[300px] flex flex-col items-center justify-center gap-1 rounded-2xl bg-white/70 backdrop-blur-sm border border-white/60 hover:bg-white text-slate-500 hover:text-slate-800 font-bold text-[10px] transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)]"
-              >
-                <ChevronLeft className="w-5 h-5" />
-                <span>Back</span>
-              </button>
-            </div>
-
-            {/* ── Main Lesson Card ── */}
-            <div className="flex-1 min-w-0 max-w-[700px]">
-
-              {/* Celebration overlay */}
-              {showCelebration && xpEarned > 0 && (
-                <div className="relative rounded-2xl p-8 lg:p-10 mb-4 text-center overflow-hidden border-2 border-indigo-200/50 shadow-[0_8px_40px_rgba(79,70,229,0.12)]" style={{ background: "linear-gradient(135deg, rgba(238,242,255,0.95) 0%, rgba(255,247,237,0.95) 50%, rgba(255,241,242,0.95) 100%)" }}>
-                  <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                    {["⭐", "✨", "🎉", "💫", "🌟", "⚡", "🏆", "🦉"].map((emoji, i) => (
-                      <div key={i} className="absolute text-xl" style={{ left: `${10 + i * 12}%`, top: `${15 + (i % 4) * 20}%`, animation: `float ${2 + i * 0.4}s ease-in-out infinite alternate`, animationDelay: `${i * 0.15}s` }}>{emoji}</div>
-                    ))}
-                    {[...Array(8)].map((_, i) => (
-                      <div key={`sparkle-${i}`} className="absolute w-2 h-2 rounded-full bg-amber-400" style={{ left: `${Math.random() * 80 + 10}%`, top: `${Math.random() * 80 + 10}%`, animation: `sparkle ${1.5 + Math.random()}s ease-in-out infinite`, animationDelay: `${Math.random() * 2}s`, opacity: 0.6 }} />
-                    ))}
-                  </div>
-                  <div className="relative z-10">
-                    <div className="flex justify-center mb-3"><OwlTeacher size={80} expression="celebrating" /></div>
-                    <h2 className="text-2xl lg:text-3xl font-black text-slate-900 mb-2 tracking-tight">Lesson Complete! 🎉</h2>
-                    <p className="text-slate-600 text-base lg:text-lg mb-4 font-medium">You worked hard and learned something amazing!</p>
-                    <div className="flex items-center justify-center gap-3 flex-wrap">
-                      <div className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-white/90 backdrop-blur-sm shadow-[0_4px_20px_rgba(79,70,229,0.12)] border border-indigo-100">
-                        <Zap className="w-5 h-5 text-indigo-600" /><span className="text-2xl font-black text-indigo-600">+{xpEarned}</span><span className="text-sm font-bold text-slate-500">XP</span>
-                      </div>
-                      {streakCount > 0 && (
-                        <div className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-white/90 backdrop-blur-sm shadow-[0_4px_20px_rgba(255,92,138,0.12)] border border-pink-100">
-                          <Flame className="w-5 h-5 text-pink-500" /><span className="text-2xl font-black text-pink-500">+{streakCount}</span><span className="text-sm font-bold text-slate-500">streak</span>
-                        </div>
-                      )}
-                    </div>
-                    {newBadges.length > 0 && (
-                      <div className="mt-4 flex gap-2 justify-center flex-wrap">
-                        {newBadges.map((b, i) => (
-                          <div key={i} className="rounded-xl border-2 border-purple-200/60 bg-white/90 backdrop-blur-sm px-3 py-2 flex items-center gap-1.5 shadow-[0_4px_16px_rgba(139,92,246,0.1)]">
-                            <span className="text-lg">🏅</span><span className="font-bold text-xs text-slate-800">{b}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    <div className="mt-5 flex gap-3 justify-center flex-wrap">
-                      <button onClick={() => { setViewing(false); setShowCelebration(false); setCurrentStep(0); }}
-                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/90 backdrop-blur-sm border-2 border-slate-200/60 text-slate-700 font-bold text-sm hover:bg-white hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] transition-all active:scale-[0.98]">
-                        <ArrowLeft className="w-4 h-4" /> Back to Quest
-                      </button>
-                      <button onClick={() => { setShowCelebration(false); setCurrentStep(0); }}
-                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold text-sm hover:from-indigo-600 hover:to-purple-600 transition-all shadow-[0_4px_20px_rgba(79,70,229,0.25)] hover:shadow-[0_8px_30px_rgba(79,70,229,0.35)] active:scale-[0.98]">
-                        <RotateCcw className="w-4 h-4" /> Review Lesson
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Current step */}
-              {isJourney && currentJourneyStep ? (
-                <LessonStepView step={currentJourneyStep} stepNumber={clampedStep + 1} totalSteps={totalSteps}
-                  interaction={interaction} setInteraction={setInteraction} lesson={lesson} onSaveReflection={handleSaveReflection} />
-              ) : journeySteps.length > 0 ? (
-                <div className="flex flex-col gap-4">
-                  {journeySteps.map((s, i) => (
-                    <LessonStepView key={s.id} step={s} stepNumber={i + 1} totalSteps={journeySteps.length}
-                      interaction={interaction} setInteraction={setInteraction} lesson={lesson} onSaveReflection={handleSaveReflection} />
-                  ))}
-                </div>
-              ) : (
-                <div className="rounded-2xl border border-slate-200/50 bg-white/80 backdrop-blur-sm text-center p-10 shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
-                  <div className="w-12 h-12 rounded-xl bg-slate-100/80 flex items-center justify-center mx-auto mb-3"><BookOpen className="w-6 h-6 text-slate-400" /></div>
-                  <h3 className="text-lg font-extrabold text-slate-800 mb-1">This lesson is being prepared</h3>
-                  <p className="text-slate-500 text-sm font-medium">Please check back soon.</p>
-                </div>
-              )}
-
-              {completeError && (
-                <div className="mt-4 rounded-xl border border-red-300/50 bg-red-50/80 backdrop-blur-sm p-4 text-center shadow-[0_4px_16px_rgba(239,68,68,0.08)]">
-                  <p className="text-sm font-bold text-red-700">{completeError}</p>
-                  <button onClick={() => setCompleteError(null)} className="mt-1.5 text-xs text-red-500 underline hover:text-red-700 font-semibold">Dismiss</button>
-                </div>
-              )}
-
-              {/* ── Mobile Nav Buttons (inside card, bottom) ── */}
-              {isJourney && currentJourneyStep && (
-                <div className="mt-5 flex gap-3 lg:hidden">
-                  {clampedStep > 0 ? (
-                    <button onClick={() => setCurrentStep(clampedStep - 1)}
-                      className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/90 backdrop-blur-sm border-2 border-slate-200/60 text-slate-700 font-bold text-sm hover:bg-white transition-all active:scale-[0.98]">
-                      <ChevronLeft className="w-4 h-4" /> Back
-                    </button>
-                  ) : (
-                    <div className="flex-1" />
-                  )}
-
-                  {currentJourneyStep.stepType === "complete" ? (
-                    <div className="flex-1 flex gap-2">
-                      <button onClick={() => { setViewing(false); setShowCelebration(false); setCurrentStep(0); }}
-                        className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-3 rounded-xl bg-white/90 backdrop-blur-sm border-2 border-slate-200/60 text-slate-700 font-bold text-sm hover:bg-white transition-all active:scale-[0.98]">
-                        <ArrowLeft className="w-3.5 h-3.5" /> Quest
-                      </button>
-                      {!completed ? (
-                        <button onClick={handleComplete} disabled={completing}
-                          className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold text-sm hover:from-emerald-600 hover:to-teal-600 transition-all shadow-[0_4px_20px_rgba(0,168,132,0.25)] disabled:opacity-50 active:scale-[0.98]">
-                          {completing ? <><span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Earning...</> : <><Trophy className="w-4 h-4" /> Finish +{xp} XP</>}
-                        </button>
-                      ) : (
-                        <button onClick={() => { setViewing(false); setShowCelebration(false); setCurrentStep(0); }}
-                          className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold text-sm hover:from-indigo-600 hover:to-purple-600 transition-all shadow-[0_4px_20px_rgba(79,70,229,0.25)] active:scale-[0.98]">
-                          <RotateCcw className="w-3.5 h-3.5" /> Review
-                        </button>
-                      )}
-                    </div>
-                  ) : !isLastStep ? (
-                    <button onClick={() => setCurrentStep(clampedStep + 1)}
-                      className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold text-sm hover:from-indigo-600 hover:to-purple-600 transition-all shadow-[0_4px_20px_rgba(79,70,229,0.25)] active:scale-[0.98]">
-                      {NEXT_BUTTON_LABELS[currentJourneyStep.stepType] || "Next →"} <ChevronRight className="w-4 h-4" />
-                    </button>
-                  ) : !completed ? (
-                    <button onClick={handleComplete} disabled={completing}
-                      className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold text-sm hover:from-emerald-600 hover:to-teal-600 transition-all shadow-[0_4px_20px_rgba(0,168,132,0.25)] disabled:opacity-50 active:scale-[0.98]">
-                      {completing ? <><span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Completing...</> : <>Complete {xp > 0 && <span className="bg-white/20 px-1.5 py-0.5 rounded text-[10px]">+{xp} XP</span>}</>}
-                    </button>
-                  ) : (
-                    <button onClick={() => { setViewing(false); setShowCelebration(false); setCurrentStep(0); }}
-                      className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl bg-white/90 backdrop-blur-sm border-2 border-slate-200/60 text-slate-700 font-bold text-sm hover:bg-white transition-all active:scale-[0.98]">
-                      <ArrowLeft className="w-4 h-4" /> Back to Quest
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* ── Right Side Nav (desktop) ── */}
-            <div className="hidden lg:flex w-[60px] flex-shrink-0 flex-col items-center pt-2">
-              <button
-                onClick={() => {
-                  if (currentJourneyStep?.stepType === "complete") {
-                    if (!completed) { handleComplete(); } else { setCurrentStep(0); }
-                  } else if (!isLastStep) {
-                    setCurrentStep(clampedStep + 1);
-                  }
-                }}
-                disabled={
-                  completing ||
-                  (isLastStep && !completed && currentJourneyStep?.stepType !== "complete") ||
-                  (isLastStep && completed)
-                }
-                className="w-[48px] h-full min-h-[120px] max-h-[300px] flex flex-col items-center justify-center gap-1 rounded-2xl bg-gradient-to-b from-indigo-500/90 to-purple-500/90 hover:from-indigo-600 hover:to-purple-600 text-white font-bold text-[10px] transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-[0_2px_12px_rgba(79,70,229,0.2)] hover:shadow-[0_4px_20px_rgba(79,70,229,0.3)]"
-              >
-                <ChevronRight className="w-5 h-5" />
-                <span className="text-center leading-tight">{stepLabel}</span>
-              </button>
-            </div>
-
-            {/* ── Right Support Panel (desktop) ── */}
-            <div className="hidden lg:block w-[280px] flex-shrink-0">
-              <SupportPanel lesson={lesson} journeySteps={journeySteps} currentStep={clampedStep} xp={xp} subject={subject} grade={grade} onStepClick={setCurrentStep} />
-            </div>
-          </div>
-        </div>
-
-        {/* ── Mobile Bottom Nav ── */}
-        {isJourney && currentJourneyStep && (
-          <div className="lg:hidden border-t border-slate-200/50 bg-white/80 backdrop-blur-sm px-4 py-3 flex-shrink-0">
-            <div className="flex gap-3">
-              {clampedStep > 0 ? (
-                <button onClick={() => setCurrentStep(clampedStep - 1)}
-                  className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-white/90 backdrop-blur-sm border border-slate-200/60 text-slate-600 font-bold text-sm hover:bg-white transition-all">
-                  <ChevronLeft className="w-4 h-4" /> Back
-                </button>
-              ) : (
-                <div className="flex-1" />
-              )}
-
-              {currentJourneyStep.stepType === "complete" ? (
-                <div className="flex-1 flex gap-2">
-                  {!completed ? (
-                    <button onClick={handleComplete} disabled={completing}
-                      className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold text-sm disabled:opacity-50 transition-all">
-                      {completing ? <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> : <><Trophy className="w-4 h-4" /> Complete +{xp} XP</>}
-                    </button>
-                  ) : (
-                    <button onClick={() => { setViewing(false); setShowCelebration(false); setCurrentStep(0); }}
-                      className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold text-sm transition-all">
-                      <RotateCcw className="w-3.5 h-3.5" /> Review
-                    </button>
-                  )}
-                </div>
-              ) : !isLastStep ? (
-                <button onClick={() => setCurrentStep(clampedStep + 1)}
-                  className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold text-sm transition-all">
-                  {NEXT_BUTTON_LABELS[currentJourneyStep.stepType] || "Next →"}
-                </button>
-              ) : !completed ? (
-                <button onClick={handleComplete} disabled={completing}
-                  className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold text-sm disabled:opacity-50 transition-all">
-                  {completing ? <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> : <>Finish +{xp} XP</>}
-                </button>
-              ) : (
-                <button onClick={() => { setViewing(false); setShowCelebration(false); setCurrentStep(0); }}
-                  className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-white/90 backdrop-blur-sm border border-slate-200/60 text-slate-700 font-bold text-sm transition-all">
-                  <ArrowLeft className="w-4 h-4" /> Quest
-                </button>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  /* ─── Landing Page ─── */
-  return (
-    <div className="fade-in max-w-[760px] mx-auto">
-      <div className="relative rounded-[2rem] p-8 lg:p-10 mb-6 overflow-hidden border border-indigo-200/50 shadow-[0_8px_40px_rgba(79,70,229,0.10)]" style={{ background: "linear-gradient(135deg, #4F46E5 0%, #8B5CF6 50%, #6D28D9 100%)" }}>
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-8 -right-8 w-36 h-36 rounded-full bg-white/10" />
-          <div className="absolute -bottom-8 -left-8 w-28 h-28 rounded-full bg-white/5" />
-          <div className="absolute top-4 right-16 text-2xl opacity-20 float-slow">⭐</div>
-          <div className="absolute bottom-6 left-12 text-xl opacity-15 float-medium">✨</div>
-        </div>
-        <div className="relative z-10">
-          {slugs && (
-            <Link href={`/dashboard/student/lessons/${slugs.themeSlug}/${slugs.questSlug}`} className="inline-flex items-center gap-1.5 text-white/70 hover:text-white text-sm font-semibold mb-4 transition-colors">
-              <ArrowLeft className="w-4 h-4" /> Back to Quest
-            </Link>
-          )}
-          <div className="flex items-center gap-2 mb-3 flex-wrap">
-            {completed && <span className="text-[10px] font-extrabold uppercase tracking-wider bg-white/20 text-white px-2.5 py-1 rounded-full">✓ Completed</span>}
-            {subject && <span className="text-[10px] font-extrabold uppercase tracking-wider bg-white/20 text-white px-2.5 py-1 rounded-full">{subject}{grade ? ` · Grade ${grade}` : ""}</span>}
-            {xp > 0 && <span className="text-[10px] font-extrabold uppercase tracking-wider bg-amber-400/80 text-white px-2.5 py-1 rounded-full flex items-center gap-1"><Zap className="w-3 h-3" /> {xp} XP</span>}
-          </div>
-          <h1 className="text-3xl lg:text-4xl font-black text-white mb-2 tracking-tight">{cleanTitle(lesson?.title)}</h1>
-          {lesson?.description && <p className="text-white/85 text-lg leading-relaxed">{lesson.description}</p>}
-        </div>
-      </div>
-
-      {completed && (
-        <div className="rounded-[2rem] border border-blue-200/50 bg-gradient-to-br from-blue-50/80 to-indigo-50/60 text-center p-6 mb-5 shadow-[0_4px_20px_rgba(59,130,246,0.08)]">
-          <CheckCircle2 className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-          <p className="font-bold text-blue-800">You've completed this lesson!</p>
-          <p className="text-blue-600 text-sm mt-1">Review the content or move on to the next lesson.</p>
-        </div>
-      )}
-
-      {isJourney && (
-        <div className="rounded-[1.5rem] border border-indigo-200/50 bg-indigo-50/60 p-5 mb-5 flex items-center gap-4 shadow-[0_4px_16px_rgba(79,70,229,0.06)]">
-          <div className="w-12 h-12 rounded-2xl bg-indigo-100/80 flex items-center justify-center flex-shrink-0"><Sparkles className="w-6 h-6 text-indigo-600" /></div>
-          <div>
-            <p className="text-base font-bold text-indigo-800">{totalSteps}-step interactive lesson</p>
-            <p className="text-sm text-indigo-600/80 font-medium">Work through each step to complete the lesson</p>
-          </div>
-        </div>
-      )}
-
-      <GradientButton variant={completed ? "secondary" : "primary"} size="lg"
-        icon={completed ? <Eye className="w-5 h-5" /> : <Sparkles className="w-5 h-5" />}
-        onClick={async () => {
-          if (lesson?.id) {
-            try { await fetch("/api/learner/progress", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ lessonId: lesson.id, action: "start" }) }); } catch { /* non-blocking */ }
-          }
-          setCurrentStep(0); setViewing(true);
-        }} className="w-full">
-        {completed ? "🔄 Review Lesson" : isJourney ? `🚀 Begin ${totalSteps}-Step Journey` : "📖 Start Lesson"}
-      </GradientButton>
-    </div>
-  );
-}
-
-/* ─── build lesson journey ─── */
-
-function buildLessonJourney(lesson: any): { steps: JourneyStep[]; source: string } | null {
-  if (!lesson?.id) return null;
-  const subject = lesson.quest?.theme?.themeSubjects?.[0]?.subject || "";
-  const grade = lesson.quest?.theme?.grade || 0;
-  return buildUniversalJourney(lesson.id, lesson.title || "Lesson", lesson.contentBlocks, {
-    subject, grade, xpReward: getRewardValue(lesson?.xpReward), coinReward: lesson?.coinReward,
-  });
-}
-
-/* ─── Compact Support Panel ─── */
-
-function SupportPanel({ lesson, journeySteps, currentStep, xp, subject, grade, onStepClick, compact }: {
-  lesson: any; journeySteps: JourneyStep[]; currentStep: number; xp: number; subject: string; grade: number;
-  onStepClick: (i: number) => void; compact?: boolean;
-}) {
-  const currentStepData = journeySteps[currentStep];
-  const missionStep = journeySteps.find(s => s.stepType === "mission");
-
-  if (compact) {
-    return (
-      <div className="flex gap-2 overflow-x-auto pb-2">
-        <div className="rounded-xl border border-violet-200/50 bg-violet-50/60 p-2.5 flex-shrink-0 min-w-[120px]">
-          <p className="text-[9px] font-extrabold text-violet-600 uppercase tracking-wider mb-0.5">Mission</p>
-          <p className="text-violet-800 text-[11px] font-semibold line-clamp-2">{missionStep?.studentText?.slice(0, 60) || "Complete this lesson!"}</p>
-        </div>
-        {currentStepData?.owlText && (
-          <div className="rounded-xl border border-sky-200/50 bg-sky-50/60 p-2.5 flex-shrink-0 min-w-[140px]">
-            <div className="flex items-center gap-1.5 mb-0.5">
-              <OwlTeacher size={20} expression={OWL_EXPRESSIONS[currentStepData.stepType] || 'happy'} />
-              <p className="text-[9px] font-extrabold text-sky-600 uppercase tracking-wider">Owl says</p>
-            </div>
-            <p className="text-sky-800 text-[11px] font-medium line-clamp-2">{currentStepData.owlText}</p>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-3 sticky top-24">
-      {/* Mission Card */}
-      <div className="rounded-2xl border border-violet-200/50 bg-gradient-to-br from-violet-50/80 to-purple-50/60 p-4 shadow-[0_2px_12px_rgba(139,92,246,0.06)]">
-        <div className="flex items-center gap-1.5 mb-1.5">
-          <Target className="w-3.5 h-3.5 text-violet-600" />
-          <h3 className="font-bold text-violet-800 text-xs">Today's Mission</h3>
-        </div>
-        <p className="text-violet-700 text-xs leading-relaxed font-medium">{missionStep?.studentText || "Complete this lesson to learn something new!"}</p>
-      </div>
-
-      {/* Owl Tip */}
-      {currentStepData?.owlText && (
-        <div className="rounded-2xl border border-sky-200/50 bg-gradient-to-br from-sky-50/80 to-indigo-50/60 p-4 shadow-[0_2px_12px_rgba(59,167,255,0.06)]">
-          <div className="flex items-center gap-2 mb-1.5">
-            <OwlTeacher size={32} expression={OWL_EXPRESSIONS[currentStepData.stepType] || 'happy'} />
-            <p className="text-[9px] font-extrabold text-sky-600 uppercase tracking-wider">Owl Teacher says</p>
-          </div>
-          <p className="text-sky-800 text-xs leading-relaxed font-medium">{currentStepData.owlText}</p>
-        </div>
-      )}
-
-      {/* Compact Lesson Map */}
-      <div className="rounded-2xl border border-slate-200/50 bg-white/80 backdrop-blur-sm p-4 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-        <h3 className="font-bold text-slate-800 text-xs mb-2">Lesson Map</h3>
-        <div className="space-y-0.5">
-          {journeySteps.map((s, i) => (
-            <button key={i} onClick={() => onStepClick(i)} className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-left transition-all text-[11px] font-semibold ${
-              i === currentStep ? "bg-indigo-100/80 text-indigo-800 shadow-sm" : i < currentStep ? "bg-emerald-50/80 text-emerald-700" : "text-slate-400 hover:bg-slate-50/80"
-            }`}>
-              <span className={`w-5 h-5 rounded-md flex items-center justify-center text-[10px] flex-shrink-0 ${
-                i === currentStep ? "bg-gradient-to-br from-indigo-500 to-purple-500 text-white" : i < currentStep ? "bg-emerald-200 text-emerald-700" : "bg-slate-100 text-slate-400"
-              }`}>
-                {i < currentStep ? "✓" : (STEP_TYPE_ICONS[s.stepType] || "•")}
-              </span>
-              <span className="truncate">{STEP_LABELS[s.stepType] || s.title}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Rewards */}
-      {xp > 0 && (
-        <div className="rounded-2xl border border-amber-200/50 bg-gradient-to-br from-amber-50/80 to-yellow-50/60 p-4 shadow-[0_2px_12px_rgba(245,165,36,0.06)]">
-          <div className="flex items-center gap-1.5 mb-1.5">
-            <Star className="w-3.5 h-3.5 text-amber-600" />
-            <h3 className="font-bold text-amber-800 text-xs">Rewards</h3>
-          </div>
-          <div className="flex gap-3">
-            <div className="flex items-center gap-1 text-amber-700"><Zap className="w-3.5 h-3.5" /><span className="font-bold text-xs">{xp} XP</span></div>
-            <div className="flex items-center gap-1 text-amber-700"><Flame className="w-3.5 h-3.5" /><span className="font-bold text-xs">{Math.floor(xp / 2)} coins</span></div>
-          </div>
-        </div>
-      )}
-
-      {/* Tools Needed */}
-      {currentStepData?.materials && currentStepData.materials.length > 0 && (
-        <div className="rounded-2xl border border-orange-200/50 bg-gradient-to-br from-orange-50/80 to-amber-50/60 p-4 shadow-[0_2px_12px_rgba(245,165,36,0.06)]">
-          <h3 className="font-bold text-orange-800 text-xs mb-1.5">🧰 What you might need</h3>
-          <div className="flex flex-wrap gap-1">
-            {currentStepData.materials.map((m: string, i: number) => <span key={i} className="px-2 py-0.5 rounded-full bg-orange-100/80 text-orange-800 text-[10px] font-semibold">{m}</span>)}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-/* ─── Lesson Step View (compact) ─── */
-
-function LessonStepView({ step, stepNumber, totalSteps, interaction, setInteraction, lesson, onSaveReflection }: {
+function SlideStepView({ step, stepNumber, totalSteps, interaction, setInteraction, lesson, onSaveReflection }: {
   step: JourneyStep; stepNumber: number; totalSteps: number;
   interaction: any; setInteraction: any; lesson: any;
   onSaveReflection: () => Promise<void>;
 }) {
   if (!step) return null;
   const theme = STEP_THEME[step.stepType] || STEP_THEME.welcome;
-  const icon = STEP_TYPE_ICONS[step.stepType] || "📖";
   const paragraphs = splitIntoParagraphs(step.studentText);
   const isComplete = step.stepType === "complete";
 
   return (
-    <div className={`rounded-2xl border-2 ${theme.border} bg-white/80 backdrop-blur-sm p-5 lg:p-7 shadow-[0_4px_20px_rgba(0,0,0,0.04)]`}>
-      {/* Step header */}
+    <div className="flex flex-col">
+      {/* Step header badge */}
       <div className="flex items-center gap-3 mb-4">
-        <div className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-lg font-black bg-gradient-to-br ${theme.gradient} text-white shadow-md`}>
-          {stepNumber}
+        <div className={`flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center bg-gradient-to-br ${theme.gradient} text-white shadow-md`}>
+          <span className="text-lg font-black">{stepNumber}</span>
         </div>
         <div className="flex-1 min-w-0">
-          <h2 className={`font-black text-xl lg:text-2xl ${theme.accent} tracking-tight`}>{step.title}</h2>
-          <span className="text-xs font-semibold text-slate-400">Step {stepNumber} of {totalSteps}</span>
+          <h2 className={`font-black text-xl lg:text-2xl ${theme.accent} tracking-tight leading-tight`}>{step.title}</h2>
+          <span className="text-[11px] font-semibold text-slate-400">Step {stepNumber} of {totalSteps}</span>
         </div>
       </div>
 
-      {/* Owl guide */}
-      <OwlGuideCard step={step} />
+      {/* Owl guide — only once, inline */}
+      <OwlGuideInline step={step} />
 
       {/* Math display */}
       {step.mathDisplay && (
@@ -896,22 +289,28 @@ function LessonStepView({ step, stepNumber, totalSteps, interaction, setInteract
       )}
 
       {/* Content paragraphs */}
-      <div className="mt-4 flex flex-col gap-3">
-        {paragraphs.map((p, i) => (
-          <p key={i} className="text-slate-700 text-base lg:text-lg leading-relaxed whitespace-pre-line">{p}</p>
-        ))}
-      </div>
+      {paragraphs.length > 0 && (
+        <div className="mt-4 flex flex-col gap-3">
+          {paragraphs.map((p, i) => (
+            <p key={i} className="text-slate-700 text-base lg:text-lg leading-relaxed whitespace-pre-line">{p}</p>
+          ))}
+        </div>
+      )}
 
       {/* Illustration */}
-      <IllustrationPlaceholder step={step} icon={icon} stepType={step.stepType} />
+      <div className="mt-4">
+        <IllustrationArea step={step} stepType={step.stepType} />
+      </div>
 
       {/* Video */}
-      <VideoCard step={step} />
+      <div className="mt-4">
+        <VideoArea step={step} />
+      </div>
 
       {/* Materials */}
       {step.materials && step.materials.length > 0 && (
         <div className="mt-4 px-4 py-3 rounded-xl bg-amber-50/60 border border-amber-200/50">
-          <p className="text-[10px] font-extrabold uppercase tracking-wider text-amber-700 mb-1.5">🧰 What you might need:</p>
+          <p className="text-[10px] font-extrabold uppercase tracking-wider text-amber-700 mb-1.5">What you might need:</p>
           <div className="flex flex-wrap gap-1.5">
             {step.materials.map((m: string, i: number) => <span key={i} className="px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-semibold">{m}</span>)}
           </div>
@@ -1040,7 +439,7 @@ function LessonStepView({ step, stepNumber, totalSteps, interaction, setInteract
 
       {/* ── Completion step ── */}
       {isComplete && (
-        <div className="mt-4 text-center">
+        <div className="mt-4 text-center py-4">
           <div className="flex justify-center mb-3"><OwlTeacher size={72} expression="celebrating" /></div>
           <h3 className="text-xl lg:text-2xl font-black text-slate-900 mb-1">You did it! 🏆</h3>
           <p className="text-slate-600 text-base lg:text-lg">You've completed this lesson. Great work!</p>
@@ -1048,4 +447,493 @@ function LessonStepView({ step, stepNumber, totalSteps, interaction, setInteract
       )}
     </div>
   );
+}
+
+/* ─── Compact Support Panel (right sidebar) ─── */
+
+function SupportPanel({ lesson, journeySteps, currentStep, xp, subject, grade, onStepClick }: {
+  lesson: any; journeySteps: JourneyStep[]; currentStep: number; xp: number; subject: string; grade: number;
+  onStepClick: (i: number) => void;
+}) {
+  const missionStep = journeySteps.find(s => s.stepType === "mission");
+
+  return (
+    <div className="space-y-3 sticky top-4">
+      {/* Mission Card */}
+      <div className="rounded-2xl border border-violet-200/50 bg-gradient-to-br from-violet-50/80 to-purple-50/60 p-4 shadow-sm">
+        <div className="flex items-center gap-1.5 mb-1.5">
+          <Target className="w-3.5 h-3.5 text-violet-600" />
+          <h3 className="font-bold text-violet-800 text-xs">Today's Mission</h3>
+        </div>
+        <p className="text-violet-700 text-xs leading-relaxed font-medium">{missionStep?.studentText?.slice(0, 120) || "Complete this lesson to learn something new!"}</p>
+      </div>
+
+      {/* Lesson Map */}
+      <div className="rounded-2xl border border-slate-200/50 bg-white/80 backdrop-blur-sm p-4 shadow-sm">
+        <div className="flex items-center gap-1.5 mb-2">
+          <Map className="w-3.5 h-3.5 text-slate-500" />
+          <h3 className="font-bold text-slate-800 text-xs">Lesson Map</h3>
+        </div>
+        <div className="space-y-0.5">
+          {journeySteps.map((s, i) => (
+            <button key={i} onClick={() => onStepClick(i)} className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-left transition-all text-[11px] font-semibold ${
+              i === currentStep ? "bg-indigo-100/80 text-indigo-800 shadow-sm" : i < currentStep ? "bg-emerald-50/80 text-emerald-700" : "text-slate-400 hover:bg-slate-50/80"
+            }`}>
+              <span className={`w-5 h-5 rounded-md flex items-center justify-center text-[10px] flex-shrink-0 ${
+                i === currentStep ? "bg-gradient-to-br from-indigo-500 to-purple-500 text-white" : i < currentStep ? "bg-emerald-200 text-emerald-700" : "bg-slate-100 text-slate-400"
+              }`}>
+                {i < currentStep ? "✓" : (STEP_TYPE_ICONS[s.stepType] || "•")}
+              </span>
+              <span className="truncate">{STEP_LABELS[s.stepType] || s.title}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Rewards */}
+      {xp > 0 && (
+        <div className="rounded-2xl border border-amber-200/50 bg-gradient-to-br from-amber-50/80 to-yellow-50/60 p-4 shadow-sm">
+          <div className="flex items-center gap-1.5 mb-1.5">
+            <Star className="w-3.5 h-3.5 text-amber-600" />
+            <h3 className="font-bold text-amber-800 text-xs">Rewards</h3>
+          </div>
+          <div className="flex gap-3">
+            <div className="flex items-center gap-1 text-amber-700"><Zap className="w-3.5 h-3.5" /><span className="font-bold text-xs">{xp} XP</span></div>
+            <div className="flex items-center gap-1 text-amber-700"><Flame className="w-3.5 h-3.5" /><span className="font-bold text-xs">{Math.floor(xp / 2)} coins</span></div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─── main page component ─── */
+
+export default function LessonPlayerPage({ params }: { params: Promise<{ themeSlug: string; questSlug: string; lessonSlug: string }> }) {
+  const { data: session, status } = useSession();
+  const [slugs, setSlugs] = useState<{ themeSlug: string; questSlug: string; lessonSlug: string } | null>(null);
+  const [lesson, setLesson] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [viewing, setViewing] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [completed, setCompleted] = useState(false);
+  const [justCompleted, setJustCompleted] = useState(false);
+  const [completing, setCompleting] = useState(false);
+  const [xpEarned, setXpEarned] = useState(0);
+  const [streakCount, setStreakCount] = useState(0);
+  const [newBadges, setNewBadges] = useState<string[]>([]);
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [completeError, setCompleteError] = useState<string | null>(null);
+  const hasCompletedRef = useRef(false);
+
+  const [interaction, setInteraction] = useState({
+    predictionText: "",
+    practiceEntries: ["", "", ""] as string[],
+    selectedChoice: null as number | null,
+    choiceFeedback: null as "correct" | "incorrect" | null,
+    selfChecked: null as boolean | null,
+    reflectionText: "",
+    reflectionChip: null as number | null,
+    reflectionSaved: false,
+  });
+
+  const journey = buildLessonJourney(lesson);
+  const journeySteps = journey?.steps || [];
+  const journeySource = journey?.source || "cbc_fallback";
+  const isJourney = journeySteps.length >= 5 && journeySource !== "legacy_array";
+  const totalSteps = journeySteps.length;
+  const isLastStep = currentStep >= totalSteps - 1;
+  const clampedStep = Math.min(currentStep, Math.max(totalSteps - 1, 0));
+  const currentJourneyStep = isJourney && totalSteps > 0 ? journeySteps[clampedStep] : null;
+  const xp = getRewardValue(lesson?.xpReward);
+  const subject = lesson?.quest?.theme?.themeSubjects?.[0]?.subject || "";
+  const grade = lesson?.quest?.theme?.grade || 0;
+
+  // Next step label for the slide-style Next button
+  const nextStepLabel = !isLastStep && journeySteps[clampedStep + 1]
+    ? (STEP_LABELS[journeySteps[clampedStep + 1].stepType] || journeySteps[clampedStep + 1].title)
+    : null;
+
+  useEffect(() => {
+    setInteraction({
+      predictionText: "", practiceEntries: ["", "", ""], selectedChoice: null,
+      choiceFeedback: null, selfChecked: null, reflectionText: "",
+      reflectionChip: null, reflectionSaved: false,
+    });
+  }, [currentStep]);
+
+  useEffect(() => {
+    if (status === "unauthenticated") window.location.replace("/auth/login");
+  }, [status]);
+
+  useEffect(() => {
+    params.then(p => {
+      setSlugs(p);
+      fetch(`/api/lessons/${p.lessonSlug}?slug=${p.lessonSlug}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.lesson) {
+            setLesson(data.lesson);
+            setCompleted(data.lesson.isCompleted);
+          }
+        })
+        .catch(console.error)
+        .finally(() => setLoading(false));
+    });
+  }, [params]);
+
+  const fireConfetti = useCallback(() => {
+    confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 }, colors: ["#2DD4BF", "#F59E0B", "#3B82F6", "#EC4899", "#10B981"] });
+    setTimeout(() => confetti({ particleCount: 40, angle: 60, spread: 55, origin: { x: 0, y: 0.6 }, colors: ["#2DD4BF", "#F59E0B", "#3B82F6"] }), 150);
+    setTimeout(() => confetti({ particleCount: 40, angle: 120, spread: 55, origin: { x: 1, y: 0.6 }, colors: ["#EC4899", "#10B981", "#F59E0B"] }), 300);
+    setTimeout(() => confetti({ particleCount: 30, spread: 100, origin: { y: 0.5 }, shapes: ["star"], colors: ["#FFD700", "#FFA500"], scalar: 1.5 }), 500);
+  }, []);
+
+  const handleComplete = useCallback(async () => {
+    if (!slugs || completing || hasCompletedRef.current) return;
+    hasCompletedRef.current = true;
+    setCompleting(true);
+    setCompleteError(null);
+    try {
+      const questId = lesson?.questId || slugs.questSlug || null;
+      const res = await fetch("/api/learner/progress", {
+        method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include",
+        body: JSON.stringify({ lessonId: lesson?.id, questId, action: "complete" }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setCompleteError(data.error || `Could not complete (status ${res.status})`); hasCompletedRef.current = false; return; }
+      if (data.success || data.completed) {
+        const xpAmt = getRewardValue(data.rewards?.xp);
+        setCompleted(true); setJustCompleted(true); setXpEarned(xpAmt); setStreakCount(data.streak || 0);
+        setShowCelebration(true);
+        if (data.newBadges?.length) setNewBadges(data.newBadges);
+        fireConfetti();
+      } else if (data.alreadyCompleted) {
+        setCompleted(true); setShowCelebration(false);
+      } else {
+        setCompleteError("Unexpected response. Please try again.");
+        hasCompletedRef.current = false;
+      }
+    } catch {
+      setCompleteError("Network error. Please check your connection.");
+      hasCompletedRef.current = false;
+    } finally { setCompleting(false); }
+  }, [slugs, completing, lesson, fireConfetti]);
+
+  const handleSaveReflection = useCallback(async () => {
+    const text = interaction.reflectionText.trim() || (interaction.reflectionChip !== null && currentJourneyStep?.reflectionOptions?.[interaction.reflectionChip]) || "";
+    if (!text) return;
+    try {
+      await fetch("/api/learner/reflections", {
+        method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include",
+        body: JSON.stringify({ prompt: currentJourneyStep?.interaction?.question || "Reflection", response: text, lessonId: lesson?.id || null, questId: lesson?.questId || null }),
+      });
+      setInteraction((prev: any) => ({ ...prev, reflectionSaved: true }));
+    } catch { /* non-blocking */ }
+  }, [interaction.reflectionText, interaction.reflectionChip, currentJourneyStep, lesson]);
+
+  const goNext = useCallback(() => {
+    if (currentJourneyStep?.stepType === "complete") {
+      if (!completed) handleComplete();
+    } else if (!isLastStep) {
+      setCurrentStep(clampedStep + 1);
+    }
+  }, [currentJourneyStep, completed, isLastStep, clampedStep, handleComplete]);
+
+  const goBack = useCallback(() => {
+    if (clampedStep > 0) setCurrentStep(clampedStep - 1);
+  }, [clampedStep]);
+
+  /* ─── loading state ─── */
+  if (loading) return (
+    <div className="min-h-screen bg-slate-50">
+      <div className="flex items-center justify-center min-h-[70vh]">
+        <div className="flex flex-col items-center gap-5 bg-white rounded-3xl p-12 shadow-lg border border-slate-100">
+          <OwlTeacher size={80} expression="happy" />
+          <p className="text-lg font-bold text-slate-500">Loading your lesson...</p>
+          <div className="relative w-8 h-8"><div className="absolute inset-0 rounded-full border-[3px] border-indigo-200/30" /><div className="absolute inset-0 rounded-full border-[3px] border-transparent border-t-indigo-500 animate-spin" /></div>
+        </div>
+      </div>
+    </div>
+  );
+
+  /* ─── Journey Slide View ─── */
+  if (viewing) {
+    const stepLabel = currentJourneyStep ? (STEP_LABELS[currentJourneyStep.stepType] || "Next") : "Next";
+    const theme = currentJourneyStep ? STEP_THEME[currentJourneyStep.stepType] : STEP_THEME.welcome;
+
+    return (
+      <div className="fixed inset-0 z-50 bg-slate-50 flex flex-col overflow-hidden">
+        <style>{CELEBRATION_CSS}</style>
+
+        {/* ── Compact Top Bar ── */}
+        <div className="relative z-10 bg-white/90 backdrop-blur-xl border-b border-slate-200/60 px-4 py-2.5 flex-shrink-0 shadow-sm">
+          <div className="max-w-[1200px] mx-auto flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <button onClick={() => { setViewing(false); setShowCelebration(false); setCurrentStep(0); }}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs transition-all">
+                <ArrowLeft className="w-3.5 h-3.5" /> {completed ? "Exit" : "Back"}
+              </button>
+              <div className="min-w-0">
+                <h1 className="font-extrabold text-slate-900 text-sm lg:text-base truncate tracking-tight">{cleanTitle(lesson?.title)}</h1>
+                {subject && <p className="text-[10px] text-slate-500 font-semibold">{subject}{grade ? ` · Grade ${grade}` : ""}</p>}
+              </div>
+            </div>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {isJourney && <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">{clampedStep + 1}/{totalSteps}</span>}
+              {xp > 0 && (
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200/50">
+                  <Zap className="w-3 h-3" /> +{xp} XP
+                </span>
+              )}
+              {justCompleted ? (
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200/50">
+                  <CheckCircle2 className="w-3 h-3" /> Done
+                </span>
+              ) : completed ? (
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200/50">
+                  <Eye className="w-3 h-3" /> Review
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200/50">
+                  <Pencil className="w-3 h-3" /> In Progress
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* ── Progress Bar ── */}
+        {isJourney && totalSteps > 0 && (
+          <div className="relative z-10 bg-white/60 backdrop-blur-sm border-b border-slate-200/40 px-4 py-2 flex-shrink-0">
+            <div className="max-w-[1200px] mx-auto">
+              <div className="flex gap-1">
+                {journeySteps.map((s, i) => (
+                  <button key={i} onClick={() => setCurrentStep(i)} className="flex-1 group" title={STEP_LABELS[s.stepType] || s.title}>
+                    <div className={`h-1.5 rounded-full transition-all duration-500 ${
+                      i < clampedStep
+                        ? "bg-gradient-to-r from-emerald-400 to-teal-400"
+                        : i === clampedStep
+                        ? `bg-gradient-to-r ${theme.gradient}`
+                        : "bg-slate-200/60 group-hover:bg-slate-300/60"
+                    }`} />
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── Main Content Area ── */}
+        <div className="flex-1 overflow-y-auto relative z-10">
+          <div className="max-w-[1200px] mx-auto px-4 py-5 flex gap-5">
+
+            {/* ── Main Slide Card ── */}
+            <div className="flex-1 min-w-0 max-w-[720px]">
+
+              {/* Celebration overlay */}
+              {showCelebration && xpEarned > 0 && (
+                <div className="rounded-2xl p-8 mb-5 text-center overflow-hidden border-2 border-indigo-200/50 shadow-xl bg-gradient-to-br from-indigo-50 via-amber-50/50 to-rose-50/50">
+                  <div className="relative z-10">
+                    <div className="flex justify-center mb-3"><OwlTeacher size={80} expression="celebrating" /></div>
+                    <h2 className="text-2xl lg:text-3xl font-black text-slate-900 mb-2 tracking-tight">Lesson Complete!</h2>
+                    <p className="text-slate-600 text-base lg:text-lg mb-4 font-medium">You worked hard and learned something amazing!</p>
+                    <div className="flex items-center justify-center gap-3 flex-wrap">
+                      <div className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-white shadow-lg border border-indigo-100">
+                        <Zap className="w-5 h-5 text-indigo-600" /><span className="text-2xl font-black text-indigo-600">+{xpEarned}</span><span className="text-sm font-bold text-slate-500">XP</span>
+                      </div>
+                      {streakCount > 0 && (
+                        <div className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-white shadow-lg border border-pink-100">
+                          <Flame className="w-5 h-5 text-pink-500" /><span className="text-2xl font-black text-pink-500">+{streakCount}</span><span className="text-sm font-bold text-slate-500">streak</span>
+                        </div>
+                      )}
+                    </div>
+                    {newBadges.length > 0 && (
+                      <div className="mt-4 flex gap-2 justify-center flex-wrap">
+                        {newBadges.map((b, i) => (
+                          <div key={i} className="rounded-xl border-2 border-purple-200/60 bg-white px-3 py-2 flex items-center gap-1.5 shadow-md">
+                            <span className="text-lg">🏅</span><span className="font-bold text-xs text-slate-800">{b}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <div className="mt-5 flex gap-3 justify-center flex-wrap">
+                      <button onClick={() => { setViewing(false); setShowCelebration(false); setCurrentStep(0); }}
+                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white border-2 border-slate-200/60 text-slate-700 font-bold text-sm hover:bg-slate-50 transition-all active:scale-[0.98] shadow-sm">
+                        <ArrowLeft className="w-4 h-4" /> Back to Quest
+                      </button>
+                      <button onClick={() => { setShowCelebration(false); setCurrentStep(0); }}
+                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold text-sm hover:from-indigo-600 hover:to-purple-600 transition-all shadow-lg shadow-indigo-200/50 active:scale-[0.98]">
+                        <RotateCcw className="w-4 h-4" /> Review Lesson
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Current step slide */}
+              {isJourney && currentJourneyStep ? (
+                <div className={`rounded-2xl border-2 ${theme.border} bg-white p-6 lg:p-8 shadow-lg`}>
+                  <SlideStepView step={currentJourneyStep} stepNumber={clampedStep + 1} totalSteps={totalSteps}
+                    interaction={interaction} setInteraction={setInteraction} lesson={lesson} onSaveReflection={handleSaveReflection} />
+                </div>
+              ) : journeySteps.length > 0 ? (
+                <div className="flex flex-col gap-4">
+                  {journeySteps.map((s, i) => (
+                    <div key={s.id} className="rounded-2xl border-2 border-slate-200/60 bg-white p-6 lg:p-8 shadow-lg">
+                      <SlideStepView step={s} stepNumber={i + 1} totalSteps={journeySteps.length}
+                        interaction={interaction} setInteraction={setInteraction} lesson={lesson} onSaveReflection={handleSaveReflection} />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="rounded-2xl border border-slate-200/50 bg-white text-center p-10 shadow-lg">
+                  <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center mx-auto mb-3"><BookOpen className="w-6 h-6 text-slate-400" /></div>
+                  <h3 className="text-lg font-extrabold text-slate-800 mb-1">This lesson is being prepared</h3>
+                  <p className="text-slate-500 text-sm font-medium">Please check back soon.</p>
+                </div>
+              )}
+
+              {completeError && (
+                <div className="mt-4 rounded-xl border border-red-300/50 bg-red-50 p-4 text-center shadow-sm">
+                  <p className="text-sm font-bold text-red-700">{completeError}</p>
+                  <button onClick={() => setCompleteError(null)} className="mt-1.5 text-xs text-red-500 underline hover:text-red-700 font-semibold">Dismiss</button>
+                </div>
+              )}
+            </div>
+
+            {/* ── Right Support Panel (desktop) ── */}
+            <div className="hidden lg:block w-[260px] flex-shrink-0">
+              <SupportPanel lesson={lesson} journeySteps={journeySteps} currentStep={clampedStep} xp={xp} subject={subject} grade={grade} onStepClick={setCurrentStep} />
+            </div>
+          </div>
+        </div>
+
+        {/* ── Bottom Navigation Bar ── */}
+        {isJourney && currentJourneyStep && (
+          <div className="relative z-10 bg-white/90 backdrop-blur-xl border-t border-slate-200/60 px-4 py-3 flex-shrink-0 shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
+            <div className="max-w-[1200px] mx-auto flex items-center gap-3">
+
+              {/* Back button — compact floating style */}
+              {clampedStep > 0 ? (
+                <button onClick={goBack}
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm transition-all active:scale-[0.97]">
+                  <ChevronLeft className="w-4 h-4" /> Back
+                </button>
+              ) : (
+                <div className="w-20" />
+              )}
+
+              {/* Step dots (mobile) */}
+              <div className="flex-1 flex items-center justify-center gap-1.5 lg:hidden">
+                {journeySteps.map((_, i) => (
+                  <button key={i} onClick={() => setCurrentStep(i)} className={`w-2 h-2 rounded-full transition-all ${
+                    i === clampedStep ? "bg-indigo-500 w-6" : i < clampedStep ? "bg-emerald-400" : "bg-slate-300"
+                  }`} />
+                ))}
+              </div>
+
+              {/* Spacer for desktop */}
+              <div className="flex-1 hidden lg:block" />
+
+              {/* Next / Complete button — slide-style card */}
+              {currentJourneyStep.stepType === "complete" ? (
+                <div className="flex gap-2">
+                  {!completed ? (
+                    <button onClick={handleComplete} disabled={completing}
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold text-sm hover:from-emerald-600 hover:to-teal-600 transition-all shadow-lg shadow-emerald-200/50 disabled:opacity-50 active:scale-[0.97]">
+                      {completing ? <><span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Earning...</> : <><Trophy className="w-4 h-4" /> Finish +{xp} XP</>}
+                    </button>
+                  ) : (
+                    <button onClick={() => { setViewing(false); setShowCelebration(false); setCurrentStep(0); }}
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold text-sm hover:from-indigo-600 hover:to-purple-600 transition-all shadow-lg shadow-indigo-200/50 active:scale-[0.97]">
+                      <RotateCcw className="w-4 h-4" /> Review
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <button onClick={goNext}
+                  className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all active:scale-[0.97] ${
+                    isLastStep
+                      ? "bg-slate-100 text-slate-500 cursor-default"
+                      : `bg-gradient-to-r ${theme.gradient} text-white shadow-lg hover:brightness-110`
+                  }`}
+                  disabled={isLastStep && !completed}>
+                  <span>{NEXT_BUTTON_LABELS[currentJourneyStep.stepType] || "Next"}</span>
+                  {nextStepLabel && <span className="text-xs opacity-75 hidden sm:inline">— {nextStepLabel}</span>}
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  /* ─── Landing Page ─── */
+  return (
+    <div className="fade-in max-w-[760px] mx-auto">
+      <div className="relative rounded-3xl p-8 lg:p-10 mb-6 overflow-hidden border border-indigo-200/50 shadow-xl bg-gradient-to-br from-indigo-600 via-violet-600 to-purple-700">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-8 -right-8 w-36 h-36 rounded-full bg-white/10" />
+          <div className="absolute -bottom-8 -left-8 w-28 h-28 rounded-full bg-white/5" />
+        </div>
+        <div className="relative z-10">
+          {slugs && (
+            <Link href={`/dashboard/student/lessons/${slugs.themeSlug}/${slugs.questSlug}`} className="inline-flex items-center gap-1.5 text-white/70 hover:text-white text-sm font-semibold mb-4 transition-colors">
+              <ArrowLeft className="w-4 h-4" /> Back to Quest
+            </Link>
+          )}
+          <div className="flex items-center gap-2 mb-3 flex-wrap">
+            {completed && <span className="text-[10px] font-extrabold uppercase tracking-wider bg-white/20 text-white px-2.5 py-1 rounded-full">✓ Completed</span>}
+            {subject && <span className="text-[10px] font-extrabold uppercase tracking-wider bg-white/20 text-white px-2.5 py-1 rounded-full">{subject}{grade ? ` · Grade ${grade}` : ""}</span>}
+            {xp > 0 && <span className="text-[10px] font-extrabold uppercase tracking-wider bg-amber-400/80 text-white px-2.5 py-1 rounded-full flex items-center gap-1"><Zap className="w-3 h-3" /> {xp} XP</span>}
+          </div>
+          <h1 className="text-3xl lg:text-4xl font-black text-white mb-2 tracking-tight">{cleanTitle(lesson?.title)}</h1>
+          {lesson?.description && <p className="text-white/85 text-lg leading-relaxed">{lesson.description}</p>}
+        </div>
+      </div>
+
+      {completed && (
+        <div className="rounded-2xl border border-blue-200/50 bg-gradient-to-br from-blue-50/80 to-indigo-50/60 text-center p-6 mb-5 shadow-lg">
+          <CheckCircle2 className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+          <p className="font-bold text-blue-800">You've completed this lesson!</p>
+          <p className="text-blue-600 text-sm mt-1">Review the content or move on to the next lesson.</p>
+        </div>
+      )}
+
+      {isJourney && (
+        <div className="rounded-2xl border border-indigo-200/50 bg-indigo-50/60 p-5 mb-5 flex items-center gap-4 shadow-lg">
+          <div className="w-12 h-12 rounded-2xl bg-indigo-100 flex items-center justify-center flex-shrink-0"><Sparkles className="w-6 h-6 text-indigo-600" /></div>
+          <div>
+            <p className="text-base font-bold text-indigo-800">{totalSteps}-step interactive lesson</p>
+            <p className="text-sm text-indigo-600/80 font-medium">Work through each step to complete the lesson</p>
+          </div>
+        </div>
+      )}
+
+      <GradientButton variant={completed ? "secondary" : "primary"} size="lg"
+        icon={completed ? <Eye className="w-5 h-5" /> : <Sparkles className="w-5 h-5" />}
+        onClick={async () => {
+          if (lesson?.id) {
+            try { await fetch("/api/learner/progress", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ lessonId: lesson.id, action: "start" }) }); } catch { /* non-blocking */ }
+          }
+          setCurrentStep(0); setViewing(true);
+        }} className="w-full">
+        {completed ? "Review Lesson" : isJourney ? `Begin ${totalSteps}-Step Journey` : "Start Lesson"}
+      </GradientButton>
+    </div>
+  );
+}
+
+/* ─── build lesson journey ─── */
+
+function buildLessonJourney(lesson: any): { steps: JourneyStep[]; source: string } | null {
+  if (!lesson?.id) return null;
+  const subject = lesson.quest?.theme?.themeSubjects?.[0]?.subject || "";
+  const grade = lesson.quest?.theme?.grade || 0;
+  return buildUniversalJourney(lesson.id, lesson.title || "Lesson", lesson.contentBlocks, {
+    subject, grade, xpReward: getRewardValue(lesson?.xpReward), coinReward: lesson?.coinReward,
+  });
 }
