@@ -476,6 +476,11 @@ export default function SubjectCurriculumPage() {
                             background: "white", color: colors.text,
                             fontSize: "0.625rem", fontWeight: 700, textDecoration: "none", display: "inline-block",
                           }}>Edit Shell</Link>
+                          <Link href={`/dashboard/admin/lessons/${l.id}/student-view`} style={{
+                            padding: "3px 8px", borderRadius: 6, border: "none",
+                            background: "#4F46E5", color: "#fff",
+                            fontSize: "0.625rem", fontWeight: 700, textDecoration: "none", display: "inline-block",
+                          }}>Preview</Link>
                           {(!l.generationStatus || l.generationStatus === "Not generated" || l.generationStatus === "Rejected") && (
                             <button
                               onClick={async () => {
