@@ -666,21 +666,7 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
                 </button>
                 <button
                   onClick={() => {
-                    const journeyToShow = hasApprovedJourney
-                      ? (() => {
-                          try {
-                            const cb = typeof lesson?.contentBlocks === "string"
-                              ? JSON.parse(lesson.contentBlocks)
-                              : lesson?.contentBlocks;
-                            return cb?.studentJourney || [];
-                          } catch { return []; }
-                        })()
-                      : (aiDraft || []);
-                    const lessonSlug = lesson?.slug || "";
-                    const themeSlug = lesson?.quest?.theme?.slug || "theme";
-                    const questSlug = lesson?.quest?.slug || "quest";
-                    const url = `/dashboard/student/lessons/${themeSlug}/${questSlug}/${lessonSlug}?adminPreview=true`;
-                    window.open(url, "_blank");
+                    window.open(`/dashboard/admin/lessons/${params.id}/student-view`, "_blank");
                   }}
                   style={{
                     display: "inline-flex", alignItems: "center", gap: "0.5rem",
@@ -692,7 +678,7 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
                   }}
                 >
                   <ExternalLink style={{ width: 14, height: 14 }} />
-                  Preview Student Journey
+                  Preview as Student
                 </button>
               </div>
             )}

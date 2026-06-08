@@ -4,7 +4,8 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Users, Flame, Star, BookOpen, GraduationCap, LogOut, Link2,
-  CalendarCheck, ChevronRight, Award, Heart, Trophy, Target, Loader2
+  CalendarCheck, ChevronRight, Award, Heart, Trophy, Target, Loader2,
+  MessageCircle
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { PageHeader, SectionHeader, GradientButton, StatCard, EmptyStateCard } from "@/components/ui/Pill";
@@ -250,6 +251,39 @@ export default function ParentDashboard() {
                 <p className="text-xs text-text-muted">Activity will appear here as your children complete lessons.</p>
               </div>
             )}
+
+            {/* Quick Links */}
+            <SectionHeader title="Quick Links" subtitle="Everything you need in one place" />
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              <Link href="/dashboard/parent/messages" className="rounded-[1.25rem] bg-white p-4 shadow-sm border border-slate-200/50 hover:shadow-md hover:-translate-y-0.5 transition-all group">
+                <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center mb-3 group-hover:bg-indigo-100 transition-colors">
+                  <MessageCircle className="w-5 h-5 text-indigo-600" />
+                </div>
+                <p className="text-sm font-bold text-slate-800">Messages</p>
+                <p className="text-[10px] text-slate-500 mt-0.5">Chat with your child</p>
+              </Link>
+              <Link href="/dashboard/parent/calendar" className="rounded-[1.25rem] bg-white p-4 shadow-sm border border-slate-200/50 hover:shadow-md hover:-translate-y-0.5 transition-all group">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center mb-3 group-hover:bg-emerald-100 transition-colors">
+                  <CalendarCheck className="w-5 h-5 text-emerald-600" />
+                </div>
+                <p className="text-sm font-bold text-slate-800">Calendar</p>
+                <p className="text-[10px] text-slate-500 mt-0.5">Track learning activity</p>
+              </Link>
+              <Link href="/dashboard/parent/progress" className="rounded-[1.25rem] bg-white p-4 shadow-sm border border-slate-200/50 hover:shadow-md hover:-translate-y-0.5 transition-all group">
+                <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center mb-3 group-hover:bg-amber-100 transition-colors">
+                  <Award className="w-5 h-5 text-amber-600" />
+                </div>
+                <p className="text-sm font-bold text-slate-800">Progress</p>
+                <p className="text-[10px] text-slate-500 mt-0.5">View detailed reports</p>
+              </Link>
+              <Link href="/dashboard/parent/support" className="rounded-[1.25rem] bg-white p-4 shadow-sm border border-slate-200/50 hover:shadow-md hover:-translate-y-0.5 transition-all group">
+                <div className="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center mb-3 group-hover:bg-rose-100 transition-colors">
+                  <Heart className="w-5 h-5 text-rose-600" />
+                </div>
+                <p className="text-sm font-bold text-slate-800">Support</p>
+                <p className="text-[10px] text-slate-500 mt-0.5">Get help & contact us</p>
+              </Link>
+            </div>
           </>
         )}
     </div>
