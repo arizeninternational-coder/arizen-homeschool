@@ -1,132 +1,206 @@
-# Product Pass — Test Notes & Handoff Report
+# Product Pass — Final Test Notes & Handoff Report
 
 **Date:** June 8, 2026  
 **Branch:** `product-pass-june2026`  
-**Preview URL:** https://arizen-homeschool-p5f9iwem7-arizeninternational-coders-projects.vercel.app  
-**Commit:** `3376ab5` (latest)
+**Preview URL:** https://arizen-homeschool-4e63kjja9-arizeninternational-coders-projects.vercel.app  
+**Latest Commit:** `953fa10`  
+**Database Migration:** STABILIZATION_MIGRATION.sql — RUN by Victor on June 8 2026
 
 ---
 
-## Database Status (VERIFIED June 8 2026)
+## Test Accounts Used
 
-I queried the live Supabase database directly. Here is the ground truth:
+| Role | Email | Password | User ID |
+|------|-------|----------|---------|
+| Admin | test.admin@arizen.local | TestAdmin2025! | d9f3cc56-c041-4bf1-b395-f96b1f3ba65e |
+| Parent | test.parent@arizen.local | TestParent2025! | 6df41dc4-cb20-4cb8-8f0f-ebd4e1fe4927 |
+| Student | test.student@arizen.local | TestStudent2025! | 06d1c868-964c-40b6-a3c2-de25137cc448 |
 
-### Tables that ALREADY EXIST (verified via REST API):
-| Table | Rows | Columns match code? |
-|-------|------|-------------------|
-| `Conversation` | 0 | ✅ Yes — id, title, isGroup, createdBy, createdAt, updatedAt |
-| `ConversationParticipant` | 0 | ✅ Yes — id, conversationId, userId, role, joinedAt |
-| `Message` | 0 | ✅ Yes — id, conversationId, senderId, body, messageType, createdAt, readAt |
-| `support_requests` | 0 | ✅ Yes — all expected columns |
-| `ParentChild` | 1 | ✅ Link table exists with data |
-| `Lesson` | 1 | ✅ Has isAvailable, archivedAt, lastEditedAt columns already |
-| `User` | 1 | ✅ Exists |
-
-### RLS Status:
-- No RLS blocking anon reads on Conversation, Message, or support_requests
-- The API routes use `withAuth` guard (cookie-based JWT), not anon key, for mutations
-
-### Migration Verdict:
-**STABILIZATION_MIGRATION.sql is SAFE to run.** It uses `CREATE TABLE IF NOT EXISTS` and `DO $$ IF NOT EXISTS` guards throughout. It will NOT delete, modify, or duplicate anything. It is purely additive/defensive.
-
-**However, it is also NOT STRICTLY NECESSARY** — all tables and columns already exist. Running it is a safety measure to ensure completeness.
+**ParentChild link:** Created between test.parent and test.student  
+**LearnerProfile:** test.student has LearnerProfile (grade 2)
 
 ---
 
-## Root Cause Analysis
+## Database Verification (June 8 2026)
 
-### nextStepLabel Crash (FIXED ✅)
-**Error:** `Uncaught ReferenceError: nextStepLabel is not defined`  
-**Root cause:** In `student-view/page.tsx`, `nextStepLabel` was defined inside `renderSlideView()` function scope (line 411) but referenced in the bottom nav JSX (line 620) which is outside that function.  
-**Fix:** Moved `nextStepLabel` to component scope. Removed duplicate definition inside `renderSlideView()`.  
-**Status:** Fixed, built, deployed.
+All tables verified via direct Supabase REST API query:
 
-### Messaging Not Working (ROOT CAUSE FOUND ⚠️)
-**Root cause:** The messaging tables DO exist (verified above). The real issue is likely one of:
-1. No conversations have been created (tables are empty — 0 rows)
-2. The parent messaging page uses `/api/members` to find linked children, but if no ParentChild links exist for the test user, the "New Conversation" list will be empty
-3. The messaging flow requires: ParentChild link → Conversation creation → Message sending
-**Status:** API routes are correct. Need real test accounts with ParentChild links to verify end-to-end.
+| Table | Exists | Rows | Columns Match Code |
+|-------|--------|------|-------------------|
+| Conversation | ✅ | 0 | ✅ |
+| ConversationParticipant | ✅ | 0 | ✅ |
+| Message | ✅ | 0 | ✅ |
+| support_requests | ✅ | 0 | ✅ |
+| ParentChild | ✅ | 3 | ✅ |
+| Lesson | ✅ | 10 | ✅ (has isAvailable, archivedAt, lastEditedAt) |
+| User | ✅ | 13 | ✅ |
 
-### Lesson Content Repetition (PARTIALLY FIXED ⚠️)
-**Root cause:** `generateJourneyContent()` in `lesson-journey.ts` creates welcome/mission steps where both `owlText` and `studentText` repeat the lesson title.  
-**Rendering fix applied:** `SlideStepView` now treats welcome/mission/complete as "owl-primary" steps — showing owl as main content, skipping redundant student text.  
-**Remaining:** The generated data itself is still repetitive. Rendering fix mitigates but doesn't eliminate.
+**RLS Status:** No RLS blocking anon reads. API routes use cookie-based JWT auth (`getAuthUser`).
 
 ---
 
-## What Was Fixed This Session
+## Browser Test Results
 
-| # | Issue | Status |
-|---|-------|--------|
-| 1 | nextStepLabel crash | ✅ Fixed — variable moved to component scope |
-| 2 | Lesson content repetition | ⚠️ Partial — rendering improved, data generation still repetitive |
-| 3 | STABILIZATION_MIGRATION.sql | ✅ Rewritten to be truly safe (additive-only, all guards) |
+### A. ADMIN PREVIEW AS STUDENT — ✅ WORKS (with fix)
 
----
+**Flow tested:** Admin login → Grades → Grade 2 → Mathematics → "Comparing Numbers" lesson → Preview as Student
 
-## What Needs Testing (After You Provide Credentials)
+**What worked:**
+- Admin login successful
+- Grades page loads with all grades
+- Subject page loads with lesson list and quest grouping
+- Preview page loads without crash
+- All 10 steps visible in progress bar: Welcome, Mission, Predict, Learn, Connect, Example, Practice, Check, Reflect, Done
+- Step navigation works (clicking step buttons)
+- Owl Teacher message displays per step
+- Student text displays per step
+- Illustration area shows with "Generate AI" button
+- Video area shows with URL input
+- Lesson Map sidebar shows all steps with completion status
+- Admin toolbar: Save, Unpublish, Hide, Archive buttons visible
+- Status card: "PUBLISHED / Visible to students"
+- Rewards card: "40 XP"
+- Back/Next navigation buttons work
+- No JavaScript errors in console
 
-### Admin Flow:
-1. Login → Dashboard → Grades → Subject → Verify quest grouping works
-2. Click "Preview" on a lesson → Student-view page opens
-3. Navigate through ALL 10 steps → No crash
-4. Verify admin toolbar works (Publish, Archive, Availability toggle)
+**Root cause of previous "No journey steps yet" bug:**
+The `buildLessonJourney()` function in `student-view/page.tsx` only handled dict-format contentBlocks (`{studentJourney: [...]}`) but the DB stores contentBlocks as a JSON array (`[{type: "text", data: {...}}, ...]`). Fixed by adding `Array.isArray(cb)` check that routes to `convertLegacyBlocksToJourney()`.
 
-### Messaging Flow (CRITICAL — Full E2E):
-1. **Parent logs in** → Opens Messages → Sees linked child in "New Conversation" list
-2. **Parent** clicks child → Conversation opens → Sends message
-3. **Parent logs out**
-4. **Child logs in** → Opens Messages → Sees parent → Sees message → Replies
-5. **Child logs out**
-6. **Parent logs in again** → Opens Messages → Sees child's reply
-7. **Refresh page** → Conversation and messages persist
-
-### Parent Pages:
-1. Parent Calendar opens → Shows real data or honest empty state
-2. Parent Support form submits → Success confirmation appears
-3. No "Coming Soon" labels remain
-
-### Student Flow:
-1. Student logs in → Opens lesson → All steps navigable
-2. No content repetition (owl text doesn't duplicate student text)
-3. Sidebar has good contrast (future steps not faded)
+**Files changed:** `src/app/dashboard/admin/lessons/[id]/student-view/page.tsx`
 
 ---
 
-## Test Accounts Needed
+### B. QUICK CHECK — ❌ NOT INTERACTIVE (needs fix)
 
-I need **three working accounts** with this exact setup:
+**Current state (Step 8 of "Comparing Numbers"):**
+- Questions displayed as plain text paragraphs:
+  - "1. 6 ___ 9 (greater than, less than, or equal to?)"
+  - "2. 3 ___ 3 (greater than, less than, or equal to?)"
+  - "3. 8 ___ 5 (greater than, less than, or equal to?)"
+  - "Write >, <, or = in each blank."
+- NO clickable options
+- NO input fields
+- NO feedback states
+- Owl Teacher text gives away answer strategy before student tries
 
-1. **Admin account** — role: ADMIN — can access /dashboard/admin
-2. **Parent account** — role: PARENT — can access /dashboard/parent
-3. **Child/Student account** — role: LEARNER — can access /dashboard/student
-
-**CRITICAL:** The Parent and Child accounts MUST be linked in the `ParentChild` table:
-- `ParentChild.parentId` = Parent's User.id
-- `ParentChild.childUserId` = Child's User.id
-
-Without this link, the messaging flow cannot work because:
-- `/api/members` for a PARENT returns only linked children
-- `/api/members` for a LEARNER returns only linked parents
-- The conversation creation API validates that users are linked
-
-**Please provide:** Email + password for each of the 3 accounts. If the ParentChild link doesn't exist yet, you'll need to create it in Supabase or use the parent's "Link Child" feature.
+**Required fix:**
+- Convert questions to interactive cards with clickable options (>, <, =)
+- Add input fields for written answers
+- Show feedback ONLY after answering
+- Owl text should encourage, not explain solutions
+- This applies to both admin preview AND student view
 
 ---
 
-## Files Changed
+### C. STUDENT VIEW — ⚠️ NOT YET TESTED
 
-| File | Change |
-|------|--------|
-| `src/app/dashboard/admin/lessons/[id]/student-view/page.tsx` | Fixed nextStepLabel scoping, improved bottom nav |
-| `src/app/dashboard/student/lessons/[themeSlug]/[questSlug]/[lessonSlug]/page.tsx` | Improved SlideStepView to reduce content repetition |
-| `STABILIZATION_MIGRATION.sql` | Rewritten — verified safe, additive-only, all guards |
-| `src/lib/db-health.ts` | New — utility for defensive table-existence checks |
-| `docs/PRODUCT_PASS_TEST_NOTES.md` | This file |
+Student login was attempted but not fully tested. Need to:
+1. Log in as test.student@arizen.local
+2. Navigate to a lesson
+3. Verify all steps render correctly
+4. Verify no admin controls visible
+5. Verify contentBlocks array format is handled (uses buildUniversalJourney which should work)
+
+---
+
+### D. PARENT-CHILD MESSAGING — ⚠️ NOT YET TESTED
+
+Parent and student accounts created with ParentChild link. Need to test:
+1. Parent login → Messages → See linked child → Send message
+2. Student login → Messages → See parent → See message → Reply
+3. Parent login → See reply
+4. Refresh → Persistence verified
+
+---
+
+### E. PARENT PAGES — ⚠️ NOT YET TESTED
+
+Need to test:
+1. Parent dashboard → Children cards with real data
+2. Parent Calendar → Activity data or honest empty state
+3. Parent Support → Form submission → support_requests table
+
+---
+
+### F. VIDEO AND MEDIA — ⚠️ NOT YET TESTED
+
+Need to test:
+1. Admin adds YouTube URL to lesson step
+2. Student views lesson → Video appears (not crash)
+3. Invalid video URL → Helpful error, not crash
+4. Missing media → Clean empty state
+
+---
+
+### G. IMAGE UPLOAD — ❌ NOT BUILT
+
+Current state: Only "Generate AI" button and URL input. No file upload capability.
+- No Upload Image button
+- No Supabase Storage integration
+- No upload progress/loading state
+- No image persistence after refresh
+
+**This is a feature gap, not a bug.**
+
+---
+
+## Security Assessment
+
+### Messaging Security:
+- ✅ All messaging reads/writes go through server-side API routes
+- ✅ `getAuthUser` validates JWT from cookie for every mutation
+- ✅ Conversation creation validates role-based permissions (LEARNER↔PARENT only)
+- ✅ Message sending validates participant membership
+- ⚠️ No RLS policies on messaging tables — anon key can read all rows
+- ⚠️ This is acceptable for testing but **RLS must be added before real users onboard**
+
+### Recommended RLS policies (for future):
+```sql
+ALTER TABLE "Conversation" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "ConversationParticipant" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "Message" ENABLE ROW LEVEL SECURITY;
+
+-- Users can only see conversations they're part of
+CREATE POLICY "Users can view their conversations" ON "Conversation"
+  FOR SELECT USING (
+    id IN (SELECT "conversationId" FROM "ConversationParticipant" WHERE "userId" = auth.uid())
+  );
+
+-- Similar policies for ConversationParticipant and Message
+```
+
+---
+
+## Summary of Fixes Made
+
+| # | Issue | Status | Files Changed |
+|---|-------|--------|---------------|
+| 1 | nextStepLabel crash | ✅ Fixed | student-view/page.tsx |
+| 2 | contentBlocks array format not handled | ✅ Fixed | student-view/page.tsx |
+| 3 | Admin preview shows journey steps | ✅ Verified working | — |
+| 4 | Database migration | ✅ Run by Victor | STABILIZATION_MIGRATION.sql |
+| 5 | Test accounts created | ✅ Admin/Parent/Student | — |
+| 6 | ParentChild link created | ✅ | — |
+
+## What Still Needs Work
+
+### Critical (blocks launch):
+1. **Quick Check interactivity** — Questions must be interactive cards, not paragraphs
+2. **Student view testing** — Need to verify student sees correct content
+3. **Parent-child messaging E2E** — Need to test full flow
+4. **Video/media handling** — Need to test YouTube URL → embed flow
+
+### Important (should fix before demo):
+5. **Image upload** — No file upload capability exists
+6. **Parent dashboard** — Needs real child data, better cards
+7. **Parent pages testing** — Calendar, Support, Messages
+
+### Security (before real users):
+8. **RLS policies** — Add to messaging tables
+9. **API rate limiting** — Consider for messaging endpoints
 
 ---
 
 ## Production Status
 
-**NOT TOUCHED.** All work is on `product-pass-june2026` only.
+**NOT TOUCHED.** All work is on `product-pass-june2026` only. No production deployment.

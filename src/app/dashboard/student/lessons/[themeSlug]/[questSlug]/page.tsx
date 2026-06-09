@@ -120,8 +120,17 @@ export default function QuestDetailPage({ params }: { params: Promise<{ themeSlu
   );
 }
 
+function getXpValue(xpReward: any): number {
+  if (typeof xpReward === "number") return xpReward;
+  if (typeof xpReward === "string") {
+    try { const parsed = JSON.parse(xpReward); return typeof parsed === "object" ? (parsed?.base ?? 0) : Number(parsed) || 0; } catch { return Number(xpReward) || 0; }
+  }
+  if (typeof xpReward === "object") return xpReward?.base ?? 0;
+  return 0;
+}
+
 function LessonCard({ lesson, index, themeSlug, questSlug }: { lesson: Lesson; index: number; themeSlug: string; questSlug: string }) {
-  const xp = typeof lesson.xpReward === "object" ? (lesson.xpReward as any)?.base : lesson.xpReward;
+  const xp = getXpValue(lesson.xpReward);
 
   return (
     <Link href={`/dashboard/student/lessons/${themeSlug}/${questSlug}/${lesson.slug}`} className="rounded-2xl border border-white/60 bg-white p-4 flex items-center gap-3 hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(0,0,0,0.06)] transition-all duration-200 no-underline group">

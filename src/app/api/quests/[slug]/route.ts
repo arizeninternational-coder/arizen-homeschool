@@ -10,79 +10,63 @@ function respondError(message: string, status = 400) {
 
 export const GET = withAuth(async (req, user, url) => {
   try {
-    const guildId = user.guildId || user.guildSlug;
-    if (!guildId) return respondError("No guild assigned", 400);
 
     const slug = url.searchParams.get("slug");
     if (!slug) return respondError("Slug required", 400);
 
-    // First try: find a PUBLISHED quest
-    const { data: quest, error } = await supabase
+    // Find the quest by slug (any status — students see quests with published lessons)
+    const { data: quest, error: questError } = await supabase
       .from("Quest")
       .select("id, title, slug, description, questType, orderIndex, coverImage, xpReward")
       .eq("slug", slug)
-      .eq("status", "PUBLISHED")
-      .single();
+      .maybeSingle();
 
-    if (error || !quest) {
-      // Second try: find any quest with this slug that has PUBLISHED lessons
-      // This is a controlled fallback for the golden lesson path
-      const { data: lessonCheck } = await supabase
-        .from("Lesson")
-        .select("questId, quest:Quest(id, title, slug, description, questType, orderIndex, coverImage, xpReward)")
-        .eq("status", "PUBLISHED")
-        .limit(1);
-
-      if (lessonCheck && lessonCheck.length > 0 && lessonCheck[0].quest) {
-        const fallbackQuest = lessonCheck[0].quest as any;
-        // Only use fallback if the quest slug matches
-        if (fallbackQuest.slug === slug) {
-          questFallback(fallbackQuest);
-        } else {
-          return respondError("Quest not found", 404);
-        }
-      } else {
-        return respondError("Quest not found", 404);
-      }
+    if (questError) {
+      console.error("[QUEST_API] DB error:", questError.message);
+      return respondError("Database error: " + questError.message, 500);
     }
 
-    function questFallback(q: any) {
-      // Attach to response below
-      (questFallback as any)._quest = q;
+    if (!quest) {
+      return respondError("Quest not found", 404);
     }
 
-    const activeQuest = quest || (questFallback as any)._quest;
+    const activeQuest = quest;
 
     // Get lessons
-    const { data: lessons } = await supabase
-      .from("Lesson")
-      .select("id, title, slug, description, orderIndex, xpReward")
-      .eq("questId", activeQuest.id)
-      .eq("status", "PUBLISHED")
-      .orderBy("orderIndex");
+    let lessons: any[] = [];
+    try {
+      const q = supabase
+        .from("Lesson")
+        .select("id, title, slug, description, orderIndex, xpReward")
+        .eq("questId", activeQuest.id)
+        .eq("status", "PUBLISHED");
+      const { data: lessonData, error: lessonError } = await q;
+      if (lessonError) {
+        console.error("[QUEST_API] Lessons error:", lessonError.message);
+      } else if (lessonData) {
+        lessons = [...lessonData].sort((a: any, b: any) => (a.orderIndex || 0) - (b.orderIndex || 0));
+      }
+    } catch (e: any) {
+      console.error("[QUEST_API] Lessons catch:", e.message);
+    }
 
     // Get progress
     const learnerProfileId = user.learnerProfileId;
     let progressMap: Record<string, { mastery: number; completedAt: string | null }> = {};
-    if (learnerProfileId) {
-      const allIds = [activeQuest.id, ...(lessons || []).map((l: any) => l.id)];
-      const { data: progressRecords } = await supabase
-        .from("Progress")
-        .select("questId, lessonId, masteryPercent, completedAt")
-        .eq("learnerId", learnerProfileId)
-        .in("questId", allIds);
-      const { data: lessonProgress } = await supabase
-        .from("Progress")
-        .select("lessonId, masteryPercent, completedAt")
-        .eq("learnerId", learnerProfileId)
-        .in("lessonId", (lessons || []).map((l: any) => l.id));
+    if (learnerProfileId && lessons.length > 0) {
+      try {
+        const lessonIds = lessons.map((l: any) => l.id);
+        const { data: progressRecords } = await supabase
+          .from("Progress")
+          .select("lessonId, masteryPercent, completedAt")
+          .eq("learnerId", learnerProfileId)
+          .in("lessonId", lessonIds);
 
-      for (const r of progressRecords || []) {
-        const key = r.questId || r.lessonId;
-        if (key) progressMap[key] = { mastery: r.masteryPercent, completedAt: r.completedAt };
-      }
-      for (const r of lessonProgress || []) {
-        if (r.lessonId) progressMap[r.lessonId] = { mastery: r.masteryPercent, completedAt: r.completedAt };
+        for (const r of progressRecords || []) {
+          if (r.lessonId) progressMap[r.lessonId] = { mastery: r.masteryPercent, completedAt: r.completedAt };
+        }
+      } catch (e: any) {
+        console.error("[QUEST_API] Progress error:", e.message);
       }
     }
 
@@ -100,6 +84,6 @@ export const GET = withAuth(async (req, user, url) => {
     });
   } catch (err: any) {
     console.error("GET quest error:", err);
-    return respondError("Failed to fetch quest", 500);
+    return respondError("Failed to fetch quest: " + (err?.message || String(err)), 500);
   }
 });

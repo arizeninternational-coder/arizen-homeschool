@@ -2,7 +2,7 @@
 
 export const dynamic = "force-dynamic";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, Component, ReactNode } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import {
@@ -13,13 +13,9 @@ import {
 } from "lucide-react";
 import { GradientButton } from "@/components/ui/Pill";
 import OwlTeacher from "@/components/ui/OwlTeacher";
-import confetti from "canvas-confetti";
-import {
-  type JourneyStep,
-  type JourneyStepType,
-  STEP_TYPE_ICONS,
-  buildUniversalJourney,
-} from "@/lib/curriculum/lesson-journey";
+// confetti is dynamically imported in fireConfetti to avoid SSR issues
+import type { JourneyStep, JourneyStepType } from "@/lib/curriculum/lesson-journey";
+import { STEP_TYPE_ICONS, buildUniversalJourney } from "@/lib/curriculum/lesson-journey";
 
 /* ─── helpers ─── */
 
@@ -185,7 +181,8 @@ function IllustrationArea({ step, stepType }: { step: JourneyStep; stepType: Jou
 function VideoArea({ step }: { step: JourneyStep }) {
   const videoData = step.media?.video || step.video;
   const hasApproved = videoData?.approvedUrl && videoData?.approvedByAdmin === true;
-  const hasSearchKeywords = videoData?.searchKeywords && videoData.searchKeywords.trim().length > 0;
+  const searchKeywordsStr = Array.isArray(videoData?.searchKeywords) ? videoData.searchKeywords.join(', ') : (videoData?.searchKeywords || '');
+  const hasSearchKeywords = searchKeywordsStr.trim().length > 0;
   const hasSuggestedUrl = videoData?.suggestedUrl;
 
   if (hasApproved) {
@@ -244,7 +241,7 @@ function VideoArea({ step }: { step: JourneyStep }) {
         <Play className="w-5 h-5 text-slate-400 flex-shrink-0" />
         <div>
           <p className="text-xs font-bold text-slate-500">Video coming soon</p>
-          <p className="text-[10px] text-slate-400 mt-0.5">Search: {videoData.searchKeywords}</p>
+          <p className="text-[10px] text-slate-400 mt-0.5">Search: {searchKeywordsStr}</p>
         </div>
       </div>
     );
@@ -526,6 +523,36 @@ function SupportPanel({ lesson, journeySteps, currentStep, xp, subject, grade, o
   );
 }
 
+/* ─── Error Boundary ─── */
+
+interface ErrorBoundaryState { error: Error | null; errorInfo: string; }
+interface ErrorBoundaryProps { children: ReactNode; fallback?: ReactNode; }
+
+class JourneyErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { error: null, errorInfo: "" };
+  }
+  static getDerivedStateFromError(error: Error) {
+    return { error, errorInfo: error.stack || error.message };
+  }
+  render() {
+    if (this.state.error) {
+      return this.props.fallback || (
+        <div className="p-8 text-center">
+          <p className="text-lg font-bold text-red-600 mb-2">Something went wrong displaying this lesson step.</p>
+          <details className="text-left bg-red-50 p-4 rounded-lg text-xs font-mono text-red-800 max-w-xl mx-auto mt-4">
+            <summary className="cursor-pointer font-bold mb-2">Show error details</summary>
+            <pre className="whitespace-pre-wrap break-all">{this.state.error.message}\n\n{this.state.errorInfo}</pre>
+          </details>
+          <button onClick={() => this.setState({ error: null, errorInfo: "" })} className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-bold">Try Again</button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 /* ─── main page component ─── */
 
 export default function LessonPlayerPage({ params }: { params: Promise<{ themeSlug: string; questSlug: string; lessonSlug: string }> }) {
@@ -601,11 +628,14 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
     });
   }, [params]);
 
-  const fireConfetti = useCallback(() => {
-    confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 }, colors: ["#2DD4BF", "#F59E0B", "#3B82F6", "#EC4899", "#10B981"] });
-    setTimeout(() => confetti({ particleCount: 40, angle: 60, spread: 55, origin: { x: 0, y: 0.6 }, colors: ["#2DD4BF", "#F59E0B", "#3B82F6"] }), 150);
-    setTimeout(() => confetti({ particleCount: 40, angle: 120, spread: 55, origin: { x: 1, y: 0.6 }, colors: ["#EC4899", "#10B981", "#F59E0B"] }), 300);
-    setTimeout(() => confetti({ particleCount: 30, spread: 100, origin: { y: 0.5 }, shapes: ["star"], colors: ["#FFD700", "#FFA500"], scalar: 1.5 }), 500);
+  const fireConfetti = useCallback(async () => {
+    try {
+      const confetti = (await import("canvas-confetti")).default;
+      confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 }, colors: ["#2DD4BF", "#F59E0B", "#3B82F6", "#EC4899", "#10B981"] });
+      setTimeout(() => confetti({ particleCount: 40, angle: 60, spread: 55, origin: { x: 0, y: 0.6 }, colors: ["#2DD4BF", "#F59E0B", "#3B82F6"] }), 150);
+      setTimeout(() => confetti({ particleCount: 40, angle: 120, spread: 55, origin: { x: 1, y: 0.6 }, colors: ["#EC4899", "#10B981", "#F59E0B"] }), 300);
+      setTimeout(() => confetti({ particleCount: 30, spread: 100, origin: { y: 0.5 }, shapes: ["star"], colors: ["#FFD700", "#FFA500"], scalar: 1.5 }), 500);
+    } catch { /* non-blocking */ }
   }, []);
 
   const handleComplete = useCallback(async () => {
@@ -678,8 +708,17 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
 
   /* ─── Journey Slide View ─── */
   if (viewing) {
+    // Debug: log journey data to console
+    console.log("[LessonPlayer] viewing=true, journeySteps:", journeySteps.length, "source:", journeySource, "isJourney:", isJourney);
+    if (journeySteps.length > 0) {
+      console.log("[LessonPlayer] step types:", journeySteps.map(s => s.stepType));
+      console.log("[LessonPlayer] first step:", JSON.stringify(journeySteps[0], null, 2));
+    }
+
     const stepLabel = currentJourneyStep ? (STEP_LABELS[currentJourneyStep.stepType] || "Next") : "Next";
-    const theme = currentJourneyStep ? STEP_THEME[currentJourneyStep.stepType] : STEP_THEME.welcome;
+    const theme = (currentJourneyStep ? STEP_THEME[currentJourneyStep.stepType] : STEP_THEME.welcome) || STEP_THEME.welcome;
+
+    console.log("[LessonPlayer] about to render journey view, currentJourneyStep:", currentJourneyStep?.stepType, "theme:", theme?.accent);
 
     return (
       <div className="fixed inset-0 z-50 bg-slate-50 flex flex-col overflow-hidden">
@@ -792,10 +831,12 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
 
               {/* Current step slide */}
               {isJourney && currentJourneyStep ? (
+                <JourneyErrorBoundary>
                 <div className={`rounded-2xl border-2 ${theme.border} bg-white p-6 lg:p-8 shadow-lg`}>
                   <SlideStepView step={currentJourneyStep} stepNumber={clampedStep + 1} totalSteps={totalSteps}
                     interaction={interaction} setInteraction={setInteraction} lesson={lesson} onSaveReflection={handleSaveReflection} />
                 </div>
+                </JourneyErrorBoundary>
               ) : journeySteps.length > 0 ? (
                 <div className="flex flex-col gap-4">
                   {journeySteps.map((s, i) => (
