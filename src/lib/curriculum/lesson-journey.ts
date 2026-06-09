@@ -77,6 +77,7 @@ export type InteractionType =
   | "none"
   | "open_response"
   | "multiple_choice"
+  | "choice" // DB alias for multiple_choice
   | "self_check"
   | "draw_or_use_objects"
   | "parent_assisted"
@@ -146,6 +147,7 @@ export const EMPTY_VIDEO: JourneyVideo = {
 export interface JourneyInteraction {
   type: InteractionType;
   question?: string;
+  prompt?: string; // DB field name used by AI generator
   options?: string[];
   correctAnswer?: string | number;
   hint?: string;

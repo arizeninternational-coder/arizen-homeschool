@@ -14,7 +14,7 @@ import {
 import { GradientButton } from "@/components/ui/Pill";
 import OwlTeacher from "@/components/ui/OwlTeacher";
 // confetti is dynamically imported in fireConfetti to avoid SSR issues
-import type { JourneyStep, JourneyStepType } from "@/lib/curriculum/lesson-journey";
+import type { JourneyStep, JourneyStepType, JourneyInteraction } from "@/lib/curriculum/lesson-journey";
 import { STEP_TYPE_ICONS, buildUniversalJourney } from "@/lib/curriculum/lesson-journey";
 
 /* ─── helpers ─── */
@@ -250,6 +250,87 @@ function VideoArea({ step }: { step: JourneyStep }) {
   return null;
 }
 
+/* ─── Fallback Quick Check Interaction Builder ─── */
+
+function buildFallbackQuickCheckInteraction(step: JourneyStep): JourneyInteraction | null {
+  // If step already has a valid interaction with a recognized type, return null (use as-is)
+  if (step.interaction && step.interaction.type && step.interaction.type !== "none") {
+    return null; // signal: use existing interaction
+  }
+
+  const text = step.studentText || "";
+  const title = step.title || "";
+  const combined = `${title} ${text}`;
+
+  // Detect numbered questions (1. 2. 3. or 1) 2) 3))
+  const numberedQ = combined.match(/(?:\d+[.)]\s*[^\n]+)/g);
+
+  // Detect option lists: patterns like "greater than, less than, or equal to"
+  // or lines starting with -, *, a), b), A), B)
+  const optionPatterns = combined.match(/(?:^|\n)\s*(?:[-*]|[a-dA-D][.)])\s*[^\n]+/g);
+
+  // Detect blanks (___)
+  const hasBlanks = /_{3,}/.test(combined);
+
+  // Detect yes/no or self-check patterns
+  const isYesNo = /\b(yes|no|true|false|agree|disagree)\b/i.test(combined) &&
+    (/\?/.test(combined) || /check|decide|choose/i.test(combined));
+
+  // Detect simple math questions (contains = ? or "what is")
+  const isMath = /\bwhat\s+is\b.*[=?]|[0-9]\s*[+−×÷]\s*[0-9].*\?/.test(combined);
+
+  // If we found option patterns, build multiple_choice
+  if (optionPatterns && optionPatterns.length >= 2) {
+    const options = optionPatterns.map(o => o.replace(/^\s*(?:[-*]|[a-dA-D][.)])\s*/, "").trim()).filter(Boolean);
+    if (options.length >= 2) {
+      return {
+        type: "multiple_choice",
+        question: step.interaction?.question || step.interaction?.prompt || title || "Quick Check",
+        options,
+        correctAnswer: undefined, // no answer key — will use self-check style
+        hint: "Think carefully about each option before choosing!",
+      };
+    }
+  }
+
+  // If we found numbered questions, build multiple_choice from them
+  if (numberedQ && numberedQ.length >= 2) {
+    const options = numberedQ.map(q => q.replace(/^\d+[.)]\s*/, "").trim()).filter(Boolean);
+    if (options.length >= 2) {
+      return {
+        type: "multiple_choice",
+        question: step.interaction?.question || step.interaction?.prompt || title || "Quick Check",
+        options,
+        correctAnswer: undefined,
+        hint: "Read each option carefully and pick the one you think is right!",
+      };
+    }
+  }
+
+  // If it's a yes/no or self-check pattern
+  if (isYesNo || hasBlanks || isMath) {
+    return {
+      type: "self_check",
+      question: step.interaction?.question || step.interaction?.prompt || title || "Quick Check",
+      hint: "Take your time and think through your answer!",
+    };
+  }
+
+  // Default: self-check with the student text as the prompt
+  return {
+    type: "self_check",
+    question: step.interaction?.question || step.interaction?.prompt || "Can you answer this question?",
+    hint: "Try your best — there's no wrong effort here!",
+  };
+}
+
+/* ─── Normalize interaction type from DB ─── */
+function normalizeInteractionType(type: string | undefined): string {
+  if (!type || type === "none") return "none";
+  if (type === "choice") return "multiple_choice"; // DB uses "choice", code expects "multiple_choice"
+  return type;
+}
+
 /* ─── Slide Step View ─── */
 
 function SlideStepView({ step, stepNumber, totalSteps, interaction, setInteraction, lesson, onSaveReflection }: {
@@ -261,6 +342,24 @@ function SlideStepView({ step, stepNumber, totalSteps, interaction, setInteracti
   const theme = STEP_THEME[step.stepType] || STEP_THEME.welcome;
   const paragraphs = splitIntoParagraphs(step.studentText);
   const isComplete = step.stepType === "complete";
+
+  // Effective interaction: for quick_check steps, normalize type and apply fallback if missing
+  const _rawQcInteraction = step.stepType === "quick_check" ? (step.interaction || null) : null;
+  const _existingQcInteraction = _rawQcInteraction && _rawQcInteraction.type && _rawQcInteraction.type !== "none" ? _rawQcInteraction : null;
+  const _fallbackQcInteraction = !_existingQcInteraction && step.stepType === "quick_check" ? buildFallbackQuickCheckInteraction(step) : null;
+  const effectiveQcInteraction = _existingQcInteraction || _fallbackQcInteraction; // JourneyInteraction | null
+  const normalizedQcType = normalizeInteractionType(effectiveQcInteraction?.type);
+  // Use effective interaction for quick_check, otherwise use step.interaction as-is
+  const effectiveInteraction = step.stepType === "quick_check" ? effectiveQcInteraction : (step.interaction || null);
+  const normalizedType = step.stepType === "quick_check" ? normalizedQcType : normalizeInteractionType(step.interaction?.type);
+  // Question text: support both `question` and `prompt` field names (DB uses `prompt`)
+  const effectiveQuestion = effectiveInteraction?.question || effectiveInteraction?.prompt || null;
+
+  // Safe Owl text for Quick Check: encourage without revealing answers
+  // For quick_check steps, replace owlText with a safe encouraging version
+  const safeOwlText = step.stepType === "quick_check"
+    ? "Let's see what you remember! Take your time and think carefully. There's no rush — you've got this!"
+    : step.owlText;
 
   // Determine if student text adds value beyond the owl message
   // For welcome/mission steps, the owl text IS the main content — skip redundant body
@@ -281,14 +380,14 @@ function SlideStepView({ step, stepNumber, totalSteps, interaction, setInteracti
       </div>
 
       {/* For owl-primary steps (welcome, mission, complete), show owl as the main content */}
-      {isOwlPrimaryStep && step.owlText ? (
+      {isOwlPrimaryStep && safeOwlText ? (
         <div className="flex items-start gap-3 px-5 py-4 rounded-2xl bg-gradient-to-br from-sky-50/90 via-indigo-50/60 to-purple-50/40 border border-sky-200/50 shadow-sm">
           <div className="flex-shrink-0 mt-0.5">
             <OwlTeacher size={48} expression={OWL_EXPRESSIONS[step.stepType] || 'happy'} />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-[10px] font-extrabold uppercase tracking-[0.12em] text-sky-600/70 mb-1">Owl Teacher says:</p>
-            <p className="text-slate-700 text-base lg:text-lg leading-relaxed font-medium">{step.owlText}</p>
+            <p className="text-slate-700 text-base lg:text-lg leading-relaxed font-medium">{safeOwlText}</p>
           </div>
         </div>
       ) : (
@@ -364,25 +463,26 @@ function SlideStepView({ step, stepNumber, totalSteps, interaction, setInteracti
       )}
 
       {/* ── Quick Check (multiple choice) ── */}
-      {step.stepType === "quick_check" && step.interaction?.type === "multiple_choice" && step.interaction.question && (
+      {step.stepType === "quick_check" && normalizedType === "multiple_choice" && effectiveQuestion && (
         <div className="mt-4 px-5 py-4 rounded-xl bg-lime-50/80 border border-lime-200/60">
           <p className="text-base font-bold text-lime-900 mb-0.5 flex items-center gap-2"><HelpCircle className="w-4 h-4" /> Quick Check</p>
-          <p className="text-lg font-bold text-lime-800 mb-3">{step.interaction.question}</p>
-          {step.interaction.options && step.interaction.options.length > 0 && (
+          <p className="text-lg font-bold text-lime-800 mb-3">{effectiveQuestion}</p>
+          {effectiveInteraction?.options && effectiveInteraction.options.length > 0 && (
             <div className="flex flex-col gap-2">
-              {step.interaction.options.map((opt: string, i: number) => {
+              {effectiveInteraction.options.map((opt: string, i: number) => {
                 const isSelected = interaction.selectedChoice === i;
-                const isCorrect = i === step.interaction?.correctAnswer;
+                const hasCorrectAnswer = effectiveInteraction?.correctAnswer !== undefined && effectiveInteraction?.correctAnswer !== null;
+                const isCorrect = hasCorrectAnswer ? i === effectiveInteraction?.correctAnswer : true; // if no answer key, treat all as valid
                 const showFeedback = interaction.choiceFeedback !== null;
                 let btnClass = "bg-white border-lime-200 text-lime-800 hover:bg-lime-50 hover:shadow-md";
                 if (isSelected && !showFeedback) btnClass = "bg-lime-600 text-white border-lime-600 shadow-lg shadow-lime-200";
                 if (showFeedback && isSelected && isCorrect) btnClass = "bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-200";
                 if (showFeedback && isSelected && !isCorrect) btnClass = "bg-orange-500 text-white border-orange-500 shadow-lg shadow-orange-200";
-                if (showFeedback && !isSelected && isCorrect) btnClass = "bg-emerald-100 border-emerald-400 text-emerald-800";
+                if (showFeedback && !isSelected && isCorrect && hasCorrectAnswer) btnClass = "bg-emerald-100 border-emerald-400 text-emerald-800";
                 return (
                   <button key={i} onClick={() => {
                     if (interaction.choiceFeedback !== null) return;
-                    const correct = i === step.interaction?.correctAnswer;
+                    const correct = hasCorrectAnswer ? i === effectiveInteraction?.correctAnswer : true;
                     setInteraction((p: any) => ({ ...p, selectedChoice: i, choiceFeedback: correct ? "correct" : "incorrect" }));
                   }} disabled={interaction.choiceFeedback !== null}
                     className={`text-left px-4 py-3 rounded-xl text-sm font-semibold transition-all border-2 ${btnClass} disabled:cursor-default`}>
@@ -394,32 +494,45 @@ function SlideStepView({ step, stepNumber, totalSteps, interaction, setInteracti
           )}
           {interaction.choiceFeedback === "correct" && (
             <div className="mt-3 px-4 py-2.5 rounded-xl bg-emerald-100 border border-emerald-300">
-              <p className="text-sm font-bold text-emerald-800">✅ Correct! Well done! {step.interaction.hint || ""}</p>
+              <p className="text-sm font-bold text-emerald-800">
+                ✅ {effectiveInteraction?.hint || "Great job thinking through this!"}
+              </p>
             </div>
           )}
           {interaction.choiceFeedback === "incorrect" && (
             <div className="mt-3 px-4 py-2.5 rounded-xl bg-orange-100 border border-orange-300">
-              <p className="text-sm font-bold text-orange-800">Not quite. {step.interaction.hint || "Think about it again!"} Try a different answer.</p>
+              <p className="text-sm font-bold text-orange-800">Not quite. {effectiveInteraction?.hint || "Think about it again!"} Try a different answer.</p>
             </div>
           )}
         </div>
       )}
 
-      {/* ── Self check ── */}
-      {step.stepType === "quick_check" && step.interaction?.type === "self_check" && step.interaction.question && (
+      {/* ── Self check (also used as fallback when no correctAnswer in multiple_choice) ── */}
+      {step.stepType === "quick_check" && (normalizedType === "self_check" || (normalizedType === "multiple_choice" && effectiveInteraction?.correctAnswer == null && interaction.selectedChoice !== undefined && !interaction.choiceFeedback)) && effectiveQuestion && (
         <div className="mt-4 px-5 py-4 rounded-xl bg-lime-50/80 border border-lime-200/60">
-          <p className="text-base font-bold text-lime-900 mb-0.5">✅ Check yourself:</p>
-          <p className="text-lg font-bold text-lime-800 mb-3">{step.interaction.question}</p>
+          <p className="text-base font-bold text-lime-900 mb-0.5 flex items-center gap-2"><HelpCircle className="w-4 h-4" /> Quick Check</p>
+          <p className="text-lg font-bold text-lime-800 mb-3">{effectiveQuestion}</p>
+          <p className="text-sm text-lime-700 mb-3 italic">Take a moment to think about your answer. There's no rush — trust your learning!</p>
           <div className="flex gap-2">
             <button onClick={() => setInteraction((p: any) => ({ ...p, selfChecked: true }))}
               className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all border-2 ${interaction.selfChecked === true ? "bg-emerald-600 text-white border-emerald-600 shadow-lg" : "bg-white border-lime-200 text-lime-700 hover:bg-lime-50"}`}>
-              ✓ Yes, I got it!
+              ✓ Yes, I worked it out!
             </button>
             <button onClick={() => setInteraction((p: any) => ({ ...p, selfChecked: false }))}
               className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all border-2 ${interaction.selfChecked === false ? "bg-orange-500 text-white border-orange-500 shadow-lg" : "bg-white border-orange-200 text-orange-600 hover:bg-orange-50"}`}>
-              ↺ I need more practice
+              ↺ I want to review again
             </button>
           </div>
+          {interaction.selfChecked === true && (
+            <div className="mt-3 px-4 py-2.5 rounded-xl bg-emerald-100 border border-emerald-300">
+              <p className="text-sm font-bold text-emerald-800">🌟 Wonderful! Keep up the great thinking!</p>
+            </div>
+          )}
+          {interaction.selfChecked === false && (
+            <div className="mt-3 px-4 py-2.5 rounded-xl bg-amber-100 border border-amber-300">
+              <p className="text-sm font-bold text-amber-800">👍 That's okay! Reviewing helps us learn even more.</p>
+            </div>
+          )}
         </div>
       )}
 
