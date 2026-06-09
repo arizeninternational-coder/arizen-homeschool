@@ -77,6 +77,7 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
 
   // Video state
   const [videoStates, setVideoStates] = useState<Record<number, { loading: boolean; error: string | null; url: string; title: string }>>({});
+  const [illustrationStates, setIllustrationStates] = useState<Record<number, { loading: boolean; error: string | null }>>({});
 
   // Extract journey info from lesson data
   useEffect(() => {
@@ -1006,7 +1007,6 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
 
         {/* ── Illustrations Section ── */}
         {(() => {
-          const [illustrationStates, setIllustrationStates] = useState<Record<number, { loading: boolean; error: string | null }>>({});
           const journeyForIllustrations = (() => {
             try {
               const cb = typeof lesson?.contentBlocks === "string" ? JSON.parse(lesson.contentBlocks) : lesson?.contentBlocks;
