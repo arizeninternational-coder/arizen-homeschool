@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthUser } from "@/lib/api-guard";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 export const dynamic = "force-dynamic";
 
 // POST /api/messages/conversations/[id]/send
-export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+// Permission: sender must be a participant; role-based relationship enforced
+export async function POST(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const user = await getAuthUser(req);
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -12,6 +16,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const { id: conversationId } = await params;
     const senderId = user.id;
     const senderRole = user.role;
+    const db = getSupabaseAdmin();
     const body = await req.json();
     const messageBody = body?.body;
 
@@ -19,21 +24,19 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       return NextResponse.json({ error: "Message body required" }, { status: 400 });
     }
 
-    // Set RLS session variable so policies can identify the current user
-    await supabase.rpc('set_app_user_id', { uid: senderId });
-
-    // Verify user is a participant
-    const { data: participant } = await supabase
+    // Verify sender is a participant
+    const { data: participant } = await db
       .from("ConversationParticipant")
       .select("id")
       .eq("conversationId", conversationId)
       .eq("userId", senderId)
       .single();
 
-    if (!participant) return NextResponse.json({ error: "Not a participant" }, { status: 403 });
+    if (!participant)
+      return NextResponse.json({ error: "Not a participant" }, { status: 403 });
 
-    // Get other participants' roles for validation
-    const { data: otherParts } = await supabase
+    // Get other participants and validate role-based relationship
+    const { data: otherParts } = await db
       .from("ConversationParticipant")
       .select("userId")
       .eq("conversationId", conversationId)
@@ -42,25 +45,40 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const otherIds = (otherParts || []).map((p: any) => p.userId);
 
     if (otherIds.length > 0) {
-      const { data: otherUsers } = await supabase
+      const { data: otherUsers } = await db
         .from("User")
-        .select("role")
+        .select("id, role")
         .in("id", otherIds);
 
       const otherRoles = (otherUsers || []).map((u: any) => u.role);
 
       for (const targetRole of otherRoles) {
         if (senderRole === "LEARNER" && targetRole !== "PARENT") {
-          return NextResponse.json({ error: "Learners can only message parents" }, { status: 403 });
+          return NextResponse.json(
+            { error: "Students can only message their parent or guardian" },
+            { status: 403 }
+          );
         }
-        if ((senderRole === "ADMIN" || senderRole === "TEACHER") && targetRole !== "PARENT") {
-          return NextResponse.json({ error: "Teachers can only message parents" }, { status: 403 });
+        if (
+          (senderRole === "ADMIN" || senderRole === "TEACHER") &&
+          targetRole !== "PARENT"
+        ) {
+          return NextResponse.json(
+            { error: "Staff can only message parents" },
+            { status: 403 }
+          );
+        }
+        if (senderRole === "PARENT" && targetRole !== "LEARNER") {
+          return NextResponse.json(
+            { error: "Parents can only message their children" },
+            { status: 403 }
+          );
         }
       }
     }
 
     // Create message
-    const { data: message, error } = await supabase
+    const { data: message, error } = await db
       .from("Message")
       .insert({
         conversationId,
@@ -74,7 +92,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     if (error) throw error;
 
     // Update conversation updatedAt
-    await supabase
+    await db
       .from("Conversation")
       .update({ updatedAt: new Date().toISOString() })
       .eq("id", conversationId);

@@ -1,18 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "@/lib/api-guard";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 export const dynamic = "force-dynamic";
 
-// GET /api/messages/conversations - list all conversations for current user
+// GET /api/messages/conversations — list all conversations for current user
 export const GET = withAuth(async (req: NextRequest, user: any) => {
   try {
     const userId = user.id;
+    const db = getSupabaseAdmin();
 
-    // Set RLS session variable so policies can identify the current user
-    await supabase.rpc('set_app_user_id', { uid: userId });
-
-    // Get conversation IDs for this user
-    const { data: participantRows } = await supabase
+    // Get conversation IDs where user is a participant
+    const { data: participantRows } = await db
       .from("ConversationParticipant")
       .select("conversationId")
       .eq("userId", userId);
@@ -24,7 +22,7 @@ export const GET = withAuth(async (req: NextRequest, user: any) => {
     const convIds = participantRows.map((r: any) => r.conversationId);
 
     // Get conversations
-    const { data: convs } = await supabase
+    const { data: convs } = await db
       .from("Conversation")
       .select("*")
       .in("id", convIds)
@@ -34,21 +32,31 @@ export const GET = withAuth(async (req: NextRequest, user: any) => {
       return NextResponse.json({ conversations: [] });
     }
 
-    // Get all participants for these conversations (separate query to avoid FK ambiguity)
-    const { data: allParticipants } = await supabase
+    // Get all participants for these conversations
+    const { data: allParticipants } = await db
       .from("ConversationParticipant")
       .select("conversationId, userId")
       .in("conversationId", convIds);
+
     // Batch-fetch user records for all participant user IDs
-    const participantUserIds = Array.from(new Set((allParticipants || []).map((p: any) => p.userId)));
-    const { data: participantUsers } = participantUserIds.length > 0
-      ? await supabase.from("User").select("id, name, role").in("id", participantUserIds)
-      : { data: [] };
+    const participantUserIds = Array.from(
+      new Set((allParticipants || []).map((p: any) => p.userId))
+    );
+    const { data: participantUsers } =
+      participantUserIds.length > 0
+        ? await db
+            .from("User")
+            .select("id, name, role")
+            .in("id", participantUserIds)
+        : { data: [] };
+
     const userMap: Record<string, any> = {};
-    (participantUsers || []).forEach((u: any) => { userMap[u.id] = u; });
+    (participantUsers || []).forEach((u: any) => {
+      userMap[u.id] = u;
+    });
 
     // Get last message for each conversation
-    const { data: allMessages } = await supabase
+    const { data: allMessages } = await db
       .from("Message")
       .select("id, conversationId, senderId, body, createdAt, readAt")
       .in("conversationId", convIds)
@@ -60,12 +68,18 @@ export const GET = withAuth(async (req: NextRequest, user: any) => {
         .filter((p: any) => p.conversationId === conv.id)
         .map((p: any) => {
           const u = userMap[p.userId] || {};
-          return { userId: p.userId, name: u.name || "Unknown", role: u.role || null };
+          return {
+            userId: p.userId,
+            name: u.name || "Unknown",
+            role: u.role || null,
+          };
         });
 
-      const convMessages = (allMessages || [])
-        .filter((m: any) => m.conversationId === conv.id);
-      const lastMessage = convMessages.length > 0 ? convMessages[convMessages.length - 1] : null;
+      const convMessages = (allMessages || []).filter(
+        (m: any) => m.conversationId === conv.id
+      );
+      const lastMessage =
+        convMessages.length > 0 ? convMessages[convMessages.length - 1] : null;
 
       return {
         id: conv.id,
@@ -79,8 +93,12 @@ export const GET = withAuth(async (req: NextRequest, user: any) => {
 
     // Sort by last message time
     conversations.sort((a: any, b: any) => {
-      const aTime = a.lastMessage ? new Date(a.lastMessage.createdAt).getTime() : 0;
-      const bTime = b.lastMessage ? new Date(b.lastMessage.createdAt).getTime() : 0;
+      const aTime = a.lastMessage
+        ? new Date(a.lastMessage.createdAt).getTime()
+        : 0;
+      const bTime = b.lastMessage
+        ? new Date(b.lastMessage.createdAt).getTime()
+        : 0;
       return bTime - aTime;
     });
 
@@ -91,52 +109,112 @@ export const GET = withAuth(async (req: NextRequest, user: any) => {
   }
 });
 
-// POST /api/messages/conversations - create a new conversation
+// POST /api/messages/conversations — create a new conversation
 // Body: { participantIds: string[], title?: string }
+// Permission: Parent can only message linked child. Child can only message linked parent.
 export async function POST(req: NextRequest) {
   try {
-    const user = await (await import("@/lib/api-guard")).getAuthUser(req);
+    const user = await (
+      await import("@/lib/api-guard")
+    ).getAuthUser(req);
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const userId = user.id;
+    const userRole = user.role;
+    const db = getSupabaseAdmin();
     const body = await req.json();
     const { participantIds, title } = body || {};
 
-    if (!participantIds || !Array.isArray(participantIds) || participantIds.length === 0) {
-      return NextResponse.json({ error: "participantIds required" }, { status: 400 });
+    if (
+      !participantIds ||
+      !Array.isArray(participantIds) ||
+      participantIds.length === 0
+    ) {
+      return NextResponse.json(
+        { error: "participantIds required" },
+        { status: 400 }
+      );
     }
 
-    // Set RLS session variable so policies can identify the current user
-    await supabase.rpc('set_app_user_id', { uid: userId });
+    const allParticipantIds = [userId, ...participantIds];
 
-    const userRole = user.role;
-    const allParticipants = [userId, ...participantIds];
-
-    // Get roles of all participants
-    const { data: users } = await supabase
+    // Fetch roles of all participants
+    const { data: users } = await db
       .from("User")
       .select("id, role")
-      .in("id", allParticipants);
+      .in("id", allParticipantIds);
 
-    // Validate role-based permissions
     const roleMap: Record<string, string> = {};
-    (users || []).forEach((u: any) => { roleMap[u.id] = u.role; });
+    (users || []).forEach((u: any) => {
+      roleMap[u.id] = u.role;
+    });
 
-    for (const pid of participantIds) {
-      const targetRole = roleMap[pid];
-      if (userRole === "LEARNER" && targetRole !== "PARENT") {
-        return NextResponse.json({ error: "Learners can only message their parents" }, { status: 403 });
+    // --- Permission checks based on role ---
+    if (userRole === "PARENT") {
+      // Parent can only message their linked children
+      for (const pid of participantIds) {
+        const targetRole = roleMap[pid];
+        if (targetRole !== "LEARNER") {
+          return NextResponse.json(
+            { error: "Parents can only message their children" },
+            { status: 403 }
+          );
+        }
+        // Verify the child is actually linked to this parent
+        const { data: link } = await db
+          .from("ParentChild")
+          .select("id")
+          .eq("parentId", userId)
+          .eq("childUserId", pid)
+          .single();
+        if (!link) {
+          return NextResponse.json(
+            { error: "You can only message your own child" },
+            { status: 403 }
+          );
+        }
       }
-      if ((userRole === "ADMIN" || userRole === "TEACHER") && targetRole !== "PARENT") {
-        return NextResponse.json({ error: "Teachers can only message parents" }, { status: 403 });
+    } else if (userRole === "LEARNER") {
+      // Child can only message their linked parent/guardian
+      for (const pid of participantIds) {
+        const targetRole = roleMap[pid];
+        if (targetRole !== "PARENT") {
+          return NextResponse.json(
+            { error: "Students can only message their parent or guardian" },
+            { status: 403 }
+          );
+        }
+        // Verify the parent is actually linked to this child
+        const { data: link } = await db
+          .from("ParentChild")
+          .select("id")
+          .eq("parentId", pid)
+          .eq("childUserId", userId)
+          .single();
+        if (!link) {
+          return NextResponse.json(
+            { error: "You can only message your own parent or guardian" },
+            { status: 403 }
+          );
+        }
+      }
+    } else if (userRole === "ADMIN" || userRole === "TEACHER") {
+      // Admin/Teacher can only message parents
+      for (const pid of participantIds) {
+        if (roleMap[pid] !== "PARENT") {
+          return NextResponse.json(
+            { error: "Staff can only message parents" },
+            { status: 403 }
+          );
+        }
       }
     }
 
-    // Check if a 1-on-1 conversation already exists
-    const { data: existingRows } = await supabase
+    // Check if a 1-on-1 conversation already exists between these exact users
+    const { data: existingRows } = await db
       .from("ConversationParticipant")
       .select("conversationId, userId")
-      .in("userId", allParticipants);
+      .in("userId", allParticipantIds);
 
     if (existingRows && existingRows.length >= 2) {
       const convMap: Record<string, string[]> = {};
@@ -144,39 +222,54 @@ export async function POST(req: NextRequest) {
         if (!convMap[row.conversationId]) convMap[row.conversationId] = [];
         convMap[row.conversationId].push(row.userId);
       }
-      const participantSet = new Set(allParticipants);
+      const participantSet = new Set(allParticipantIds);
       for (const convId of Object.keys(convMap)) {
         const members = convMap[convId];
         if (members.length === participantSet.size) {
           let allMatch = true;
           for (const m of members) {
-            if (!participantSet.has(m)) { allMatch = false; break; }
+            if (!participantSet.has(m)) {
+              allMatch = false;
+              break;
+            }
           }
           if (allMatch) {
-            const { data: existingConv } = await supabase.from("Conversation").select("*").eq("id", convId).single();
-            if (existingConv) return NextResponse.json({ conversation: existingConv, existing: true });
+            const { data: existingConv } = await db
+              .from("Conversation")
+              .select("*")
+              .eq("id", convId)
+              .single();
+            if (existingConv)
+              return NextResponse.json({
+                conversation: existingConv,
+                existing: true,
+              });
           }
         }
       }
     }
 
     // Create new conversation
-    const { data: conv, error: convErr } = await supabase
+    const { data: conv, error: convErr } = await db
       .from("Conversation")
-      .insert({ title: title || null, createdBy: userId, isGroup: participantIds.length > 1 })
+      .insert({
+        title: title || null,
+        createdBy: userId,
+        isGroup: participantIds.length > 1,
+      })
       .select()
       .single();
 
     if (convErr) throw convErr;
 
     // Add all participants
-    const participantRows = allParticipants.map((pid: string) => ({
+    const participantRows = allParticipantIds.map((pid: string) => ({
       conversationId: conv.id,
       userId: pid,
       role: pid === userId ? "admin" : "member",
     }));
 
-    await supabase.from("ConversationParticipant").insert(participantRows);
+    await db.from("ConversationParticipant").insert(participantRows);
 
     return NextResponse.json({ conversation: conv, existing: false });
   } catch (err: any) {

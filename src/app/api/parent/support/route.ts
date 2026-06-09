@@ -1,7 +1,8 @@
 // POST /api/parent/support
 // Parent support request submission
+// Permission: userId must match the logged-in user (from JWT)
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { getAuthUser } from "@/lib/api-guard";
 export const dynamic = "force-dynamic";
 
@@ -16,14 +17,24 @@ export async function POST(req: NextRequest) {
     const { category, subject, message } = body || {};
 
     if (!category || !subject?.trim() || !message?.trim()) {
-      return NextResponse.json({ error: "Category, subject, and message are required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Category, subject, and message are required" },
+        { status: 400 }
+      );
     }
 
-    // Set RLS session variable so policies can identify the current user
-    await supabase.rpc('set_app_user_id', { uid: user.id });
+    // Verify the user is a parent (only parents submit support requests)
+    if (user.role !== "PARENT") {
+      return NextResponse.json(
+        { error: "Only parents can submit support requests" },
+        { status: 403 }
+      );
+    }
 
-    // Check if support_requests table exists by trying to insert
-    const { data, error } = await supabase
+    const db = getSupabaseAdmin();
+
+    // Insert support request — userId comes from JWT, not from client input
+    const { data, error } = await db
       .from("support_requests")
       .insert({
         userId: user.id,
@@ -43,7 +54,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({
           success: true,
           message: "Support request received. We'll get back to you soon.",
-          note: "Stored locally (support_requests table not yet created in database)"
+          note: "Stored locally (support_requests table not yet created in database)",
         });
       }
       throw error;
@@ -52,13 +63,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: "Support request submitted successfully. We'll get back to you soon.",
-      requestId: data?.id,
+      request: data,
     });
   } catch (err: any) {
     console.error("[SUPPORT_POST] Error:", err);
-    return NextResponse.json(
-      { error: err.message || "Failed to submit support request" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
