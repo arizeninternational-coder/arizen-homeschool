@@ -19,6 +19,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       return NextResponse.json({ error: "Message body required" }, { status: 400 });
     }
 
+    // Set RLS session variable so policies can identify the current user
+    await supabase.rpc('set_app_user_id', { uid: senderId });
+
     // Verify user is a participant
     const { data: participant } = await supabase
       .from("ConversationParticipant")

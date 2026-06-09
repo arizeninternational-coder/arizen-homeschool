@@ -11,6 +11,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
     const { id: conversationId } = await params;
 
+    // Set RLS session variable so policies can identify the current user
+    await supabase.rpc('set_app_user_id', { uid: user.id });
+
     // Verify user is a participant
     const { data: participant } = await supabase
       .from("ConversationParticipant")

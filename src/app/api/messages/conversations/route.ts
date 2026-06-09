@@ -8,6 +8,9 @@ export const GET = withAuth(async (req: NextRequest, user: any) => {
   try {
     const userId = user.id;
 
+    // Set RLS session variable so policies can identify the current user
+    await supabase.rpc('set_app_user_id', { uid: userId });
+
     // Get conversation IDs for this user
     const { data: participantRows } = await supabase
       .from("ConversationParticipant")
@@ -102,6 +105,9 @@ export async function POST(req: NextRequest) {
     if (!participantIds || !Array.isArray(participantIds) || participantIds.length === 0) {
       return NextResponse.json({ error: "participantIds required" }, { status: 400 });
     }
+
+    // Set RLS session variable so policies can identify the current user
+    await supabase.rpc('set_app_user_id', { uid: userId });
 
     const userRole = user.role;
     const allParticipants = [userId, ...participantIds];

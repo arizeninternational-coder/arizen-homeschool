@@ -19,6 +19,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Category, subject, and message are required" }, { status: 400 });
     }
 
+    // Set RLS session variable so policies can identify the current user
+    await supabase.rpc('set_app_user_id', { uid: user.id });
+
     // Check if support_requests table exists by trying to insert
     const { data, error } = await supabase
       .from("support_requests")

@@ -1,0 +1,40 @@
+RLS POLICIES — Messaging & Support Tables (FINAL REVISED)
+========================================================
+
+CONTEXT:
+- Arizen uses NextAuth (custom JWT in cookie), NOT Supabase Auth
+- supabase.auth.uid() returns NULL for all Arizen users
+- API routes use Supabase anon key + extract user ID from JWT
+- auth.uid() in RLS policies DOES NOT WORK for this app
+
+STRATEGY:
+1. API calls supabase.rpc('set_app_user_id', { uid: userId }) before queries
+2. This sets app.current_user_id session variable
+3. RLS policies compare table columns to this session variable
+4. is_participant() is SECURITY DEFINER (bypasses RLS, no recursion)
+
+FLOW — Creating a conversation:
+1. API extracts user_id from NextAuth JWT
+2. SET app.current_user_id via rpc('set_app_user_id', { uid: userId })
+3. INSERT INTO Conversation (createdBy = user_id)
+4. INSERT INTO ConversationParticipant (conversationId, userId)
+   → First participant: allowed because createdBy matches
+   → Subsequent: allowed because is_participant() returns true
+5. INSERT INTO Message (senderId = user_id)
+   → Allowed because senderId matches AND is_participant() returns true
+
+CHANGES MADE:
+- docs/RLS_POLICIES_TO_APPLY.sql — Rewritten with working approach
+- src/app/api/messages/conversations/route.ts — Added set_app_user_id call (GET + POST)
+- src/app/api/messages/conversations/[id]/messages/route.ts — Added set_app_user_id call
+- src/app/api/messages/conversations/[id]/send/route.ts — Added set_app_user_id call
+- src/app/api/parent/support/route.ts — Added set_app_user_id call
+
+WHAT TO DO:
+1. Run docs/RLS_POLICIES_TO_APPLY.sql in Supabase SQL Editor
+2. Redeploy to Vercel (Vercel auto-deploys on push)
+3. Test: parent login → Messages → create conversation → send message → verify
+4. Test: parent login → Support → submit form → verify
+
+TABLES AFFECTED: Conversation, ConversationParticipant, Message, support_requests
+NOTHING ELSE IS TOUCHED.
