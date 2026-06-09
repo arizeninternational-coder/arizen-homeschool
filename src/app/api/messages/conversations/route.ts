@@ -31,11 +31,18 @@ export const GET = withAuth(async (req: NextRequest, user: any) => {
       return NextResponse.json({ conversations: [] });
     }
 
-    // Get all participants for these conversations
+    // Get all participants for these conversations (separate query to avoid FK ambiguity)
     const { data: allParticipants } = await supabase
       .from("ConversationParticipant")
-      .select("conversationId, userId, user:User(id, name, role)")
+      .select("conversationId, userId")
       .in("conversationId", convIds);
+    // Batch-fetch user records for all participant user IDs
+    const participantUserIds = Array.from(new Set((allParticipants || []).map((p: any) => p.userId)));
+    const { data: participantUsers } = participantUserIds.length > 0
+      ? await supabase.from("User").select("id, name, role").in("id", participantUserIds)
+      : { data: [] };
+    const userMap: Record<string, any> = {};
+    (participantUsers || []).forEach((u: any) => { userMap[u.id] = u; });
 
     // Get last message for each conversation
     const { data: allMessages } = await supabase
@@ -48,11 +55,10 @@ export const GET = withAuth(async (req: NextRequest, user: any) => {
     const conversations = convs.map((conv: any) => {
       const participants = (allParticipants || [])
         .filter((p: any) => p.conversationId === conv.id)
-        .map((p: any) => ({
-          userId: p.userId,
-          name: p.user?.name || "Unknown",
-          role: p.user?.role,
-        }));
+        .map((p: any) => {
+          const u = userMap[p.userId] || {};
+          return { userId: p.userId, name: u.name || "Unknown", role: u.role || null };
+        });
 
       const convMessages = (allMessages || [])
         .filter((m: any) => m.conversationId === conv.id);

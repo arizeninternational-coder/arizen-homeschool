@@ -116,23 +116,35 @@ function OwlGuideInline({ step }: { step: JourneyStep }) {
   if (!step.owlText) return null;
   const expression = OWL_EXPRESSIONS[step.stepType] || 'happy';
   return (
-    <div className="flex items-start gap-3 px-4 py-3 rounded-2xl bg-gradient-to-br from-sky-50/90 via-indigo-50/60 to-purple-50/40 border border-sky-200/50 shadow-sm">
+    <div className="flex items-start gap-2.5 px-3 py-2 rounded-xl bg-gradient-to-br from-sky-50/80 via-indigo-50/50 to-purple-50/30 border border-sky-200/40">
       <div className="flex-shrink-0 mt-0.5">
-        <OwlTeacher size={44} expression={expression} />
+        <OwlTeacher size={36} expression={expression} />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-[10px] font-extrabold uppercase tracking-[0.12em] text-sky-600/70 mb-0.5">Owl Teacher says:</p>
-        <p className="text-slate-700 text-sm leading-relaxed font-medium">{step.owlText}</p>
+        <p className="text-[9px] font-extrabold uppercase tracking-[0.1em] text-sky-600/60 mb-0.5">Owl says:</p>
+        <p className="text-slate-700 text-sm leading-snug font-medium">{step.owlText}</p>
       </div>
     </div>
   );
 }
 
 function IllustrationArea({ step, stepType }: { step: JourneyStep; stepType: JourneyStepType }) {
-  const approvedUrl = step.media?.illustration?.approvedUrl;
+  const illustration = step.media?.illustration;
+  const approvedUrl = illustration?.approvedUrl || step.media?.illustration?.approvedUrl;
+  const generatedUrl = illustration?.generatedUrl;
+  const uploadedUrl = illustration?.uploadedUrl;
+  // Check if this step also has video content
+  const videoData = step.media?.video || step.video;
+  const hasVideo = videoData?.approvedUrl || videoData?.suggestedUrl || videoData?.searchKeywords;
+
+  // If video exists and there's no approved image, hide illustration entirely
+  // Video takes priority; avoids competing media blocks
+  if (hasVideo && !approvedUrl) return null;
+
   const theme = STEP_THEME[stepType];
   const icon = STEP_TYPE_ICONS[stepType] || "📖";
 
+  // Show approved image
   if (approvedUrl) {
     return (
       <div className="rounded-2xl overflow-hidden border border-slate-200/50 shadow-sm">
@@ -141,39 +153,25 @@ function IllustrationArea({ step, stepType }: { step: JourneyStep; stepType: Jou
     );
   }
 
-  const prompt = step.illustrationPrompt;
-  if (!prompt) return null;
-
-  const friendlyDesc = prompt
-    .replace(/^A (child|student|young learner) (measuring|choosing|writing|looking at|thinking about|on a quest|celebrating with)/i, (_, _p, action) => action.charAt(0).toUpperCase() + action.slice(1))
-    .replace(/^A friendly owl teacher welcoming a (young )?student to a lesson about/i, "Learning about")
-    .replace(/^A mission banner for/i, "Goal:")
-    .replace(/^Colourful illustration showing/i, "Picture of")
-    .replace(/^Science illustration showing/i, "Science picture of")
-    .replace(/^Visual examples of/i, "Examples of")
-    .replace(/^Hands-on practice with/i, "Practicing")
-    .replace(/^A celebration scene with/i, "Celebrating with")
-    .replace(/^Objects of different sizes with measurement labels:/i, "Different sized objects:")
-    .replace(/\s*grade\s*\d.*$/i, "")
-    .replace(/\s*with maths objects.*$/i, "")
-    .replace(/\s*with labelled diagrams$/i, "")
-    .replace(/\s*with counters and number lines$/i, "")
-    .replace(/\s*with stars and confetti$/i, "")
-    .replace(/\s*looking at a goal$/i, "")
-    .replace(/\s*on a quest, exploring and measuring things$/i, " on an adventure")
-    .replace(/\s*choosing an answer about.*$/i, " choosing an answer")
-    .replace(/\s*writing a reflection$/i, " writing thoughts")
-    .trim() || "A helpful picture for this lesson";
-
-  return (
-    <div className={`rounded-2xl border-2 border-dashed ${theme.border} overflow-hidden`}>
-      <div className={`bg-gradient-to-br ${theme.softBg} p-5 flex flex-col items-center gap-2.5`}>
-        <div className={`w-12 h-12 rounded-xl ${theme.iconBg} flex items-center justify-center`}>
-          <span className="text-xl">{icon}</span>
+  // Show generated/uploaded image with pending badge
+  if (generatedUrl || uploadedUrl) {
+    const url = generatedUrl || uploadedUrl!;
+    return (
+      <div className="rounded-2xl overflow-hidden border border-amber-200/50 shadow-sm relative">
+        <img src={url} alt="Lesson illustration" className="w-full h-auto max-h-[220px] object-cover" />
+        <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-amber-100 border border-amber-300 text-[9px] font-bold text-amber-700">
+          Pending approval
         </div>
-        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Illustration</p>
-        <p className={`text-sm font-semibold ${theme.accent} text-center max-w-xs leading-snug`}>{friendlyDesc}</p>
       </div>
+    );
+  }
+
+  // No real image exists — show a clean, minimal placeholder (never raw prompt text)
+  // Only show this if there's also no video (video case handled above)
+  return (
+    <div className={`rounded-2xl border border-dashed border-slate-200/60 bg-slate-50/40 px-4 py-3 flex items-center gap-2.5`}>
+      <span className="text-base opacity-40">🖼️</span>
+      <p className="text-[11px] text-slate-400 font-medium">Illustration coming soon</p>
     </div>
   );
 }
@@ -407,18 +405,14 @@ function SlideStepView({ step, stepNumber, totalSteps, interaction, setInteracti
 
       {/* Math display */}
       {step.mathDisplay && (
-        <div className="mt-4 px-5 py-4 rounded-xl bg-slate-50 border border-slate-200/60 text-center">
-          <span className="text-xl font-mono font-bold text-slate-800">{step.mathDisplay}</span>
+        <div className="mt-3 px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200/60 text-center">
+          <span className="text-lg font-mono font-bold text-slate-800">{step.mathDisplay}</span>
         </div>
       )}
 
-      {/* Illustration */}
-      <div className="mt-4">
+      {/* Media zone: illustration + video combined */}
+      <div className="mt-3 space-y-2">
         <IllustrationArea step={step} stepType={step.stepType} />
-      </div>
-
-      {/* Video */}
-      <div className="mt-4">
         <VideoArea step={step} />
       </div>
 
