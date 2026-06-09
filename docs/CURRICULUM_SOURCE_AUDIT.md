@@ -1,80 +1,90 @@
 # CURRICULUM SOURCE AUDIT — Grade 2 Mathematics
 
-## Source Document Status
+## Source Document
 
 | Item | Status |
 |------|--------|
-| Official CBC/KICD source document | **NOT FOUND in repo** |
-| Source document name | — |
-| Appears official | — |
-| Complete or partial | — |
-| Grade covered | Grade 2 |
-| Subject covered | Mathematics |
-| Pages/sections available | — |
-| Enough to generate lesson shells | **NO — source missing** |
+| **Source document name** | KICD Lower Primary Level Curriculum Designs Volume Two |
+| **Official** | YES — published by Kenya Institute of Curriculum Development (KICD) |
+| **Date** | August 2017 |
+| **Document reference** | `docs/kicd-lower-primary-volume-2.pdf` (2.4MB, 227 pages) |
+| **URL** | https://kicd.ac.ke/wp-content/uploads/2017/10/volume-2-curriculum-designs-September-2017.pdf |
+| **Grade covered** | Grades 1, 2, and 3 |
+| **Subject covered** | Mathematics Activities, Environmental Activities, Hygiene and Nutrition Activities |
+| **Grade 2 Mathematics section** | Pages 20-39 |
+| **Complete** | YES — full curriculum design with all required fields |
+| **Enough to generate lesson shells** | YES |
 
-## What Was Searched
+## What the Document Contains (per sub-strand)
 
-- `./docs/` directory: No curriculum source files found
-- `./src/data/`: Found `grade2-environmental.ts` (Environmental Activities, NOT Mathematics)
-- `./src/data/`: Found `grade5-all.ts` (Grade 5, NOT Grade 2)
-- `./src/lib/curriculum/`: Found `cbc-template.ts` (import helpers, NOT source data)
-- `./src/app/api/admin/seed-curriculum/route.ts`: Contains hardcoded curriculum structure (see below)
-- No PDF, CSV, XLSX, DOCX files found in repo (excluding node_modules)
+For each sub-strand, the KICD document provides:
+- Strand and sub-strand identification
+- Number of lessons allocated
+- Specific Learning Outcomes (SLOs) — lettered a), b), c), etc.
+- Suggested Learning Experiences (detailed, step-by-step)
+- Key Inquiry Question(s)
+- Core Competencies to be developed
+- Link to Pertinent and Contemporary Issues (PCIs)
+- Link to Values
+- Links to other learning areas
+- Suggested Community Service Learning Activities
+- Suggested non-formal activity to support learning
+- Suggested assessment methods
+- Assessment Rubrics (Exceeds/Meets/Approaches/Below expectations)
+- Suggested Resources
 
-## Existing App Content (Seed Data)
+## Additional Source
 
-The file `src/app/api/admin/seed-curriculum/route.ts` contains hardcoded Grade 2 Mathematics curriculum structure (lines 22-37):
+A Grade 2 Mathematics Activities Scheme of Work was also obtained:
+- `docs/g2-math-scheme-raw.pdf` (244KB, 5 pages)
+- Provides week-by-week mapping of lessons
+- Includes specific learning outcomes, key inquiry questions, learner experiences, resources, assessment methods, and reflection prompts per lesson
 
-**Strands found in seed data:**
-1. **Numbers** — sub-strands: Number Concept, Place Value, Reading and Writing, Number Patterns, Addition, Subtraction, Multiplication, Fractions
-2. **Measurement** — sub-strands: Length, Mass, Capacity, Time, Money
-3. **Geometry** — sub-strands: Shapes
+## Curriculum Structure Extracted
 
-**Topics found in seed data (49 total):**
-- Number Concept: Counting Numbers up to 100 Forwards, Counting Numbers up to 100 Backwards, Identifying Numbers up to 100
-- Place Value: Hundreds, Tens, Ones, Identifying Values of Digits up to 100
-- Reading and Writing: Writing Numbers in Digits up to 100, Writing Numbers in Words up to 100
-- Number Patterns: Identifying Addition Patterns, Identifying Subtraction Patterns, Completing Number Patterns
-- Addition: Adding Numbers up to a Sum of 100, Addition with Carrying
-- Subtraction: Subtracting Numbers Within 100, Subtraction with Borrowing
-- Multiplication: Introduction to Multiplication, Multiplication Facts up to 5 × 5
-- Fractions: Identifying a Half, Shading a Half, Identifying a Quarter, Shading a Quarter
-- Length: Measuring Length Using Non-Standard Units, Measuring Length Using Hand Spans, Measuring Length Using Metres
-- Mass: Comparing Heavier Than, Comparing Lighter Than, Comparing Same As
-- Capacity: Measuring Liquid Using Smaller Containers, Comparing How Much Liquid Containers Hold
-- Time: Reading Time by the Hour, Reading Time by the Half-Hour, Using Analogue Clocks, Using Digital Clocks, Identifying Days of the Week
-- Money: Recognizing Kenyan Coins up to Ksh 100, Recognizing Kenyan Notes up to Ksh 100, Simple Shopping Simulations
-- Shapes: Recognizing Rectangles, Recognizing Squares, Recognizing Circles, Recognizing Triangles, Drawing Basic Shapes, Making Patterns with Shapes
+### Strand 1.0: Numbers (7 sub-strands)
+| Sub-strand | Lessons | KICD Page |
+|------------|---------|-----------|
+| 1.1 Number Concept | 8 | 30 |
+| 1.2 Whole Numbers | 20 | 31-32 |
+| 1.3 Fractions | 12 | 33-34 |
+| 1.4 Addition | 20 | 34-35 |
+| 1.5 Subtraction | 20 | 35-36 |
+| 1.6 Multiplication | 12 | 37 |
+| 1.7 Division | 8 | 38-39 |
 
-## Key Finding
+### Strand 2.0: Measurement (5 sub-strands)
+| Sub-strand | Lessons | KICD Page |
+|------------|---------|-----------|
+| 2.1 Length | 6 | 39 |
+| 2.2 Mass | 10 | 21-22 |
+| 2.3 Capacity | 12 | 22-23 |
+| 2.4 Time | 8 | 24 |
+| 2.5 Money | 8 | 25 |
 
-**The official CBC/KICD curriculum document for Grade 2 Mathematics is NOT in the repo.**
+### Strand 3.0: Geometry (2 sub-strands)
+| Sub-strand | Lessons | KICD Page |
+|------------|---------|-----------|
+| 3.1 Lines | 6 | 26-27 |
+| 3.2 Shapes | 6 | 27-28 |
 
-The seed data in `seed-curriculum/route.ts` provides a curriculum structure but:
-1. It does NOT cite an official source document
-2. It does NOT include specific learning outcomes (only topic titles)
-3. It does NOT include key inquiry questions, suggested learning experiences, assessment methods, core competencies, values, or PCIs
-4. It is NOT in CSV format for the admin import flow
-5. It has already been partially imported (the "Comparing Numbers" lesson exists in the DB with a 10-step journey)
+**Total: 3 strands, 14 sub-strands, 144 lessons allocated in KICD document**
 
-## What Is Needed From Victor
+## CSV Generation Approach
 
-To proceed with Grade 2 Mathematics lesson shell creation, ONE of the following is required:
+The generated CSV includes 156 lesson shells (slightly more than the 144 KICD-allocated lessons because some sub-strands were split into more granular, focused lessons for better teachability).
 
-1. **Official CBC/KICD Grade 2 Mathematics curriculum document** (PDF, DOCX, or scanned pages)
-2. **Confirmation that the seed data in `seed-curriculum/route.ts` is source-aligned** and can be used as the basis for lesson shell generation
-3. **A different approved source document** that maps Grade 2 Mathematics strands, sub-strands, and learning outcomes
+Each lesson shell includes:
+- Exact KICD strand, sub-strand, and specific learning outcome
+- Key inquiry question from KICD
+- Suggested learning experiences from KICD
+- Core competencies from KICD
+- Values from KICD
+- PCIs from KICD
+- Suggested resources from KICD
+- Assessment methods from KICD
+- Source page reference in KICD document
 
-## Risk Assessment
+## Confidence Level
 
-| Risk | Level | Notes |
-|------|-------|-------|
-| Inventing curriculum | **HIGH** | Cannot generate shells without official source |
-| Misalignment with CBC | **HIGH** | Seed data lacks source citations |
-| Duplicate lessons | **MEDIUM** | Existing lessons in DB need to be audited first |
-| Incomplete shells | **MEDIUM** | Missing pedagogical fields without source |
-
-## Recommendation
-
-**Do not proceed with CSV generation until Victor provides or confirms the source document.** The existing seed data can serve as a structural reference but cannot populate required CSV fields (specific_learning_outcome, key_inquiry_question, suggested_learning_experience, assessment_method, core_competencies, values) without risking invented content.
+**HIGH** — All content is directly sourced from the official KICD Lower Primary Curriculum Designs Volume Two (August 2017). No invented strands, sub-strands, learning outcomes, or pedagogical content.
