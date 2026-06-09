@@ -463,7 +463,9 @@ function SlideStepView({ step, stepNumber, totalSteps, interaction, setInteracti
       )}
 
       {/* ── Quick Check (multiple choice) ── */}
-      {step.stepType === "quick_check" && normalizedType === "multiple_choice" && effectiveQuestion && (
+      {step.stepType === "quick_check" && normalizedType === "multiple_choice" && effectiveQuestion && (() => {
+        const _hasCorrectAnswer = effectiveInteraction?.correctAnswer !== undefined && effectiveInteraction?.correctAnswer !== null;
+        return (
         <div className="mt-4 px-5 py-4 rounded-xl bg-lime-50/80 border border-lime-200/60">
           <p className="text-base font-bold text-lime-900 mb-0.5 flex items-center gap-2"><HelpCircle className="w-4 h-4" /> Quick Check</p>
           <p className="text-lg font-bold text-lime-800 mb-3">{effectiveQuestion}</p>
@@ -471,18 +473,17 @@ function SlideStepView({ step, stepNumber, totalSteps, interaction, setInteracti
             <div className="flex flex-col gap-2">
               {effectiveInteraction.options.map((opt: string, i: number) => {
                 const isSelected = interaction.selectedChoice === i;
-                const hasCorrectAnswer = effectiveInteraction?.correctAnswer !== undefined && effectiveInteraction?.correctAnswer !== null;
-                const isCorrect = hasCorrectAnswer ? i === effectiveInteraction?.correctAnswer : true; // if no answer key, treat all as valid
+                const isCorrect = _hasCorrectAnswer ? i === effectiveInteraction?.correctAnswer : true;
                 const showFeedback = interaction.choiceFeedback !== null;
                 let btnClass = "bg-white border-lime-200 text-lime-800 hover:bg-lime-50 hover:shadow-md";
                 if (isSelected && !showFeedback) btnClass = "bg-lime-600 text-white border-lime-600 shadow-lg shadow-lime-200";
                 if (showFeedback && isSelected && isCorrect) btnClass = "bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-200";
                 if (showFeedback && isSelected && !isCorrect) btnClass = "bg-orange-500 text-white border-orange-500 shadow-lg shadow-orange-200";
-                if (showFeedback && !isSelected && isCorrect && hasCorrectAnswer) btnClass = "bg-emerald-100 border-emerald-400 text-emerald-800";
+                if (showFeedback && !isSelected && isCorrect && _hasCorrectAnswer) btnClass = "bg-emerald-100 border-emerald-400 text-emerald-800";
                 return (
                   <button key={i} onClick={() => {
                     if (interaction.choiceFeedback !== null) return;
-                    const correct = hasCorrectAnswer ? i === effectiveInteraction?.correctAnswer : true;
+                    const correct = _hasCorrectAnswer ? i === effectiveInteraction?.correctAnswer : true;
                     setInteraction((p: any) => ({ ...p, selectedChoice: i, choiceFeedback: correct ? "correct" : "incorrect" }));
                   }} disabled={interaction.choiceFeedback !== null}
                     className={`text-left px-4 py-3 rounded-xl text-sm font-semibold transition-all border-2 ${btnClass} disabled:cursor-default`}>
@@ -495,7 +496,7 @@ function SlideStepView({ step, stepNumber, totalSteps, interaction, setInteracti
           {interaction.choiceFeedback === "correct" && (
             <div className="mt-3 px-4 py-2.5 rounded-xl bg-emerald-100 border border-emerald-300">
               <p className="text-sm font-bold text-emerald-800">
-                ✅ {effectiveInteraction?.hint || "Great job thinking through this!"}
+                {_hasCorrectAnswer ? "✅ Correct! Well done!" : "✅ Great choice!"} {effectiveInteraction?.hint || ""}
               </p>
             </div>
           )}
@@ -505,10 +506,11 @@ function SlideStepView({ step, stepNumber, totalSteps, interaction, setInteracti
             </div>
           )}
         </div>
-      )}
+        );
+      })()}
 
-      {/* ── Self check (also used as fallback when no correctAnswer in multiple_choice) ── */}
-      {step.stepType === "quick_check" && (normalizedType === "self_check" || (normalizedType === "multiple_choice" && effectiveInteraction?.correctAnswer == null && interaction.selectedChoice !== undefined && !interaction.choiceFeedback)) && effectiveQuestion && (
+      {/* ── Self check ── */}
+      {step.stepType === "quick_check" && (normalizedType === "self_check" || (normalizedType === "multiple_choice" && (!effectiveInteraction?.options || effectiveInteraction.options.length === 0))) && effectiveQuestion && (
         <div className="mt-4 px-5 py-4 rounded-xl bg-lime-50/80 border border-lime-200/60">
           <p className="text-base font-bold text-lime-900 mb-0.5 flex items-center gap-2"><HelpCircle className="w-4 h-4" /> Quick Check</p>
           <p className="text-lg font-bold text-lime-800 mb-3">{effectiveQuestion}</p>
