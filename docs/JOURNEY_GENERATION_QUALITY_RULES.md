@@ -112,15 +112,24 @@ Before committing any batch, run:
 - **Answer leak in `standardJourney` helper**: Practice step had `` `The answer is ${practiceAns}.` `` — patched.
 - **3 DB journeys patched**: 2 via Batch 2 script (`standardJourney` journeys), 1 remaining ("Adding 3 Single Digit Numbers Vertically").
 
-### Batch 2 (19 lessons, June 2026)
-- All 19 generated with patched `standardJourney` helper — no answer leaks introduced.
-- Step count: 10 steps confirmed for all 19.
+### Scanner False Positive Fix (June 2026)
+- The journey QA scanner initially flagged `=\s*\d+` as answer leaks — but this matches legitimate math content like "2 + 3 = 5"
+- Fixed: answer-leak patterns now only match explicit phrases like "the answer is N" or "correct answer is"
+- The scanner also had a bug where `studentJourneyDraft || studentJourney` picked the empty draft over the approved journey
+- Fixed: scanner now checks `studentJourney` (approved) first, then falls back to `studentJourneyDraft`
+- Regex escaping issue: `\d` in file write tool gets double-escaped to `\\d`. Use `[0-9]` character class instead
+
+### Pre-existing Journey Issues (June 2026)
+- 2 pre-existing journeys had old `standardJourney` answer leaks ("The answer is N") — patched
+- 2 pre-existing journeys have 11 steps (extra practice step from old generator) — cosmetic, not blocking
+- 5 pre-existing journeys have long owl text (>300 chars) — cosmetic, not blocking for Grade 2
+- 2 pre-existing journeys have illustration-like text in student content ("Draw a line", "Draw a number line") — minor
 
 ---
 
 ## Future Generator Improvements
 
-- [ ] Replace template-based generation with AI-powered (OpenRouter) when quality baseline is stable
+- [x] Build reusable journey QA scanner (`scripts/journey-qa-scanner.js`)
 - [ ] Add automatic quality scanner as pre-commit hook
 - [ ] Add per-step word count limits to enforce "slide-like" feel
 - [ ] Add illustration prompt auto-generation that's always separated from student content
