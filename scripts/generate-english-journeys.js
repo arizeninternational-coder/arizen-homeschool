@@ -152,7 +152,7 @@ function buildQuickCheck(lesson) {
         explanation: 'When someone shares their feelings, we listen carefully and respond with kindness. This shows we care about them!',
       };
     }
-    if (sloLower.includes('conversation') && sloLower.includes('key detail')) {
+    if (sloLower.includes('informational') || sloLower.includes('key detail') || subStrand.toLowerCase().includes('conversation')) {
       return {
         question: `What are cue words we use to ask questions in a conversation?`,
         options: ['Run, jump, play', 'Who, what, where, when, why', 'Red, blue, green', 'Big, small, tall'],
@@ -280,7 +280,7 @@ function buildQuickCheck(lesson) {
         explanation: 'Self-assessment means checking your own work. In reading, it means noticing when you read well and when you need more practice!',
       };
     }
-    if (sloLower.includes('silent reading') && sloLower.includes('sustained focus')) {
+    if (sloLower.includes('silently') && sloLower.includes('sustained focus')) {
       return {
         question: `What is important when reading silently?`,
         options: ['Reading out loud', 'Staying focused on the text without getting distracted', 'Moving around', 'Talking to a friend'],
@@ -332,7 +332,7 @@ function buildQuickCheck(lesson) {
         explanation: 'Sentences start with a capital letter! "The cat sat" is correct. The first letter is capitalised, and the rest are lowercase.',
       };
     }
-    if (sloLower.includes('spelling') && (sloLower.includes('short') || sloLower.includes('long') || sloLower.includes('vowel'))) {
+    if (sloLower.includes('spell') && (sloLower.includes('short') || sloLower.includes('long') || sloLower.includes('vowel'))) {
       return {
         question: `What is a vowel sound?`,
         options: ['Sounds made only with your lips', 'The sounds a, e, i, o, u — every syllable needs a vowel sound', 'Sounds that are very loud', 'Sounds made with your hands'],
@@ -424,7 +424,7 @@ function buildPracticeTask(lesson) {
     if (sloLower.includes('feelings') || sloLower.includes('experiences')) {
       return `Practice responding: Tell a partner about something that happened to you today. They should listen and respond with kindness. Then switch!`;
     }
-    if (sloLower.includes('conversation') && sloLower.includes('key detail')) {
+    if (sloLower.includes('informational') || sloLower.includes('key detail') || subStrand.toLowerCase().includes('conversation')) {
       return `Practice cue words: With a partner, have a conversation about your favourite animal. Use who, what, where, when, and why questions!`;
     }
     if (sloLower.includes('respect') || sloLower.includes('build on')) {
@@ -499,7 +499,7 @@ function buildPracticeTask(lesson) {
     if (sloLower.includes('upper') || sloLower.includes('lower case') || sloLower.includes('capitali')) {
       return `Practice capitalisation: Rewrite these sentences correctly: "the dog is big" → "The dog is big." Try: "my name is ali" and "we like school."`;
     }
-    if (sloLower.includes('spelling') && (sloLower.includes('short') || sloLower.includes('long') || sloLower.includes('vowel'))) {
+    if (sloLower.includes('spell') && (sloLower.includes('short') || sloLower.includes('long') || sloLower.includes('vowel'))) {
       return `Practice vowel sounds: Write 3 words with short vowel sounds (like "cat," "bed," "sit") and 3 with long vowel sounds (like "cake," "tree," "home").`;
     }
     if (sloLower.includes('phonic') || sloLower.includes('editing')) {
@@ -740,16 +740,24 @@ function writingJourney(lesson) {
 // ── Main ─────────────────────────────────────────────────────────
 
 async function main() {
-  // Fetch all English lessons
-  const { data: lessons, error } = await db
-    .from('Lesson')
-    .select('id, title, slug, questId, contentBlocks')
-    .limit(200);
-
-  if (error) { console.error('Fetch error:', error); process.exit(1); }
+  // Fetch ALL English lessons (paginate — DB has 1525+ lessons, English ones may be at any position)
+  let allLessons = [];
+  let offset = 0;
+  const batchSize = 200;
+  while (true) {
+    const { data, error } = await db
+      .from('Lesson')
+      .select('id, title, slug, questId, contentBlocks')
+      .range(offset, offset + batchSize - 1);
+    if (error) { console.error('Fetch error:', error); process.exit(1); }
+    if (!data || data.length === 0) break;
+    allLessons = allLessons.concat(data);
+    offset += batchSize;
+    if (data.length < batchSize) break;
+  }
 
   // Filter to English lessons
-  const englishLessons = lessons.filter(l => {
+  const englishLessons = allLessons.filter(l => {
     try {
       const cb = typeof l.contentBlocks === 'string' ? JSON.parse(l.contentBlocks) : l.contentBlocks;
       return cb && cb.subject === 'English Language Activities';
