@@ -382,6 +382,56 @@ function buildQuickCheck(lesson) {
     }
   }
 
+  // ── Additional SLO matches for new lessons ──
+  if (sloLower.includes('enjoyment') || sloLower.includes('pleasure') && sloLower.includes('silent')) {
+    return {
+      question: `Why is it good to read silently for enjoyment?`,
+      options: ['Because the teacher said so', 'Because it helps us develop a love of reading and focus on our own', 'Because we have to', 'It is not good'],
+      correctIndex: 1,
+      explanation: 'Reading for enjoyment helps us develop a love of reading! When we read for pleasure, we focus better and learn to love books.',
+    };
+  }
+  if (sloLower.includes('context clue') || sloLower.includes('unknown words') && sloLower.includes('vocabulary')) {
+    return {
+      question: `What are context clues?`,
+      options: ['Words and sentences around an unknown word that help us guess its meaning', 'The title of the book', 'The pictures only', 'The back cover'],
+      correctIndex: 0,
+      explanation: 'Context clues are the words and sentences around an unknown word. They help us guess what the word means without asking someone!',
+    };
+  }
+  if (sloLower.includes('writing for pleasure') || sloLower.includes('interest in writing')) {
+    return {
+      question: `Why should we write for pleasure?`,
+      options: ['Only because the teacher says so', 'Because it helps us express ourselves and become better writers', 'We should not write for pleasure', 'It is a waste of time'],
+      correctIndex: 1,
+      explanation: 'Writing for pleasure helps us express ourselves! When we write for fun, we become more confident and creative writers.',
+    };
+  }
+  if (sloLower.includes('handwriting') && sloLower.includes('contest') || sloLower.includes('artistic expression')) {
+    return {
+      question: `What makes handwriting artistic and expressive?`,
+      options: ['Writing as fast as possible', 'Careful letter formation, neat spacing, and creative expression', 'Using only capital letters', 'Writing very small'],
+      correctIndex: 1,
+      explanation: 'Artistic handwriting means forming letters carefully, spacing neatly, and expressing ourselves creatively through writing!',
+    };
+  }
+  if (sloLower.includes('creative') && sloLower.includes('story') || sloLower.includes('artistic expression') && sloLower.includes('writing')) {
+    return {
+      question: `What makes a story creative?`,
+      options: ['Using the same words as everyone else', 'Using imagination, interesting ideas, and artistic expression', 'Copying from a book', 'Writing very short sentences'],
+      correctIndex: 1,
+      explanation: 'Creative stories use imagination! We include interesting ideas, descriptive words, and artistic expression to make our stories come alive.',
+    };
+  }
+  if (sloLower.includes('independent') || sloLower.includes('free choice') && sloLower.includes('writing')) {
+    return {
+      question: `Why is it important to choose to write on our own?`,
+      options: ['It is not important', 'Because it helps us develop confidence and a love of writing', 'Because the teacher makes us', 'We should never write independently'],
+      correctIndex: 1,
+      explanation: 'Choosing to write on our own helps us develop confidence! When we write independently, we practice our skills and discover the joy of writing.',
+    };
+  }
+
   // ── Fallback (should not reach here if all SLOs are covered) ──
   return {
     question: `What is one important thing you learned in "${title}"?`,
@@ -518,6 +568,26 @@ function buildPracticeTask(lesson) {
       return `Practice sequencing: Write a short story using these connecting words: "First... Then... Next... Finally..." Make sure your ideas are in order!`;
     }
     return `Practice writing: Write 5 sentences about your favourite animal. Use capital letters, full stops, and neat handwriting.`;
+  }
+
+  // Additional practice tasks for new lessons
+  if (sloLower.includes('enjoyment') || sloLower.includes('pleasure') && sloLower.includes('silent')) {
+    return `Practice sustained silent reading: Choose a book you enjoy and read silently for 15 minutes. Focus on the story. After, tell someone what you read about.`;
+  }
+  if (sloLower.includes('context clue') || (sloLower.includes('unknown words') && sloLower.includes('vocabulary'))) {
+    return `Practice context clues: Read a passage with some difficult words. For each difficult word, look at the words around it and try to guess what it means. Then check if you were right!`;
+  }
+  if (sloLower.includes('writing for pleasure') || sloLower.includes('interest in writing')) {
+    return `Practice writing for Pleasure: Write about anything you like — a story, a letter, a poem, or a list. Remember: there are no wrong answers when writing for fun!`;
+  }
+  if ((sloLower.includes('handwriting') && sloLower.includes('contest')) || sloLower.includes('artistic expression')) {
+    return `Practice artistic handwriting: Write your favourite quote or poem as beautifully as you can. Focus on neat letters, even spacing, and making it look artistic.`;
+  }
+  if ((sloLower.includes('creative') && sloLower.includes('story')) || (sloLower.includes('artistic expression') && sloLower.includes('writing'))) {
+    return `Practice creative story writing: Write a short story using your imagination. Include characters, a setting, a problem, and a solution. Make it creative and fun to read!`;
+  }
+  if (sloLower.includes('independent') || (sloLower.includes('free choice') && sloLower.includes('writing'))) {
+    return `Practice independent writing: On your own, choose something you want to write about. Write a story, a poem, or a letter. Share it with someone when you are done!`;
   }
 
   return `Practice: Review what you learned today and try it again with a partner or on your own.`;
