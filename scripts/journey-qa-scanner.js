@@ -47,11 +47,14 @@ const ANSWER_LEAK_PATTERNS = [
 ];
 
 const ILLUSTRATION_LEAK_PATTERNS = [
-  /illustration prompt/i,
-  /image prompt/i,
-  /draw a\s+\w+/i,
-  /cartoon style/i,
-  /colorful illustration/i,
+  /illustration\s*prompt/i,
+  /image\s*prompt[i.]/i,
+  /cartoon\s*style/i,
+  /colorful\s*illustration/i,
+  /\bgenerate\s+an?\s+image/i,
+  /\bdraw\s+a\s+(red|blue|green|yellow|purple|orange|pink|black|brown)\b/i,
+  /\bbeautiful\s+illustration/i,
+  /\bchild-friendly\s+illustration/i,
 ];
 
 const MAX_OWL_TEXT_LENGTH = 300;
