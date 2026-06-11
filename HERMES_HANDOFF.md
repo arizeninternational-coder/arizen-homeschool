@@ -1,71 +1,71 @@
-# HERMES_HANDOFF — June 10, 2026 (FINAL)
+# HERMES_HANDOFF — June 10, 2026 (LEARNER UX FIX)
 
 ## Branch & Commit
 - **Branch:** `grade-2-english-journey-batch-1-june2026`
-- **Latest commit:** `b3e8d04`
+- **Latest commit:** `95195a0`
 
-## Grade 2 Status: ALL PUBLISHED + LEARNER UX FIXED ✅
+## Grade 2 Status: ALL PUBLISHED + LEARNER UX REWRITTEN ✅
 
-### Coverage
-| Subject | Count | Status |
-|---------|-------|--------|
-| English (theme) | 90 | PUBLISHED |
-| English Language Activities | 48 | PUBLISHED |
-| Mathematics | 154 | PUBLISHED |
-| Kiswahili | 90 | PUBLISHED |
-| Environmental Activities | 150 | PUBLISHED |
-| Hygiene & Nutrition | 66 | PUBLISHED |
-| Movement | 240 | PUBLISHED |
-| **TOTAL** | **843** | **ALL PUBLISHED** |
+### What Was Fixed
 
-### Critical Fixes Applied Tonight
+**1. Today's Learning Plan — compact cards, no subject repeats**
+- Horizontal card layout (not large vertical grid)
+- Deduplicated by subject (max 5 per day)
+- Each card: subject, title, Start/Continue/Done status
+- No wasted space
 
-1. **ThemeSubject table populated** (17 records, was 0)
-   - Root cause of "No subjects showing" in My Subjects page
-   - Maps themes to canonical CBC subject names
+**2. Weekly Streak Strip**
+- Mon-Sun visual strip
+- States: ✓ active, ★ today, ○ missed, — rest weekend
+- Shows current streak count
 
-2. **All themes published** (18, was 9)
-3. **All quests published** (176, was 13)
-4. **API limits removed** from lessons, quests, badges, learner lessons APIs
-5. **Student dashboard rewritten**
-   - "Today's Learning Plan" with up to 6 lesson cards
-   - Each card shows: title, subject, status (Done/Start), progress
-   - Replaced single "Today's Lesson" hero
-6. **Calendar fixed**
-   - Lessons spread across Mon-Fri (not all on today)
-   - Shows lesson cards per day with completion status
-   - Weekends marked as "Rest day"
-   - Weekly lesson summary below calendar
-7. **EQ check-in improved**
-   - Warmer question: "How are you feeling?"
-   - Emoji buttons (😀😌🤔😐😢😟😡😴)
-   - Shows selected emotion with emoji after check-in
-8. **Avatar section hidden** (commented out until polished)
-9. **Generic content cleaned** from 95+ lesson journeys
-10. **Reading/Writing fallback templates** fixed with theme-specific content (30 journeys)
+**3. EQ Check-in — prominent and warm**
+- Large section with "How are you feeling today?"
+- 8 emoji buttons with labels (😀😌🤔😐😢😟😡😴)
+- Selected emotion shown with emoji after check-in
 
-### Files Changed (this session)
-- `src/app/dashboard/student/page.tsx` — Complete rewrite of dashboard
-- `src/app/dashboard/student/calendar/page.tsx` — Weekly schedule view
-- `src/app/api/admin/lessons/route.ts` — Removed .limit()
-- `src/app/api/admin/quests/route.ts` — Removed .limit()
-- `src/app/api/admin/badges/route.ts` — Removed .limit()
-- `src/app/api/learner/lessons/route.ts` — Removed .limit()
-- `scripts/fix-critical.js` — ThemeSubject + theme/quest status fix
-- `scripts/publish-grade2.js` — Batch publish script
-- `scripts/cleanup-content.js` — Generic content cleanup
-- `scripts/fix-reading-writing.js` — Reading/Writing template fix
-- Plus 5 more cleanup/fix scripts
+**4. Progress Stats — compressed**
+- 3 small cards: Badges, Quests, Done
+- No more 3 large boxes wasting space
 
-### Remaining Known Issues
-1. No media/images generated yet (text-only journeys)
-2. Some think_first steps use technical sub-strand titles (actual CBC curriculum language)
-3. Parent dashboard not fully tested with real learner data
-4. Streak display could be improved (weekly progress strip)
-5. No weekly cross-subject planning layer yet
-6. Quests are static (not dynamically generated from lesson progress)
+**5. Calendar — proper weekly schedule**
+- Lessons spread across Mon-Fri
+- Deduplicated by subject per day
+- Shows 2 lessons per day preview + count
+- Weekends marked as "Rest"
+- Weekly lesson summary below
+
+**6. Sidebar — cleaned up**
+- Removed unfinished nav items (Shop, Avatar, Leaderboard, etc.)
+- Replaced AvatarRenderer with clean initials circle
+- Minimal navigation: Dashboard, Subjects, Quests, Reflections, Badges, Calendar, Settings
+
+**7. My Subjects — compact grid**
+- 2-4 column grid, no wasted space
+- Shows all Grade 2 subjects from ThemeSubject table
+
+### Root Causes Fixed
+1. ThemeSubject table was empty → populated 17 records
+2. Themes/quests not PUBLISHED → published all
+3. API limits (200) → removed
+4. Dashboard showed 1 lesson → now shows 5 deduplicated
+5. Calendar dumped all lessons → now spreads across week
+6. Avatar unfinished → replaced with initials
+7. Nav items unfinished → hidden
+
+### Remaining Issues
+1. No media/images yet
+2. Parent calendar is monthly view (not weekly schedule) — acceptable for now
+3. Quests are static (not dynamically generated from progress)
+4. No weekly cross-subject planning layer yet
+5. Streak uses summary data (not daily activity tracking)
 
 ### Recommendation
-✅ Grade 2 is ready for manual review. Preview should be live on Vercel.
-Spot-check the student dashboard, My Subjects page, and calendar.
-If those look good, consider moving to Grade 5 Mathematics or media generation.
+✅ Grade 2 learner experience is significantly improved.
+Preview should be live. Check:
+- Student dashboard: Today's Learning Plan, streak strip, EQ check-in
+- Calendar: weekly schedule with lessons spread across days
+- Sidebar: clean nav, initials instead of unfinished avatar
+- My Subjects: all 7 Grade 2 subjects visible
+
+If these look good, consider Grade 5 Mathematics or media generation.
