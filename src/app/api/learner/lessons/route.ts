@@ -67,7 +67,7 @@ export async function GET(req: NextRequest) {
       `)
       .eq("status", "PUBLISHED")
       .order("orderIndex", { ascending: true })
-      .limit(200);
+      .limit(1000);
 
     if (error) {
       console.error("[LEARNER_LESSONS] Error:", error.message);

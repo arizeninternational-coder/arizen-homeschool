@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
         )
       `)
       .order("createdAt", { ascending: false })
-      .limit(200);
+      .limit(1000);
 
     if (status && status !== "all") {
       query = query.eq("status", status.toUpperCase());
