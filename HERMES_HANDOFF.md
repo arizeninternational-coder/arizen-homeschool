@@ -1,37 +1,39 @@
-# HERMES_HANDOFF — June 10, 2026 (FINAL)
+# HERMES_HANDOFF — June 10, 2026 (FINAL QA)
 
 ## Current Branch
 `grade-2-english-journey-batch-1-june2026`
 
 ## Latest Commit
-`978cc4b` — feat: generate journeys for all remaining Grade 2 subjects
-
-## Git Status
-Clean working tree.
+`741d153` — fix: increase API limits from 200 to 1000 for quests, badges, and learner lessons
 
 ## Grade 2 Coverage — COMPLETE ✅
 
-| Subject | Total | With Draft | Approved | None | Status |
-|---------|-------|-----------|----------|------|--------|
-| English (theme) | 90 | 90 | 0 | 0 | ✅ Journeys done |
-| English Language Activities | 48 | 48 | 0 | 0 | ✅ Journeys done |
-| Mathematics | 154 | 0 | 154 | 0 | ✅ Already approved |
-| Kiswahili | 90 | 90 | 0 | 0 | ✅ Journeys done |
-| Environmental | 150 | 150 | 0 | 0 | ✅ Journeys done |
-| Hygiene & Nutrition | 66 | 66 | 0 | 0 | ✅ Journeys done |
-| Movement | 240 | 240 | 0 | 0 | ✅ Journeys done |
-| **TOTAL** | **838** | **594** | **154** | **0** | **✅ ALL DONE** |
+| Subject | Total | Draft | Approved | None | QA |
+|---------|-------|-------|----------|------|-----|
+| English (theme) | 90 | 90 | 0 | 0 | ✅ |
+| English Language Activities | 48 | 48 | 0 | 0 | ✅ |
+| Mathematics | 154 | 0 | 154 | 0 | ✅ |
+| Kiswahili | 90 | 90 | 0 | 0 | ✅ |
+| Environmental | 150 | 150 | 0 | 0 | ✅ |
+| Hygiene & Nutrition | 66 | 66 | 0 | 0 | ✅ |
+| Movement | 240 | 240 | 0 | 0 | ✅ |
+| **TOTAL** | **838** | **594** | **154** | **0** | **✅** |
 
 ## QA Results
-- English (theme): 90/90 clean
-- English Language Activities: 48/48 clean
-- Kiswahili: 90/90 clean
-- Environmental: 150/150 clean
-- Hygiene & Nutrition: 66/66 clean
-- Movement: 240/240 clean
-- **Total: 684/684 journeys QA clean**
+- All 838 lessons have valid 10-step journeys
+- All journeys have proper MCQ Quick Check interactions
+- No answer leaks detected
+- Generic content cleaned from 95+ lessons
+- Reading/Writing fallback templates fixed with theme-specific content
+- Kiswahili journeys verified to be in Kiswahili
+- API limits fixed (200 → 1000) for lessons, quests, badges, learner lessons
 
-## Commits Tonight (11 total)
+## Remaining Known Issues (Minor)
+1. Some think_first steps use sub-strand titles that may be slightly technical (e.g., "enterprise project review and presentation") — these are the actual CBC curriculum titles
+2. 5 old "Numbers in Everyday Life" lessons have no journeys (old seed data, may be archived)
+3. Some Environmental/Movement lessons have generic fallback content for less common sub-strand patterns
+
+## Commits Tonight (14 total)
 1. `6419d39` — chore: add tsconfig.tsbuildinfo to .gitignore
 2. `21792bd` — chore: improve English import safety and journey generator quality
 3. `0ee5e27` — feat: generate QA-clean journeys for all 35 Grade 2 English lessons
@@ -44,24 +46,27 @@ Clean working tree.
 10. `126c046` — fix: repair English theme journeys — lesson-specific content, proper QC interactions
 11. `7cd4078` — chore: update handoff, add Kiswahili generator (partial)
 12. `978cc4b` — feat: generate journeys for all remaining Grade 2 subjects
-
-## What You Should Review Next
-1. Spot-check journeys in admin student-view preview across subjects
-2. Verify Quick Check MCQs render as interactive
-3. Check Kiswahili journeys are properly in Kiswahili
-4. Approve journeys in batches
-
-## Next Steps After Review
-1. Approve English journeys (90 theme + 48 KICD = 138)
-2. Approve Kiswahili journeys (90)
-3. Approve Environmental journeys (150)
-4. Approve Hygiene journeys (66)
-5. Approve Movement journeys (240)
-6. Consider archiving old seed data (5 Numbers lessons)
-7. Move to Grade 5 Mathematics (if desired)
+13. `aad0926` — fix: increase API limit from 200 to 1000 lessons
+14. `8ad6cd1` — fix: cleanup generic content across all Grade 2 journeys
+15. `741d153` — fix: increase API limits from 200 to 1000 for quests, badges, and learner lessons
 
 ## Production Status
 - NOT touched — all lessons remain DRAFT
 - isAvailable=false on all new journeys
 - No database schema changes
-- No architecture changes
+- Preview deploying on Vercel
+
+## Recommended Manual Spot-Check List
+1. School: Listening for Key Ideas (English theme)
+2. Transport: Object pronouns: him, her, them, you, us, me (English theme)
+3. Accidents: Past continuous tense (English theme)
+4. Kusikiliza masimulizi kuhusu haki za watoto (Kiswahili)
+5. Describing Weather at Different Times of Day (Environmental)
+6. What Is Breakfast? (Hygiene & Nutrition)
+7. Combining Levels, Pathways and Directions in Hopping (Movement)
+8. Responding to Questions (English Language Activities)
+9. Kutamka sauti /g/, /d/, /j/ na /r/ (Kiswahili)
+10. Identifying Possible Dangers in School (Environmental)
+
+## Recommendation
+✅ Grade 2 is ready for manual review. All critical blockers resolved. Remaining issues are minor and suitable for manual review during the approval process.
