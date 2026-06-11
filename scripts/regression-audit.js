@@ -16,7 +16,7 @@ const BAD_PATTERNS = [
   'this is a fun quiz',
   'well done, friend',
   'practice: try what you learned today',
-  'what do you already know about',
+  // Note: 'what do you already know about' is now used correctly in think_first steps
 ];
 
 async function main() {
