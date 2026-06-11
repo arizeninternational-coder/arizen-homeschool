@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
         )
       `)
       .order("createdAt", { ascending: false })
-      .limit(1000);
+      
 
     if (error) {
       console.error("[ADMIN_LESSONS] Error:", error.message);
