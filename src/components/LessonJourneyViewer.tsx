@@ -7,7 +7,7 @@ import {
   Send, CheckCircle, AlertTriangle, Clock, BookOpen, Target,
   Star, Flame, Map, X, Loader2, MessageCircle, Zap, Award,
   HelpCircle, Pencil, RotateCcw, Image, Link2, ExternalLink,
-  FileText, Users, MoreVertical, ChevronDown, Search, Filter
+  FileText, Users, MoreVertical, ChevronDown, Search, Filter, Trophy
 } from "lucide-react";
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -30,6 +30,7 @@ export interface JourneyStep {
   title: string;
   studentText: string;
   owlText: string;
+  subject?: string;
   mathDisplay?: string;
   visualType?: string;
   illustrationPrompt?: string;
@@ -125,17 +126,17 @@ export const useViewer = () => useContext(ViewerContext)!;
 
 // ── Shared sub-components ────────────────────────────────────────────────────
 
-const STEP_TYPE_META: Record<string, { icon: string; label: string; color: string; bg: string; border: string; gradient: string }> = {
-  welcome:    { icon: "🦉", label: "Welcome", color: "text-indigo-700", bg: "bg-indigo-50/60", border: "border-indigo-200/60", gradient: "from-indigo-500 to-purple-500" },
-  mission:    { icon: "🎯", label: "Mission", color: "text-violet-700", bg: "bg-violet-50/60", border: "border-violet-200/60", gradient: "from-violet-500 to-purple-500" },
-  think_first:{ icon: "💭", label: "Predict", color: "text-amber-700", bg: "bg-amber-50/60", border: "border-amber-200/60", gradient: "from-amber-500 to-orange-500" },
-  learn:      { icon: "📖", label: "Learn", color: "text-emerald-700", bg: "bg-emerald-50/60", border: "border-emerald-200/60", gradient: "from-emerald-500 to-teal-500" },
-  connect:    { icon: "🔗", label: "Connect", color: "text-teal-700", bg: "bg-teal-50/60", border: "border-teal-200/60", gradient: "from-teal-500 to-cyan-500" },
-  example:    { icon: "💡", label: "Example", color: "text-cyan-700", bg: "bg-cyan-50/60", border: "border-cyan-200/60", gradient: "from-cyan-500 to-blue-500" },
-  practice:   { icon: "✏️", label: "Practice", color: "text-sky-700", bg: "bg-sky-50/60", border: "border-sky-200/60", gradient: "from-sky-500 to-blue-500" },
-  quick_check:{ icon: "✅", label: "Check", color: "text-lime-700", bg: "bg-lime-50/60", border: "border-lime-200/60", gradient: "from-lime-500 to-green-500" },
-  reflect:    { icon: "🪞", label: "Reflect", color: "text-rose-700", bg: "bg-rose-50/60", border: "border-rose-200/60", gradient: "from-rose-500 to-pink-500" },
-  complete:   { icon: "🏆", label: "Done", color: "text-yellow-700", bg: "bg-yellow-50/60", border: "border-yellow-200/60", gradient: "from-yellow-500 to-amber-500" },
+const STEP_TYPE_META: Record<string, { icon: string; label: string; color: string; bg: string; border: string; gradient: string; accent?: string; softBg?: string; iconBg?: string }> = {
+  welcome:    { icon: "🦉", label: "Welcome", color: "text-indigo-700", bg: "bg-indigo-50/60", border: "border-indigo-200/60", gradient: "from-indigo-500 to-purple-500", accent: "text-indigo-700", softBg: "from-indigo-50/80 to-purple-50/50", iconBg: "bg-indigo-100" },
+  mission:    { icon: "🎯", label: "Mission", color: "text-violet-700", bg: "bg-violet-50/60", border: "border-violet-200/60", gradient: "from-violet-500 to-purple-500", accent: "text-violet-700", softBg: "from-violet-50/80 to-purple-50/50", iconBg: "bg-violet-100" },
+  think_first:{ icon: "💭", label: "Predict", color: "text-amber-700", bg: "bg-amber-50/60", border: "border-amber-200/60", gradient: "from-amber-500 to-orange-500", accent: "text-amber-700", softBg: "from-amber-50/80 to-orange-50/50", iconBg: "bg-amber-100" },
+  learn:      { icon: "📖", label: "Learn", color: "text-emerald-700", bg: "bg-emerald-50/60", border: "border-emerald-200/60", gradient: "from-emerald-500 to-teal-500", accent: "text-emerald-700", softBg: "from-emerald-50/80 to-teal-50/50", iconBg: "bg-emerald-100" },
+  connect:    { icon: "🔗", label: "Connect", color: "text-teal-700", bg: "bg-teal-50/60", border: "border-teal-200/60", gradient: "from-teal-500 to-cyan-500", accent: "text-teal-700", softBg: "from-teal-50/80 to-cyan-50/50", iconBg: "bg-teal-100" },
+  example:    { icon: "💡", label: "Example", color: "text-cyan-700", bg: "bg-cyan-50/60", border: "border-cyan-200/60", gradient: "from-cyan-500 to-blue-500", accent: "text-cyan-700", softBg: "from-cyan-50/80 to-blue-50/50", iconBg: "bg-cyan-100" },
+  practice:   { icon: "✏️", label: "Practice", color: "text-sky-700", bg: "bg-sky-50/60", border: "border-sky-200/60", gradient: "from-sky-500 to-blue-500", accent: "text-sky-700", softBg: "from-sky-50/80 to-blue-50/50", iconBg: "bg-sky-100" },
+  quick_check:{ icon: "✅", label: "Check", color: "text-lime-700", bg: "bg-lime-50/60", border: "border-lime-200/60", gradient: "from-lime-500 to-green-500", accent: "text-lime-700", softBg: "from-lime-50/80 to-green-50/50", iconBg: "bg-lime-100" },
+  reflect:    { icon: "🪞", label: "Reflect", color: "text-rose-700", bg: "bg-rose-50/60", border: "border-rose-200/60", gradient: "from-rose-500 to-pink-500", accent: "text-rose-700", softBg: "from-rose-50/80 to-pink-50/50", iconBg: "bg-rose-100" },
+  complete:   { icon: "🏆", label: "Done", color: "text-yellow-700", bg: "bg-yellow-50/60", border: "border-yellow-200/60", gradient: "from-yellow-500 to-amber-500", accent: "text-yellow-700", softBg: "from-yellow-50/80 to-amber-50/50", iconBg: "bg-yellow-100" },
 };
 
 export function getStepMeta(stepType: string) {
@@ -421,21 +422,14 @@ export function ViewerInteractionArea({ step, interaction, setInteraction, onSav
 
   // Practice
   if (step.stepType === "practice") {
+    const lang = (step.subject || '').toLowerCase().includes('kiswahili') ? 'sw' : 'en';
     return (
       <div className="mt-4 px-5 py-4 rounded-xl bg-sky-50/80 border border-sky-200/60">
-        <p className="text-base font-bold text-sky-900 mb-1.5 flex items-center gap-2"><Pencil className="w-4 h-4" /> Record your measurements</p>
-        <p className="text-xs text-sky-700 mb-3">Write down 3 things that can be measured in metres:</p>
-        {[0, 1, 2].map(i => (
-          <div key={i} className="flex items-center gap-2 mb-2">
-            <span className="w-7 h-7 rounded-lg bg-sky-200 text-sky-800 text-xs font-black flex items-center justify-center flex-shrink-0">{i + 1}</span>
-            <input value={interaction.practiceEntries?.[i] || ""} onChange={e => {
-              const entries = [...(interaction.practiceEntries || ["", "", ""])]; entries[i] = e.target.value;
-              setInteraction((p: any) => ({ ...p, practiceEntries: entries }));
-            }} placeholder={`Thing ${i + 1} (e.g., "classroom door")`}
-              className="flex-1 px-3 py-2.5 rounded-xl border border-sky-200 bg-white text-base text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-300" />
-          </div>
-        ))}
-        {interaction.practiceEntries?.some((e: string) => e.trim()) && <p className="text-xs text-sky-600 mt-1.5 font-semibold">✓ Measurements saved!</p>}
+        {step.studentText && step.studentText !== "Practice" ? (
+          <div className="prose prose-sm max-w-none text-sky-900 mb-3" dangerouslySetInnerHTML={{ __html: step.studentText.replace(/\n/g, '<br/>') }} />
+        ) : (
+          <p className="text-base font-bold text-sky-900 mb-1.5 flex items-center gap-2"><Pencil className="w-4 h-4" /> {lang === 'sw' ? 'Zoezi Lako' : 'Your Turn'}</p>
+        )}
       </div>
     );
   }
@@ -503,11 +497,11 @@ export function ViewerInteractionArea({ step, interaction, setInteraction, onSav
   if (step.stepType === "reflect") {
     return (
       <div className="mt-4 px-5 py-4 rounded-xl bg-rose-50/80 border border-rose-200/60">
-        <p className="text-base font-bold text-rose-900 mb-0.5 flex items-center gap-2"><MessageCircle className="w-4 h-4" /> Reflection Time</p>
-        <p className="text-lg font-bold text-rose-800 mb-3">{step.interaction?.question || "What did you learn today?"}</p>
-        {step.reflectionOptions?.length > 0 && (
+        <p className="text-base font-bold text-rose-900 mb-0.5 flex items-center gap-2"><MessageCircle className="w-4 h-4" /> {(step.subject || '').toLowerCase().includes('kiswahili') ? 'Wakati wa Tafakari' : 'Reflection Time'}</p>
+        <p className="text-lg font-bold text-rose-800 mb-3">{step.interaction?.question || ((step.subject || '').toLowerCase().includes('kiswahili') ? 'Ulijifunza nini leo?' : 'What did you learn today?')}</p>
+        {step.reflectionOptions && step.reflectionOptions.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mb-3">
-            {step.reflectionOptions.map((opt: string, i: number) => (
+            {step.reflectionOptions!.map((opt: string, i: number) => (
               <button key={i} onClick={() => setInteraction((p: any) => ({ ...p, reflectionChip: p.reflectionChip === i ? null : i }))}
                 className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all border-2 ${
                   interaction.reflectionChip === i ? "bg-rose-600 text-white border-rose-600 shadow-md" : "bg-white border-rose-200 text-rose-700 hover:bg-rose-50"

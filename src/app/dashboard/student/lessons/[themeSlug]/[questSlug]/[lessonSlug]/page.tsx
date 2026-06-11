@@ -77,8 +77,26 @@ const STEP_LABELS: Record<JourneyStepType, string> = {
 const NEXT_BUTTON_LABELS: Record<JourneyStepType, string> = {
   welcome: "Start Mission", mission: "I'm Ready", think_first: "Save My Guess",
   learn: "I Understand", connect: "Continue", example: "Show Practice",
-  practice: "Save Measurements", quick_check: "Check Answer",
+  practice: "Save Work", quick_check: "Check Answer",
   reflect: "Continue to Finish", complete: "",
+};
+
+// Localization map for Kiswahili
+const NEXT_BUTTON_LABELS_SW: Record<JourneyStepType, string> = {
+  welcome: "Anza Missheni", mission: "Niko Tayari", think_first: "Hifadhi Ndhana Yako",
+  learn: "Nimeelewa", connect: "Endelea", example: "Onyesha Mazoezi",
+  practice: "Hifadhi Kazi", quick_check: "Angalia Jibu",
+  reflect: "Endelea kumaliza", complete: "",
+};
+
+const REFLECTION_QUESTIONS: Record<string, string> = {
+  en: "What did you learn today?",
+  sw: "Ulijifunza nini leo?",
+};
+
+const PRACTICE_LABELS: Record<string, string> = {
+  en: "Your Turn",
+  sw: "Zoezi Lako",
 };
 
 const OWL_EXPRESSIONS: Record<JourneyStepType, 'happy' | 'thinking' | 'encouraging' | 'celebrating'> = {
@@ -343,6 +361,15 @@ function SlideStepView({ step, stepNumber, totalSteps, interaction, setInteracti
 
   // Effective interaction: for quick_check steps, normalize type and apply fallback if missing
   const _rawQcInteraction = step.stepType === "quick_check" ? (step.interaction || null) : null;
+
+  // Detect language from lesson data
+  const lang = (() => {
+    try {
+      const cb = JSON.parse(lesson?.contentBlocks || '{}');
+      const subj = (cb.subject || cb.strand || '').toLowerCase();
+      return subj.includes('kiswahili') ? 'sw' : 'en';
+    } catch { return 'en'; }
+  })();
   const _existingQcInteraction = _rawQcInteraction && _rawQcInteraction.type && _rawQcInteraction.type !== "none" ? _rawQcInteraction : null;
   const _fallbackQcInteraction = !_existingQcInteraction && step.stepType === "quick_check" ? buildFallbackQuickCheckInteraction(step) : null;
   const effectiveQcInteraction = _existingQcInteraction || _fallbackQcInteraction; // JourneyInteraction | null
@@ -440,19 +467,12 @@ function SlideStepView({ step, stepNumber, totalSteps, interaction, setInteracti
       {/* ── Guided Practice ── */}
       {step.stepType === "practice" && (
         <div className="mt-4 px-5 py-4 rounded-xl bg-sky-50/80 border border-sky-200/60">
-          <p className="text-base font-bold text-sky-900 mb-1.5 flex items-center gap-2"><Pencil className="w-4 h-4" /> Record your measurements</p>
-          <p className="text-xs text-sky-700 mb-3">Write down 3 things that can be measured in metres:</p>
-          {[0, 1, 2].map(i => (
-            <div key={i} className="flex items-center gap-2 mb-2">
-              <span className="w-7 h-7 rounded-lg bg-sky-200 text-sky-800 text-xs font-black flex items-center justify-center flex-shrink-0">{i + 1}</span>
-              <input value={interaction.practiceEntries[i] || ""} onChange={e => {
-                const entries = [...interaction.practiceEntries]; entries[i] = e.target.value;
-                setInteraction((p: any) => ({ ...p, practiceEntries: entries }));
-              }} placeholder={`Thing ${i + 1} (e.g., "classroom door")`}
-                className="flex-1 px-3 py-2.5 rounded-xl border border-sky-200 bg-white text-base text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-300" />
-            </div>
-          ))}
-          {interaction.practiceEntries.some((e: string) => e.trim()) && <p className="text-xs text-sky-600 mt-1.5 font-semibold">✓ Measurements saved! Click Next to continue.</p>}
+          {step.studentText && step.studentText !== "Practice" && (
+            <div className="prose prose-sm max-w-none text-sky-900 mb-3" dangerouslySetInnerHTML={{ __html: step.studentText.replace(/\\n/g, '<br/>') }} />
+          )}
+          {!step.studentText || step.studentText === "Practice" ? (
+            <p className="text-base font-bold text-sky-900 mb-1.5 flex items-center gap-2"><Pencil className="w-4 h-4" /> {PRACTICE_LABELS[lang] || PRACTICE_LABELS.en}</p>
+          ) : null}
         </div>
       )}
 
@@ -461,7 +481,7 @@ function SlideStepView({ step, stepNumber, totalSteps, interaction, setInteracti
         const _hasCorrectAnswer = effectiveInteraction?.correctAnswer !== undefined && effectiveInteraction?.correctAnswer !== null;
         return (
         <div className="mt-4 px-5 py-4 rounded-xl bg-lime-50/80 border border-lime-200/60">
-          <p className="text-base font-bold text-lime-900 mb-0.5 flex items-center gap-2"><HelpCircle className="w-4 h-4" /> Quick Check</p>
+          <p className="text-base font-bold text-lime-900 mb-0.5 flex items-center gap-2"><HelpCircle className="w-4 h-4" /> {lang === 'sw' ? 'Ukaguzi wa Haraka' : 'Quick Check'}</p>
           <p className="text-lg font-bold text-lime-800 mb-3">{effectiveQuestion}</p>
           {effectiveInteraction?.options && effectiveInteraction.options.length > 0 && (
             <div className="flex flex-col gap-2">
@@ -506,7 +526,7 @@ function SlideStepView({ step, stepNumber, totalSteps, interaction, setInteracti
       {/* ── Self check ── */}
       {step.stepType === "quick_check" && (normalizedType === "self_check" || (normalizedType === "multiple_choice" && (!effectiveInteraction?.options || effectiveInteraction.options.length === 0))) && effectiveQuestion && (
         <div className="mt-4 px-5 py-4 rounded-xl bg-lime-50/80 border border-lime-200/60">
-          <p className="text-base font-bold text-lime-900 mb-0.5 flex items-center gap-2"><HelpCircle className="w-4 h-4" /> Quick Check</p>
+          <p className="text-base font-bold text-lime-900 mb-0.5 flex items-center gap-2"><HelpCircle className="w-4 h-4" /> {lang === 'sw' ? 'Ukaguzi wa Haraka' : 'Quick Check'}</p>
           <p className="text-lg font-bold text-lime-800 mb-3">{effectiveQuestion}</p>
           <p className="text-sm text-lime-700 mb-3 italic">Take a moment to think about your answer. There's no rush — trust your learning!</p>
           <div className="flex gap-2">
@@ -535,8 +555,8 @@ function SlideStepView({ step, stepNumber, totalSteps, interaction, setInteracti
       {/* ── Reflection step ── */}
       {step.stepType === "reflect" && (
         <div className="mt-4 px-5 py-4 rounded-xl bg-rose-50/80 border border-rose-200/60">
-          <p className="text-base font-bold text-rose-900 mb-0.5 flex items-center gap-2"><MessageCircle className="w-4 h-4" /> Reflection Time</p>
-          <p className="text-lg font-bold text-rose-800 mb-3">{step.interaction?.question || "What did you learn today?"}</p>
+          <p className="text-base font-bold text-rose-900 mb-0.5 flex items-center gap-2"><MessageCircle className="w-4 h-4" /> {lang === 'sw' ? 'Wakati wa Tafakari' : 'Reflection Time'}</p>
+          <p className="text-lg font-bold text-rose-800 mb-3">{step.interaction?.question || REFLECTION_QUESTIONS[lang] || REFLECTION_QUESTIONS.en}</p>
 
           {step.reflectionOptions && step.reflectionOptions.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mb-3">
@@ -566,7 +586,7 @@ function SlideStepView({ step, stepNumber, totalSteps, interaction, setInteracti
       {isComplete && (
         <div className="mt-4 text-center py-4">
           <div className="flex justify-center mb-3"><OwlTeacher size={72} expression="celebrating" /></div>
-          <h3 className="text-xl lg:text-2xl font-black text-slate-900 mb-1">You did it! 🏆</h3>
+          <h3 className="text-xl lg:text-2xl font-black text-slate-900 mb-1">{lang === 'sw' ? 'Umefanya vizuri! 🏆' : 'You did it! 🏆'}</h3>
           <p className="text-slate-600 text-base lg:text-lg">You've completed this lesson. Great work!</p>
         </div>
       )}
@@ -663,12 +683,21 @@ class JourneyErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 }
 
 /* ─── main page component ─── */
-
 export default function LessonPlayerPage({ params }: { params: Promise<{ themeSlug: string; questSlug: string; lessonSlug: string }> }) {
   const { data: session, status } = useSession();
   const [slugs, setSlugs] = useState<{ themeSlug: string; questSlug: string; lessonSlug: string } | null>(null);
   const [lesson, setLesson] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+
+  // Detect language from lesson data — computed once per render
+  const lang = (() => {
+    if (!lesson) return 'en';
+    try {
+      const cb = JSON.parse(lesson.contentBlocks || '{}');
+      const subj = (cb.subject || cb.strand || '').toLowerCase();
+      return subj.includes('kiswahili') ? 'sw' : 'en';
+    } catch { return 'en'; }
+  })();
   const [viewing, setViewing] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [completed, setCompleted] = useState(false);
@@ -730,6 +759,7 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
           if (data.lesson) {
             setLesson(data.lesson);
             setCompleted(data.lesson.isCompleted);
+            // Language detected from lesson data at render time, not stored in state
           }
         })
         .catch(console.error)
@@ -927,7 +957,7 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
                     <div className="mt-5 flex gap-3 justify-center flex-wrap">
                       <button onClick={() => { setViewing(false); setShowCelebration(false); setCurrentStep(0); }}
                         className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white border-2 border-slate-200/60 text-slate-700 font-bold text-sm hover:bg-slate-50 transition-all active:scale-[0.98] shadow-sm">
-                        <ArrowLeft className="w-4 h-4" /> Back to Quest
+                        <ArrowLeft className="w-4 h-4" /> {lang === 'sw' ? 'Rudi kwenye Quest' : 'Back to Quest'}
                       </button>
                       <button onClick={() => { setShowCelebration(false); setCurrentStep(0); }}
                         className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold text-sm hover:from-indigo-600 hover:to-purple-600 transition-all shadow-lg shadow-indigo-200/50 active:scale-[0.98]">

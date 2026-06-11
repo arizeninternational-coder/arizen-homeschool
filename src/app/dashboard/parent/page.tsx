@@ -112,10 +112,10 @@ export default function ParentDashboard() {
           <>
             {/* Stat Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-              <StatCard label="Children" value={children.length} icon={<Users className="w-5 h-5 text-secondary" />} gradient="bg-card-gradient-green" borderColor="border-secondary/15" textColor="text-secondary-dark" />
-              <StatCard label="Active Streaks" value={`${totalStreaks}d`} icon={<Flame className="w-5 h-5 text-pink" />} gradient="bg-card-gradient-pink" borderColor="border-pink/15" textColor="text-pink" />
-              <StatCard label="Total XP" value={totalXp.toLocaleString()} icon={<Star className="w-5 h-5 text-gold" />} gradient="bg-card-gradient-gold" borderColor="border-gold/15" textColor="text-amber-700" />
-              <StatCard label="Lessons Done" value={totalLessons} icon={<BookIcon size={20} className="text-accent-blue" />} gradient="bg-card-gradient-blue" borderColor="border-accent-blue/15" textColor="text-accent-blue" />
+              <StatCard label="Children" value={children.length} icon={<Users className="w-5 h-5 text-secondary" />} gradient="bg-card-gradient-green" textColor="text-secondary-dark" />
+              <StatCard label="Active Streaks" value={`${totalStreaks}d`} icon={<Flame className="w-5 h-5 text-pink" />} gradient="bg-card-gradient-pink" textColor="text-pink" />
+              <StatCard label="Total XP" value={totalXp.toLocaleString()} icon={<Star className="w-5 h-5 text-gold" />} gradient="bg-card-gradient-gold" textColor="text-amber-700" />
+              <StatCard label="Lessons Done" value={totalLessons} icon={<BookIcon size={20} className="text-accent-blue" />} gradient="bg-card-gradient-blue" textColor="text-accent-blue" />
             </div>
 
             {/* My Children */}
@@ -153,7 +153,7 @@ export default function ParentDashboard() {
                   >
                     <div className="flex items-start gap-4 mb-4">
                       <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center shadow-md flex-shrink-0">
-                        <span className="text-lg font-black text-white">{(child.name || child.displayName || 'S').split(' ').map(function(n){return n[0];}).join('').toUpperCase().slice(0,2)}</span>
+                        <span className="text-lg font-black text-white">{(child.name || child.displayName || 'S').split(' ').map(function(n: string){return n[0];}).join('').toUpperCase().slice(0,2)}</span>
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="text-base font-bold text-text truncate">{child.name || child.displayName || "Student"}</h3>
