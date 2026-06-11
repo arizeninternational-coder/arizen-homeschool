@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CalendarDays, Loader2, Heart, BookOpen, CheckCircle2, Circle, Sparkles, Target } from "lucide-react";
-import { PageHeader, EmptyStateCard, ProgressBar } from "@/components/ui/Pill";
+import { CalendarDays, Loader2, Heart, BookOpen, CheckCircle2, Circle, Target } from "lucide-react";
+import { PageHeader, ProgressBar } from "@/components/ui/Pill";
 import { cn } from "@/lib/utils/cn";
 
 const DAY_NAMES = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -16,7 +16,7 @@ function getMonday(d: Date): Date {
   return date;
 }
 
-function getWeekDays(): Date[] {
+function getCurrentWeek(): Date[] {
   const monday = getMonday(new Date());
   return Array.from({ length: 7 }, (_, i) => {
     const d = new Date(monday);
@@ -34,12 +34,30 @@ function formatDate(d: Date): string {
   return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
+// Build weekly schedule from lessons — deduplicated by subject per day
+function buildWeeklySchedule(allLessons: any[]): Record<number, any[]> {
+  const schedule: Record<number, any[]> = { 0: [], 1: [], 2: [], 3: [], 4: [] };
+  const subjectTracker: Record<number, Set<string>> = { 0: new Set(), 1: new Set(), 2: new Set(), 3: new Set(), 4: new Set() };
+  
+  for (const lesson of allLessons) {
+    const subject = lesson.subject || "General";
+    for (let day = 0; day < 5; day++) {
+      if (!subjectTracker[day].has(subject) && schedule[day].length < 6) {
+        schedule[day].push(lesson);
+        subjectTracker[day].add(subject);
+        break;
+      }
+    }
+  }
+  return schedule;
+}
+
 export default function CalendarPage() {
   const [checkins, setCheckins] = useState<any[]>([]);
   const [lessons, setLessons] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const weekDays = getWeekDays();
+  const weekDays = getCurrentWeek();
 
   useEffect(() => {
     async function load() {
@@ -71,15 +89,8 @@ export default function CalendarPage() {
   const completedLessons = lessons.filter((l) => l.progress?.completedAt).length;
   const checkinCount = checkinDays.size;
 
-  // Distribute lessons across the week (Mon-Fri), 4-6 lessons per day
-  const lessonsByDay: Record<number, any[]> = {};
-  const weekdayIndices = [0, 1, 2, 3, 4]; // Mon-Fri
-  
-  lessons.forEach((lesson: any, i: number) => {
-    const dayIndex = weekdayIndices[i % weekdayIndices.length];
-    if (!lessonsByDay[dayIndex]) lessonsByDay[dayIndex] = [];
-    lessonsByDay[dayIndex].push(lesson);
-  });
+  // Build weekly schedule
+  const weeklySchedule = buildWeeklySchedule(lessons);
 
   if (loading) {
     return (
@@ -105,14 +116,15 @@ export default function CalendarPage() {
           {weekDays.map((day, i) => {
             const today = isToday(day);
             const hasCheckin = checkinDays.has(day.toDateString());
-            const dayLessons = lessonsByDay[i] || [];
+            const dayLessons = weeklySchedule[i] || [];
             const isWeekend = i >= 5;
-            
+            const dayCompleted = dayLessons.filter((l: any) => l.progress?.completedAt).length;
+
             return (
               <div
                 key={i}
                 className={cn(
-                  "p-2 lg:p-3 text-center min-h-[120px] lg:min-h-[160px] transition-colors",
+                  "p-2 lg:p-3 text-center min-h-[110px] lg:min-h-[140px] transition-colors",
                   today ? "bg-primary-soft/30" : "hover:bg-bg-main/50",
                   isWeekend && "bg-bg-main/30"
                 )}
@@ -133,32 +145,29 @@ export default function CalendarPage() {
                       <span className="text-[8px] font-bold text-secondary-dark">Checked in</span>
                     </div>
                   )}
-                  {!hasCheckin && today && (
-                    <div className="inline-flex items-center gap-0.5 px-1 py-0.5 rounded-full bg-bg-main">
-                      <Circle className="w-2 h-2 text-border-soft" />
-                      <span className="text-[8px] font-bold text-text-muted">Not yet</span>
-                    </div>
-                  )}
-                  {dayLessons.length > 0 && (
+                  {dayLessons.length > 0 && !isWeekend && (
                     <div className="space-y-0.5">
-                      {dayLessons.slice(0, 3).map((lesson: any, li: number) => {
+                      {dayLessons.slice(0, 2).map((lesson: any, li: number) => {
                         const completed = !!lesson.progress?.completedAt;
                         return (
                           <div key={li} className={cn(
                             "text-[8px] font-bold truncate px-1 py-0.5 rounded",
                             completed ? "bg-secondary-soft text-secondary-dark" : "bg-accent-blue-soft/50 text-accent-blue"
                           )}>
-                            {completed ? "✓ " : ""}{lesson.title.substring(0, 20)}
+                            {completed ? "✓ " : ""}{lesson.title.substring(0, 18)}
                           </div>
                         );
                       })}
-                      {dayLessons.length > 3 && (
-                        <p className="text-[8px] text-text-muted font-semibold">+{dayLessons.length - 3} more</p>
+                      {dayLessons.length > 2 && (
+                        <p className="text-[8px] text-text-muted font-semibold">+{dayLessons.length - 2} more</p>
                       )}
                     </div>
                   )}
-                  {isWeekend && dayLessons.length === 0 && (
-                    <p className="text-[8px] text-text-muted italic">Rest day</p>
+                  {isWeekend && (
+                    <p className="text-[8px] text-text-muted italic">Rest</p>
+                  )}
+                  {!isWeekend && dayLessons.length === 0 && (
+                    <p className="text-[8px] text-text-muted/50">—</p>
                   )}
                 </div>
               </div>
@@ -206,48 +215,39 @@ export default function CalendarPage() {
           <BookOpen className="w-5 h-5 text-accent-purple" />
           This Week's Lessons
         </h3>
-        {lessons.length === 0 ? (
-          <div className="text-center py-6">
-            <BookOpen className="w-8 h-8 text-text-muted mx-auto mb-2 opacity-40" />
-            <p className="text-sm text-text-muted italic">No published lessons available yet.</p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {weekdayIndices.map((dayIdx) => {
-              const dayLessons = lessonsByDay[dayIdx] || [];
-              if (dayLessons.length === 0) return null;
-              const dayDate = weekDays[dayIdx];
-              return (
-                <div key={dayIdx}>
-                  <p className="text-xs font-extrabold text-text-muted mb-1.5">
-                    {DAY_NAMES[dayIdx]}, {formatDate(dayDate)} {isToday(dayDate) && <span className="text-primary">(Today)</span>}
-                  </p>
-                  <div className="space-y-1.5 ml-2">
-                    {dayLessons.map((lesson: any, li: number) => {
-                      const completed = !!lesson.progress?.completedAt;
-                      return (
-                        <div key={li} className="flex items-center gap-2 p-2 rounded-lg bg-bg-main/50">
-                          {completed ? (
-                            <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0" />
-                          ) : (
-                            <Circle className="w-4 h-4 text-border-soft flex-shrink-0" />
-                          )}
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs font-bold text-text truncate">{lesson.title}</p>
-                            <p className="text-[10px] text-text-muted">{lesson.subject || "Lesson"}</p>
-                          </div>
-                          {completed && (
-                            <span className="px-1.5 py-0.5 rounded-full bg-secondary-soft text-secondary-dark text-[9px] font-extrabold">Done</span>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
+        {[0, 1, 2, 3, 4].map((dayIdx) => {
+          const dayLessons = weeklySchedule[dayIdx] || [];
+          if (dayLessons.length === 0) return null;
+          const dayDate = weekDays[dayIdx];
+          return (
+            <div key={dayIdx} className="mb-3">
+              <p className="text-xs font-extrabold text-text-muted mb-1.5">
+                {DAY_NAMES[dayIdx]}, {formatDate(dayDate)} {isToday(dayDate) && <span className="text-primary">(Today)</span>}
+              </p>
+              <div className="space-y-1 ml-2">
+                {dayLessons.map((lesson: any, li: number) => {
+                  const completed = !!lesson.progress?.completedAt;
+                  return (
+                    <div key={li} className="flex items-center gap-2 p-2 rounded-lg bg-bg-main/50">
+                      {completed ? (
+                        <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0" />
+                      ) : (
+                        <Circle className="w-4 h-4 text-border-soft flex-shrink-0" />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-bold text-text truncate">{lesson.title}</p>
+                        <p className="text-[10px] text-text-muted">{lesson.subject || "Lesson"}</p>
+                      </div>
+                      {completed && (
+                        <span className="px-1.5 py-0.5 rounded-full bg-secondary-soft text-secondary-dark text-[9px] font-extrabold">Done</span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

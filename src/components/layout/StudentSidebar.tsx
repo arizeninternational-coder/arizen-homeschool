@@ -4,28 +4,20 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Home, BookOpen, Swords, Heart, Trophy, ShoppingBag,
-  UserRound, BarChart3, Star, LogOut, Sparkles, Menu, X,
-  Library, CalendarDays, MessageCircle, Settings
+  Home, BookOpen, Swords, Heart, Trophy, CalendarDays,
+  Star, LogOut, Sparkles, Menu, X, Settings
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { StreakIcon } from "@/components/ui/Illustrations";
-import AvatarRenderer from "@/components/AvatarRenderer";
 
+// Only show polished nav items
 const NAV_ITEMS = [
   { icon: Home, label: "Dashboard", href: "/dashboard/student" },
   { icon: BookOpen, label: "My Subjects", href: "/dashboard/student/subjects" },
-  { icon: BookOpen, label: "Lessons", href: "/dashboard/student/lessons" },
   { icon: Swords, label: "Quests", href: "/dashboard/student/quests" },
   { icon: Heart, label: "Reflections", href: "/dashboard/student/reflections" },
   { icon: Trophy, label: "Badges", href: "/dashboard/student/badges" },
-  { icon: ShoppingBag, label: "Shop", href: "/dashboard/student/shop" },
-  { icon: UserRound, label: "Avatar", href: "/dashboard/student/avatar" },
-  { icon: BarChart3, label: "Leaderboard", href: "/dashboard/student/leaderboard" },
-  { icon: Star, label: "Achievements", href: "/dashboard/student/achievements" },
-  { icon: Library, label: "Library", href: "/dashboard/student/library" },
   { icon: CalendarDays, label: "Calendar", href: "/dashboard/student/calendar" },
-  { icon: MessageCircle, label: "Messages", href: "/dashboard/student/messages" },
   { icon: Settings, label: "Settings", href: "/dashboard/student/settings" },
 ];
 
@@ -36,7 +28,6 @@ export function StudentSidebar({ children }: { children: React.ReactNode }) {
   const [summary, setSummary] = useState<any>(null);
 
   useEffect(() => {
-    // Fetch profile for name/avatar
     fetch("/api/learner/profile", { credentials: "include" })
       .then(r => r.json())
       .then(d => setProfile(d.profile || null))
@@ -44,7 +35,6 @@ export function StudentSidebar({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    // Fetch summary for real coins/XP/streak (single source of truth)
     fetch("/api/learner/progress/summary", { credentials: "include" })
       .then(r => r.json())
       .then(d => setSummary(d))
@@ -59,10 +49,10 @@ export function StudentSidebar({ children }: { children: React.ReactNode }) {
 
   const studentName = profile?.displayName || profile?.name || "Student";
   const grade = profile?.grade || "";
-  const totalXp = summary?.xp || profile?.totalXp || 0;
   const currentStreak = summary?.streak || profile?.currentStreak || 0;
-  const coins = summary?.coins || 0;
-  const avatarLevel = Math.floor(totalXp / 100) + 1;
+
+  // Simple initials avatar (no unfinished AvatarRenderer)
+  const initials = studentName.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2);
 
   const sidebarContent = (
     <div className="flex flex-col h-full bg-white/80 backdrop-blur-xl">
@@ -74,7 +64,7 @@ export function StudentSidebar({ children }: { children: React.ReactNode }) {
         <span className="font-extrabold text-lg text-text tracking-tight">Arizen</span>
       </div>
 
-      {/* Stats pills — streak only, coins shown in dashboard header */}
+      {/* Stats pills */}
       <div className="px-4 pb-3">
         <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-pink-soft/50 border border-pink/10">
           <StreakIcon size={16} />
@@ -106,15 +96,15 @@ export function StudentSidebar({ children }: { children: React.ReactNode }) {
         })}
       </nav>
 
-      {/* Student Profile Card */}
+      {/* Student Profile Card — clean initials, no unfinished avatar */}
       <div className="px-3 py-3">
         <div className="flex items-center gap-3 px-3 py-3 rounded-2xl bg-gradient-to-r from-primary-soft/40 to-accent-purple-soft/30 mb-2">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-50 to-violet-50 flex items-center justify-center flex-shrink-0 overflow-hidden">
-            <AvatarRenderer size="xs" skinHex="#C68642" hairColorHex="#1a1a1a" hairStyle="short-curls" outfitHex="#4F46E5" shoeHex="#37474F" expression="happy" />
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center flex-shrink-0">
+            <span className="text-sm font-extrabold text-white">{initials}</span>
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-bold text-text truncate">{studentName}</p>
-            <p className="text-xs text-text-muted">Grade {grade} • Level {avatarLevel}</p>
+            <p className="text-xs text-text-muted">Grade {grade}</p>
           </div>
         </div>
         <button
@@ -133,7 +123,7 @@ export function StudentSidebar({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen bg-bg-main">
-      {/* Desktop sidebar — floating panel with shadow, no hard border */}
+      {/* Desktop sidebar */}
       <aside className="hidden lg:flex lg:w-[260px] lg:flex-col lg:fixed lg:inset-y-0 z-40 shadow-[4px_0_24px_rgba(0,0,0,0.03)]">
         {sidebarContent}
       </aside>
@@ -153,7 +143,6 @@ export function StudentSidebar({ children }: { children: React.ReactNode }) {
 
       {/* Main content */}
       <div className="flex-1 lg:ml-[260px] flex flex-col min-h-screen">
-        {/* Top bar — light, clean, no hard border */}
         <header className="sticky top-0 z-30 h-14 bg-white/70 backdrop-blur-xl flex items-center justify-between px-4 lg:px-6 gap-4">
           <div className="flex items-center gap-3">
             <button onClick={() => setMobileOpen(true)} className="lg:hidden p-2 rounded-xl hover:bg-bg-main text-text-muted">

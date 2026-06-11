@@ -3,30 +3,82 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import {
-  BookOpen, Swords, Heart, Trophy, Star, ArrowRight, Flame,
-  Target, Clock, GraduationCap, Sparkles, ChevronRight,
-  Smile, Leaf, Sparkles as SparklesIcon, Meh, CloudRain, Flame as FlameIcon, AlertTriangle, Zap,
-  CheckCircle2, Circle, CalendarDays
+  BookOpen, Heart, Trophy, Flame, ArrowRight,
+  CheckCircle2, Circle, CalendarDays, Star, Swords, Target
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { CoinPill, StreakPill, XpPill, ProgressBar } from "@/components/ui/Pill";
-import { StarIcon, TrophyIcon, HeartIcon, BookIcon, FractionIllustration } from "@/components/ui/Illustrations";
-import { GradientButton } from "@/components/ui/Pill";
-import { FloatingCard, SectionTitle, StatPill, BrowseGrid, CARD_COLORS } from "@/components/ui/FloatingCard";
-import AvatarRenderer from "@/components/AvatarRenderer";
 
 export const dynamic = "force-dynamic";
 
 const EQ_EMOTIONS = [
-  { key: "HAPPY", label: "Happy", icon: Smile, bg: "bg-amber-100 hover:bg-amber-200", text: "text-amber-700", emoji: "😀" },
-  { key: "CALM", label: "Calm", icon: Leaf, bg: "bg-teal-100 hover:bg-teal-200", text: "text-teal-700", emoji: "😌" },
-  { key: "CURIOUS", label: "Curious", icon: SparklesIcon, bg: "bg-blue-100 hover:bg-blue-200", text: "text-blue-700", emoji: "🤔" },
-  { key: "OKAY", label: "Okay", icon: Meh, bg: "bg-slate-100 hover:bg-slate-200", text: "text-slate-600", emoji: "😐" },
-  { key: "SAD", label: "Sad", icon: CloudRain, bg: "bg-pink-100 hover:bg-pink-200", text: "text-pink-700", emoji: "😢" },
-  { key: "WORRIED", label: "Worried", icon: AlertTriangle, bg: "bg-purple-100 hover:bg-purple-200", text: "text-purple-700", emoji: "😟" },
-  { key: "FRUSTRATED", label: "Frustrated", icon: FlameIcon, bg: "bg-orange-100 hover:bg-orange-200", text: "text-orange-700", emoji: "😡" },
-  { key: "TIRED", label: "Tired", icon: Zap, bg: "bg-yellow-100 hover:bg-yellow-200", text: "text-yellow-700", emoji: "😴" },
+  { key: "HAPPY", label: "Happy", emoji: "😀", bg: "bg-amber-100 hover:bg-amber-200 border-amber-200" },
+  { key: "CALM", label: "Calm", emoji: "😌", bg: "bg-teal-100 hover:bg-teal-200 border-teal-200" },
+  { key: "CURIOUS", label: "Curious", emoji: "🤔", bg: "bg-blue-100 hover:bg-blue-200 border-blue-200" },
+  { key: "OKAY", label: "Okay", emoji: "😐", bg: "bg-slate-100 hover:bg-slate-200 border-slate-200" },
+  { key: "SAD", label: "Sad", emoji: "😢", bg: "bg-pink-100 hover:bg-pink-200 border-pink-200" },
+  { key: "WORRIED", label: "Worried", emoji: "😟", bg: "bg-purple-100 hover:bg-purple-200 border-purple-200" },
+  { key: "FRUSTRATED", label: "Frustrated", emoji: "😡", bg: "bg-orange-100 hover:bg-orange-200 border-orange-200" },
+  { key: "TIRED", label: "Tired", emoji: "😴", bg: "bg-yellow-100 hover:bg-yellow-200 border-yellow-200" },
 ];
+
+// Deduplicate lessons by subject for daily plan
+function deduplicateBySubject(lessons: any[], maxPerDay: number): any[] {
+  const seen = new Set<string>();
+  const result: any[] = [];
+  for (const lesson of lessons) {
+    const subject = lesson.subject || "General";
+    if (!seen.has(subject)) {
+      seen.add(subject);
+      result.push(lesson);
+      if (result.length >= maxPerDay) break;
+    }
+  }
+  return result;
+}
+
+// Build weekly schedule from lessons
+function buildWeeklySchedule(allLessons: any[]): Record<number, any[]> {
+  const schedule: Record<number, any[]> = { 0: [], 1: [], 2: [], 3: [], 4: [] }; // Mon-Fri
+  const subjectTracker: Record<number, Set<string>> = { 0: new Set(), 1: new Set(), 2: new Set(), 3: new Set(), 4: new Set() };
+  
+  for (const lesson of allLessons) {
+    const subject = lesson.subject || "General";
+    // Find the first day that doesn't have this subject yet
+    for (let day = 0; day < 5; day++) {
+      if (!subjectTracker[day].has(subject) && schedule[day].length < 6) {
+        schedule[day].push(lesson);
+        subjectTracker[day].add(subject);
+        break;
+      }
+    }
+  }
+  return schedule;
+}
+
+// Get current week's Monday-Sunday
+function getCurrentWeek(): Date[] {
+  const now = new Date();
+  const day = now.getDay();
+  const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+  const monday = new Date(now);
+  monday.setDate(diff);
+  monday.setHours(0, 0, 0, 0);
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(monday);
+    d.setDate(d.getDate() + i);
+    return d;
+  });
+}
+
+function isToday(d: Date): boolean {
+  const now = new Date();
+  return d.getDate() === now.getDate() && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+}
+
+function getDayName(d: Date): string {
+  return d.toLocaleDateString("en-US", { weekday: "short" });
+}
 
 export default function StudentDashboard() {
   const [data, setData] = useState<any>({});
@@ -80,16 +132,31 @@ export default function StudentDashboard() {
   const currentStreak = s.streak || 0;
   const completedLessons = s.lessonsCompleted || 0;
   const badgeCount = s.badges || 0;
-  const avatarLevel = Math.floor(totalXp / 100) + 1;
-  const xpProgress = totalXp % 100;
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
 
-  // Get today's lessons (up to 6)
+  // All published lessons
   const allLessons = data.lessons?.lessons || [];
-  const todayLessons = allLessons.slice(0, 6);
+  
+  // Today's lessons: deduplicated by subject, max 5
+  const todayLessons = deduplicateBySubject(allLessons, 5);
   const todayCompleted = todayLessons.filter((l: any) => l.progress?.completedAt).length;
-  const subjects = data.lessons?.subjects || [];
+  
+  // Weekly schedule
+  const weeklySchedule = buildWeeklySchedule(allLessons);
+  const weekDays = getCurrentWeek();
+  const todayIdx = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1; // Mon=0
+  
+  // Weekly streak strip
+  const streakDays = weekDays.map((d, i) => {
+    const isTodayDay = isToday(d);
+    const isPast = d < new Date(new Date().setHours(0, 0, 0, 0));
+    const isWeekend = i >= 5;
+    const dayLessons = weeklySchedule[i] || [];
+    const dayCompleted = dayLessons.filter((l: any) => l.progress?.completedAt).length;
+    const isActive = dayCompleted > 0;
+    return { date: d, dayName: getDayName(d), isToday: isTodayDay, isPast, isWeekend, isActive, completed: dayCompleted, total: dayLessons.length };
+  });
 
   if (loading) {
     return (
@@ -107,20 +174,54 @@ export default function StudentDashboard() {
 
   return (
     <div className="space-y-5">
-      {/* ── Greeting + Stat Pills ── */}
+      {/* ── Greeting ── */}
       <div className="flex items-end justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-xl lg:text-2xl font-extrabold text-text tracking-tight">
             {greeting}, {studentName}! <span className="inline-block wiggle">👋</span>
           </h1>
           <p className="text-text-muted text-sm mt-0.5">
-            {grade ? `Grade ${grade} • ` : ""}Let's make today an amazing learning adventure.
+            {grade ? `Grade ${grade}` : ""} • Let's make today amazing.
           </p>
         </div>
         <div className="flex items-center gap-2">
           <CoinPill coins={coins} size="sm" />
           <StreakPill count={currentStreak} size="sm" />
           <XpPill amount={totalXp} size="sm" />
+        </div>
+      </div>
+
+      {/* ── Weekly Streak Strip ── */}
+      <div className="rounded-2xl border border-orange-200/60 bg-gradient-to-r from-orange-50/80 to-amber-50/60 p-4">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <Flame size={16} className="text-orange-500" />
+            <span className="text-xs font-extrabold text-orange-700">This Week</span>
+          </div>
+          <span className="text-[10px] font-bold text-orange-600">{currentStreak}-day streak 🔥</span>
+        </div>
+        <div className="grid grid-cols-7 gap-1.5">
+          {streakDays.map((day, i) => (
+            <div key={i} className="flex flex-col items-center">
+              <span className={cn(
+                "text-[9px] font-bold uppercase mb-1",
+                day.isToday ? "text-primary" : day.isWeekend ? "text-text-muted/50" : "text-text-muted"
+              )}>
+                {day.dayName}
+              </span>
+              <div className={cn(
+                "w-9 h-9 rounded-xl flex items-center justify-center text-xs font-extrabold border-2 transition-all",
+                day.isToday ? "bg-primary text-white border-primary shadow-md" :
+                day.isActive ? "bg-secondary text-white border-secondary" :
+                day.isPast && !day.isWeekend ? "bg-red-50 text-red-400 border-red-200" :
+                day.isWeekend ? "bg-slate-50 text-slate-300 border-slate-100" :
+                "bg-white text-slate-400 border-slate-200"
+              )}>
+                {day.isToday ? "★" : day.isActive ? "✓" : day.isWeekend ? "—" : day.isPast ? "○" : String(i + 1)}
+              </div>
+              {day.isToday && <span className="text-[8px] font-bold text-primary mt-0.5">Today</span>}
+            </div>
+          ))}
         </div>
       </div>
 
@@ -137,13 +238,12 @@ export default function StudentDashboard() {
         </div>
 
         {todayLessons.length === 0 ? (
-          <div className="rounded-[1.5rem] border border-dashed border-primary/20 p-8 text-center">
-            <BookOpen className="w-10 h-10 text-primary/30 mx-auto mb-3" />
+          <div className="rounded-2xl border border-dashed border-primary/20 p-6 text-center">
+            <BookOpen className="w-8 h-8 text-primary/30 mx-auto mb-2" />
             <p className="text-sm font-bold text-text-muted">No lessons scheduled for today</p>
-            <p className="text-xs text-text-muted mt-1">Check back soon or ask your teacher to add lessons.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div className="space-y-2">
             {todayLessons.map((lesson: any, i: number) => {
               const isCompleted = lesson.progress?.completedAt != null;
               const themeSlug = lesson.quest?.theme?.slug || "";
@@ -153,37 +253,38 @@ export default function StudentDashboard() {
                 ? `/dashboard/student/lessons/${themeSlug}/${questSlug}/${lessonSlug}`
                 : "/dashboard/student/lessons";
               const subjectName = lesson.subject || "Lesson";
-              const color = CARD_COLORS[i % CARD_COLORS.length];
 
               return (
                 <Link
                   key={lesson.id || i}
                   href={lessonHref}
                   className={cn(
-                    "group rounded-[1.25rem] border p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg",
+                    "group flex items-center gap-3 p-3 rounded-xl border transition-all duration-200 hover:shadow-md",
                     isCompleted ? "border-secondary/20 bg-secondary/5" : "border-primary/10 bg-white hover:border-primary/20"
                   )}
                 >
-                  <div className="flex items-start justify-between mb-2">
-                    <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center", color.iconBg)}>
-                      {isCompleted ? (
-                        <CheckCircle2 size={16} className="text-secondary" />
-                      ) : (
-                        <BookIcon size={16} className={color.textColor} />
-                      )}
-                    </div>
-                    {isCompleted && (
-                      <span className="text-[9px] font-extrabold text-secondary bg-secondary/10 px-1.5 py-0.5 rounded-full">Done</span>
+                  <div className={cn(
+                    "w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0",
+                    isCompleted ? "bg-secondary/20" : "bg-primary/10"
+                  )}>
+                    {isCompleted ? (
+                      <CheckCircle2 size={18} className="text-secondary" />
+                    ) : (
+                      <BookOpen size={18} className="text-primary" />
                     )}
                   </div>
-                  <h3 className="text-xs font-extrabold text-text leading-tight mb-1 line-clamp-2">{lesson.title}</h3>
-                  <span className={cn("text-[9px] font-bold px-1.5 py-0.5 rounded-full", color.pillBg || "bg-primary/10 text-primary")}>
-                    {subjectName}
-                  </span>
-                  <div className="mt-2 flex items-center gap-1">
-                    <span className="text-[10px] font-bold text-primary flex items-center gap-0.5">
-                      {isCompleted ? "Review" : "Start"} <ArrowRight size={10} />
-                    </span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-extrabold text-text truncate">{lesson.title}</p>
+                    <p className="text-[10px] font-semibold text-text-muted">{subjectName}</p>
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    {isCompleted ? (
+                      <span className="text-[9px] font-extrabold text-secondary bg-secondary/10 px-2 py-0.5 rounded-full">Done</span>
+                    ) : (
+                      <span className="text-[10px] font-bold text-primary flex items-center gap-0.5">
+                        Start <ArrowRight size={10} />
+                      </span>
+                    )}
                   </div>
                 </Link>
               );
@@ -192,125 +293,87 @@ export default function StudentDashboard() {
         )}
       </div>
 
-      {/* ── Compact Modules Row ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        {/* EQ Check-in */}
-        <FloatingCard className="!p-3.5">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 rounded-xl bg-pink-soft flex items-center justify-center"><Heart size={16} className="text-pink" /></div>
-            <span className="text-[10px] font-extrabold uppercase tracking-wider text-text-muted">How are you feeling?</span>
+      {/* ── EQ Check-in (Prominent) ── */}
+      <div className="rounded-2xl border border-pink-200/60 bg-gradient-to-r from-pink-50/80 to-rose-50/60 p-5">
+        <div className="flex items-center gap-2 mb-3">
+          <Heart size={18} className="text-pink" />
+          <h2 className="text-sm font-extrabold text-text">How are you feeling today?</h2>
+        </div>
+        {checkinLoading ? (
+          <div className="flex items-center gap-2">
+            <div className="w-5 h-5 rounded-full border-2 border-pink/20 border-t-pink spinner" />
+            <span className="text-xs text-text-muted">Loading...</span>
           </div>
-          {checkinLoading ? (
-            <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded-full border-2 border-pink/20 border-t-pink spinner" /><span className="text-[10px] text-text-muted">Loading...</span></div>
-          ) : checkin ? (
-            <div className="flex items-center gap-2">
-              <span className="text-lg">{EQ_EMOTIONS.find(e => e.key === checkin.emotion)?.emoji || "😊"}</span>
-              <p className="text-sm font-extrabold text-pink">{checkin.emotionLabel || checkin.emotion}</p>
+        ) : checkin ? (
+          <div className="flex items-center gap-3">
+            <span className="text-3xl">{EQ_EMOTIONS.find(e => e.key === checkin.emotion)?.emoji || "😊"}</span>
+            <div>
+              <p className="text-base font-extrabold text-pink">{checkin.emotionLabel || checkin.emotion}</p>
+              <p className="text-[10px] text-text-muted">Tap below to change</p>
             </div>
-          ) : (
-            <div className="flex flex-wrap gap-1">
-              {EQ_EMOTIONS.map(({ key, label, emoji }) => (
-                <button key={key} onClick={() => submitCheckin(key)} disabled={checkinSaving}
-                  className="inline-flex items-center gap-0.5 px-2 py-1 rounded-full text-[10px] font-bold transition-all cursor-pointer active:scale-95 disabled:opacity-50 bg-pink-50 hover:bg-pink-100 text-pink-700">
-                  {emoji} {label}
-                </button>
-              ))}
-            </div>
-          )}
-        </FloatingCard>
-
-        {/* Badges */}
-        <Link href="/dashboard/student/badges">
-          <FloatingCard className="!p-3.5">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-8 h-8 rounded-xl bg-accent-purple-soft flex items-center justify-center"><StarIcon size={16} className="text-accent-purple" /></div>
-              <span className="text-[10px] font-extrabold uppercase tracking-wider text-text-muted">Badges</span>
-            </div>
-            <p className="text-lg font-extrabold text-accent-purple">{badgeCount}</p>
-            <p className="text-[10px] text-text-muted font-semibold">Achievements earned</p>
-          </FloatingCard>
-        </Link>
-
-        {/* Quest Progress */}
-        <Link href="/dashboard/student/quests">
-          <FloatingCard className="!p-3.5">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-8 h-8 rounded-xl bg-pink-soft/50 flex items-center justify-center"><TrophyIcon size={16} className="text-pink" /></div>
-              <span className="text-[10px] font-extrabold uppercase tracking-wider text-text-muted">Quests</span>
-            </div>
-            <p className="text-lg font-extrabold text-pink">{s.questsCompleted || 0}/{s.totalQuests || 0}</p>
-            <p className="text-[10px] text-text-muted font-semibold">Quests completed</p>
-          </FloatingCard>
-        </Link>
-
-        {/* Today's Goal */}
-        <FloatingCard className="!p-3.5">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 rounded-xl bg-accent-blue-soft/50 flex items-center justify-center"><Target size={16} className="text-accent-blue" /></div>
-            <span className="text-[10px] font-extrabold uppercase tracking-wider text-text-muted">Today's Goal</span>
           </div>
-          <p className="text-lg font-extrabold text-accent-blue">{todayCompleted}/{todayLessons.length}</p>
-          <p className="text-[10px] text-text-muted font-semibold">Lessons to complete</p>
-        </FloatingCard>
+        ) : null}
+        <div className="flex flex-wrap gap-2 mt-3">
+          {EQ_EMOTIONS.map(({ key, label, emoji, bg }) => (
+            <button
+              key={key}
+              onClick={() => submitCheckin(key)}
+              disabled={checkinSaving}
+              className={cn(
+                "inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border-2 transition-all cursor-pointer active:scale-95 disabled:opacity-50",
+                bg,
+                checkin?.emotion === key ? "ring-2 ring-pink ring-offset-1" : ""
+              )}
+            >
+              <span className="text-base">{emoji}</span>
+              <span>{label}</span>
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* ── Subjects Quick Access ── */}
+      {/* ── Progress Today (compact) ── */}
+      <div className="grid grid-cols-3 gap-2">
+        <div className="rounded-xl border border-accent-purple/10 bg-accent-purple/5 p-3 text-center">
+          <Trophy size={14} className="text-accent-purple mx-auto mb-1" />
+          <p className="text-base font-extrabold text-accent-purple">{badgeCount}</p>
+          <p className="text-[9px] font-bold text-text-muted">Badges</p>
+        </div>
+        <div className="rounded-xl border border-pink/10 bg-pink/5 p-3 text-center">
+          <Swords size={14} className="text-pink mx-auto mb-1" />
+          <p className="text-base font-extrabold text-pink">{s.questsCompleted || 0}/{s.totalQuests || 0}</p>
+          <p className="text-[9px] font-bold text-text-muted">Quests</p>
+        </div>
+        <div className="rounded-xl border border-accent-blue/10 bg-accent-blue/5 p-3 text-center">
+          <Target size={14} className="text-accent-blue mx-auto mb-1" />
+          <p className="text-base font-extrabold text-accent-blue">{completedLessons}</p>
+          <p className="text-[9px] font-bold text-text-muted">Done</p>
+        </div>
+      </div>
+
+      {/* ── My Subjects ── */}
       <div>
-        <SectionTitle
-          title="My Subjects"
-          subtitle="Jump back into your learning"
-          action={<Link href="/dashboard/student/subjects" className="text-xs font-bold text-primary hover:text-primary-dark flex items-center gap-1">View All <ChevronRight size={14} /></Link>}
-        />
-        {subjects.length === 0 ? (
-          <div className="rounded-[1.5rem] border border-dashed border-primary/20 p-6 text-center">
-            <BookOpen className="w-8 h-8 text-primary/30 mx-auto mb-2" />
-            <p className="text-sm font-bold text-text-muted">No subjects available yet</p>
-            <p className="text-xs text-text-muted mt-1">Your subjects will appear here once your teacher publishes lessons.</p>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-extrabold text-text">My Subjects</h2>
+          <Link href="/dashboard/student/subjects" className="text-[10px] font-bold text-primary">View All →</Link>
+        </div>
+        {(data.lessons?.subjects || []).length === 0 ? (
+          <div className="rounded-xl border border-dashed border-primary/20 p-4 text-center">
+            <BookOpen className="w-6 h-6 text-primary/30 mx-auto mb-1" />
+            <p className="text-xs text-text-muted">Loading subjects...</p>
           </div>
         ) : (
-          <BrowseGrid cols={4}>
-            {(subjects || []).slice(0, 8).map((subject: string, i: number) => {
-              const color = CARD_COLORS[i % CARD_COLORS.length];
-              const icons = [BookOpen, Swords, Star, Heart, Trophy, Sparkles, Target, GraduationCap];
-              const Icon = icons[i % icons.length];
-              return (
-                <Link key={subject} href="/dashboard/student/subjects">
-                  <FloatingCard className={cn("flex flex-col items-center gap-2 !p-4", color.border)}>
-                    <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center", color.iconBg)}>
-                      <Icon size={20} className={color.textColor} />
-                    </div>
-                    <span className="text-xs font-bold text-text text-center leading-tight">{subject}</span>
-                  </FloatingCard>
-                </Link>
-              );
-            })}
-          </BrowseGrid>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+            {(data.lessons?.subjects || []).slice(0, 8).map((subject: string, i: number) => (
+              <Link key={subject} href="/dashboard/student/subjects" className="block">
+                <div className="rounded-xl border border-primary/10 bg-white p-3 text-center hover:border-primary/20 hover:shadow-sm transition-all">
+                  <p className="text-xs font-extrabold text-text truncate">{subject}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
         )}
       </div>
-
-      {/* ── Streak + Lessons Completed ── */}
-      {currentStreak > 0 && (
-        <div className="rounded-2xl border border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50 p-4 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center shadow-[0_4px_15px_rgba(249,115,22,0.3)]">
-            <Flame size={24} className="text-white" />
-          </div>
-          <div className="flex-1">
-            <p className="text-2xl font-extrabold text-orange-700">{currentStreak}-day streak</p>
-            <p className="text-xs font-semibold text-orange-600/70">Keep it going! You're on fire! 🔥</p>
-          </div>
-          <div className="text-right">
-            <p className="text-lg font-extrabold text-primary">{completedLessons}</p>
-            <p className="text-[10px] font-semibold text-text-muted">lessons done</p>
-          </div>
-        </div>
-      )}
-
-      {/* ── Avatar + XP (hidden until polished) --}
-      {false && (
-        <FloatingCard className="!p-5">
-          ...
-        </FloatingCard>
-      ) */}
     </div>
   );
 }
