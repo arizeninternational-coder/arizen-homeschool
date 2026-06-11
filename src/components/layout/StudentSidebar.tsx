@@ -140,7 +140,7 @@ export function StudentSidebar({ children }: { children: React.ReactNode }) {
               <item.icon className="w-[18px] h-[18px] flex-shrink-0" />
               <span className="flex-1">{item.label}</span>
               {!item.active && (
-                <span className="text-[7px] font-extrabold uppercase tracking-wider bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full">Soon</span>
+                <span className="text-[6px] font-extrabold uppercase tracking-wider bg-pink-100 text-pink-500 px-1.5 py-0.5 rounded-full leading-none">Soon</span>
               )}
             </Link>
           );

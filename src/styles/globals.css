@@ -223,3 +223,56 @@ textarea:focus-visible {
   border-color: rgba(79, 70, 229, 0.4);
   border-radius: 1rem;
 }
+
+/* ── EQ Check-in Emotion Animations ── */
+@keyframes eq-confetti {
+  0% { background: radial-gradient(circle at 50% 50%, rgba(251,191,36,0.15) 0%, transparent 70%); }
+  50% { background: radial-gradient(circle at 30% 40%, rgba(251,191,36,0.25) 0%, transparent 60%), radial-gradient(circle at 70% 60%, rgba(234,179,8,0.2) 0%, transparent 50%); }
+  100% { background: transparent; }
+}
+@keyframes eq-breathe {
+  0%, 100% { background: radial-gradient(circle at 50% 50%, rgba(20,184,166,0.1) 0%, transparent 70%); }
+  50% { background: radial-gradient(circle at 50% 50%, rgba(20,184,166,0.2) 0%, transparent 60%); }
+}
+@keyframes eq-sparkle {
+  0% { background: radial-gradient(circle at 40% 40%, rgba(59,130,246,0.15) 0%, transparent 50%); }
+  50% { background: radial-gradient(circle at 60% 60%, rgba(59,130,246,0.25) 0%, transparent 50%), radial-gradient(circle at 30% 70%, rgba(147,197,253,0.2) 0%, transparent 40%); }
+  100% { background: transparent; }
+}
+@keyframes eq-bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+@keyframes eq-heart {
+  0%, 100% { background: radial-gradient(circle at 50% 50%, rgba(244,114,182,0.1) 0%, transparent 70%); }
+  50% { background: radial-gradient(circle at 50% 50%, rgba(244,114,182,0.2) 0%, transparent 60%); }
+}
+@keyframes eq-pulse {
+  0%, 100% { background: radial-gradient(circle at 50% 50%, rgba(168,85,247,0.1) 0%, transparent 70%); }
+  50% { background: radial-gradient(circle at 50% 50%, rgba(168,85,247,0.18) 0%, transparent 60%); }
+}
+@keyframes eq-cool {
+  0% { background: radial-gradient(circle at 50% 50%, rgba(249,115,22,0.15) 0%, transparent 70%); }
+  100% { background: radial-gradient(circle at 50% 50%, rgba(96,165,250,0.15) 0%, transparent 70%); }
+}
+@keyframes eq-moon {
+  0%, 100% { background: radial-gradient(circle at 60% 40%, rgba(250,204,21,0.08) 0%, transparent 60%); }
+  50% { background: radial-gradient(circle at 60% 40%, rgba(250,204,21,0.15) 0%, transparent 50%); }
+}
+@keyframes eq-emoji-bounce {
+  0%, 100% { transform: scale(1); }
+  25% { transform: scale(1.3) rotate(-5deg); }
+  50% { transform: scale(0.9) rotate(3deg); }
+  75% { transform: scale(1.1) rotate(-2deg); }
+}
+
+.eq-anim-active { animation-duration: 1.2s; animation-fill-mode: forwards; }
+.eq-anim-happy { animation-name: eq-confetti; }
+.eq-anim-calm { animation-name: eq-breathe; }
+.eq-anim-curious { animation-name: eq-sparkle; }
+.eq-anim-okay { animation-name: eq-bounce; }
+.eq-anim-sad { animation-name: eq-heart; }
+.eq-anim-worried { animation-name: eq-pulse; }
+.eq-anim-frustrated { animation-name: eq-cool; }
+.eq-anim-tired { animation-name: eq-moon; }
+.eq-emoji-bounce { display: inline-block; animation: eq-emoji-bounce 0.6s ease-out; }
