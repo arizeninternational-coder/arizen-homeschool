@@ -44,13 +44,11 @@ export default function CalendarPage() {
   useEffect(() => {
     async function load() {
       try {
-        // Fetch recent check-ins (last 7 days)
         const checkinRes = await fetch("/api/learner/checkin", { credentials: "include" });
         if (checkinRes.ok) {
           const cData = await checkinRes.json();
           setCheckins(cData.checkin ? [cData.checkin] : []);
         }
-        // Fetch lessons for the week
         const lessonsRes = await fetch("/api/learner/lessons", { credentials: "include" });
         if (lessonsRes.ok) {
           const lData = await lessonsRes.json();
@@ -69,10 +67,19 @@ export default function CalendarPage() {
     checkins.map((c) => new Date(c.createdAt).toDateString())
   );
 
-  // Simple goal: lessons available this week
   const totalLessons = lessons.length;
   const completedLessons = lessons.filter((l) => l.progress?.completedAt).length;
   const checkinCount = checkinDays.size;
+
+  // Distribute lessons across the week (Mon-Fri), 4-6 lessons per day
+  const lessonsByDay: Record<number, any[]> = {};
+  const weekdayIndices = [0, 1, 2, 3, 4]; // Mon-Fri
+  
+  lessons.forEach((lesson: any, i: number) => {
+    const dayIndex = weekdayIndices[i % weekdayIndices.length];
+    if (!lessonsByDay[dayIndex]) lessonsByDay[dayIndex] = [];
+    lessonsByDay[dayIndex].push(lesson);
+  });
 
   if (loading) {
     return (
@@ -89,7 +96,7 @@ export default function CalendarPage() {
   }
 
   return (
-    <div className="space-y-8 fade-in">
+    <div className="space-y-6 fade-in">
       <PageHeader title="Calendar" subtitle="Your learning schedule this week" />
 
       {/* Weekly Grid */}
@@ -98,41 +105,60 @@ export default function CalendarPage() {
           {weekDays.map((day, i) => {
             const today = isToday(day);
             const hasCheckin = checkinDays.has(day.toDateString());
+            const dayLessons = lessonsByDay[i] || [];
+            const isWeekend = i >= 5;
+            
             return (
               <div
                 key={i}
                 className={cn(
-                  "p-3 lg:p-4 text-center min-h-[100px] lg:min-h-[120px] transition-colors",
-                  today ? "bg-primary-soft/30" : "hover:bg-bg-main/50"
+                  "p-2 lg:p-3 text-center min-h-[120px] lg:min-h-[160px] transition-colors",
+                  today ? "bg-primary-soft/30" : "hover:bg-bg-main/50",
+                  isWeekend && "bg-bg-main/30"
                 )}
               >
                 <p className={cn("text-[10px] font-bold uppercase tracking-wider mb-1", today ? "text-primary-dark" : "text-text-muted")}>
                   {DAY_NAMES[i]}
                 </p>
                 <p className={cn(
-                  "text-sm font-extrabold mb-2 w-8 h-8 rounded-full flex items-center justify-center mx-auto",
+                  "text-sm font-extrabold mb-2 w-7 h-7 rounded-full flex items-center justify-center mx-auto",
                   today ? "bg-primary text-white" : "text-text"
                 )}>
                   {day.getDate()}
                 </p>
                 <div className="space-y-1">
                   {hasCheckin && (
-                    <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-secondary-soft">
-                      <Heart className="w-2.5 h-2.5 text-secondary" />
-                      <span className="text-[9px] font-bold text-secondary-dark">Checked in</span>
+                    <div className="inline-flex items-center gap-0.5 px-1 py-0.5 rounded-full bg-secondary-soft">
+                      <Heart className="w-2 h-2 text-secondary" />
+                      <span className="text-[8px] font-bold text-secondary-dark">Checked in</span>
                     </div>
                   )}
                   {!hasCheckin && today && (
-                    <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-bg-main">
-                      <Circle className="w-2.5 h-2.5 text-border-soft" />
-                      <span className="text-[9px] font-bold text-text-muted">Not yet</span>
+                    <div className="inline-flex items-center gap-0.5 px-1 py-0.5 rounded-full bg-bg-main">
+                      <Circle className="w-2 h-2 text-border-soft" />
+                      <span className="text-[8px] font-bold text-text-muted">Not yet</span>
                     </div>
                   )}
-                  {today && totalLessons > 0 && (
-                    <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-accent-blue-soft">
-                      <BookOpen className="w-2.5 h-2.5 text-accent-blue" />
-                      <span className="text-[9px] font-bold text-accent-blue">{totalLessons} lessons</span>
+                  {dayLessons.length > 0 && (
+                    <div className="space-y-0.5">
+                      {dayLessons.slice(0, 3).map((lesson: any, li: number) => {
+                        const completed = !!lesson.progress?.completedAt;
+                        return (
+                          <div key={li} className={cn(
+                            "text-[8px] font-bold truncate px-1 py-0.5 rounded",
+                            completed ? "bg-secondary-soft text-secondary-dark" : "bg-accent-blue-soft/50 text-accent-blue"
+                          )}>
+                            {completed ? "✓ " : ""}{lesson.title.substring(0, 20)}
+                          </div>
+                        );
+                      })}
+                      {dayLessons.length > 3 && (
+                        <p className="text-[8px] text-text-muted font-semibold">+{dayLessons.length - 3} more</p>
+                      )}
                     </div>
+                  )}
+                  {isWeekend && dayLessons.length === 0 && (
+                    <p className="text-[8px] text-text-muted italic">Rest day</p>
                   )}
                 </div>
               </div>
@@ -145,7 +171,7 @@ export default function CalendarPage() {
       <div className="rounded-[1.75rem] border border-white/60 bg-white p-5 lg:p-6">
         <h3 className="font-extrabold text-text mb-4 flex items-center gap-2">
           <Target className="w-5 h-5 text-primary" />
-          This Week&apos;s Goals
+          This Week's Goals
         </h3>
         <div className="space-y-4">
           <div>
@@ -174,11 +200,11 @@ export default function CalendarPage() {
         </div>
       </div>
 
-      {/* Upcoming Lessons */}
+      {/* Weekly Lesson Summary */}
       <div className="rounded-[1.75rem] border border-white/60 bg-white p-5 lg:p-6">
         <h3 className="font-extrabold text-text mb-4 flex items-center gap-2">
           <BookOpen className="w-5 h-5 text-accent-purple" />
-          Available Lessons
+          This Week's Lessons
         </h3>
         {lessons.length === 0 ? (
           <div className="text-center py-6">
@@ -186,29 +212,40 @@ export default function CalendarPage() {
             <p className="text-sm text-text-muted italic">No published lessons available yet.</p>
           </div>
         ) : (
-          <div className="space-y-2">
-            {lessons.slice(0, 8).map((lesson: any) => {
-              const completed = !!lesson.progress?.completedAt;
+          <div className="space-y-3">
+            {weekdayIndices.map((dayIdx) => {
+              const dayLessons = lessonsByDay[dayIdx] || [];
+              if (dayLessons.length === 0) return null;
+              const dayDate = weekDays[dayIdx];
               return (
-                <div key={lesson.id} className="flex items-center gap-3 p-3 rounded-xl bg-bg-main/50 border border-white/60/50">
-                  {completed ? (
-                    <CheckCircle2 className="w-5 h-5 text-secondary flex-shrink-0" />
-                  ) : (
-                    <Circle className="w-5 h-5 text-border-soft flex-shrink-0" />
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-text truncate">{lesson.title}</p>
-                    <p className="text-xs text-text-muted">{lesson.quest?.theme?.title || "Lesson"}</p>
+                <div key={dayIdx}>
+                  <p className="text-xs font-extrabold text-text-muted mb-1.5">
+                    {DAY_NAMES[dayIdx]}, {formatDate(dayDate)} {isToday(dayDate) && <span className="text-primary">(Today)</span>}
+                  </p>
+                  <div className="space-y-1.5 ml-2">
+                    {dayLessons.map((lesson: any, li: number) => {
+                      const completed = !!lesson.progress?.completedAt;
+                      return (
+                        <div key={li} className="flex items-center gap-2 p-2 rounded-lg bg-bg-main/50">
+                          {completed ? (
+                            <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0" />
+                          ) : (
+                            <Circle className="w-4 h-4 text-border-soft flex-shrink-0" />
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-bold text-text truncate">{lesson.title}</p>
+                            <p className="text-[10px] text-text-muted">{lesson.subject || "Lesson"}</p>
+                          </div>
+                          {completed && (
+                            <span className="px-1.5 py-0.5 rounded-full bg-secondary-soft text-secondary-dark text-[9px] font-extrabold">Done</span>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
-                  {completed && (
-                    <span className="px-2 py-0.5 rounded-full bg-secondary-soft text-secondary-dark text-[10px] font-extrabold">Done</span>
-                  )}
                 </div>
               );
             })}
-            {lessons.length > 8 && (
-              <p className="text-xs text-text-muted text-center pt-1">+{lessons.length - 8} more lessons</p>
-            )}
           </div>
         )}
       </div>

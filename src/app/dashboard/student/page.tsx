@@ -5,7 +5,8 @@ import Link from "next/link";
 import {
   BookOpen, Swords, Heart, Trophy, Star, ArrowRight, Flame,
   Target, Clock, GraduationCap, Sparkles, ChevronRight,
-  Smile, Leaf, Sparkles as SparklesIcon, Meh, CloudRain, Flame as FlameIcon, AlertTriangle, Zap
+  Smile, Leaf, Sparkles as SparklesIcon, Meh, CloudRain, Flame as FlameIcon, AlertTriangle, Zap,
+  CheckCircle2, Circle, CalendarDays
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { CoinPill, StreakPill, XpPill, ProgressBar } from "@/components/ui/Pill";
@@ -15,6 +16,17 @@ import { FloatingCard, SectionTitle, StatPill, BrowseGrid, CARD_COLORS } from "@
 import AvatarRenderer from "@/components/AvatarRenderer";
 
 export const dynamic = "force-dynamic";
+
+const EQ_EMOTIONS = [
+  { key: "HAPPY", label: "Happy", icon: Smile, bg: "bg-amber-100 hover:bg-amber-200", text: "text-amber-700", emoji: "😀" },
+  { key: "CALM", label: "Calm", icon: Leaf, bg: "bg-teal-100 hover:bg-teal-200", text: "text-teal-700", emoji: "😌" },
+  { key: "CURIOUS", label: "Curious", icon: SparklesIcon, bg: "bg-blue-100 hover:bg-blue-200", text: "text-blue-700", emoji: "🤔" },
+  { key: "OKAY", label: "Okay", icon: Meh, bg: "bg-slate-100 hover:bg-slate-200", text: "text-slate-600", emoji: "😐" },
+  { key: "SAD", label: "Sad", icon: CloudRain, bg: "bg-pink-100 hover:bg-pink-200", text: "text-pink-700", emoji: "😢" },
+  { key: "WORRIED", label: "Worried", icon: AlertTriangle, bg: "bg-purple-100 hover:bg-purple-200", text: "text-purple-700", emoji: "😟" },
+  { key: "FRUSTRATED", label: "Frustrated", icon: FlameIcon, bg: "bg-orange-100 hover:bg-orange-200", text: "text-orange-700", emoji: "😡" },
+  { key: "TIRED", label: "Tired", icon: Zap, bg: "bg-yellow-100 hover:bg-yellow-200", text: "text-yellow-700", emoji: "😴" },
+];
 
 export default function StudentDashboard() {
   const [data, setData] = useState<any>({});
@@ -61,7 +73,6 @@ export default function StudentDashboard() {
   }
 
   const s = data.summary || {};
-  // API returns: displayName, xp, coins, streak, lessonsCompleted, badges, grade at top level
   const studentName = s.displayName || "Learner";
   const grade = s.grade || "";
   const totalXp = s.xp || 0;
@@ -73,6 +84,12 @@ export default function StudentDashboard() {
   const xpProgress = totalXp % 100;
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+
+  // Get today's lessons (up to 6)
+  const allLessons = data.lessons?.lessons || [];
+  const todayLessons = allLessons.slice(0, 6);
+  const todayCompleted = todayLessons.filter((l: any) => l.progress?.completedAt).length;
+  const subjects = data.lessons?.subjects || [];
 
   if (loading) {
     return (
@@ -107,37 +124,73 @@ export default function StudentDashboard() {
         </div>
       </div>
 
-      {/* ── Today's Lesson Hero ── */}
-      {(() => {
-        // Use real lesson data from API
-        const recentLesson = data.lessons?.lessons?.[0];
-        const lessonTitle = recentLesson?.title || "Continue Learning";
-        const lessonSubject = recentLesson?.subject || "Lesson";
-        // API returns nested quest.slug and quest.theme.slug
-        const themeSlug = recentLesson?.quest?.theme?.slug || "";
-        const questSlug = recentLesson?.quest?.slug || "";
-        const lessonSlug = recentLesson?.slug || "";
-        const lessonHref = (themeSlug && questSlug && lessonSlug)
-          ? `/dashboard/student/lessons/${themeSlug}/${questSlug}/${lessonSlug}`
-          : "/dashboard/student/lessons";
-        const isCompleted = recentLesson?.progress?.completedAt != null;
-        return (
-          <Link
-            href={lessonHref}
-            className="block rounded-[1.5rem] border border-primary/10 p-5 bg-gradient-to-br from-primary/[0.04] to-accent-purple/[0.03] hover:shadow-[0_8px_25px_rgba(79,70,229,0.1)] hover:-translate-y-0.5 transition-all duration-200"
-          >
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-[9px] font-extrabold uppercase tracking-[0.12em] text-primary bg-primary/10 px-2.5 py-0.5 rounded-full">Today's Lesson</span>
-              {totalXp > 0 && <span className="text-[9px] font-semibold text-gold bg-gold-soft/50 px-2 py-0.5 rounded-full flex items-center gap-1"><Zap size={10} /> {totalXp} XP</span>}
-            </div>
-            <h2 className="text-lg lg:text-xl font-extrabold text-text mb-1">{lessonTitle}</h2>
-            <span className="inline-block text-[10px] font-bold text-accent-blue bg-accent-blue-soft/50 px-2.5 py-0.5 rounded-full mb-3">{lessonSubject}</span>
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-bold text-primary flex items-center gap-1">{isCompleted ? "Review Lesson" : "Start Lesson"} <ArrowRight size={14} /></span>
-            </div>
-          </Link>
-        );
-      })()}
+      {/* ── Today's Learning Plan ── */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <CalendarDays size={16} className="text-primary" />
+            <h2 className="text-sm font-extrabold text-text">Today's Learning Plan</h2>
+          </div>
+          <span className="text-[10px] font-bold text-text-muted bg-primary/10 px-2 py-0.5 rounded-full">
+            {todayCompleted}/{todayLessons.length} done
+          </span>
+        </div>
+
+        {todayLessons.length === 0 ? (
+          <div className="rounded-[1.5rem] border border-dashed border-primary/20 p-8 text-center">
+            <BookOpen className="w-10 h-10 text-primary/30 mx-auto mb-3" />
+            <p className="text-sm font-bold text-text-muted">No lessons scheduled for today</p>
+            <p className="text-xs text-text-muted mt-1">Check back soon or ask your teacher to add lessons.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {todayLessons.map((lesson: any, i: number) => {
+              const isCompleted = lesson.progress?.completedAt != null;
+              const themeSlug = lesson.quest?.theme?.slug || "";
+              const questSlug = lesson.quest?.slug || "";
+              const lessonSlug = lesson.slug || "";
+              const lessonHref = (themeSlug && questSlug && lessonSlug)
+                ? `/dashboard/student/lessons/${themeSlug}/${questSlug}/${lessonSlug}`
+                : "/dashboard/student/lessons";
+              const subjectName = lesson.subject || "Lesson";
+              const color = CARD_COLORS[i % CARD_COLORS.length];
+
+              return (
+                <Link
+                  key={lesson.id || i}
+                  href={lessonHref}
+                  className={cn(
+                    "group rounded-[1.25rem] border p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg",
+                    isCompleted ? "border-secondary/20 bg-secondary/5" : "border-primary/10 bg-white hover:border-primary/20"
+                  )}
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center", color.iconBg)}>
+                      {isCompleted ? (
+                        <CheckCircle2 size={16} className="text-secondary" />
+                      ) : (
+                        <BookIcon size={16} className={color.textColor} />
+                      )}
+                    </div>
+                    {isCompleted && (
+                      <span className="text-[9px] font-extrabold text-secondary bg-secondary/10 px-1.5 py-0.5 rounded-full">Done</span>
+                    )}
+                  </div>
+                  <h3 className="text-xs font-extrabold text-text leading-tight mb-1 line-clamp-2">{lesson.title}</h3>
+                  <span className={cn("text-[9px] font-bold px-1.5 py-0.5 rounded-full", color.pillBg || "bg-primary/10 text-primary")}>
+                    {subjectName}
+                  </span>
+                  <div className="mt-2 flex items-center gap-1">
+                    <span className="text-[10px] font-bold text-primary flex items-center gap-0.5">
+                      {isCompleted ? "Review" : "Start"} <ArrowRight size={10} />
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </div>
 
       {/* ── Compact Modules Row ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -145,27 +198,21 @@ export default function StudentDashboard() {
         <FloatingCard className="!p-3.5">
           <div className="flex items-center gap-2 mb-2">
             <div className="w-8 h-8 rounded-xl bg-pink-soft flex items-center justify-center"><Heart size={16} className="text-pink" /></div>
-            <span className="text-[10px] font-extrabold uppercase tracking-wider text-text-muted">EQ Check-in</span>
+            <span className="text-[10px] font-extrabold uppercase tracking-wider text-text-muted">How are you feeling?</span>
           </div>
           {checkinLoading ? (
             <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded-full border-2 border-pink/20 border-t-pink spinner" /><span className="text-[10px] text-text-muted">Loading...</span></div>
           ) : checkin ? (
-            <p className="text-sm font-extrabold text-pink">{checkin.emotionLabel || checkin.emotion}</p>
+            <div className="flex items-center gap-2">
+              <span className="text-lg">{EQ_EMOTIONS.find(e => e.key === checkin.emotion)?.emoji || "😊"}</span>
+              <p className="text-sm font-extrabold text-pink">{checkin.emotionLabel || checkin.emotion}</p>
+            </div>
           ) : (
             <div className="flex flex-wrap gap-1">
-              {([
-                { key: "HAPPY", label: "Happy", icon: Smile, bg: "bg-amber-100 hover:bg-amber-200", text: "text-amber-700" },
-                { key: "CALM", label: "Calm", icon: Leaf, bg: "bg-teal-100 hover:bg-teal-200", text: "text-teal-700" },
-                { key: "CURIOUS", label: "Curious", icon: SparklesIcon, bg: "bg-blue-100 hover:bg-blue-200", text: "text-blue-700" },
-                { key: "OKAY", label: "Okay", icon: Meh, bg: "bg-slate-100 hover:bg-slate-200", text: "text-slate-600" },
-                { key: "SAD", label: "Sad", icon: CloudRain, bg: "bg-pink-100 hover:bg-pink-200", text: "text-pink-700" },
-                { key: "WORRIED", label: "Worried", icon: AlertTriangle, bg: "bg-purple-100 hover:bg-purple-200", text: "text-purple-700" },
-                { key: "FRUSTRATED", label: "Frustrated", icon: FlameIcon, bg: "bg-orange-100 hover:bg-orange-200", text: "text-orange-700" },
-                { key: "TIRED", label: "Tired", icon: Zap, bg: "bg-yellow-100 hover:bg-yellow-200", text: "text-yellow-700" },
-              ] as const).map(({ key, label, icon: Icon, bg, text }) => (
+              {EQ_EMOTIONS.map(({ key, label, emoji }) => (
                 <button key={key} onClick={() => submitCheckin(key)} disabled={checkinSaving}
-                  className={cn("inline-flex items-center gap-0.5 px-2 py-1 rounded-full text-[10px] font-bold transition-all cursor-pointer active:scale-95 disabled:opacity-50", bg, text)}>
-                  <Icon size={10} />{label}
+                  className="inline-flex items-center gap-0.5 px-2 py-1 rounded-full text-[10px] font-bold transition-all cursor-pointer active:scale-95 disabled:opacity-50 bg-pink-50 hover:bg-pink-100 text-pink-700">
+                  {emoji} {label}
                 </button>
               ))}
             </div>
@@ -202,7 +249,7 @@ export default function StudentDashboard() {
             <div className="w-8 h-8 rounded-xl bg-accent-blue-soft/50 flex items-center justify-center"><Target size={16} className="text-accent-blue" /></div>
             <span className="text-[10px] font-extrabold uppercase tracking-wider text-text-muted">Today's Goal</span>
           </div>
-          <p className="text-lg font-extrabold text-accent-blue">{s.lessonsToday || 0}/3</p>
+          <p className="text-lg font-extrabold text-accent-blue">{todayCompleted}/{todayLessons.length}</p>
           <p className="text-[10px] text-text-muted font-semibold">Lessons to complete</p>
         </FloatingCard>
       </div>
@@ -214,23 +261,31 @@ export default function StudentDashboard() {
           subtitle="Jump back into your learning"
           action={<Link href="/dashboard/student/subjects" className="text-xs font-bold text-primary hover:text-primary-dark flex items-center gap-1">View All <ChevronRight size={14} /></Link>}
         />
-        <BrowseGrid cols={4}>
-          {(data.lessons?.subjects || []).slice(0, 8).map((subject: string, i: number) => {
-            const color = CARD_COLORS[i % CARD_COLORS.length];
-            const icons = [BookOpen, Swords, Star, Heart, Trophy, Sparkles, Target, GraduationCap];
-            const Icon = icons[i % icons.length];
-            return (
-              <Link key={subject} href="/dashboard/student/subjects">
-                <FloatingCard className={cn("flex flex-col items-center gap-2 !p-4", color.border)}>
-                  <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center", color.iconBg)}>
-                    <Icon size={20} className={color.textColor} />
-                  </div>
-                  <span className="text-xs font-bold text-text text-center leading-tight">{subject}</span>
-                </FloatingCard>
-              </Link>
-            );
-          })}
-        </BrowseGrid>
+        {subjects.length === 0 ? (
+          <div className="rounded-[1.5rem] border border-dashed border-primary/20 p-6 text-center">
+            <BookOpen className="w-8 h-8 text-primary/30 mx-auto mb-2" />
+            <p className="text-sm font-bold text-text-muted">No subjects available yet</p>
+            <p className="text-xs text-text-muted mt-1">Your subjects will appear here once your teacher publishes lessons.</p>
+          </div>
+        ) : (
+          <BrowseGrid cols={4}>
+            {(subjects || []).slice(0, 8).map((subject: string, i: number) => {
+              const color = CARD_COLORS[i % CARD_COLORS.length];
+              const icons = [BookOpen, Swords, Star, Heart, Trophy, Sparkles, Target, GraduationCap];
+              const Icon = icons[i % icons.length];
+              return (
+                <Link key={subject} href="/dashboard/student/subjects">
+                  <FloatingCard className={cn("flex flex-col items-center gap-2 !p-4", color.border)}>
+                    <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center", color.iconBg)}>
+                      <Icon size={20} className={color.textColor} />
+                    </div>
+                    <span className="text-xs font-bold text-text text-center leading-tight">{subject}</span>
+                  </FloatingCard>
+                </Link>
+              );
+            })}
+          </BrowseGrid>
+        )}
       </div>
 
       {/* ── Streak + Lessons Completed ── */}
@@ -250,39 +305,12 @@ export default function StudentDashboard() {
         </div>
       )}
 
-      {/* ── Avatar + XP ── */}
-      <FloatingCard className="!p-5">
-        <div className="flex flex-col sm:flex-row items-center gap-5">
-          <div className="flex-shrink-0">
-            <div className="w-20 h-24 rounded-2xl bg-gradient-to-b from-primary-soft/40 to-accent-purple-soft/30 flex items-center justify-center shadow-[0_4px_15px_rgba(79,70,229,0.08)] relative overflow-hidden">
-              <AvatarRenderer size="sm" skinHex="#C68642" hairColorHex="#1a1a1a" hairStyle="short-curls" outfitHex="#4F46E5" shoeHex="#37474F" expression="happy" className="relative z-10" />
-            </div>
-          </div>
-          <div className="flex-1 text-center sm:text-left">
-            <div className="flex items-center gap-2 justify-center sm:justify-start mb-0.5">
-              <h3 className="text-base font-extrabold text-text">Your Avatar</h3>
-              <span className="text-[9px] font-extrabold uppercase tracking-wider bg-gold-soft text-amber-800 px-2 py-0.5 rounded-full">Level {avatarLevel}</span>
-            </div>
-            <p className="text-xs text-text-muted mb-2">{["Explorer", "Adventurer", "Scholar", "Champion", "Master", "Legend"][Math.min(avatarLevel - 1, 5)]}</p>
-            <div className="max-w-xs mx-auto sm:mx-0 mb-2">
-              <ProgressBar value={xpProgress} max={100} color="bg-gradient-to-r from-primary to-accent-purple" height="h-2" />
-            </div>
-            <p className="text-[10px] text-text-muted font-semibold">{totalXp.toLocaleString()} XP total • {xpProgress}/100 to next level</p>
-          </div>
-          <div className="flex gap-2 flex-shrink-0">
-            <Link href="/dashboard/student/avatar">
-              <button className="px-4 py-2 rounded-xl text-xs font-bold bg-primary-soft text-primary hover:brightness-110 transition-all flex items-center gap-1.5">
-                <Sparkles size={12} /> Customize <span className="px-1.5 py-0.5 rounded-full bg-red-100 text-red-700 text-[8px] font-extrabold uppercase">Soon</span>
-              </button>
-            </Link>
-            <Link href="/dashboard/student/shop">
-              <button className="px-4 py-2 rounded-xl text-xs font-bold bg-gold-soft/50 text-amber-700 hover:brightness-105 transition-all flex items-center gap-1.5">
-                <Sparkles size={12} /> Shop <span className="px-1.5 py-0.5 rounded-full bg-red-100 text-red-700 text-[8px] font-extrabold uppercase">Soon</span>
-              </button>
-            </Link>
-          </div>
-        </div>
-      </FloatingCard>
+      {/* ── Avatar + XP (hidden until polished) --}
+      {false && (
+        <FloatingCard className="!p-5">
+          ...
+        </FloatingCard>
+      ) */}
     </div>
   );
 }
