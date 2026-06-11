@@ -10,7 +10,7 @@ import {
 import { cn } from "@/lib/utils/cn";
 import { PageHeader, SectionHeader, GradientButton, StatCard, EmptyStateCard } from "@/components/ui/Pill";
 import { CoinIcon, StreakIcon, BookIcon } from "@/components/ui/Illustrations";
-import AvatarRenderer from "@/components/AvatarRenderer";
+// AvatarRenderer removed — using initials until avatar system is polished
 
 export const dynamic = "force-dynamic";
 
@@ -152,8 +152,8 @@ export default function ParentDashboard() {
                     className="rounded-[1.5rem] bg-white/80 backdrop-blur-sm p-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-[#E2E8F0]/40 hover:shadow-[0_8px_25px_rgba(0,0,0,0.05)] transition-all duration-200"
                   >
                     <div className="flex items-start gap-4 mb-4">
-                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/10 to-accent-purple/10 flex items-center justify-center shadow-md flex-shrink-0 overflow-hidden">
-                        <AvatarRenderer size="xs" skinHex="#C68642" hairColorHex="#1a1a1a" hairStyle="short-curls" outfitHex="#4F46E5" shoeHex="#37474F" expression="happy" />
+                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center shadow-md flex-shrink-0">
+                        <span className="text-lg font-black text-white">{(child.name || child.displayName || 'S').split(' ').map(function(n){return n[0];}).join('').toUpperCase().slice(0,2)}</span>
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="text-base font-bold text-text truncate">{child.name || child.displayName || "Student"}</h3>
