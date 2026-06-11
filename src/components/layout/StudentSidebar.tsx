@@ -61,7 +61,6 @@ export function StudentSidebar({ children }: { children: React.ReactNode }) {
   const currentStreak = summary?.streak || profile?.currentStreak || 0;
   const initials = studentName.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2);
 
-  // Build 7-day streak data
   const today = new Date();
   const monday = getMonday(today);
   const streakDays = Array.from({ length: 7 }, (_, i) => {
@@ -70,47 +69,46 @@ export function StudentSidebar({ children }: { children: React.ReactNode }) {
     const isToday = d.getDate() === today.getDate() && d.getMonth() === today.getMonth();
     const isPast = d < new Date(today.setHours(0, 0, 0, 0));
     const isWeekend = i >= 5;
-    // For now, mark past weekdays as active if streak > 0
     const isActive = currentStreak > 0 && isPast && !isWeekend;
     return { isToday, isPast, isWeekend, isActive, dayLabel: DAY_LABELS[i] };
   });
 
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-white/80 backdrop-blur-xl">
+    <div className="flex flex-col h-full bg-white shadow-[2px_0_16px_rgba(0,0,0,0.04)]">
       {/* Logo */}
-      <div className="flex items-center gap-3 px-5 py-4">
-        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center shadow-[0_4px_15px_rgba(79,70,229,0.25)]">
+      <div className="flex items-center gap-3 px-6 py-5">
+        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-200">
           <Sparkles className="w-5 h-5 text-white" />
         </div>
-        <span className="font-extrabold text-lg text-text tracking-tight">Arizen</span>
+        <span className="font-extrabold text-xl text-gray-900 tracking-tight">Arizen</span>
       </div>
 
-      {/* ── Streak Card ── */}
-      <div className="px-4 pb-3">
+      {/* Streak Card */}
+      <div className="px-4 pb-4">
         <div className="rounded-2xl bg-gradient-to-br from-orange-50 to-amber-50 border border-orange-200/60 p-3">
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center justify-between mb-2.5">
             <div className="flex items-center gap-1.5">
               <Flame size={14} className="text-orange-500" />
-              <span className="text-xs font-extrabold text-orange-700">Streak</span>
+              <span className="text-xs font-bold text-orange-700">Streak</span>
             </div>
-            <span className="text-sm font-black text-orange-600">{currentStreak}d 🔥</span>
+            <span className="text-lg font-black text-orange-600 leading-none">{currentStreak}<span className="text-xs font-bold">d</span></span>
           </div>
           <div className="grid grid-cols-7 gap-1">
             {streakDays.map((day, i) => (
-              <div key={i} className="flex flex-col items-center">
+              <div key={i} className="flex flex-col items-center gap-0.5">
                 <span className={cn(
-                  "text-[8px] font-bold mb-0.5",
-                  day.isToday ? "text-primary" : day.isWeekend ? "text-text-muted/40" : "text-text-muted"
+                  "text-[8px] font-bold",
+                  day.isToday ? "text-indigo-600" : day.isWeekend ? "text-gray-300" : "text-gray-400"
                 )}>
                   {day.dayLabel}
                 </span>
                 <div className={cn(
-                  "w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-extrabold border transition-all",
-                  day.isToday ? "bg-primary text-white border-primary shadow-sm" :
-                  day.isActive ? "bg-secondary text-white border-secondary" :
+                  "w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-bold border transition-all",
+                  day.isToday ? "bg-indigo-600 text-white border-indigo-600 shadow-sm" :
+                  day.isActive ? "bg-emerald-500 text-white border-emerald-500" :
                   day.isPast && !day.isWeekend ? "bg-red-50 text-red-300 border-red-100" :
-                  day.isWeekend ? "bg-slate-50 text-slate-300 border-slate-100" :
-                  "bg-white text-slate-300 border-slate-100"
+                  day.isWeekend ? "bg-gray-50 text-gray-300 border-gray-100" :
+                  "bg-white text-gray-300 border-gray-100"
                 )}>
                   {day.isToday ? "★" : day.isActive ? "✓" : day.isWeekend ? "·" : day.isPast ? "○" : "·"}
                 </div>
@@ -121,7 +119,7 @@ export function StudentSidebar({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-3 py-2 space-y-0.5">
+      <nav className="flex-1 overflow-y-auto px-3 py-1 space-y-0.5">
         {NAV_ITEMS.map((item) => {
           const isActive = pathname === item.href || (item.href !== "/dashboard/student" && pathname.startsWith(item.href));
           return (
@@ -130,17 +128,17 @@ export function StudentSidebar({ children }: { children: React.ReactNode }) {
               href={item.active ? item.href : "#"}
               onClick={(e) => { if (!item.active) e.preventDefault(); setMobileOpen(false); }}
               className={cn(
-                "flex items-center gap-3 px-4 py-2.5 rounded-2xl text-sm font-semibold transition-all duration-150",
-                !item.active && "opacity-50 cursor-not-allowed",
+                "flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150",
+                !item.active && "opacity-40 cursor-not-allowed",
                 isActive && item.active
-                  ? "bg-gradient-to-r from-indigo-50/80 to-violet-50/60 text-[#4F46E5] shadow-[0_2px_8px_rgba(79,70,229,0.06)]"
-                  : item.active && "text-[#64748B] hover:bg-[#F8F7FF] hover:text-[#0F172A]"
+                  ? "bg-indigo-50 text-indigo-700"
+                  : item.active && "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
               )}
             >
               <item.icon className="w-[18px] h-[18px] flex-shrink-0" />
               <span className="flex-1">{item.label}</span>
               {!item.active && (
-                <span className="text-[6px] font-extrabold uppercase tracking-wider bg-pink-100 text-pink-500 px-1.5 py-0.5 rounded-full leading-none">Soon</span>
+                <span className="text-[6px] font-bold uppercase tracking-wider bg-pink-100 text-pink-500 px-1.5 py-0.5 rounded-full leading-none">Soon</span>
               )}
             </Link>
           );
@@ -148,19 +146,19 @@ export function StudentSidebar({ children }: { children: React.ReactNode }) {
       </nav>
 
       {/* Student Profile */}
-      <div className="px-3 py-3">
-        <div className="flex items-center gap-3 px-3 py-3 rounded-2xl bg-gradient-to-r from-primary-soft/40 to-accent-purple-soft/30 mb-2">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center flex-shrink-0">
-            <span className="text-sm font-extrabold text-white">{initials}</span>
+      <div className="px-3 py-3 border-t border-gray-100">
+        <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gray-50 mb-2">
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center flex-shrink-0">
+            <span className="text-xs font-bold text-white">{initials}</span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold text-text truncate">{studentName}</p>
-            <p className="text-xs text-text-muted">Grade {grade}</p>
+            <p className="text-sm font-bold text-gray-900 truncate">{studentName}</p>
+            <p className="text-[10px] text-gray-500">Grade {grade || "—"}</p>
           </div>
         </div>
         <button
           onClick={() => { fetch("/api/auth/logout", { method: "POST", credentials: "include" }).then(() => window.location.href = "/"); }}
-          className="flex items-center gap-3 px-4 py-2.5 rounded-2xl text-sm font-semibold text-text-muted hover:bg-red-50 hover:text-danger w-full transition-colors"
+          className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-500 hover:bg-red-50 hover:text-red-600 w-full transition-colors"
         >
           <LogOut className="w-[18px] h-[18px]" />
           <span>Sign Out</span>
@@ -170,39 +168,39 @@ export function StudentSidebar({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <div className="flex min-h-screen bg-bg-main">
-      <aside className="hidden lg:flex lg:w-[260px] lg:flex-col lg:fixed lg:inset-y-0 z-40 shadow-[4px_0_24px_rgba(0,0,0,0.03)]">
+    <div className="flex min-h-screen bg-[#F7F8FF]">
+      <aside className="hidden lg:flex lg:w-[290px] lg:flex-col lg:fixed lg:inset-y-0 z-40">
         {sidebarContent}
       </aside>
       {mobileOpen && (
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden fade-in" onClick={() => setMobileOpen(false)} />
       )}
       <aside className={cn(
-        "fixed inset-y-0 left-0 z-50 w-[260px] transform transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] lg:hidden shadow-xl",
+        "fixed inset-y-0 left-0 z-50 w-[290px] transform transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] lg:hidden shadow-xl",
         mobileOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         {sidebarContent}
       </aside>
-      <div className="flex-1 lg:ml-[260px] flex flex-col min-h-screen">
-        <header className="sticky top-0 z-30 h-14 bg-white/70 backdrop-blur-xl flex items-center justify-between px-4 lg:px-6 gap-4">
+      <div className="flex-1 lg:ml-[290px] flex flex-col min-h-screen">
+        <header className="sticky top-0 z-30 h-14 bg-white/80 backdrop-blur-xl border-b border-gray-100 flex items-center justify-between px-4 lg:px-6 gap-4">
           <div className="flex items-center gap-3">
-            <button onClick={() => setMobileOpen(true)} className="lg:hidden p-2 rounded-xl hover:bg-bg-main text-text-muted">
+            <button onClick={() => setMobileOpen(true)} className="lg:hidden p-2 rounded-xl hover:bg-gray-100 text-gray-500">
               <Menu className="w-5 h-5" />
             </button>
             <Link href="/dashboard/student" className="flex items-center gap-2 lg:hidden">
-              <Sparkles className="w-5 h-5 text-primary" />
-              <span className="font-extrabold text-sm text-primary">Arizen</span>
+              <Sparkles className="w-5 h-5 text-indigo-600" />
+              <span className="font-extrabold text-sm text-indigo-600">Arizen</span>
             </Link>
           </div>
           <button
             onClick={() => fetch("/api/auth/logout", { method: "POST", credentials: "include" }).then(() => window.location.href = "/")}
-            className="p-2 rounded-xl hover:bg-red-50 text-text-muted hover:text-danger transition-colors"
+            className="p-2 rounded-xl hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors"
             title="Sign Out"
           >
             <LogOut className="w-4 h-4" />
           </button>
         </header>
-        <main className="flex-1 p-4 lg:p-6 max-w-[1400px] w-full">
+        <main className="flex-1 p-5 lg:p-7 max-w-[1400px] w-full">
           {children}
         </main>
       </div>

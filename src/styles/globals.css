@@ -265,14 +265,16 @@ textarea:focus-visible {
   50% { transform: scale(0.9) rotate(3deg); }
   75% { transform: scale(1.1) rotate(-2deg); }
 }
-
-.eq-anim-active { animation-duration: 1.2s; animation-fill-mode: forwards; }
-.eq-anim-happy { animation-name: eq-confetti; }
-.eq-anim-calm { animation-name: eq-breathe; }
-.eq-anim-curious { animation-name: eq-sparkle; }
-.eq-anim-okay { animation-name: eq-bounce; }
-.eq-anim-sad { animation-name: eq-heart; }
-.eq-anim-worried { animation-name: eq-pulse; }
-.eq-anim-frustrated { animation-name: eq-cool; }
-.eq-anim-tired { animation-name: eq-moon; }
-.eq-emoji-bounce { display: inline-block; animation: eq-emoji-bounce 0.6s ease-out; }
+/* ── EQ Check-in Emotion Animations ── */
+.eq-anim-pulse {
+  animation: eq-glow-pulse 1.5s ease-out forwards;
+}
+@keyframes eq-glow-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(244,114,182,0.3); }
+  30% { box-shadow: 0 0 20px 8px rgba(244,114,182,0.15); }
+  60% { box-shadow: 0 0 30px 12px rgba(244,114,182,0.08); }
+  100% { box-shadow: 0 0 0 0 rgba(244,114,182,0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .eq-anim-pulse { animation: none; }
+}
