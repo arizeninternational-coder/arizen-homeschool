@@ -1,0 +1,49 @@
+MESSAGING & SUPPORT API — Server-Side Admin Client Setup
+===========================================================
+
+WHAT CHANGED:
+- Created src/lib/supabase-admin.ts — lazy Supabase client using service role key
+- All messaging + support API routes now use this admin client (bypasses RLS)
+- Permission checks done in code (JWT user ID + role + relationship validation)
+- No RLS policies needed for these tables
+
+FILES CHANGED:
+1. src/lib/supabase-admin.ts (NEW)
+2. src/app/api/messages/conversations/route.ts (GET + POST)
+3. src/app/api/messages/conversations/[id]/messages/route.ts (GET)
+4. src/app/api/messages/conversations/[id]/send/route.ts (POST)
+5. src/app/api/parent/support/route.ts (POST)
+
+PERMISSION CHECKS:
+- POST conversations:
+  * PARENT → can only message linked children (verified via ParentChild table)
+  * LEARNER → can only message linked parents (verified via ParentChild table)
+  * ADMIN/TEACHER → can only message PARENT role
+- GET conversations: returns only conversations where user is a participant
+- GET messages: returns only if user is participant in the conversation
+- POST send: sender must be participant + role-based relationship validated
+- POST support: user.role must be PARENT, userId from JWT only (never from client input)
+
+REQUIRED ENV VAR (must add to .env.local):
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.xxxx
+(Get from Supabase Dashboard → Settings → API → service_role key)
+NEVER add to .env.example or commit to git.
+Must NOT have NEXT_PUBLIC_ prefix — server-only.
+
+RLS STATUS:
+- RLS SQL file (docs/RLS_POLICIES_TO_APPLY.sql) is NO LONGER NEEDED
+- The service role key bypasses RLS entirely
+- Can be applied later as defense-in-depth, but not required for MVP
+
+CURRENT DEPLOY:
+- Vercel auto-build from push is still Building (commit ea2018b)
+- Previous working preview: https://arizen-homeschool-50m1kci10-arizeninternational-coders-projects.vercel.app
+- Once built, new preview URL will appear in vercel ls output
+
+TESTING CHECKLIST (after SUPABASE_SERVICE_ROLE_KEY is set):
+[ ] Parent login → Messages → create conversation with child
+[ ] Child login → Messages → see parent's message
+[ ] Child → reply to message
+[ ] Parent → see child's reply
+[ ] Parent → Support page → submit request
+[ ] Verify support request created in DB

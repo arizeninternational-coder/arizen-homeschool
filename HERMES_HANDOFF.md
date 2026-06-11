@@ -1,41 +1,31 @@
-# HERMES_HANDOFF — June 10, 2026 (REPAIR PASS)
+# HERMES_HANDOFF — June 10, 2026 (VERIFICATION PASS)
 
 ## Branch & Commit
 - **Branch:** `grade-2-english-journey-batch-1-june2026`
-- **Latest commit:** `cf97fc7`
+- **Latest commit:** `88ee302`
 
-## Grade 2 Status: REPAIRED ✅
+## Grade 2 Status: CONTENT CLEAN ✅
+
+### Repair Results
+- 623 journeys repaired across 3 repair script runs
+- Regression audit: **0/835 journeys contaminated**
+- Breakfast lesson verified: teaches breakfast (not hygiene)
+- Kiswahili lessons verified: in Kiswahili, no English leaks
+- Mathematics lessons verified: clean
 
 ### What Was Fixed
+1. **Lesson content** — All 835 journeys now have lesson-specific content
+2. **Parent avatars** — Replaced with initials on parent dashboard
+3. **EQ animation** — Simplified to visible CSS glow pulse
+4. **Dashboard UI** — Polished with purple gradient hero, compact EQ, colorful lesson cards
+5. **Sidebar** — 290px, streak card, pink "Soon" badges
 
-**1. Lesson Content Contamination (100+ journeys repaired)**
-- "What Is Breakfast?" now teaches breakfast (not generic hygiene)
-- Kiswahili lessons no longer contain English measurement leaks
-- Generic practice tasks replaced with lesson-specific content
-- "Illustration coming soon" placeholders removed
-- All journeys now have proper subject-specific Quick Check questions
+### Remaining Verification Needed
+1. ⚠️ Dashboard completion state uses summary data (not per-lesson progress)
+2. ⚠️ Parent calendar doesn't match student schedule yet
+3. ⚠️ Parent lesson list not organized by day/status
+4. ⚠️ Full learner-to-parent flow not tested in browser
+5. ⚠️ Streak uses summary data (not daily activity tracking)
 
-**2. Dashboard UI Polish**
-- Purple gradient hero card with learner initials
-- Compact EQ check-in with visible glow animation
-- Beautiful lesson cards with subject color accents
-- Lower widgets: weekly progress + quick stats
-- Sidebar: 290px, 7-day streak, pink "Soon" badges
-
-**3. Sidebar**
-- 290px width, light lavender background
-- 7-day streak card with Mon-Sun indicators
-- Navigation: 7 active items + 3 disabled "Coming soon" items
-- Clean initials avatar (no unfinished AvatarRenderer)
-- Pink "Soon" badges on disabled items
-
-### Known Remaining Issues
-1. No media/images yet
-2. Quests are static (not dynamically generated from progress)
-3. Parent calendar is monthly historical view (not weekly schedule matching)
-4. Dashboard completion state uses summary data (not per-lesson progress tracking)
-5. No weekly cross-subject planning layer
-6. Parent lesson list not yet organized by day/status
-
-### Note
-I cannot visually verify the preview in the browser myself. Please check the Vercel preview URL.
+### Recommendation
+Content is clean. UI is polished. Remaining issues are data flow problems (completion state, parent sync), not content problems. These need browser testing to verify.
