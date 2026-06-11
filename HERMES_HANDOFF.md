@@ -1,14 +1,13 @@
-# HERMES_HANDOFF — June 10, 2026 (FINAL - PUBLISHED)
+# HERMES_HANDOFF — June 10, 2026 (FINAL)
 
-## Current Branch
-`grade-2-english-journey-batch-1-june2026`
+## Branch & Commit
+- **Branch:** `grade-2-english-journey-batch-1-june2026`
+- **Latest commit:** `b3e8d04`
 
-## Latest Commit
-`a4e2adf` — feat: publish all 843 Grade 2 lessons
+## Grade 2 Status: ALL PUBLISHED + LEARNER UX FIXED ✅
 
-## Grade 2 Status: ALL PUBLISHED ✅
-
-| Subject | Total | Status |
+### Coverage
+| Subject | Count | Status |
 |---------|-------|--------|
 | English (theme) | 90 | PUBLISHED |
 | English Language Activities | 48 | PUBLISHED |
@@ -19,26 +18,54 @@
 | Movement | 240 | PUBLISHED |
 | **TOTAL** | **843** | **ALL PUBLISHED** |
 
-## Counts
-- Themes: 18
-- Quests: 176
-- Total Lessons: 843 (all PUBLISHED, 0 DRAFT, 0 REVIEW, 0 ARCHIVED)
+### Critical Fixes Applied Tonight
 
-## What Was Done Tonight
-1. Generated journeys for all Grade 2 subjects (838 lessons)
-2. Fixed journey structure, content quality, Quick Check interactions
-3. Cleaned generic content from 95+ lessons
-4. Fixed API limits (200→1000) for lessons, quests, badges, learner lessons
-5. Published all 843 Grade 2 lessons
+1. **ThemeSubject table populated** (17 records, was 0)
+   - Root cause of "No subjects showing" in My Subjects page
+   - Maps themes to canonical CBC subject names
 
-## Production Status
-- ✅ All Grade 2 lessons are PUBLISHED and available to students
-- ✅ All have valid 10-step journeys
-- ✅ All have proper Quick Check MCQs
-- ✅ API limits fixed for accurate counts
+2. **All themes published** (18, was 9)
+3. **All quests published** (176, was 13)
+4. **API limits removed** from lessons, quests, badges, learner lessons APIs
+5. **Student dashboard rewritten**
+   - "Today's Learning Plan" with up to 6 lesson cards
+   - Each card shows: title, subject, status (Done/Start), progress
+   - Replaced single "Today's Lesson" hero
+6. **Calendar fixed**
+   - Lessons spread across Mon-Fri (not all on today)
+   - Shows lesson cards per day with completion status
+   - Weekends marked as "Rest day"
+   - Weekly lesson summary below calendar
+7. **EQ check-in improved**
+   - Warmer question: "How are you feeling?"
+   - Emoji buttons (😀😌🤔😐😢😟😡😴)
+   - Shows selected emotion with emoji after check-in
+8. **Avatar section hidden** (commented out until polished)
+9. **Generic content cleaned** from 95+ lesson journeys
+10. **Reading/Writing fallback templates** fixed with theme-specific content (30 journeys)
 
-## Next Steps
-1. Review preview at Vercel
-2. Spot-check student journey experience
-3. Verify parent dashboard shows progress
-4. Consider moving to Grade 5 Mathematics
+### Files Changed (this session)
+- `src/app/dashboard/student/page.tsx` — Complete rewrite of dashboard
+- `src/app/dashboard/student/calendar/page.tsx` — Weekly schedule view
+- `src/app/api/admin/lessons/route.ts` — Removed .limit()
+- `src/app/api/admin/quests/route.ts` — Removed .limit()
+- `src/app/api/admin/badges/route.ts` — Removed .limit()
+- `src/app/api/learner/lessons/route.ts` — Removed .limit()
+- `scripts/fix-critical.js` — ThemeSubject + theme/quest status fix
+- `scripts/publish-grade2.js` — Batch publish script
+- `scripts/cleanup-content.js` — Generic content cleanup
+- `scripts/fix-reading-writing.js` — Reading/Writing template fix
+- Plus 5 more cleanup/fix scripts
+
+### Remaining Known Issues
+1. No media/images generated yet (text-only journeys)
+2. Some think_first steps use technical sub-strand titles (actual CBC curriculum language)
+3. Parent dashboard not fully tested with real learner data
+4. Streak display could be improved (weekly progress strip)
+5. No weekly cross-subject planning layer yet
+6. Quests are static (not dynamically generated from lesson progress)
+
+### Recommendation
+✅ Grade 2 is ready for manual review. Preview should be live on Vercel.
+Spot-check the student dashboard, My Subjects page, and calendar.
+If those look good, consider moving to Grade 5 Mathematics or media generation.
