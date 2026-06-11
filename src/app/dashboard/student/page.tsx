@@ -12,14 +12,14 @@ import { CoinPill, XpPill } from "@/components/ui/Pill";
 export const dynamic = "force-dynamic";
 
 const EQ_EMOTIONS = [
-  { key: "HAPPY", label: "Happy", emoji: "😀" },
-  { key: "CALM", label: "Calm", emoji: "😌" },
-  { key: "CURIOUS", label: "Curious", emoji: "🤔" },
-  { key: "OKAY", label: "Okay", emoji: "😐" },
-  { key: "SAD", label: "Sad", emoji: "😢" },
-  { key: "WORRIED", label: "Worried", emoji: "😟" },
-  { key: "FRUSTRATED", label: "Frustrated", emoji: "😡" },
-  { key: "TIRED", label: "Tired", emoji: "😴" },
+  { key: "HAPPY", label: "Happy", emoji: "😀", msg: "Wonderful! Let's make today sparkle. ✨", anim: "confetti" },
+  { key: "CALM", label: "Calm", emoji: "😌", msg: "Peaceful. A great way to begin. 🌿", anim: "breathe" },
+  { key: "CURIOUS", label: "Curious", emoji: "🤔", msg: "Love that curiosity! Let's explore. 💡", anim: "sparkle" },
+  { key: "OKAY", label: "Okay", emoji: "😐", msg: "That's fine. We'll take it step by step. 🤝", anim: "bounce" },
+  { key: "SAD", label: "Sad", emoji: "😢", msg: "Thanks for sharing. We can take today gently. 💛", anim: "heart" },
+  { key: "WORRIED", label: "Worried", emoji: "😟", msg: "Feeling worried is okay. Let's start gently. 🤗", anim: "pulse" },
+  { key: "FRUSTRATED", label: "Frustrated", emoji: "😡", msg: "Let's take a breath. You've got this. 🌊", anim: "cool" },
+  { key: "TIRED", label: "Tired", emoji: "😴", msg: "Rest is important. Let's go at your pace. 🌙", anim: "moon" },
 ];
 
 function deduplicateBySubject(lessons: any[], max: number): any[] {
@@ -127,40 +127,36 @@ export default function StudentDashboard() {
         </div>
       </div>
 
-      {/* ── EQ Check-in (compact, warm, before learning plan) ── */}
+      {/* ── EQ Check-in ── */}
       <div className="rounded-2xl bg-gradient-to-r from-pink-50/80 to-rose-50/60 border border-pink-200/50 p-4">
-        <div className="flex items-start gap-4">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              <Heart size={16} className="text-pink" />
-              <h2 className="text-sm font-extrabold text-text">How are you feeling today?</h2>
+        <div className="flex items-center gap-2 mb-2">
+          <Heart size={16} className="text-pink" />
+          <h2 className="text-sm font-extrabold text-text">How are you feeling today?</h2>
+        </div>
+        {checkinLoading ? (
+          <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded-full border-2 border-pink/20 border-t-pink spinner" /><span className="text-[10px] text-text-muted">Loading...</span></div>
+        ) : checkin ? (
+          <div className="mb-2">
+            <div className="flex items-center gap-2">
+              <span className="text-xl">{EQ_EMOTIONS.find(e => e.key === checkin.emotion)?.emoji || "😊"}</span>
+              <span className="text-sm font-extrabold text-pink">{checkin.emotionLabel || checkin.emotion}</span>
             </div>
-            {checkinLoading ? (
-              <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded-full border-2 border-pink/20 border-t-pink spinner" /><span className="text-[10px] text-text-muted">Loading...</span></div>
-            ) : checkin ? (
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-2xl">{EQ_EMOTIONS.find(e => e.key === checkin.emotion)?.emoji || "😊"}</span>
-                <span className="text-sm font-extrabold text-pink">{checkin.emotionLabel || checkin.emotion}</span>
-              </div>
-            ) : null}
-            <div className="flex flex-wrap gap-1.5">
-              {EQ_EMOTIONS.map(({ key, label, emoji }) => (
-                <button key={key} onClick={() => submitCheckin(key)} disabled={checkinSaving}
-                  className={cn(
-                    "inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-[11px] font-bold border transition-all cursor-pointer active:scale-95 disabled:opacity-50",
-                    checkin?.emotion === key
-                      ? "bg-pink-200 border-pink-300 text-pink-800 ring-1 ring-pink-400"
-                      : "bg-white border-pink-100 text-pink-700 hover:bg-pink-50"
-                  )}>
-                  <span className="text-sm">{emoji}</span>
-                  <span>{label}</span>
-                </button>
-              ))}
-            </div>
+            <p className="text-[11px] text-pink-600/80 mt-1 ml-7">{EQ_EMOTIONS.find(e => e.key === checkin.emotion)?.msg || ""}</p>
           </div>
-          <div className="hidden sm:flex flex-col items-center justify-center w-16 h-16 rounded-2xl bg-pink-100/50 flex-shrink-0">
-            <Heart size={24} className="text-pink/40" />
-          </div>
+        ) : null}
+        <div className="flex flex-wrap gap-1.5">
+          {EQ_EMOTIONS.map(({ key, label, emoji }) => (
+            <button key={key} onClick={() => submitCheckin(key)} disabled={checkinSaving}
+              className={cn(
+                "inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-[11px] font-bold border transition-all cursor-pointer active:scale-95 disabled:opacity-50",
+                checkin?.emotion === key
+                  ? "bg-pink-200 border-pink-300 text-pink-800 ring-1 ring-pink-400"
+                  : "bg-white border-pink-100 text-pink-700 hover:bg-pink-50"
+              )}>
+              <span className="text-sm">{emoji}</span>
+              <span>{label}</span>
+            </button>
+          ))}
         </div>
       </div>
 
@@ -182,7 +178,10 @@ export default function StudentDashboard() {
             <p className="text-sm font-bold text-text-muted">No lessons scheduled for today</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-2">
+          <div className={cn(
+            "grid gap-2",
+            todayLessons.length <= 3 ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5"
+          )}>
             {todayLessons.map((lesson: any, i: number) => {
               const isCompleted = lesson.progress?.completedAt != null;
               const themeSlug = lesson.quest?.theme?.slug || "";
