@@ -1,0 +1,3542 @@
+[
+  {
+    "id": "981b27eb-9d0d-4450-9bed-e76f1ba54c96",
+    "title": "Adding Two 2-Digit Numbers Without Regrouping",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "78a3a720-af76-4c2e-8729-c5ef1421eded",
+    "title": "Multiplication as Repeated Addition with 2s and 3s",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "5cea9ba8-0047-466b-a4eb-6c1e80b3c92a",
+    "title": "Breaking Numbers Apart to Make 10",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "a97ab36c-9ad2-428d-832f-e688bea73382",
+    "title": "Reading Numbers 51 to 100 in Symbols",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "bc4a1378-6dff-4dd3-9fbb-0f5b7e9a631e",
+    "title": "Representing Numbers 1 to 50 Using Concrete Objects",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "d7cdedaa-4fc1-42fa-8f28-7aef3761a645",
+    "title": "Adding Two 2-Digit Numbers With Regrouping",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "37ff4212-3981-40fc-82d4-594215f18374",
+    "title": "Combining Levels, Pathways and Directions in Hopping",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "239becec-4f84-4e38-8169-a0bc72730d5f",
+    "title": "Counting Numbers 1 to 100 Forward",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "e0000020-0000-0000-0000-000000000020",
+    "title": "Parts of a Plant",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "04a80f76-bf67-4c8c-b3f0-183a3b205e16",
+    "title": "Counting Numbers 1 to 100 Backward",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "7e886e8a-9486-430f-b035-12909bd581a6",
+    "title": "Filling in Missing Numbers 1 to 50",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "853782ed-f7d2-4536-9665-cab6f525dbff",
+    "title": "Filling in Missing Numbers 51 to 100",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "a2f4effa-29f9-446c-be7b-0cf238d40dff",
+    "title": "Kusoma hadithi kuhusu haki za watoto",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "b98455b3-bbb1-4832-bbe7-c9e4611bbd5a",
+    "title": "Kuandika sentensi kuhusu shuleni",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "ba61386e-a890-4cdc-9537-cf5fa2b0863c",
+    "title": "Kusoma nambari 11-50 kwa Kiswahili",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "71850381-f070-437f-8bec-8fec93d6f7cc",
+    "title": "Counting in 5s Forward up to 100",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "51490dd5-4156-4b35-9910-0dfa7631bb37",
+    "title": "Kutaja haki za watoto",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "74590ca5-c695-4bf2-a990-6be39c08285b",
+    "title": "Counting in 2s Backward up to 100",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "b4130ea8-b7a0-4e57-9574-8354cf7cd146",
+    "title": "Kusoma silabi na maneno yenye g, d, j na r",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "029b94d1-1c89-415e-8e66-61e0810ac7a0",
+    "title": "Kueleza ujumbe wa hadithi ya usalama",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "2c1435c9-fc6a-4b6d-93f8-38f85ffb287e",
+    "title": "Kuandika kuhusu chombo cha usafiri",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "e0000010-0000-0000-0000-000000000010",
+    "title": "Up to Hundred Thousands",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "f2a264e6-56cf-44bc-ba18-82b8f4087170",
+    "title": "Kutaja msamiati wa usalama",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "22d83674-88b9-4431-ac3c-264ba5115764",
+    "title": "Counting in 10s Forward up to 100",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "8beea3c7-4dde-4389-8956-91778fba7fe2",
+    "title": "Kuandika sentensi kuhusu familia",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "d1347d06-2a74-4fc7-803d-b8b821cce564",
+    "title": "Kuandika sentensi kuhusu haki za watoto",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "3315147e-4a64-47cc-9bdc-c16a549ed3b3",
+    "title": "Kusoma hadithi kuhusu safari",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "5a178ae5-2f9b-4471-9a33-f959a500ccd2",
+    "title": "Kutambua maneno ya heshima",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "8019d7fd-a1a2-417d-9822-d70a676847d0",
+    "title": "Counting to 100 *Soh",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "957cb5fc-4055-47ea-844f-e83d520c34cc",
+    "title": "Writing Numbers 1 to 10 in Words",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "4b04cd35-ffa5-4ec2-8524-97bebd39238e",
+    "title": "Writing Numbers 11 to 20 in Words",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "c21e7c4f-b94f-4314-a198-d15a958222a0",
+    "title": "Jumping Over Safe Markers",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "86fee50b-673f-48e0-8e44-5c2aa2c22d3f",
+    "title": "Kusoma na kuzungumza kuhusu usalama",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "72e24754-fdd3-445c-be7a-a0fcb4c872f3",
+    "title": "Kutaja hali mbalimbali za anga",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "57b06b8d-6d1a-4e40-a19d-a2898713397d",
+    "title": "Kutoa muhtasari wa hadithi ya hali ya anga",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "f24c4ab7-c753-4dc4-9c58-c04260a74a44",
+    "title": "Kuandika sentensi kuhusu hali ya anga",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "8345c47c-b061-4d23-bd3a-a21fc0f1fb51",
+    "title": "Kusimulia kuhusu chakula ninachopenda",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "34576e67-e722-4e35-a407-698d2a46a970",
+    "title": "Kutumia hivi katika sentensi",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "8713f8d6-5d07-4b7d-82ae-5ddfffe39385",
+    "title": "Kutumia msamiati wa kutunza wanyama",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "471474e5-9e66-4f20-812d-001bd6a57c6b",
+    "title": "Kutoa muhtasari wa hadithi ya mnyama",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "c9b94969-e483-426a-ba66-ad928b7f5bb6",
+    "title": "Water Storage and Transport Review",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "af51bd6e-b42a-4a17-b832-3a718e5fae43",
+    "title": "Drawing a Plant from the Environment",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "9a219337-a69f-41db-a669-75912da17498",
+    "title": "Observing Today’s Weather",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "bc7cda0b-de66-4e48-9d90-b82a7e95daba",
+    "title": "Recording Today’s Weather Using Symbols",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "2c3fa3ab-1474-4f56-88db-0725ccde0fd7",
+    "title": "Comparing Parts of Different Plants",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "0767b9f0-4a75-4a27-b2a2-fa9833c8dae8",
+    "title": "Introduction to Halves Using Rectangular Cut-outs",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "159f92b9-69c7-45ea-8376-2b15af491360",
+    "title": "Identifying 1/2 in Everyday Objects",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "68788758-5a0e-45ff-a68d-11587051876d",
+    "title": "Identifying Leaves",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "ca1986a6-4c6c-495f-a8a5-0226eee33274",
+    "title": "Making a One-Week Weather Record",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "7398d822-45a5-4e75-9efe-e1af9f1c2b32",
+    "title": "Water Transport Story and Discussion",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "90eec968-1c32-42d9-98de-864f34997d26",
+    "title": "Matching Weather Symbols to Weather Conditions",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "9b887eb8-0a48-4f37-9689-b53113904728",
+    "title": "Introduction to Quarters Using Rectangular Cut-outs",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "60441bd5-774f-4135-9871-666fc481b13b",
+    "title": "Identifying 1/4 in Everyday Objects",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "2fbf6938-cad5-4f67-bb24-86286b188920",
+    "title": "What Is Breakfast?",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "6527e4f6-2f45-4830-8503-7b5151585721",
+    "title": "Carrying Small Quantities of Water Safely",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "b163de06-c0e5-4a42-8bce-ba7dcab330a9",
+    "title": "Making Patterns with Fractions",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "dbadac3a-b59b-4f76-bebf-efda6fb3e261",
+    "title": "Digital Games with Fractions",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "70fdce2b-3284-4c89-8497-036aee7d9207",
+    "title": "Adding 3 Single Digit Numbers Vertically",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "05adca61-e6a0-4d37-98cb-9a7c082d790d",
+    "title": "Proper Waste Collection and Disposal in Class",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "040dfeff-4a79-422d-bb76-b7d1339ecd6c",
+    "title": "Why We Clean Utensils at Home",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "f58faf50-97f7-4340-b17f-9eff6f08e38d",
+    "title": "Adding Single Digit Numbers Vertically",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "ff0eab7b-753b-4373-9af1-a8d307e2ab55",
+    "title": "Grouping Plant Foods by Plant Part",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "91d8d7eb-51d1-49b6-b4b9-539bcf12eef0",
+    "title": "Foods and Drinks We Take in the Morning",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "35d3eba3-e02a-4829-afc3-c96a571e2cf4",
+    "title": "How to Care for a Comb",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "4fa40ac0-f60d-4f98-9d23-f85566b28af6",
+    "title": "Adding Using the Number Line",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "5f1f7551-1c06-40d2-a10d-14cdece75151",
+    "title": "Adding 3 Single Digit Numbers Horizontally",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "2f528f6b-b4c9-4120-a18e-9d86ea949d3e",
+    "title": "Adding 2-Digit and 1-Digit Numbers With Regrouping",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "a5e9e58e-6c6a-40fe-a7a9-5dbc55218e18",
+    "title": "Sorting Harmful and Non-Harmful Animals",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "a3089b72-6d20-4a45-9fcd-b36f798f6136",
+    "title": "Animals Found in the Immediate Environment",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "317c8a0b-8d17-4d51-9ee0-6c87af0ece2a",
+    "title": "Playing Hopscotch and Other Hopping Games",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "0f436d68-253d-4fa5-93b3-cc156805cbfe",
+    "title": "Observing Double Strand Necklaces",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "f82df719-4d6b-4125-97da-ca1bf1276e9e",
+    "title": "Playing Safe Distance Jumping Games",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "1176bbb8-b886-4e18-80cc-bce395b5e0e3",
+    "title": "Modelling Animals with Clay or Paper",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "0c1f7dbb-2c5d-401c-b439-b5a9fb927348",
+    "title": "Decorated Egg Shell Display",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "f438c1b3-9cd9-4b5c-8a7a-3dc32bb1b14d",
+    "title": "Naming Body Parts Used in Jumping for Distance",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "b546d836-3292-48a1-b445-134e85b30e20",
+    "title": "Subtracting 2-Digit Numbers Without Regrouping (Horizontal)",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "11d88b45-b1a6-4143-9c04-42e88e57d080",
+    "title": "Subtracting Single Digit Numbers",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "37c8422a-14ee-4212-8c1c-c2283ebde3f0",
+    "title": "Hopping Skills Practice and Reflection",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "bec50c90-2129-4275-8cdb-abb06296e4cf",
+    "title": "Subtracting Using the Number Line",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "17d7857a-a622-4b09-8524-db7be78977f8",
+    "title": "Subtracting 2-Digit Numbers Without Regrouping (Vertical)",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "026ca056-1faa-4588-9682-44f6a3ed44c4",
+    "title": "Choosing Materials for Bracelets",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "ba702273-f49b-4172-80f2-5134e11a6592",
+    "title": "Possible Dangers When Handling Animals",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "e20dbfd4-eba4-402d-8743-8e24e00475a2",
+    "title": "Using Number Families for Subtraction",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "66cdd3b3-858d-4be2-a451-b2f2340bc852",
+    "title": "Missing Numbers in Subtraction",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "1d7de236-e2cc-4780-81a1-00764d427d7c",
+    "title": "Making a Double Strand Bracelet",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "08df47c1-b046-4f5f-bfdd-3ea9423fc952",
+    "title": "Simple First Aid Awareness for Classroom Accidents",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "223a5b63-d52a-43ac-93f9-34c80ec64283",
+    "title": "Animal Safety Role-Play",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "43850721-2e58-453a-a4d9-0e71bd18b927",
+    "title": "Natural Sources of Light",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "98178508-631b-480e-aa6a-8fd9b086b682",
+    "title": "Producing Light Safely with Teacher Guidance",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "b0c38507-b852-4a4c-8767-c0234ef9b89c",
+    "title": "Multiplication as Repeated Addition Using Counters",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "f3e92483-c349-4553-ba43-fd277cf2be73",
+    "title": "Multiplication as Repeated Addition Using Number Lines",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "cff3b7c1-2468-454d-b2da-fe35d49e2456",
+    "title": "Writing Multiplication Sentences Using the × Sign",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "1bb9d70b-0761-4669-8e0e-7980954b9c46",
+    "title": "How Shadows Are Formed",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "938a3ed5-06ab-430b-a345-b933cce98a68",
+    "title": "Multiplying by 3 and 4",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "2afb0a5b-88e3-4c8e-9ccb-844064b1bd3f",
+    "title": "Multiplying by 5 and 10",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "93733f22-ae31-4ab8-8fbf-e0a0ffd114fa",
+    "title": "Objects That Form Shadows",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "192fb69f-96c0-4e21-b0ab-bde38c1bf6ef",
+    "title": "Objects That Do Not Form Clear Shadows",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "1bbec668-c87b-4051-a7da-9a1352002deb",
+    "title": "Creating Light Safety Messages",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "111ffd7a-ba2e-40c9-bf78-bb2e0c6ba22e",
+    "title": "Jumping in Pairs and Groups",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "b3214750-8db1-4500-bbab-3ee176e09b4d",
+    "title": "Light Practices That Can Harm Our Eyes",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "1df175e0-07d0-497f-9f43-ee8217368ffa",
+    "title": "Main Features Between Home and School",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "41bcb543-6dda-46d2-9446-4936392017f9",
+    "title": "Physical Features Around the School",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "586e3ab6-8380-4725-a9ed-e7ecc4a2667a",
+    "title": "Built Features Around the School",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "643f24ae-1990-41e6-8795-96a4e6e2f027",
+    "title": "Using Key Features to Locate Places",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "691a24c5-b84e-4434-9c94-6e5f9cf2f29b",
+    "title": "Making a Simple Route Sketch Map",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "29307c8c-072e-4af0-8c1f-d84e95bc6ef6",
+    "title": "What Makes the School Environment Dirty?",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "6f24e77e-a1fb-441c-809a-3ca4f5ea0e44",
+    "title": "Ways to Keep the School Environment Clean",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "11fb0677-7b3d-4c4d-b674-120b5685afed",
+    "title": "Why a Clean School Environment Matters",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "60d1b044-9a0c-4f64-b106-f97915701f31",
+    "title": "Identifying Possible Dangers in School",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "70c06d54-43b2-4f4b-88be-292927709490",
+    "title": "Making Safety Rules for School",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "9681b2f7-1169-4c90-9fdd-2aa92f949843",
+    "title": "Ways to Keep Safe and Secure in School",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "f4a610e5-6b91-4131-9dca-d0ffa31f922e",
+    "title": "Making Shapes Through Hopping",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "1cf0ddc5-51b1-4cc9-af20-9d604d80a3cd",
+    "title": "Colours of the Kenya National Flag",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "3270ad29-e435-40d2-87a3-587dd1de7b4a",
+    "title": "Making Letters Through Hopping",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "6e8019ea-b088-41fb-b4e6-71586d03f937",
+    "title": "Kutamka sauti /g/, /d/, /j/ na /r/",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "e23ddac2-b3c0-4a5b-a268-b07caa886dae",
+    "title": "Kutambua herufi g, d, j na r kwenye maneno",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "c679949d-6c7c-49a5-b577-ac1b73eca3f6",
+    "title": "Maamkuzi ya asubuhi, mchana na jioni",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "b668eedd-fe0f-4d59-8e3f-1aaa5509f4fb",
+    "title": "Msamiati wa vifaa na watu shuleni",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "ab1aeaeb-51d2-4f78-963c-2b58128d01e3",
+    "title": "Kusoma hadithi fupi kuhusu shuleni",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "585a6182-8bf9-49d3-b74b-f9998654eecb",
+    "title": "Kuandika majina ya nambari 11-50",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "43b7a217-14dc-40df-bb4e-d2ba9e75d0b2",
+    "title": "Kutumia -ako katika sentensi",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "9260289b-dca4-4c83-9e71-74260819e9b2",
+    "title": "Kutumia -enu katika sentensi",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "dad41a32-1b82-4538-b3a8-04ffe7ee7072",
+    "title": "Kutamka sauti /p/, /f/ na /v/",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "75af1af8-b00b-458c-8a2c-78e59899186d",
+    "title": "Kusoma maneno yenye p, f na v",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "5cc2c538-f15f-4b1c-b1b2-2b8c0ba7fb33",
+    "title": "Kutumia msamiati wa haki katika sentensi",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "bdf89397-cd73-4ad3-a2db-981674fe30b4",
+    "title": "Kusikiliza masimulizi kuhusu haki za watoto",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "049dcd3e-af08-480d-9f77-1d9acad1ff3e",
+    "title": "Kueleza haki yangu kwa heshima",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "5ea0575f-fa4b-4d2b-a22a-7c9097d3c2cc",
+    "title": "Kujibu maswali ya ufahamu kuhusu haki",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "2588a955-726b-4912-bb7a-dc04bcc92979",
+    "title": "Kutambua vizuri na vibaya",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "ec145111-ea07-41f0-9299-fb4b1d9a06fc",
+    "title": "Kutumia vizuri na vibaya katika sentensi",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "d8dcdda4-fb11-4c4e-bf3b-8b00372d21f2",
+    "title": "Kutamka sauti /ch/ na /dh/",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "37ee9ed2-db89-4ea4-bba7-26b8dedc9b87",
+    "title": "Kusoma maneno yenye ch na dh",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "325917b5-34bf-46d1-9f6a-881890b1fb21",
+    "title": "Kutaja vyombo vya usafiri",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "a7fd8f83-57d0-48e0-b07a-18610edf900b",
+    "title": "Kutumia msamiati wa usafiri katika sentensi",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "87519222-2f5c-4fd6-8db1-7732a5142149",
+    "title": "Kusimulia safari fupi",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "cc5634cb-11d6-4967-9673-0a187b863ced",
+    "title": "Kuzungumza kuhusu usalama wa usafiri",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "1e0a8eb5-8ab9-4f7f-b2e7-66b100e244f1",
+    "title": "Kutoa muhtasari wa hadithi ya usafiri",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "f3c3af2e-f438-413f-b079-7a1cae9a8bbc",
+    "title": "Kutambua herufi kubwa mwanzoni mwa sentensi",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "922f2b67-63d0-4cde-9cac-4ec5f3141767",
+    "title": "Kuandika sentensi kwa herufi kubwa ifaavyo",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "380cddb0-85ad-498e-8955-3342216ed106",
+    "title": "Kutamka sauti /gh/, /ny/ na /ng'/",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "c4badb49-55f4-4ab8-a520-25e58d5a88c2",
+    "title": "Kusoma maneno yenye gh, ny na ng'",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "a5114b24-5601-4180-9e29-8af09b4b40a1",
+    "title": "Kutumia maneno ya heshima katika mazungumzo",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "20fa55c7-f58e-48dd-8ff4-376c1ba03c25",
+    "title": "Kutaja watu wa familia",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "9a265092-b15f-4785-8315-8b71c6d71150",
+    "title": "Kutumia majina ya familia katika sentensi",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "33c38664-6d8d-459a-a48a-02c6f4c770d9",
+    "title": "Kusimulia kuhusu familia yangu",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "666490ca-246d-43eb-ac00-dc49c7553c12",
+    "title": "Kusoma hadithi kuhusu familia",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "fef79089-2f13-4a2f-8185-088c956a5ba7",
+    "title": "Kueleza ujumbe wa hadithi ya familia",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "49816eb2-be9d-4d51-88c0-b8ef15a25f58",
+    "title": "Kutambua vitendo katika sentensi",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "1abaa187-e586-48f1-9318-3fa13cc7e1e8",
+    "title": "Kutamka sauti /sh/ na /th/",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "fd195895-42eb-4871-bc5d-bf03961e8689",
+    "title": "Kusoma maneno yenye sh na th",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "484e2bac-9f47-4eff-a3aa-d27674805360",
+    "title": "Kutumia msamiati wa usalama katika sentensi",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "fb4b2338-6139-4c88-b802-5c30d45db453",
+    "title": "Kusimulia kuhusu kuepuka ajali",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "6e072808-bef4-46e4-8394-4867f71b64c3",
+    "title": "Kusoma hadithi kuhusu usalama",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "66d20ca6-857d-437e-b3e8-fbd9c3ab6d1e",
+    "title": "Kutumia huyo katika sentensi",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "a2d48696-f896-4690-ae9c-dcdc67697489",
+    "title": "Kutumia hao katika sentensi",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "1684b1a5-c927-47e8-8232-182f62795ef8",
+    "title": "Kuandika sentensi kuhusu usalama",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "f84c26e5-539f-4f91-bd16-c2bb9f5bc088",
+    "title": "Kusoma alfabeti ya Kiswahili",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "c46bfb38-8eaf-4e9a-bc7b-6d53ab43d0bf",
+    "title": "Kutofautisha irabu na konsonanti",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "6f9636ed-03f9-43c6-9507-f0f629577d89",
+    "title": "Kutumia msamiati wa hali ya anga katika sentensi",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "3958b979-617c-4305-8505-a235a92ecdf9",
+    "title": "Kusimulia kuhusu hali ya anga",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "b9d664e8-27f9-47f9-b1c8-82c0e01c7428",
+    "title": "Kusoma hadithi kuhusu hali ya anga",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "56636cc8-6055-45f1-ae13-378169635451",
+    "title": "Kutambua wewe na nyinyi wakati uliopita",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "9f79f5ed-0df6-4c18-8fff-f65af35d4f94",
+    "title": "Kutumia wewe uli- katika sentensi",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "7feda5da-aefb-42f1-9c49-931799d7e8f9",
+    "title": "Kutumia nyinyi mli- katika sentensi",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "406c62c7-0893-4063-8d07-3e467231cf54",
+    "title": "Kutaja vyakula vinavyofaidi mwili",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "497bfe37-578c-4c7f-95af-7b056802c80a",
+    "title": "Kutofautisha vyakula vinavyofaidi na vinavyodhuru",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "360cd2c3-48d2-46a0-81ec-c28ae043b548",
+    "title": "Kusoma hadithi kuhusu lishe bora",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "a46b0919-05c8-4440-82c3-71cb8168e4dd",
+    "title": "Kueleza ujumbe wa hadithi ya lishe bora",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "4cd710e5-ec8d-477f-a194-b2dfa0c5393b",
+    "title": "Kutumia hiki katika sentensi",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "e07b1754-ab5f-4568-9e5c-017697420e8f",
+    "title": "Kuandika sentensi kuhusu lishe bora",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "13884479-7dd2-4ff4-9b6e-fa92509575d8",
+    "title": "Kutaja wanyama wa nyumbani",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "9836c63a-fd91-4098-a538-70dcaa424345",
+    "title": "Kusimulia kuhusu mnyama nimpendaye",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "f507dbfb-936a-4b8c-bf32-7bd086907bb2",
+    "title": "Kueleza jinsi ya kumtunza mnyama",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "7cd1b6a1-38b0-468a-bfbe-4c19509b4df9",
+    "title": "Kusoma hadithi kuhusu wanyama wa nyumbani",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "5986360b-cbee-419c-a721-615fc08bf6e5",
+    "title": "Naming Sunny, Windy, Cloudy, Calm and Rainy Weather",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "4dfa0142-b4da-4da8-89b3-4c17dc6118d3",
+    "title": "Responding Safely to Hot Weather",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "4fa6c06e-4abf-41c4-84ba-880e82b1987d",
+    "title": "Responding Safely to Cold and Rainy Weather",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "f7d0eb95-37ce-42d2-a3aa-4feca6c0c5cd",
+    "title": "Describing Weather at Different Times of Day",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "3b3080e4-d232-4f15-b8bb-48bc74a59f87",
+    "title": "Drawing Simple Weather Symbols",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "8de6aa28-3c94-4d3b-8530-1a9b7f93ae50",
+    "title": "Reading a Simple Weather Chart",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "770942b4-513d-4d94-b654-9d08303715f7",
+    "title": "Telling a Weather Message from a Chart",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "439c7726-24f7-41e8-8e6f-c8729616358f",
+    "title": "Why We Store Water at Home and School",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "c79feaab-7302-4fa1-8fe0-82b3a8e371e4",
+    "title": "Good and Poor Ways of Storing Water",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "f035e4a3-35b7-46b6-87e2-74d896c1e591",
+    "title": "Water Storage Practice and Reflection",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "70183797-f923-4d74-b6b4-6872e4203b8e",
+    "title": "Sharing Weather Information with Others",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "4bc88162-598b-452e-944e-3b65e6c7d3cc",
+    "title": "Identifying Safe Water Storage Containers",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "760b05e3-48b2-4186-a712-8470b1153951",
+    "title": "Keeping Stored Water Clean and Covered",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "a3b702d1-5ab6-417b-9e10-ef1a77abe94b",
+    "title": "Ways Water Is Transported at Home and School",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "661e20a7-e145-4d76-b639-068ca1c2f6ae",
+    "title": "Choosing Age-Appropriate Water Containers",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "43e67210-0a58-4c90-b4d1-6e6b2a49c0b6",
+    "title": "Interpreting Weather Symbols in Pairs",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "306418b3-58c1-451b-84cc-e70d4f77d2bc",
+    "title": "Making Soil Balls from Different Soils",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "6f8aecb3-ad9b-4cf4-9717-cbb98c677051",
+    "title": "Making Ribbons with Clay Soil",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "902337ec-b839-4610-a3f6-2c929a5cc15c",
+    "title": "Trying to Make Ribbons with Sandy Soil",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "80e870e3-a169-4e15-b833-e7d8bd391526",
+    "title": "Modelling Simple Objects with Soil",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "7b76ecb3-1ad5-4f2e-a244-6f50f1628db0",
+    "title": "Soil Uses in the School Environment",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "0fd55152-3abb-483c-872e-501000518645",
+    "title": "Taking or Drawing Soil Use Pictures",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "7d4f7898-7c5d-4aa0-ada1-3aa162b8b9b9",
+    "title": "Identifying Roots",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "481fd2a3-9036-4ce9-8d17-9a9481371540",
+    "title": "Identifying Clay, Loam and Sand Samples",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "a0b00758-89f8-490e-971a-7b1af92b6855",
+    "title": "Observing How Soil Balls Break Apart",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "caa40557-4e84-487f-9055-77abe9d1c252",
+    "title": "Making Ribbons with Loam Soil",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "69642ec3-4c19-4b55-9d53-72115b69c2a6",
+    "title": "Using Clay to Make Small Pots or Shapes",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "c16bdbb7-6dcd-467b-9b83-a16e5734dc02",
+    "title": "Comparing Which Soil Makes the Best Ribbon",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "34db39f6-7dbc-4f7e-880b-ac31f50ed57d",
+    "title": "Soil Uses in the Community",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "cc19db1e-d265-4ad5-8b2d-9ecd52754eec",
+    "title": "Soil Exploration Review and Reflection",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "1db4f3a6-94ba-4c69-aaa7-cf2988ce8f2b",
+    "title": "Exploring Soil Around Our School",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "2ff87ee1-f341-4bdb-91d1-477c47d3e65c",
+    "title": "Feeling and Describing Soil Safely",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "f59a02a8-3148-48e8-945e-48b7861cf5c9",
+    "title": "Identifying Stems",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "b49d445e-49f9-4119-86ed-22a9131348f9",
+    "title": "Identifying Flowers",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "be4c651a-96eb-4eab-8d79-565aed748df4",
+    "title": "Matching Plant Parts to Pictures",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "110513ef-2e92-4b54-abe0-64df6d8d388a",
+    "title": "Identifying Fruits on Plants",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "7ebae2e0-731b-4b25-b899-01e9958f995d",
+    "title": "Talking About Plant Parts in Groups",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "67524a58-0f26-48f8-8304-4a976a562e5f",
+    "title": "Labelling Roots, Stem, Leaves, Flowers and Fruits",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "161bac5f-8d88-4b0e-942a-8132731f718e",
+    "title": "Taking or Choosing Plant Part Photographs",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "915d8eec-2abe-40a3-b9ca-90015d51da59",
+    "title": "Displaying Plant Drawings for Peer Review",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "dc30f896-a721-456e-b591-c28e1065788a",
+    "title": "Plant Parts Review and Reflection",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "dce6e753-33c1-4ab1-a5f1-9f7f76d194d3",
+    "title": "Sorting Large and Small Animals",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "0616dd2c-2d88-4e8c-8ac4-2c49d59b0a30",
+    "title": "Sharing Experiences About Handling Animals",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "36e8f92b-6a81-4f02-ad5f-e04cd5bbb16d",
+    "title": "Naming Sources of Light",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "230bd039-50b8-4805-8dbe-2088b3bb5844",
+    "title": "Safe Ways to Handle Animals",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "8ed44ea0-4c10-4268-aeb0-505d5d558e6a",
+    "title": "Artificial Sources of Light at Home and School",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "74811dcb-a210-4152-b81a-651f720023ef",
+    "title": "Observing Shadows Around the School",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "a4c623fd-00ec-401a-9e97-efb0c0b72de9",
+    "title": "Plant Parts in Our Daily Life",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "b53b626a-2012-473b-b83c-0ceb04cbd92a",
+    "title": "Sorting Domestic and Wild Animals",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "72ab18ad-c642-4810-9530-432acb24919b",
+    "title": "Watching and Discussing Safe Hopping Movements",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "20ed6cca-3c3b-4024-ac7e-984823f1c234",
+    "title": "Hopping Forward and Backward Safely",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "95f72b5f-cd3e-41bb-9e57-fdc655e3185d",
+    "title": "Hopping to the Right and Left",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "08cfcf1e-6f30-4488-909d-a79abb67807d",
+    "title": "Hopping in Straight and Curved Pathways",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "1b6fce1c-968f-4271-a117-5f00098a3fe0",
+    "title": "Hopping in Circular and Zigzag Pathways",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "ff88b988-0c22-46d9-8cfb-69395eab4111",
+    "title": "Hopping at Low, Medium and High Levels",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "e3d5c103-6103-4874-815c-00a0e9c3da95",
+    "title": "Naming Animals and Body Parts Used for Hopping",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "01e42183-0b6b-44aa-bef2-057a7139cec4",
+    "title": "Leaping to the Right and Left",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "31c81295-7096-42e0-920b-a485d970a93f",
+    "title": "Identifying Painting Tools and Materials",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "b353f7c0-2684-4bc7-9602-db43a1172172",
+    "title": "Observing Texture Patterns",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "322dd87e-f4ee-44ee-8f9a-64f923cef918",
+    "title": "Combining Direction, Pathway and Level in Leaping",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "54f62fde-6a44-46d8-81d0-a5f209cbd832",
+    "title": "Leaping Practice and Reflection",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "79d60d40-832d-45b2-8f7d-768e54aee102",
+    "title": "Creating Colour Shape Patterns",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "9722a250-5ca0-4539-aeb2-ba17071316ee",
+    "title": "Choosing Tools for Drawing Simple Forms",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "f5856569-3deb-4ec7-9b24-cc8ef7b2b0f9",
+    "title": "Creating Texture Effects in Drawings",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "13506b47-e5b3-4bf8-85c8-91bd84694f79",
+    "title": "Watching and Discussing Safe Leaping",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "9c2211e6-f964-4cb5-b18c-dff7010d9900",
+    "title": "Leaping in Zigzag Pathways",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "d89df012-9074-4c07-97b7-652bca9ab2fa",
+    "title": "Painting the Kenya National Flag",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "f181fa77-cd46-47b5-a049-d6b0e8852afa",
+    "title": "Leaping While Making Simple Shapes",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "9743d1f7-15d0-45f1-9b87-d045610895e9",
+    "title": "Playing Simple Leaping Games",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "2c898b02-fee3-4713-bfa3-2a9d5d62a588",
+    "title": "Painting Organic and Geometric Shapes",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "a0a6131f-c54c-46bb-87dd-9f8a3e764d8e",
+    "title": "Observing Shapes for Pattern Making",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "d73989ea-e608-4932-84a3-0a4ba8de4c4f",
+    "title": "Preparing a Safe Jumping Space",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "bec63adc-d878-4d3b-a749-e020021f8401",
+    "title": "Drawing and Displaying Simple Forms",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "9af87e23-2e4e-43f4-b9a5-a03fa481c28a",
+    "title": "Practising Safe Landing After a Jump",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "cb97f981-13cc-4083-8688-b255a53eaa5a",
+    "title": "Exploring Texture Around Us",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "8fb30091-009c-4855-a2ff-d2b315e7be64",
+    "title": "Leaping at Low, Medium and High Levels",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "9780ebf6-42f8-448d-b984-6cb92d99b808",
+    "title": "Texture Drawing Display and Appreciation",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "8365fff4-cfa7-4dfd-b2a7-77b0f24dd500",
+    "title": "Naming Body Parts Used for Leaping",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "309ea17a-dc90-4cdc-8d2b-36bbcd4f209b",
+    "title": "Creating Colour Texture Patterns",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "8b2f241c-ccf0-45c2-be49-0b9b09b1da1e",
+    "title": "Leaping Forward and Backward",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "0e6b544f-f3be-4ada-92f4-ec4dd2ffa2b5",
+    "title": "Identifying Forms in the Environment",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "463465a7-7b51-47c5-bb74-a486a76a0fee",
+    "title": "Leaping in Straight and Curved Pathways",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "5cbfe868-3788-430c-8079-4e2bbda3411d",
+    "title": "Leaping with Mirroring and Partner Relationships",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "aaafa8be-7d45-4ae5-b650-f7ac8fe4af9c",
+    "title": "Displaying and Discussing Collage Work",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "47b79134-a316-4b1c-a4e5-499ca05138cc",
+    "title": "Observing Decorated Egg Shells",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "fc0abacd-c3dd-463d-8386-ab866e8d0600",
+    "title": "Observing Rules During Jumping Activities",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "29953c69-d3d8-4bab-b38a-63979f805047",
+    "title": "Practising Take-Off for Distance Jumping",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "9a88800b-14a3-4215-b961-fa6c97d6409e",
+    "title": "Comparing Near and Far Jumps Safely",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "e107ba9d-6db4-4e3a-a3c4-e6f62e3f498a",
+    "title": "Combining Balance and Distance in Jumping",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "375b6814-11a8-441f-af4b-2b531599847e",
+    "title": "Creating Colour Letter Patterns",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "e591d05f-12aa-4daf-b2cc-fa54cbf2f249",
+    "title": "Collecting Materials for Collage",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "e921c560-2c5c-4b29-869c-db79fe058d92",
+    "title": "Jumping Forward Over Short Distances",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "6d391bc8-6515-4dc8-adbb-cf150d940370",
+    "title": "Playing Pulling and Pushing Games",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "85cddae1-a719-497e-970a-bed91b54b9f7",
+    "title": "Painting and Pasting on Egg Shells",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "49cb13ef-0b33-4ff6-8e1d-cadff79f2873",
+    "title": "Pushing Safely with a Partner",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "4df91b2e-f49a-4f64-954d-b11d17d27ab4",
+    "title": "Observing Decorated Plastic Containers",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "9452f2ba-8ab5-40f6-b069-d510350f1dbb",
+    "title": "Decorated Container Display and Reflection",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "d1e613c5-38be-40e1-b074-9150268a9e33",
+    "title": "Pulling and Pushing to the Right and Left",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "c6b7497d-a330-4268-a04c-2b80d4bb3b89",
+    "title": "Jumping for Distance Practice and Reflection",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "f9f30de5-3674-4b8c-a8bc-66a663f3ee50",
+    "title": "Finding Letter Shapes Around Us",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "78efd5d0-6938-4697-ae28-effa845278a0",
+    "title": "Creating a Simple Collage Picture",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "f19f9b2f-5bb2-4932-b9bb-c73dfff47e38",
+    "title": "Naming Body Parts Used for Pulling and Pushing",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "5c161f1d-673a-4166-a322-07285363ab56",
+    "title": "Pulling and Pushing Practice and Reflection",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "0bcf771c-97d7-4fe1-a9db-b893f3b220f7",
+    "title": "Pulling and Pushing Slowly and Quickly",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "1bda2458-0943-4d9a-8342-2599c8795d10",
+    "title": "Working in Teams During Pulling and Pushing",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "dce093db-3fd6-4442-b487-5142b1f82a6e",
+    "title": "Watching Pulling and Pushing Activities",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "149c74e2-7fc6-428a-b12f-d06782a2fa8b",
+    "title": "Pulling Safely with a Rope",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "f47e1d5a-a004-4ea4-b2ef-005f777391af",
+    "title": "Decorating Plastic Containers with Paint and Paper",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "6dc0aa64-5504-4f8d-a83b-7fcb5a044aad",
+    "title": "Pulling and Pushing at Low, Medium and High Levels",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "779430a4-3d93-4681-9c2b-910829127a3d",
+    "title": "Choosing Local Materials for Necklaces",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "0017bc55-178f-4f36-a44a-e530169fa9de",
+    "title": "Practising Quarter, Half and Full Turns",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "7616b836-daa0-4155-a517-6945838a9760",
+    "title": "Safety Rules for Pulling and Pushing",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "cd917ced-dc59-492f-ac35-fd9a3d93856d",
+    "title": "Pulling and Pushing Forward and Backward",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "22977da2-e971-418d-9d4e-354e31c14e93",
+    "title": "Making a Double Strand Necklace",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "91983e86-d8e4-4cb3-964c-5db281231fcf",
+    "title": "Watching and Naming Turning Movements",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "44d73d5c-3c63-4b3b-8594-a8a5b3a91727",
+    "title": "Turning Games Practice and Reflection",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "174ac138-f8e8-4469-bd3c-f416f57c0e71",
+    "title": "Observing Double Strand Bracelets",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "200d48f3-f47f-4a7d-8d00-be2f3c759e3e",
+    "title": "Kicking to the Right and Left",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "c18ff3cc-f686-48e0-89d3-e4f9766d2be3",
+    "title": "Kicking in Circular and Zigzag Pathways",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "4f60d032-fe8d-4fa5-b872-17634aaea15c",
+    "title": "Watching and Discussing Kicking in Games",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "0115172e-c7ea-4216-ae24-35ec3bb7a396",
+    "title": "Kicking Forward and Backward",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "a594984d-8551-40ac-8a5c-037fac65bc1a",
+    "title": "Kicking in Straight and Curved Pathways",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "23a18282-fd24-4d8b-a2df-9459ad259ac0",
+    "title": "Naming Safe Items and Body Parts for Kicking",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "b5861e8b-5ffc-47fc-b47e-b2cfad91aa71",
+    "title": "Rooms and Areas in a House",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "262246f2-332c-4786-86ef-b106858acced",
+    "title": "Uses of Different Rooms at Home",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "6d19a23e-88d8-4057-93af-6941d1fb8df3",
+    "title": "Equipment and Furniture Found in Rooms",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "9b3bcfda-79ee-4daa-b291-bd048d464711",
+    "title": "Keeping Rooms Clean, Tidy and Safe",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "f74a8203-d467-49c2-8de9-fae72d10c7bc",
+    "title": "Harmful Oral Habits That Damage Teeth",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "7467dbf9-30e0-40ac-be82-79604abe93d3",
+    "title": "Why Breakfast Is an Important Healthy Habit",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "9b5b9a9b-6c0a-4a16-89be-8fcd52aa666f",
+    "title": "Keeping a Brushing Record",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "8d2866fb-6f4a-4734-9ebe-187bb2f0cfe4",
+    "title": "Good Oral Habits for Healthy Teeth",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "9b29b62b-5d52-435c-8490-2a983e68761c",
+    "title": "Making Simple Soap Gel from Leftover Soap",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "6148188f-c361-4cf9-801b-76126aa440c4",
+    "title": "Why We Re-Use Water and Soap",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "c8962681-07a7-4d5f-8354-1681af2f6f71",
+    "title": "Items Used for Personal Cleanliness",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "8ba9a1e9-c4c2-402d-8094-79d964e3da37",
+    "title": "Sorting Personal and Shared Items",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "572f93f4-545e-46c7-ab60-2345ab772bab",
+    "title": "Why Personal Items Should Not Be Shared",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "3e56c4fa-1fa8-44cf-a985-661e46129185",
+    "title": "How to Care for a Toothbrush",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "05155a0b-b217-4639-92c8-5f7b93d9d86b",
+    "title": "Cleaning Utensils Safely",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "886314b2-408d-4fd8-afaf-14b2d2e82774",
+    "title": "Drying and Storing Utensils Properly",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "4918eefd-f4de-46b3-b59b-36bc83c14781",
+    "title": "What Re-Using Means at Home",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "03d6f5b2-6b12-4cc5-9c5d-8f305d40746e",
+    "title": "What Is Second-Hand Smoke?",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "822559c7-79bb-4469-8cfb-2c01269db8ab",
+    "title": "What Is Water Contamination?",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "eeeb35f3-eb6b-4c6b-bdb3-55e962711f59",
+    "title": "How to Keep Water Safe from Contamination",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "6aac08d6-daef-4fa1-a547-bba35ebd8ed4",
+    "title": "Keeping Away from Smoke for Good Health",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "71d85abd-c75c-48f3-8d6d-896f9ebf40ce",
+    "title": "Materials Used for Cleaning Utensils",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "66b00cb3-8534-409d-80e1-db95b9a2db5a",
+    "title": "Ways to Re-Use Water Safely",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "33aa1761-2deb-445f-bd1a-721057841584",
+    "title": "How to Care for a Handkerchief",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "11685912-c200-4542-80b9-dc73771c3dcb",
+    "title": "Classifying Foods by Taste",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "0d56532a-fa18-4757-b7a3-1aa36b9e62bc",
+    "title": "Foods and Drinks Taken by Family and Friends",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "eb224a66-b6da-49ec-8c2b-7a5d5245840b",
+    "title": "Food Likes and Dislikes",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "0bb4dceb-c6e8-4ab3-96f8-9b73fa46a3b4",
+    "title": "Respecting Different Eating Habits",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "13fc1aa3-f189-4523-92ae-10041d50c20b",
+    "title": "Meals We Take in a Day",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "d300bdf1-094f-481d-9f97-f648ca24250c",
+    "title": "Difference Between Meals and Snacks",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "b14caaf2-e10d-4856-95e4-e973a837cbe9",
+    "title": "Foods We Get from Plants",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "7cffcc49-f379-4496-8dcd-5030333008e8",
+    "title": "Improvised Materials for Personal Care",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "631a3414-0d31-4a7b-8e3e-07cc0ab8315a",
+    "title": "Cleaning Personal Items Safely",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "384e1576-55b3-49ce-911d-f86091738c8e",
+    "title": "Drawing Personal Hygiene Items",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "3418e049-c4a9-4717-8585-800771f062d5",
+    "title": "Personal Items Review and Reflection",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "9dbee1a0-acea-4ddd-a626-1f61406d8329",
+    "title": "How to Care for a Face Towel",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "b338ccb3-ac4d-41ae-9269-9c4ed8e69bcf",
+    "title": "The Four Basic Tastes of Food",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "2dd5e2aa-c065-46c9-9445-b740e2bdff07",
+    "title": "How Food Advertisements Make Us Feel",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "da0d4114-0eed-45db-9ed4-a6de79c96f46",
+    "title": "Making Healthy Choices Despite Advertisements",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "7907d6b2-bd61-4a52-a4f5-0d94c0547be4",
+    "title": "Hygiene When Handling Cooked Food",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "a509ac8a-eee9-4453-bf1d-b445aa26682d",
+    "title": "Keeping Cooked Food Covered and Clean",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "ce61d967-8fb1-4636-941f-1021a0d73436",
+    "title": "What to Look for When Buying Food from Vendors",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "f4fdabc7-25c9-426b-9241-a8d57676a52f",
+    "title": "Food Vendor Hygiene Role-Play",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "cb552dcd-f2e3-4623-bf3a-700675711d89",
+    "title": "Types of Waste Found in the Classroom",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "cc55124b-7320-43fd-bdd0-8c89d06393f1",
+    "title": "Containers Used for Classroom Waste",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "02c1de58-3ce6-497b-8c1f-c7365daf3099",
+    "title": "Plant and Animal Food Sources Review",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "10bb1a62-1553-45a5-a992-dd13e01b649d",
+    "title": "Using Variety and the Right Amount of Food",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "92c79e3a-9333-4859-a8fe-eb3d4a44842f",
+    "title": "Foods Eaten by School-Going Children",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "f180b46d-d0ce-4161-8ab7-7f435d246950",
+    "title": "Eating Enough Food for Good Health",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "2e597c3b-b39f-455e-8d88-80eaa1445d01",
+    "title": "Foods We Get from Animals",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "6f03aa5e-2719-40be-86b4-77f91754e360",
+    "title": "Apportioning Food on a Plate",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "f8a92a1b-d23c-4e88-b469-4abfe87c872e",
+    "title": "What Is a Food Advertisement?",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "7d09732e-5946-4526-a4d6-c4097e9902cf",
+    "title": "Ways to Prevent Classroom Accidents",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "aa94ad25-3b8b-43a9-8ab3-819ff2f78b7a",
+    "title": "Reporting Dangers in the Classroom",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "f10b5c9b-ce1a-4f70-b545-84cb990266d6",
+    "title": "Common Accidents in the Classroom",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "75503105-e574-421c-8ed8-48f1823c0ff5",
+    "title": "Classroom Safety Review and Reflection",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  },
+  {
+    "id": "02f88efc-7fd9-4d68-a14c-6bbd9f6fff81",
+    "title": "Causes of Classroom Accidents",
+    "status": "PUBLISHED",
+    "isAvailable": false,
+    "journeySteps": 0,
+    "draftSteps": 0,
+    "batchId": "g2-fix-non-ela-1781302661484",
+    "note": "Cleared incorrect English content. Needs subject-specific regeneration."
+  }
+]
