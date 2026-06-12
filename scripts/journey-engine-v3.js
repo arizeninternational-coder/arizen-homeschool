@@ -211,10 +211,12 @@ const SKILL_CONTENT = {
     },
     practiceTemplate: (theme, vocab) => `Read a short passage about ${theme}. What is the main idea? Tell someone in your own words.`,
     qcTemplate: (theme, vocab, sentences) => {
-      const s = sentences[0] || `The ${vocab[0]} is important.`;
+      const v0 = vocab?.[0] || 'word';
+      const v1 = vocab?.[1] || 'sentence';
+      const s = sentences?.[0] || `The ${v0} is important.`;
       return {
         question: `Read: "${s}" What is this sentence mostly about?`,
-        options: [`The word "${vocab[0]}"`, `${theme} — it tells us about ${vocab[0]} and ${vocab[1]}`, `It has many words`, `It is short`],
+        options: [`The word "${v0}"`, `${theme} — it tells us about ${v0} and ${v1}`, `It has many words`, `It is short`],
         correctIndex: 1,
         explanation: `When we read, we look for the main idea — what the whole sentence is about. This sentence is about ${theme}!`,
       };
@@ -474,15 +476,28 @@ function getThemeKey(theme) {
 }
 
 function determineSkillType(strand, subStrand, title) {
-  const text = `${strand} ${subStrand} ${title}`.toLowerCase();
-  if (text.includes('reading') || text.includes('read') || text.includes('comprehension')) return 'reading comprehension';
-  if (text.includes('writing') || text.includes('write') || text.includes('handwriting') || text.includes('sentence')) return 'writing skills';
-  if (text.includes('listening') || text.includes('listen')) return 'listening skills';
-  if (text.includes('speaking') || text.includes('speak') || text.includes('greeting') || text.includes('conversation')) return 'speaking skills';
-  if (text.includes('spelling') || text.includes('spell')) return 'spelling';
-  if (text.includes('vocabulary') || text.includes('word')) return 'vocabulary';
-  if (text.includes('grammar') || text.includes('verb') || text.includes('tense') || text.includes('was') || text.includes('were')) return 'grammar';
-  if (text.includes('punctuation') || text.includes('capital') || text.includes('full stop')) return 'punctuation';
+  // Check title first — it's the most specific indicator
+  const titleLower = (title || '').toLowerCase();
+  if (titleLower.includes('vocabulary') || titleLower.includes('pronunciation') || titleLower.includes('word meaning')) return 'vocabulary';
+  if (titleLower.includes('grammar') || titleLower.includes('verb') || titleLower.includes('tense') || titleLower.includes('was and were') || titleLower.includes('subject-verb')) return 'grammar';
+  if (titleLower.includes('punctuation') || titleLower.includes('capital letter') || titleLower.includes('full stop')) return 'punctuation';
+  if (titleLower.includes('spelling') || titleLower.includes('spell')) return 'spelling';
+  if (titleLower.includes('writing') || titleLower.includes('write') || titleLower.includes('handwriting') || titleLower.includes('guided writing') || titleLower.includes('sentence building')) return 'writing skills';
+  if (titleLower.includes('reading') || titleLower.includes('read') || titleLower.includes('comprehension')) return 'reading comprehension';
+  if (titleLower.includes('listening') || titleLower.includes('listen')) return 'listening skills';
+  if (titleLower.includes('speaking') || titleLower.includes('speak') || titleLower.includes('greeting') || titleLower.includes('conversation')) return 'speaking skills';
+
+  // Fall back to strand/sub-strand
+  const strandText = `${strand} ${subStrand}`.toLowerCase();
+  if (strandText.includes('vocabulary') || strandText.includes('pronunciation')) return 'vocabulary';
+  if (strandText.includes('grammar') || strandText.includes('verb') || strandText.includes('tense')) return 'grammar';
+  if (strandText.includes('punctuation')) return 'punctuation';
+  if (strandText.includes('spelling')) return 'spelling';
+  if (strandText.includes('writing') || strandText.includes('handwriting') || strandText.includes('guided writing')) return 'writing skills';
+  if (strandText.includes('reading') || strandText.includes('comprehension')) return 'reading comprehension';
+  if (strandText.includes('listening')) return 'listening skills';
+  if (strandText.includes('speaking') || strandText.includes('conversation')) return 'speaking skills';
+
   return 'reading comprehension';
 }
 
@@ -550,26 +565,26 @@ function buildChildFriendlyGoal(learningOutcome, specificLO, keyInquiry, skillTy
 }
 
 function buildThemeSkillExample(themeKey, skillType, themeContent, skillContent, title) {
-  // Use the skill content's example template with theme-specific data
   if (skillContent && themeContent) {
     return skillContent.exampleTemplate(
       themeKey || 'everyday life',
-      themeContent.vocabulary,
-      themeContent.exampleSentences
+      themeContent.vocabulary || ['word', 'sentence'],
+      themeContent.exampleSentences || ['This is an example.']
     );
   }
   if (skillContent) {
     return skillContent.exampleTemplate('everyday life', ['word', 'sentence'], ['This is an example sentence.']);
   }
   if (themeContent) {
-    return `Let me show you an example about ${themeKey}: "${themeContent.exampleSentences[0]}"`;
+    const s = themeContent.exampleSentences?.[0] || `This is about ${themeKey}.`;
+    return `Let me show you an example about ${themeKey}: "${s}"`;
   }
   return `Let me show you how this works with an example.`;
 }
 
 function buildThemeSkillPractice(themeKey, skillType, themeContent, skillContent, type) {
   if (skillContent && themeContent) {
-    return skillContent.practiceTemplate(themeKey || 'everyday life', themeContent.vocabulary);
+    return skillContent.practiceTemplate(themeKey || 'everyday life', themeContent.vocabulary || ['word', 'sentence']);
   }
   if (skillContent) {
     return skillContent.practiceTemplate('everyday life', ['word', 'sentence', 'story']);
@@ -584,7 +599,11 @@ function buildThemeSkillPractice(themeKey, skillType, themeContent, skillContent
 
 function buildThemeSkillQC(themeKey, skillType, themeContent, skillContent, keyInquiry, title) {
   if (skillContent && themeContent) {
-    return skillContent.qcTemplate(themeKey || 'everyday life', themeContent.vocabulary, themeContent.exampleSentences);
+    return skillContent.qcTemplate(
+      themeKey || 'everyday life',
+      themeContent.vocabulary || ['word', 'sentence'],
+      themeContent.exampleSentences || ['This is an example.']
+    );
   }
   if (skillContent) {
     return skillContent.qcTemplate('everyday life', ['word', 'sentence', 'story']);
