@@ -1,0 +1,171 @@
+[
+  {
+    "id": "0767b9f0-4a75-4a27-b2a2-fa9833c8dae8",
+    "title": "Introduction to Halves Using Rectangular Cut-outs",
+    "questId": "6788306a-e14f-4698-87dd-db031c6500b0",
+    "isMathBatch": true,
+    "isAvailable": false,
+    "draftSteps": 10,
+    "oldJourneySteps": 0,
+    "qcQuestion": "What is 12 + 13?",
+    "qcOptions": [
+      "25",
+      "15",
+      "35",
+      "20",
+      "30"
+    ],
+    "qcCorrect": 0,
+    "batchId": "g2-math-hq-1781322732668"
+  },
+  {
+    "id": "159f92b9-69c7-45ea-8376-2b15af491360",
+    "title": "Identifying 1/2 in Everyday Objects",
+    "questId": "6788306a-e14f-4698-87dd-db031c6500b0",
+    "isMathBatch": true,
+    "isAvailable": false,
+    "draftSteps": 10,
+    "oldJourneySteps": 0,
+    "qcQuestion": "In the number 64, what does the 6 represent?",
+    "qcOptions": [
+      "Both 60 and 6 tens",
+      "6 tens",
+      "60",
+      "66",
+      "6 ones"
+    ],
+    "qcCorrect": 0,
+    "batchId": "g2-math-hq-1781322732668"
+  },
+  {
+    "id": "17d7857a-a622-4b09-8524-db7be78977f8",
+    "title": "Subtracting 2-Digit Numbers Without Regrouping (Vertical)",
+    "questId": "4606eafa-8ed5-4bf2-a3c8-63c91e1e4ac1",
+    "isMathBatch": true,
+    "isAvailable": false,
+    "draftSteps": 10,
+    "oldJourneySteps": 0,
+    "qcQuestion": "What is 12 − 17?",
+    "qcOptions": [
+      "-18",
+      "-10",
+      "-5",
+      "0"
+    ],
+    "qcCorrect": 2,
+    "batchId": "g2-math-hq-1781322732668"
+  },
+  {
+    "id": "60441bd5-774f-4135-9871-666fc481b13b",
+    "title": "Identifying 1/4 in Everyday Objects",
+    "questId": "6788306a-e14f-4698-87dd-db031c6500b0",
+    "isMathBatch": true,
+    "isAvailable": false,
+    "draftSteps": 10,
+    "oldJourneySteps": 0,
+    "qcQuestion": "In the number 64, what does the 6 represent?",
+    "qcOptions": [
+      "6 tens",
+      "6 ones",
+      "66",
+      "Both 60 and 6 tens",
+      "60"
+    ],
+    "qcCorrect": 3,
+    "batchId": "g2-math-hq-1781322732668"
+  },
+  {
+    "id": "9b887eb8-0a48-4f37-9689-b53113904728",
+    "title": "Introduction to Quarters Using Rectangular Cut-outs",
+    "questId": "6788306a-e14f-4698-87dd-db031c6500b0",
+    "isMathBatch": true,
+    "isAvailable": false,
+    "draftSteps": 10,
+    "oldJourneySteps": 0,
+    "qcQuestion": "When the short hand points to 5 and the long hand points to 12, what time is it?",
+    "qcOptions": [
+      "12 o'clock",
+      "6 o'clock",
+      "5 o'clock",
+      "5 minutes",
+      "50 o'clock"
+    ],
+    "qcCorrect": 2,
+    "batchId": "g2-math-hq-1781322732668"
+  },
+  {
+    "id": "b0c38507-b852-4a4c-8767-c0234ef9b89c",
+    "title": "Multiplication as Repeated Addition Using Counters",
+    "questId": "6f2ce848-33b9-4d55-ad78-2a50fccc1422",
+    "isMathBatch": true,
+    "isAvailable": false,
+    "draftSteps": 10,
+    "oldJourneySteps": 0,
+    "qcQuestion": "What number comes after 49?",
+    "qcOptions": [
+      "50",
+      "51",
+      "60",
+      "40",
+      "49"
+    ],
+    "qcCorrect": 0,
+    "batchId": "g2-math-hq-1781322732668"
+  },
+  {
+    "id": "b163de06-c0e5-4a42-8bce-ba7dcab330a9",
+    "title": "Making Patterns with Fractions",
+    "questId": "6788306a-e14f-4698-87dd-db031c6500b0",
+    "isMathBatch": true,
+    "isAvailable": false,
+    "draftSteps": 10,
+    "oldJourneySteps": 0,
+    "qcQuestion": "What is 12 + 13?",
+    "qcOptions": [
+      "20",
+      "35",
+      "15",
+      "25",
+      "30"
+    ],
+    "qcCorrect": 3,
+    "batchId": "g2-math-hq-1781322732668"
+  },
+  {
+    "id": "b546d836-3292-48a1-b445-134e85b30e20",
+    "title": "Subtracting 2-Digit Numbers Without Regrouping (Horizontal)",
+    "questId": "4606eafa-8ed5-4bf2-a3c8-63c91e1e4ac1",
+    "isMathBatch": true,
+    "isAvailable": false,
+    "draftSteps": 10,
+    "oldJourneySteps": 0,
+    "qcQuestion": "What is 12 − 17?",
+    "qcOptions": [
+      "0",
+      "-10",
+      "-5",
+      "-18"
+    ],
+    "qcCorrect": 2,
+    "batchId": "g2-math-hq-1781322732668"
+  },
+  {
+    "id": "dbadac3a-b59b-4f76-bebf-efda6fb3e261",
+    "title": "Digital Games with Fractions",
+    "questId": "6788306a-e14f-4698-87dd-db031c6500b0",
+    "isMathBatch": true,
+    "isAvailable": false,
+    "draftSteps": 10,
+    "oldJourneySteps": 0,
+    "qcQuestion": "What is 12 + 13?",
+    "qcOptions": [
+      "35",
+      "25",
+      "20",
+      "15",
+      "30"
+    ],
+    "qcCorrect": 1,
+    "batchId": "g2-math-hq-1781322732668"
+  }
+]
