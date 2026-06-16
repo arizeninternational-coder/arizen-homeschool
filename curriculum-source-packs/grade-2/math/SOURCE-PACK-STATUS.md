@@ -53,7 +53,7 @@ The following fields were populated from existing data (no guessing):
 - **representation_needed** — derived from topic
 - **example_type** — derived from topic
 - **difficulty_limit** — derived from topic (needs confirmation)
-- **video_needed** — YES for all (all need human approval)
+- **video_needed** — OPTIONAL for Math (SVG/diagrams more important); YES for English/Kiswahili
 - **visual_needed** — YES for all
 - **source_pack_status** — recovery-batch / old-v2 / new
 - **human_input_needed** — YES for all

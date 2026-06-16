@@ -38,14 +38,15 @@
 
 ## Fractions
 - **Primary visual:** Shapes divided into equal parts with shading
-- **Halves:** Rectangle/circle cut into 2 equal parts, 1 shaded
-- **Quarters:** Rectangle/circle cut into 4 equal parts, 1 shaded
-- **Real objects:** Chapati, cake, pizza, paper folding
-- **CRITICAL RULES:**
-  - Only halves (1/2) and quarters (1/4)
-  - NO fraction arithmetic (no 1/2 + 1/4)
-  - Parts MUST be equal
-- **DO NOT USE:** Unequal parts, fraction notation beyond 1/2 and 1/4
+- **Halves:** Circle/rectangle divided into 2 equal parts, 1 shaded → "one half"
+- **Quarters:** Circle/rectangle divided into 4 equal parts, 1 shaded → "one quarter"
+- **Real objects:** Chapati cut in half, cake/pizza cut into 4 slices, chocolate bar divided into 4, paper folded
+- **Equal vs unequal:** Side-by-side comparison — one shape with equal parts, one with unequal
+- **Fair sharing visuals:** 2 children sharing 1 chapati, 4 children sharing 1 cake
+- **Number line:** NOT appropriate for Grade 2 fractions
+- **Fraction notation:** Always pair "1/2" with "one half" — never show notation alone
+- **DO NOT USE:** Fraction arithmetic visuals, equivalent fractions, comparing fractions, number lines for fractions
+- **SVG priority:** HIGH — Fractions needs clear, simple SVG diagrams more than video
 
 ## Measurement
 - **Length:** Ruler, measuring tape, classroom objects (desk, book, pencil)

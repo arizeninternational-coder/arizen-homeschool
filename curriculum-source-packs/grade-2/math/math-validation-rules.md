@@ -68,6 +68,67 @@
 - Multiplication visuals must show equal groups or arrays
 - Generic/unrelated visuals = rejection
 
+### 11. Video Placement Rules
+- **Maximum 1 video per journey**
+- Video must be in Step 6 (Example) OR Step 4 (Learn) only
+- Video in Step 4 is allowed only when the concept genuinely needs demonstration
+- For Math, video should usually be in Step 6, not Step 4
+- Video must NEVER be in Practice (Step 7) or Quick Check (Step 8)
+- Video must NOT autoplay
+
+### 12. Media Approval Rules
+- `media.approvalStatus` must be set on every media item
+- Only `approved` media may be learner-facing
+- `draft`, `needs_review`, `rejected`, `missing` media must NOT appear to learners
+- Unapproved YouTube URLs must not appear to learners
+
+### 13. Text-Only Teaching Must Work
+- If all media (video, audio, SVG) is removed, the journey must still teach the concept
+- Text explanation in Learn (Step 4) must be sufficient
+- Worked example in Example (Step 6) must exist without video
+- The journey must NOT depend on video to teach the main idea
+
+### 14. Alt Text and Transcripts Required
+- All images/SVG must have `altText`
+- All audio must have `transcript`
+- All videos must have `title` and `caption`
+- Missing alt text = rejection
+
+### 15. No Placeholder Text
+- "Illustration coming soon" = rejection
+- "Video coming soon" = rejection
+- "Media placeholder" = rejection
+- Any text that admits missing content = rejection
+
+### 16. Media Must Match Lesson Topic
+- Math lesson → Math visuals only (no English reading content)
+- Media must be relevant to the specific lesson, not just the general topic
+- Cross-subject media contamination = rejection
+
+### 17. Audio Rules (New)
+- Audio must have a transcript (text fallback)
+- Audio must NOT autoplay — user taps to play
+- Audio files must be lightweight (< 500KB)
+- Maximum 30 seconds per audio clip for Grade 2
+- Voice type must be specified (`child_friendly`, `teacher`, or `tts_default`)
+
+### 18. Video Reuse Rules (New)
+- Maximum 1 video per journey
+- Video must not be reused across different topics/strands
+- Cross-strand video reuse = rejection
+
+### 19. Low-Bandwidth Rules (New)
+- Journey must remain usable if video fails to load
+- Text/SVG fallback must load before video
+- Do not block lesson completion because media failed
+- Video must not autoplay on any connection
+
+### 20. Fallback Rules (New)
+- Every media item must have a defined `fallbackType`
+- `fallbackText` must be provided for all audio
+- If media is missing, fallback must render automatically
+- Never show "Media unavailable" to learners
+
 ---
 
 ## High Rules (Journey Flagged for Review)
