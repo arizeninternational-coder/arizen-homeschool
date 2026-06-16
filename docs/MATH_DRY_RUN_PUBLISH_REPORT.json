@@ -1,0 +1,163 @@
+{
+  "timestamp": "2026-06-16T15:22:24.884Z",
+  "totalTargeted": 38,
+  "allMathBatch": true,
+  "allUnavailable": true,
+  "allHaveDraft": true,
+  "nonMathCount": 4,
+  "grade5Count": 0,
+  "lessons": [
+    {
+      "id": "78a3a720-af76-4c2e-8729-c5ef1421eded",
+      "title": "Multiplication as Repeated Addition with 2s and 3s"
+    },
+    {
+      "id": "981b27eb-9d0d-4450-9bed-e76f1ba54c96",
+      "title": "Adding Two 2-Digit Numbers Without Regrouping"
+    },
+    {
+      "id": "5cea9ba8-0047-466b-a4eb-6c1e80b3c92a",
+      "title": "Breaking Numbers Apart to Make 10"
+    },
+    {
+      "id": "bc4a1378-6dff-4dd3-9fbb-0f5b7e9a631e",
+      "title": "Representing Numbers 1 to 50 Using Concrete Objects"
+    },
+    {
+      "id": "d7cdedaa-4fc1-42fa-8f28-7aef3761a645",
+      "title": "Adding Two 2-Digit Numbers With Regrouping"
+    },
+    {
+      "id": "a97ab36c-9ad2-428d-832f-e688bea73382",
+      "title": "Reading Numbers 51 to 100 in Symbols"
+    },
+    {
+      "id": "04a80f76-bf67-4c8c-b3f0-183a3b205e16",
+      "title": "Counting Numbers 1 to 100 Backward"
+    },
+    {
+      "id": "7e886e8a-9486-430f-b035-12909bd581a6",
+      "title": "Filling in Missing Numbers 1 to 50"
+    },
+    {
+      "id": "239becec-4f84-4e38-8169-a0bc72730d5f",
+      "title": "Counting Numbers 1 to 100 Forward"
+    },
+    {
+      "id": "853782ed-f7d2-4536-9665-cab6f525dbff",
+      "title": "Filling in Missing Numbers 51 to 100"
+    },
+    {
+      "id": "74590ca5-c695-4bf2-a990-6be39c08285b",
+      "title": "Counting in 2s Backward up to 100"
+    },
+    {
+      "id": "71850381-f070-437f-8bec-8fec93d6f7cc",
+      "title": "Counting in 5s Forward up to 100"
+    },
+    {
+      "id": "22d83674-88b9-4431-ac3c-264ba5115764",
+      "title": "Counting in 10s Forward up to 100"
+    },
+    {
+      "id": "8019d7fd-a1a2-417d-9822-d70a676847d0",
+      "title": "Counting to 100 *Soh"
+    },
+    {
+      "id": "957cb5fc-4055-47ea-844f-e83d520c34cc",
+      "title": "Writing Numbers 1 to 10 in Words"
+    },
+    {
+      "id": "4b04cd35-ffa5-4ec2-8524-97bebd39238e",
+      "title": "Writing Numbers 11 to 20 in Words"
+    },
+    {
+      "id": "0767b9f0-4a75-4a27-b2a2-fa9833c8dae8",
+      "title": "Introduction to Halves Using Rectangular Cut-outs"
+    },
+    {
+      "id": "159f92b9-69c7-45ea-8376-2b15af491360",
+      "title": "Identifying 1/2 in Everyday Objects"
+    },
+    {
+      "id": "60441bd5-774f-4135-9871-666fc481b13b",
+      "title": "Identifying 1/4 in Everyday Objects"
+    },
+    {
+      "id": "9b887eb8-0a48-4f37-9689-b53113904728",
+      "title": "Introduction to Quarters Using Rectangular Cut-outs"
+    },
+    {
+      "id": "b163de06-c0e5-4a42-8bce-ba7dcab330a9",
+      "title": "Making Patterns with Fractions"
+    },
+    {
+      "id": "dbadac3a-b59b-4f76-bebf-efda6fb3e261",
+      "title": "Digital Games with Fractions"
+    },
+    {
+      "id": "2f528f6b-b4c9-4120-a18e-9d86ea949d3e",
+      "title": "Adding 2-Digit and 1-Digit Numbers With Regrouping"
+    },
+    {
+      "id": "4fa40ac0-f60d-4f98-9d23-f85566b28af6",
+      "title": "Adding Using the Number Line"
+    },
+    {
+      "id": "5f1f7551-1c06-40d2-a10d-14cdece75151",
+      "title": "Adding 3 Single Digit Numbers Horizontally"
+    },
+    {
+      "id": "70fdce2b-3284-4c89-8497-036aee7d9207",
+      "title": "Adding 3 Single Digit Numbers Vertically"
+    },
+    {
+      "id": "f58faf50-97f7-4340-b17f-9eff6f08e38d",
+      "title": "Adding Single Digit Numbers Vertically"
+    },
+    {
+      "id": "17d7857a-a622-4b09-8524-db7be78977f8",
+      "title": "Subtracting 2-Digit Numbers Without Regrouping (Vertical)"
+    },
+    {
+      "id": "b546d836-3292-48a1-b445-134e85b30e20",
+      "title": "Subtracting 2-Digit Numbers Without Regrouping (Horizontal)"
+    },
+    {
+      "id": "11d88b45-b1a6-4143-9c04-42e88e57d080",
+      "title": "Subtracting Single Digit Numbers"
+    },
+    {
+      "id": "bec50c90-2129-4275-8cdb-abb06296e4cf",
+      "title": "Subtracting Using the Number Line"
+    },
+    {
+      "id": "e20dbfd4-eba4-402d-8743-8e24e00475a2",
+      "title": "Using Number Families for Subtraction"
+    },
+    {
+      "id": "66cdd3b3-858d-4be2-a451-b2f2340bc852",
+      "title": "Missing Numbers in Subtraction"
+    },
+    {
+      "id": "b0c38507-b852-4a4c-8767-c0234ef9b89c",
+      "title": "Multiplication as Repeated Addition Using Counters"
+    },
+    {
+      "id": "f3e92483-c349-4553-ba43-fd277cf2be73",
+      "title": "Multiplication as Repeated Addition Using Number Lines"
+    },
+    {
+      "id": "cff3b7c1-2468-454d-b2da-fe35d49e2456",
+      "title": "Writing Multiplication Sentences Using the × Sign"
+    },
+    {
+      "id": "938a3ed5-06ab-430b-a345-b933cce98a68",
+      "title": "Multiplying by 3 and 4"
+    },
+    {
+      "id": "2afb0a5b-88e3-4c8e-9ccb-844064b1bd3f",
+      "title": "Multiplying by 5 and 10"
+    }
+  ]
+}
