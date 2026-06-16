@@ -318,27 +318,78 @@ The generator must follow this model. The renderer must enforce it.
 
 ## Media Summary Per Step
 
-| Step | Best Media | Video Allowed? | Required Interaction |
-|------|-----------|---------------|---------------------|
-| 1. Welcome | Owl/avatar SVG | ❌ No | None |
-| 2. Mission | Text + icon | ❌ No | None |
-| 3. Think First | Text prompt | ❌ No | Optional |
-| 4. Learn | Text + SVG/diagram | ⚠️ Optional | None |
-| 5. Real Life | Contextual SVG | ❌ No | None |
-| 6. Example | Worked example + optional video | ✅ Yes (best place) | None |
-| 7. Practice | Interactive task | ❌ No | ✅ Required |
-| 8. Quick Check | MCQ/number input | ❌ No | ✅ Required |
-| 9. Reflect | Text + emoji/writing | ❌ No | Optional |
-| 10. Complete | Celebration SVG + XP | ❌ No | None |
+| Step | Best Media | Video Allowed? | Audio Allowed? | Required Interaction |
+|------|-----------|---------------|----------------|---------------------|
+| 1. Welcome | Owl/avatar SVG | ❌ No | ✅ Read-aloud | None |
+| 2. Mission | Text + icon | ❌ No | ✅ Read-aloud | None |
+| 3. Think First | Text prompt | ❌ No | ✅ Read-aloud | Optional |
+| 4. Learn | Text + SVG/diagram | ⚠️ Optional | ✅ Read-aloud | None |
+| 5. Real Life | Contextual SVG | ❌ No | ✅ Read-aloud | None |
+| 6. Example | Worked example + optional video | ✅ Yes (best place) | ✅ Read-aloud | None |
+| 7. Practice | Interactive task | ❌ No | ✅ Instructions | ✅ Required |
+| 8. Quick Check | MCQ/number input | ❌ No | ✅ Instructions | ✅ Required |
+| 9. Reflect | Text + emoji/writing | ❌ No | ✅ Read-aloud | Optional |
+| 10. Complete | Celebration SVG + XP | ❌ No | ✅ Celebration | None |
+
+---
+
+## Minimum Viable Journey vs Enhanced Journey
+
+### Minimum Viable Journey (MVJ)
+
+A journey that teaches the concept without any external media.
+
+**Must have:**
+- Clear Owl guidance text (every step)
+- Child-friendly student text (every step)
+- Topic-appropriate SVG/visual where concept needs it (Steps 4, 5, 6)
+- Practice interaction (Step 7) — child must do something
+- Quick Check (Step 8) — valid question + correct answer + feedback
+- Reflection prompt (Step 9)
+- Completion/reward (Step 10)
+
+**Does NOT need:**
+- Video
+- Audio (helpful but not required for MVJ)
+- Animation
+- Rich illustrations (simple SVG is fine)
+
+**Rule:** A minimum viable journey must fully teach the concept. If removing video makes the lesson unteachable, the journey is not viable.
+
+### Enhanced Journey
+
+A journey that adds media to improve the learning experience.
+
+**Adds to MVJ:**
+- Approved video (Step 6 preferred, Step 4 only if concept needs demonstration)
+- Audio/read-aloud for instructions, reading, vocabulary
+- Richer illustrations and animations
+- Stronger interactive tasks
+- Sound effects and celebrations
+
+**Rule:** Enhanced journey = MVJ + approved media. Never the other way around.
+
+### When to Use Each
+
+| Situation | Use |
+|-----------|-----|
+| Initial generation / low bandwidth | Minimum Viable Journey |
+| English reading, Kiswahili | Enhanced (audio recommended) |
+| Concept needs demonstration (measuring, folding) | Enhanced (video in Step 6) |
+| Mobile-first learners | MVJ + audio, no video |
+| Concepts that are hard to show in static images | Enhanced (video in Step 6) |
 
 ---
 
 ## Key Principles
 
 1. **Video supports, never carries.** The lesson must teach without video.
-2. **Every step has a purpose.** No filler steps.
-3. **Media matches the step.** No video in Welcome. No passive content in Practice.
-4. **The child must act.** Steps 7 and 8 require learner action.
-5. **Fallbacks always exist.** Missing media never blocks the lesson.
-6. **Grade 2 appropriate.** Short, simple, concrete, visual.
-7. **Kenyan context.** Real-life connections use Kenyan settings.
+2. **Audio helps, never replaces text.** Every audio must have a transcript fallback.
+3. **Every step has a purpose.** No filler steps.
+4. **Media matches the step.** No video in Welcome. No passive content in Practice.
+5. **The child must act.** Steps 7 and 8 require learner action.
+6. **Fallbacks always exist.** Missing media never blocks the lesson.
+7. **Grade 2 appropriate.** Short, simple, concrete, visual.
+8. **Kenyan context.** Real-life connections use Kenyan settings.
+9. **Only approved media reaches learners.** Draft/unapproved media stays in admin preview.
+10. **Low-bandwidth first.** Text/SVG loads first. Video is optional and never autoplays.

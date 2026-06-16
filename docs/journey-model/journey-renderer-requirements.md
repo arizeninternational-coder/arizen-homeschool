@@ -186,17 +186,50 @@ const studentText = step.localization[language]?.studentText || step.studentText
 ## Accessibility
 
 ### Requirements
-1. All images must have `altText`
-2. All videos must have captions or transcripts (future)
-3. All interactions must be keyboard-navigable
-4. Color contrast must meet WCAG AA
-5. Font size minimum 16px for body text
-6. Touch targets minimum 44x44px
+1. All images/SVG must have `altText`
+2. All videos must have title/caption/description
+3. All audio must have `transcript` (fallback text)
+4. All interactions must have clear labels (aria-label)
+5. Color must NOT be the only way to understand an answer
+6. Feedback must be text-based, not only visual (no green/red only — add text)
+7. Touch targets minimum 44x44px
+8. Font size minimum 16px for body text
+9. Color contrast must meet WCAG AA
+10. All interactions must be keyboard-navigable
+11. Screen reader must be able to read all content (text + alt text + transcripts)
 
 ### ARIA Labels
 ```jsx
 <div aria-label={step.accessibility.ariaLabel}>
   <img alt={step.accessibility.altText} />
+</div>
+```
+
+### Audio Accessibility
+```jsx
+IF media.type = "audio" THEN
+  <AudioPlayer
+    src={media.url}
+    transcript={media.transcript}
+    onPlay={() => showTranscript(false)}
+    onPause={() => showTranscript(true)}
+  />
+  <details>
+    <summary>Read transcript</summary>
+    <p>{media.transcript}</p>
+  </details>
+```
+
+### Feedback Accessibility
+```jsx
+// WRONG: Color only
+<div style={{color: isCorrect ? 'green' : 'red'}}>✓</div>
+
+// RIGHT: Text + color + icon
+<div role="alert" aria-live="polite">
+  <span style={{color: isCorrect ? 'green' : 'red'}}>
+    {isCorrect ? '✓ Correct!' : '✗ Not quite. Try again.'}
+  </span>
 </div>
 ```
 

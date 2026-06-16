@@ -10,16 +10,21 @@
 
 ### Core Rules
 
-1. **Video is optional.** Every lesson must teach without video.
-2. **Video must be human-approved.** No auto-selected YouTube videos.
-3. **Video must be relevant to the exact lesson.** Not just the topic — the specific lesson.
-4. **Video must be child-safe.** No ads, no inappropriate content, no comments visible.
-5. **Video must be short.** Preferably under 5 minutes. Maximum 8 minutes.
-6. **Video must be Grade 2 appropriate.** Not too advanced. Not too babyish.
-7. **Video must work.** Not broken, not removed, not region-locked.
-8. **Video must have a backup.** Every approved video needs a backup URL.
-9. **Video must not be the only teaching source.** Text + visual backup required.
-10. **Video must be marked as approved in the database.** `media.approved = true` AND `media.humanReviewed = true`.
+1. **Maximum 1 video per journey.** No exceptions.
+2. **Video is usually Step 6 only.** Step 4 video is allowed only when the concept genuinely needs demonstration (movement, pronunciation, handwashing, folding paper, using a ruler).
+3. **For Math, video should usually be optional in Step 6, not Step 4.** Math concepts are better taught with SVG/diagrams than video.
+4. **Video is optional.** Every lesson must teach without video.
+5. **Video must be human-approved.** No auto-selected YouTube videos.
+6. **Video must be relevant to the exact lesson.** Not just the topic — the specific lesson.
+7. **Video must be child-safe.** No ads, no inappropriate content, no comments visible.
+8. **Video must be short.** Preferably under 5 minutes. Maximum 8 minutes.
+9. **Video must be Grade 2 appropriate.** Not too advanced. Not too babyish.
+10. **Video must work.** Not broken, not removed, not region-locked.
+11. **Video must have a backup.** Every approved video needs a backup URL.
+12. **Video must not be the only teaching source.** Text + visual backup required.
+13. **Video must be marked as approved in the database.** `media.approved = true` AND `media.humanReviewed = true`.
+14. **Unapproved YouTube videos must not appear to learners.** Ever.
+15. **If no approved video exists, show the worked example fallback.** Never show a broken video player.
 
 ---
 

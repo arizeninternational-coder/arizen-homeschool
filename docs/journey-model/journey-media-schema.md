@@ -82,11 +82,15 @@
   "altText": "Description for screen readers",
   "caption": "Optional caption below media",
 
+  "approvalStatus": "missing | draft | needs_review | approved | rejected",
   "approved": false,
   "humanReviewed": false,
+  "reviewedBy": "",
+  "reviewedAt": "",
 
   "required": false,
-  "fallbackType": "text | svg | worked_example | none"
+  "fallbackType": "text | svg | worked_example | audio | none",
+  "fallbackText": "Text shown if media fails or is unapproved"
 }
 ```
 
@@ -97,10 +101,53 @@
 | `none` | No media | Any step |
 | `svg` | Generated or approved SVG illustration | 1, 4, 5, 6, 10 |
 | `image` | Uploaded or approved image/photo | 5, 6 |
-| `youtube` | Approved YouTube embed | 4 (optional), 6 (best place) |
-| `audio` | Audio narration (future) | Any |
+| `youtube` | Approved YouTube embed (max 1 per journey) | 4 (optional), 6 (best place) |
+| `audio` | Audio narration / read-aloud | 1, 2, 3, 4, 5, 6, 7, 8, 9 (any step needing read-aloud) |
 | `animation` | Lottie/CSS animation | 6, 10 |
 | `interactive` | Interactive widget (future) | 7 |
+
+### Audio Object Schema
+
+Audio is a first-class media type. It is especially important for:
+- English reading and pronunciation
+- Kiswahili read-aloud
+- Vocabulary and listening
+- Instructions for Grade 2 learners who may struggle with reading
+- Accessibility support (screen readers, read-aloud)
+
+```json
+{
+  "type": "audio",
+  "source": "generated_tts | approved_url | uploaded_asset",
+  "url": "https://...",
+  "assetId": "audio-welcome-001",
+  "duration": "0:15",
+  "voiceType": "child_friendly | teacher | tts_default",
+  "transcript": "Hello friend! Today we're going to learn something exciting about addition.",
+  "caption": "",
+  "approvalStatus": "approved",
+  "approved": true,
+  "humanReviewed": true,
+  "required": false,
+  "fallbackType": "text",
+  "fallbackText": "Hello friend! Today we're going to learn something exciting about addition."
+}
+```
+
+**Audio fields:**
+- `transcript` — Required. The text version of the audio. Used for accessibility and fallback.
+- `duration` — Duration in seconds or "MM:SS" format.
+- `voiceType` — `child_friendly` (warm, slow), `teacher` (clear, instructional), `tts_default` (text-to-speech).
+- `approvalStatus` — Same 5-state status as all media.
+- `fallbackText` — The transcript is the natural fallback. Always provide it.
+
+**Audio rules:**
+- Audio is optional but strongly recommended for English, Kiswahili, and instructions.
+- Every audio item MUST have a transcript.
+- Audio should NOT autoplay. User taps to play.
+- If audio is missing, show the transcript as fallback.
+- Audio files should be lightweight (compressed MP3 or OGG).
+- Maximum 30 seconds per audio clip for Grade 2 attention span.
 
 ### Media Source Definitions
 
@@ -118,7 +165,28 @@
 | `text` | Show text explanation instead of media |
 | `svg` | Show simple generated SVG instead of complex media |
 | `worked_example` | Show worked example instead of video |
+| `audio` | Show audio narration instead of visual |
 | `none` | No fallback (step still works) |
+
+---
+
+## Media Approval Status
+
+Every media item has an `approvalStatus` field with 5 possible values:
+
+| Status | Meaning | Learner-Facing? | Admin Preview? |
+|--------|---------|-----------------|----------------|
+| `missing` | No media provided | ❌ No | ⚠️ Shows placeholder |
+| `draft` | Media generated but not reviewed | ❌ No | ⚠️ Shows with "DRAFT" badge |
+| `needs_review` | Media submitted for human review | ❌ No | ⚠️ Shows with "NEEDS REVIEW" badge |
+| `approved` | Human-reviewed and approved | ✅ Yes | ✅ Shows normally |
+| `rejected` | Reviewed and rejected | ❌ No | ⚠️ Shows with "REJECTED" badge |
+
+**Rules:**
+- Only `approved` media appears in learner view.
+- Admin preview shows all media with appropriate warning badges.
+- `missing` media uses fallback (text, SVG, or worked example).
+- `rejected` media is never shown to learners. Replace with fallback.
 
 ---
 

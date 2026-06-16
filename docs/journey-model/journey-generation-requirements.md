@@ -174,10 +174,18 @@ NO title-copying
 NO generic greetings
 NO raw curriculum text
 ALL media has alt text
-Video is only in Learn or Example
+ALL audio has transcript
+Video is only in Learn or Example (max 1 per journey)
 Video is approved (or marked as fallback)
+Video does not autoplay
 Practice requires learner action
 Quick Check tests lesson concept
+Media matches lesson topic
+Media approvalStatus is set (missing/draft/needs_review/approved/rejected)
+Unapproved media is NOT learner-facing
+Fallback exists for all media
+"Illustration coming soon" or "Video coming soon" does NOT appear
+Lesson difficulty is within Grade 2 limits
 ```
 
 **If any check fails → DO NOT WRITE. Flag for human review.**
@@ -194,6 +202,7 @@ practiceTemplates = topicGuide.getPracticeTemplates()
 qcTemplates = topicGuide.getQcTemplates()
 visualGuidance = topicGuide.getVisualGuidance()
 videoRecommendations = topicGuide.getVideoRecommendations()
+audioRecommendations = topicGuide.getAudioRecommendations()
 difficultyLimits = topicGuide.getDifficultyLimits()
 ```
 
@@ -202,6 +211,7 @@ difficultyLimits = topicGuide.getDifficultyLimits()
 - **Example step:** Use worked example from examples + optional video from video recommendations
 - **Practice step:** Use practice template from practiceTemplates
 - **Quick Check step:** Use QC template from qcTemplates with correct answer from difficultyLimits
+- **Audio:** Use audio recommendations from source pack. Generate TTS if no audio provided.
 - **All steps:** Follow media rules from journey model
 
 ---

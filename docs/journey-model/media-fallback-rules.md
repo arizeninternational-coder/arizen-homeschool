@@ -127,11 +127,46 @@ IF media.type = "svg" AND (media.url = "" OR media.loadFailed = true) THEN
 - **Primary:** Text prompt + emoji selector
 - **Fallback:** Text prompt only
 - **Never show:** Video, teaching content
+### Audio Missing or Failed to Load
 
-### Step 10: Complete
-- **Primary:** Celebration SVG + summary text + XP
-- **Fallback:** Summary text + XP only
-- **Never show:** Video, "Coming soon"
+| Step | Fallback Behavior |
+|------|-------------------|
+| Any | Show transcript text. Audio is supplementary. |
+
+**Rule:** Never show "Audio unavailable." Show the transcript instead.
+
+**Implementation:**
+```
+IF media.type = "audio" AND (media.url = "" OR media.loadFailed = true) THEN
+  render media.fallbackText (transcript)
+```
+
+---
+
+## Low-Bandwidth Rules
+
+For learners on mobile data or slow connections:
+
+1. **Videos must NOT autoplay.** User taps to play. No exceptions.
+2. **Heavy media is optional.** If image/video fails, lesson continues with text/SVG fallback.
+3. **Text and SVG load first.** Video loads only on user interaction.
+4. **A lesson must remain usable if video or image fails.** Text-only fallback always works.
+5. **Do not block lesson completion because media failed.** The child can complete the lesson even if all media fails.
+6. **Audio files must be lightweight.** Compressed MP3 or OGG. Maximum 500KB per clip.
+7. **SVG is preferred over images.** SVG scales, loads fast, works offline.
+8. **Cache text and SVG locally.** Video is fetched on demand.
+
+**Implementation:**
+```
+ON page load:
+  render all text content immediately
+  render SVG content immediately
+  defer video loading (load on tap)
+  defer image loading (lazy load)
+  IF network = slow THEN
+    hide video thumbnails
+    show "Tap to load video" button
+```
 
 ---
 
@@ -153,15 +188,18 @@ When media is missing, the renderer should try these in order:
 - Shows draft journeys
 - Shows unapproved media with warning badges
 - Shows "UNAPPROVED" overlay on unapproved videos
+- Shows "DRAFT" badge on draft media
+- Shows "NEEDS REVIEW" badge on pending media
 - Shows fallback indicators
 - Allows editing
 
 ### Learner View
 - Shows published journeys only
-- Never shows unapproved media
+- **Only `approved` media is shown.** No draft, no unapproved, no rejected.
 - Never shows fallback indicators
 - Never shows "coming soon" text
 - Always shows complete, polished content
+- Video shows as "Tap to play" (never autoplays)
 
 ---
 
