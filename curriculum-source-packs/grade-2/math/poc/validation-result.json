@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "errors": [],
+  "warnings": [],
+  "checks": [
+    "10 steps present",
+    "Step order correct",
+    "No duplicate step types",
+    "All steps have required text",
+    "No title-copying detected",
+    "No placeholder text",
+    "Video placement valid (no video in POC = OK)",
+    "Video count: 0 (max 1)",
+    "Practice has required interaction",
+    "Quick Check is valid",
+    "No fraction arithmetic in QC",
+    "No obvious answer leaks",
+    "All SVG/media has alt text",
+    "Learn step has sufficient text (no video dependency)",
+    "Fractions scope: halves only, no arithmetic",
+    "Media approval status set on all steps"
+  ],
+  "summary": "16 checks passed, 0 warnings, 0 errors"
+}

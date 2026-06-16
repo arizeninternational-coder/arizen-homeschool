@@ -1,0 +1,353 @@
+{
+  "version": "1.0.0",
+  "lessonId": "0767b9f0-4a75-4a27-b2a2-fa9833c8dae8",
+  "title": "Introduction to Halves Using Rectangular Cut-outs",
+  "subject": "Mathematics",
+  "grade": 2,
+  "language": "en",
+  "generatedFrom": "fractions-source-pack-draft-v1",
+  "generatedAt": "2026-06-16T21:23:31.142Z",
+  "steps": [
+    {
+      "stepNumber": 1,
+      "stepType": "welcome",
+      "title": "Welcome!",
+      "purpose": "Greet the child and set emotional tone",
+      "owlText": "Hello friend! Today we are going to learn something exciting. We will learn about halves!",
+      "studentText": "Today we learn about halves. A half is one of two equal parts!",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-welcome-owl-001",
+        "altText": "Owl teacher waving hello with a rectangle shape beside it",
+        "caption": "",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": false,
+        "fallbackType": "text",
+        "fallbackText": "Hello friend! Today we learn about halves."
+      },
+      "interaction": {
+        "type": "none"
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": false,
+        "requiresInteraction": false
+      }
+    },
+    {
+      "stepNumber": 2,
+      "stepType": "mission",
+      "title": "Our Mission",
+      "purpose": "Tell the child what they will learn in child-friendly language",
+      "owlText": "",
+      "studentText": "Today you will learn what a half is. A half means one of two equal parts of something whole.",
+      "media": {
+        "type": "none",
+        "approvalStatus": "approved",
+        "approved": true,
+        "humanReviewed": false,
+        "required": false,
+        "fallbackType": "none"
+      },
+      "interaction": {
+        "type": "none"
+      },
+      "validation": {
+        "requiresOwlText": false,
+        "requiresStudentText": true,
+        "requiresMedia": false,
+        "requiresInteraction": false
+      }
+    },
+    {
+      "stepNumber": 3,
+      "stepType": "think_first",
+      "title": "Think First!",
+      "purpose": "Activate prior knowledge about sharing and equal parts",
+      "owlText": "Before we start, think about this: If you have one chapati and you want to share it fairly with your friend, how would you cut it?",
+      "studentText": "How would you share one chapati fairly with a friend? Think about it!",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-think-chapati-001",
+        "altText": "A whole chapati with a question mark above it",
+        "caption": "",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": false,
+        "fallbackType": "text",
+        "fallbackText": "Think about sharing one chapati fairly with a friend."
+      },
+      "interaction": {
+        "type": "none"
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": false,
+        "requiresInteraction": false
+      }
+    },
+    {
+      "stepNumber": 4,
+      "stepType": "learn",
+      "title": "Learn It",
+      "purpose": "Teach the core concept: what is a half",
+      "owlText": "When we cut something into two equal parts, each part is called a half. Look at this rectangle. I will fold it into two equal parts. Each part is one half. We write it as 1/2.",
+      "studentText": "A half means one of two equal parts. When you fold a paper into two equal parts, each part is one half. We write: 1/2",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-learn-halves-001",
+        "altText": "A rectangle being folded into 2 equal parts. One part is shaded. Shows 1/2.",
+        "caption": "One half. We write it as 1/2.",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": true,
+        "fallbackType": "text",
+        "fallbackText": "A rectangle divided into 2 equal parts. One part is shaded. This is one half. We write it as 1/2."
+      },
+      "interaction": {
+        "type": "none"
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": true,
+        "requiresInteraction": false
+      }
+    },
+    {
+      "stepNumber": 5,
+      "stepType": "real_life",
+      "title": "Real Life Connection",
+      "purpose": "Connect halves to real life — Kenyan context",
+      "owlText": "We see halves every day! When you cut a chapati into two equal pieces, each piece is one half. When you fold a paper into two equal parts, each part is one half. Halves are all around us!",
+      "studentText": "Happens every day! A chapati cut into 2 equal pieces. Each piece is one half. A paper folded into 2 equal parts. Each part is one half.",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-reallife-halves-001",
+        "altText": "A chapati cut into 2 equal halves. A paper folded into 2 equal parts.",
+        "caption": "Halves in real life: chapati and paper folding.",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": false,
+        "fallbackType": "text",
+        "fallbackText": "A chapati cut into 2 equal pieces. Each piece is one half."
+      },
+      "interaction": {
+        "type": "none"
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": false,
+        "requiresInteraction": false
+      }
+    },
+    {
+      "stepNumber": 6,
+      "stepType": "example",
+      "title": "Watch and Learn",
+      "purpose": "Show a worked example of identifying halves",
+      "owlText": "Let me show you. This rectangle is divided into 2 equal parts. One part is shaded. The shaded part is one half of the whole rectangle. We write it as 1/2. Both parts are the same size — that is what makes them equal.",
+      "studentText": "This rectangle has 2 equal parts. One part is shaded. The shaded part is 1/2. Both parts are the same size.",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-example-halves-001",
+        "altText": "A rectangle divided into 2 equal parts. Left part is shaded. Arrow points to shaded part labeled 1/2.",
+        "caption": "The shaded part is one half. We write: 1/2",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": true,
+        "fallbackType": "text",
+        "fallbackText": "A rectangle divided into 2 equal parts. One part is shaded. This is one half. We write: 1/2."
+      },
+      "interaction": {
+        "type": "none"
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": true,
+        "requiresInteraction": false
+      }
+    },
+    {
+      "stepNumber": 7,
+      "stepType": "practice",
+      "title": "Your Turn!",
+      "purpose": "Child practices identifying halves",
+      "owlText": "Now it is your turn! Look at this shape. It is divided into 2 equal parts. One part is shaded. What fraction is shaded? Choose your answer.",
+      "studentText": "Look at the shape. It has 2 equal parts. One part is shaded. What fraction is shaded?",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-practice-halves-001",
+        "altText": "A circle divided into 2 equal parts. One part is shaded.",
+        "caption": "",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": true,
+        "fallbackType": "text",
+        "fallbackText": "A circle divided into 2 equal parts. One part is shaded."
+      },
+      "interaction": {
+        "type": "multiple_choice",
+        "question": "What fraction is shaded?",
+        "options": [
+          "1/2",
+          "1/4",
+          "1/3",
+          "2/2"
+        ],
+        "correctAnswer": "1/2",
+        "correctIndex": 0,
+        "feedbackCorrect": "Yes! The shape has 2 equal parts. One part is shaded. That is one half. Well done!",
+        "feedbackIncorrect": "Look again. The shape is divided into 2 equal parts. One part is shaded. That is one half. Try again!",
+        "requiresSave": true
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": true,
+        "requiresInteraction": true
+      }
+    },
+    {
+      "stepNumber": 8,
+      "stepType": "quick_check",
+      "title": "Quick Check!",
+      "purpose": "Test understanding of halves",
+      "owlText": "Quick check! This circle is divided into 2 equal parts. One part is shaded. What fraction is shaded? Choose the correct answer.",
+      "studentText": "This circle is divided into 2 equal parts. One part is shaded. What fraction is shaded?",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-qc-halves-001",
+        "altText": "A circle divided into 2 equal parts. One part is shaded.",
+        "caption": "",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": true,
+        "fallbackType": "text",
+        "fallbackText": "A circle divided into 2 equal parts. One part is shaded."
+      },
+      "interaction": {
+        "type": "multiple_choice",
+        "question": "What fraction is shaded?",
+        "options": [
+          "1/2",
+          "1/4",
+          "1/3",
+          "2/2"
+        ],
+        "correctAnswer": "1/2",
+        "correctIndex": 0,
+        "feedbackCorrect": "Correct! One out of two equal parts is one half. Excellent work!",
+        "feedbackIncorrect": "Not quite. Count the equal parts. There are 2. One part is shaded. That is one half. Try again!",
+        "requiresSave": true
+      },
+      "validation": {
+        "requiresOwlText": false,
+        "requiresStudentText": true,
+        "requiresMedia": true,
+        "requiresInteraction": true
+      }
+    },
+    {
+      "stepNumber": 9,
+      "stepType": "reflect",
+      "title": "Think About Your Learning",
+      "purpose": "Help the child reflect on what they learned",
+      "owlText": "You did great today! Think about what you learned. What is a half? When something is divided into two equal parts, each part is one half.",
+      "studentText": "What did you learn about halves today? A half means one of two equal parts.",
+      "media": {
+        "type": "none",
+        "approvalStatus": "approved",
+        "approved": true,
+        "humanReviewed": false,
+        "required": false,
+        "fallbackType": "none"
+      },
+      "interaction": {
+        "type": "reflection",
+        "question": "How do you feel about halves today?",
+        "options": [
+          "😊 I understand!",
+          "🤔 I am still learning",
+          "😟 I need more help"
+        ],
+        "correctAnswer": "",
+        "correctIndex": null,
+        "feedbackCorrect": "",
+        "feedbackIncorrect": "",
+        "requiresSave": false
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": false,
+        "requiresInteraction": false
+      }
+    },
+    {
+      "stepNumber": 10,
+      "stepType": "complete",
+      "title": "You Did It!",
+      "purpose": "Celebrate completion and provide closure",
+      "owlText": "Wonderful! You learned about halves today. A half means one of two equal parts. You can find halves in chapati, paper, and many things around you. Keep practicing!",
+      "studentText": "You learned about halves! A half is one of two equal parts. Look for halves around you!",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-complete-celebration-001",
+        "altText": "Celebration with stars and a badge that says \"I know halves!\"",
+        "caption": "",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": false,
+        "fallbackType": "text",
+        "fallbackText": "Wonderful! You learned about halves today!"
+      },
+      "interaction": {
+        "type": "none"
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": false,
+        "requiresInteraction": false
+      }
+    }
+  ],
+  "metadata": {
+    "generatedAt": "2026-06-16T21:23:31.381Z",
+    "generator": "fractions-source-pack-poc-v1",
+    "sourcePackVersion": "1.0.0-draft",
+    "validated": false,
+    "humanReviewed": false,
+    "approvedForLearners": false
+  }
+}
