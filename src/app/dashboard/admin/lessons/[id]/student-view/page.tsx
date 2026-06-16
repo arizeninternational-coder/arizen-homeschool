@@ -96,8 +96,10 @@ function buildLessonJourney(lesson: LessonData | null): JourneyStep[] {
       // Legacy array format — convert to journey steps
       return convertLegacyBlocksToJourney(cb, lesson.title || "Lesson");
     }
-    // Dict format — use approved journey first, then draft
-    return cb?.studentJourney || cb?.studentJourneyDraft || [];
+    // Dict format — use published journey (non-empty), then draft, otherwise empty
+    const publishedJourney = Array.isArray(cb?.studentJourney) ? cb.studentJourney : [];
+    const draftJourney = Array.isArray(cb?.studentJourneyDraft) ? cb.studentJourneyDraft : [];
+    return publishedJourney.length > 0 ? publishedJourney : draftJourney;
   } catch { return [];
   }
 }
