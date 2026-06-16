@@ -1,12 +1,12 @@
 {
-  "version": "1.0.0",
+  "version": "1.0.1",
   "lessonId": "0767b9f0-4a75-4a27-b2a2-fa9833c8dae8",
   "title": "Introduction to Halves Using Rectangular Cut-outs",
   "subject": "Mathematics",
   "grade": 2,
   "language": "en",
   "generatedFrom": "fractions-source-pack-draft-v1",
-  "generatedAt": "2026-06-16T21:23:31.142Z",
+  "generatedAt": "2026-06-16T22:00:00.000Z",
   "steps": [
     {
       "stepNumber": 1,
@@ -29,9 +29,7 @@
         "fallbackType": "text",
         "fallbackText": "Hello friend! Today we learn about halves."
       },
-      "interaction": {
-        "type": "none"
-      },
+      "interaction": { "type": "none" },
       "validation": {
         "requiresOwlText": true,
         "requiresStudentText": true,
@@ -54,9 +52,7 @@
         "required": false,
         "fallbackType": "none"
       },
-      "interaction": {
-        "type": "none"
-      },
+      "interaction": { "type": "none" },
       "validation": {
         "requiresOwlText": false,
         "requiresStudentText": true,
@@ -85,9 +81,7 @@
         "fallbackType": "text",
         "fallbackText": "Think about sharing one chapati fairly with a friend."
       },
-      "interaction": {
-        "type": "none"
-      },
+      "interaction": { "type": "none" },
       "validation": {
         "requiresOwlText": true,
         "requiresStudentText": true,
@@ -116,9 +110,7 @@
         "fallbackType": "text",
         "fallbackText": "A rectangle divided into 2 equal parts. One part is shaded. This is one half. We write it as 1/2."
       },
-      "interaction": {
-        "type": "none"
-      },
+      "interaction": { "type": "none" },
       "validation": {
         "requiresOwlText": true,
         "requiresStudentText": true,
@@ -147,9 +139,7 @@
         "fallbackType": "text",
         "fallbackText": "A chapati cut into 2 equal pieces. Each piece is one half."
       },
-      "interaction": {
-        "type": "none"
-      },
+      "interaction": { "type": "none" },
       "validation": {
         "requiresOwlText": true,
         "requiresStudentText": true,
@@ -178,9 +168,7 @@
         "fallbackType": "text",
         "fallbackText": "A rectangle divided into 2 equal parts. One part is shaded. This is one half. We write: 1/2."
       },
-      "interaction": {
-        "type": "none"
-      },
+      "interaction": { "type": "none" },
       "validation": {
         "requiresOwlText": true,
         "requiresStudentText": true,
@@ -192,37 +180,38 @@
       "stepNumber": 7,
       "stepType": "practice",
       "title": "Your Turn!",
-      "purpose": "Child practices identifying halves",
-      "owlText": "Now it is your turn! Look at this shape. It is divided into 2 equal parts. One part is shaded. What fraction is shaded? Choose your answer.",
-      "studentText": "Look at the shape. It has 2 equal parts. One part is shaded. What fraction is shaded?",
+      "purpose": "Child practices identifying which shape shows halves — different from QC",
+      "owlText": "Now it is your turn! Look at these two shapes. One shape is divided into two equal parts. The other is not. Which shape shows halves? Tap the correct one.",
+      "studentText": "Which shape is divided into 2 equal parts? Tap the shape that shows halves.",
       "media": {
         "type": "svg",
         "source": "generated",
         "url": "",
         "assetId": "svg-practice-halves-001",
-        "altText": "A circle divided into 2 equal parts. One part is shaded.",
+        "altText": "Two shapes side by side. Shape A: rectangle divided into 2 equal parts. Shape B: rectangle divided into 2 unequal parts.",
         "caption": "",
         "approvalStatus": "draft",
         "approved": false,
         "humanReviewed": false,
         "required": true,
         "fallbackType": "text",
-        "fallbackText": "A circle divided into 2 equal parts. One part is shaded."
+        "fallbackText": "Two rectangles. One has 2 equal parts. One has 2 unequal parts. Which shows halves?"
       },
       "interaction": {
         "type": "multiple_choice",
-        "question": "What fraction is shaded?",
+        "question": "Which shape shows halves?",
         "options": [
-          "1/2",
-          "1/4",
-          "1/3",
-          "2/2"
+          "Shape A — the parts are equal",
+          "Shape B — the parts are not equal",
+          "Both shapes",
+          "Neither shape"
         ],
-        "correctAnswer": "1/2",
+        "correctAnswer": "Shape A — the parts are equal",
         "correctIndex": 0,
-        "feedbackCorrect": "Yes! The shape has 2 equal parts. One part is shaded. That is one half. Well done!",
-        "feedbackIncorrect": "Look again. The shape is divided into 2 equal parts. One part is shaded. That is one half. Try again!",
-        "requiresSave": true
+        "feedbackCorrect": "Yes! Shape A has two equal parts. That is what makes it halves. The parts must be the same size!",
+        "feedbackIncorrect": "Look carefully. Halves means the parts must be the same size. Which shape has two equal parts?",
+        "requiresSave": true,
+        "practiceLabel": "practice-identify-halves-shape"
       },
       "validation": {
         "requiresOwlText": true,
@@ -235,7 +224,7 @@
       "stepNumber": 8,
       "stepType": "quick_check",
       "title": "Quick Check!",
-      "purpose": "Test understanding of halves",
+      "purpose": "Test understanding of halves — fraction identification",
       "owlText": "Quick check! This circle is divided into 2 equal parts. One part is shaded. What fraction is shaded? Choose the correct answer.",
       "studentText": "This circle is divided into 2 equal parts. One part is shaded. What fraction is shaded?",
       "media": {
@@ -256,15 +245,15 @@
         "type": "multiple_choice",
         "question": "What fraction is shaded?",
         "options": [
-          "1/2",
-          "1/4",
-          "1/3",
-          "2/2"
+          "one half (1/2)",
+          "one quarter (1/4)",
+          "one whole",
+          "two halves (2/2)"
         ],
-        "correctAnswer": "1/2",
+        "correctAnswer": "one half (1/2)",
         "correctIndex": 0,
-        "feedbackCorrect": "Correct! One out of two equal parts is one half. Excellent work!",
-        "feedbackIncorrect": "Not quite. Count the equal parts. There are 2. One part is shaded. That is one half. Try again!",
+        "feedbackCorrect": "Correct! One out of two equal parts is one half. We write it as 1/2. Excellent work!",
+        "feedbackIncorrect": "Not quite. Count the equal parts. There are 2. One part is shaded. That is one half. We write it as 1/2. Try again!",
         "requiresSave": true
       },
       "validation": {
@@ -331,9 +320,7 @@
         "fallbackType": "text",
         "fallbackText": "Wonderful! You learned about halves today!"
       },
-      "interaction": {
-        "type": "none"
-      },
+      "interaction": { "type": "none" },
       "validation": {
         "requiresOwlText": true,
         "requiresStudentText": true,
@@ -343,8 +330,8 @@
     }
   ],
   "metadata": {
-    "generatedAt": "2026-06-16T21:23:31.381Z",
-    "generator": "fractions-source-pack-poc-v1",
+    "generatedAt": "2026-06-16T22:00:00.000Z",
+    "generator": "fractions-source-pack-poc-v1.1",
     "sourcePackVersion": "1.0.0-draft",
     "validated": false,
     "humanReviewed": false,
