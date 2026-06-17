@@ -1,0 +1,280 @@
+{
+  "id": "839653eb-cd5e-405b-a483-b6d307fee352",
+  "title": "Comparing Fractions: 1/2 and 1/4",
+  "status": "PUBLISHED",
+  "contentBlocks": {
+    "studentJourney": [
+      {
+        "id": "welcome",
+        "stepType": "welcome",
+        "title": "Welcome!",
+        "studentText": "Hello, friend! Today we will learn about 1/2 and 1/4. Are you ready?",
+        "owlText": "Hello! I am OWL. Let us learn about 1/2 and 1/4 together!",
+        "visualType": "owl_teacher",
+        "interaction": {
+          "type": "none"
+        },
+        "media": {}
+      },
+      {
+        "id": "mission",
+        "stepType": "mission",
+        "title": "Our Mission",
+        "studentText": "By the end of this lesson, you will understand 1/2 and 1/4 better!",
+        "owlText": "Our mission is to explore 1/2 and 1/4 together.",
+        "visualType": "owl_teacher",
+        "interaction": {
+          "type": "none"
+        },
+        "media": {}
+      },
+      {
+        "id": "think_first",
+        "stepType": "think_first",
+        "title": "Think First!",
+        "studentText": "Before we start, think about this: What do you already know about 1/2 and 1/4?",
+        "owlText": "Take a moment to think about what you already know.",
+        "visualType": "owl_teacher",
+        "interaction": {
+          "type": "open_response",
+          "prompt": "What do you know about 1/2 and 1/4?",
+          "placeholder": "Share your ideas..."
+        },
+        "media": {}
+      },
+      {
+        "id": "learn",
+        "stepType": "learn",
+        "title": "Learn It",
+        "studentText": "Today we will learn about fractions. A fraction is a part of a whole. A half (1/2) means one of two equal parts.",
+        "owlText": "Here is what you need to know.",
+        "visualType": "owl_teacher",
+        "interaction": {
+          "type": "none"
+        },
+        "media": {}
+      },
+      {
+        "id": "connect",
+        "stepType": "connect",
+        "title": "Real Life Connection",
+        "studentText": "Where do you see 1/2 and 1/4 at home or school?",
+        "owlText": "We use this knowledge every day!",
+        "visualType": "owl_teacher",
+        "interaction": {
+          "type": "none"
+        },
+        "media": {}
+      },
+      {
+        "id": "example",
+        "stepType": "example",
+        "title": "Watch and Learn",
+        "studentText": "Let me show you how 1/2 and 1/4 works. Follow along!",
+        "owlText": "Watch this example, then you will try.",
+        "visualType": "owl_teacher",
+        "interaction": {
+          "type": "none"
+        },
+        "media": {}
+      },
+      {
+        "id": "practice",
+        "stepType": "practice",
+        "title": "Your Turn!",
+        "studentText": "Practice: Draw a circle and shade half. Draw a rectangle and shade a quarter.",
+        "owlText": "Great effort! Keep practicing.",
+        "visualType": "owl_teacher",
+        "interaction": {
+          "type": "none"
+        },
+        "media": {}
+      },
+      {
+        "id": "quick_check",
+        "stepType": "quick_check",
+        "title": "Quick Check!",
+        "studentText": "What is a half?",
+        "owlText": "Choose the best answer.",
+        "visualType": "owl_teacher",
+        "interaction": {
+          "type": "multiple_choice",
+          "question": "What is a half?",
+          "options": [
+            "One of four parts",
+            "One of two equal parts",
+            "Two parts",
+            "The whole"
+          ],
+          "correctIndex": 1,
+          "explanation": "Correct! A half is one of two equal parts."
+        },
+        "media": {}
+      },
+      {
+        "id": "reflect",
+        "stepType": "reflect",
+        "title": "Think About Learning",
+        "studentText": "What did you learn about 1/2 and 1/4 today? Write your answer below.",
+        "owlText": "You worked hard today!",
+        "visualType": "owl_teacher",
+        "interaction": {
+          "type": "open_response",
+          "prompt": "What did you learn?",
+          "placeholder": "Write here..."
+        },
+        "media": {}
+      },
+      {
+        "id": "complete",
+        "stepType": "complete",
+        "title": "Well Done!",
+        "studentText": "Congratulations! You completed the lesson about 1/2 and 1/4!",
+        "owlText": "Excellent work today!",
+        "visualType": "owl_teacher",
+        "interaction": {
+          "type": "none"
+        },
+        "media": {}
+      }
+    ],
+    "studentJourneyDraft": [
+      {
+        "id": "welcome",
+        "stepType": "welcome",
+        "title": "Welcome!",
+        "studentText": "Hello, friend! Today we will learn about 1/2 and 1/4. Are you ready?",
+        "owlText": "Hello! I am OWL. Let us learn about 1/2 and 1/4 together!",
+        "visualType": "owl_teacher",
+        "interaction": {
+          "type": "none"
+        },
+        "media": {}
+      },
+      {
+        "id": "mission",
+        "stepType": "mission",
+        "title": "Our Mission",
+        "studentText": "By the end of this lesson, you will understand 1/2 and 1/4 better!",
+        "owlText": "Our mission is to explore 1/2 and 1/4 together.",
+        "visualType": "owl_teacher",
+        "interaction": {
+          "type": "none"
+        },
+        "media": {}
+      },
+      {
+        "id": "think_first",
+        "stepType": "think_first",
+        "title": "Think First!",
+        "studentText": "Before we start, think about this: What do you already know about 1/2 and 1/4?",
+        "owlText": "Take a moment to think about what you already know.",
+        "visualType": "owl_teacher",
+        "interaction": {
+          "type": "open_response",
+          "prompt": "What do you know about 1/2 and 1/4?",
+          "placeholder": "Share your ideas..."
+        },
+        "media": {}
+      },
+      {
+        "id": "learn",
+        "stepType": "learn",
+        "title": "Learn It",
+        "studentText": "Today we will learn about fractions. A fraction is a part of a whole. A half (1/2) means one of two equal parts.",
+        "owlText": "Here is what you need to know.",
+        "visualType": "owl_teacher",
+        "interaction": {
+          "type": "none"
+        },
+        "media": {}
+      },
+      {
+        "id": "connect",
+        "stepType": "connect",
+        "title": "Real Life Connection",
+        "studentText": "Where do you see 1/2 and 1/4 at home or school?",
+        "owlText": "We use this knowledge every day!",
+        "visualType": "owl_teacher",
+        "interaction": {
+          "type": "none"
+        },
+        "media": {}
+      },
+      {
+        "id": "example",
+        "stepType": "example",
+        "title": "Watch and Learn",
+        "studentText": "Let me show you how 1/2 and 1/4 works. Follow along!",
+        "owlText": "Watch this example, then you will try.",
+        "visualType": "owl_teacher",
+        "interaction": {
+          "type": "none"
+        },
+        "media": {}
+      },
+      {
+        "id": "practice",
+        "stepType": "practice",
+        "title": "Your Turn!",
+        "studentText": "Practice: Draw a circle and shade half. Draw a rectangle and shade a quarter.",
+        "owlText": "Great effort! Keep practicing.",
+        "visualType": "owl_teacher",
+        "interaction": {
+          "type": "none"
+        },
+        "media": {}
+      },
+      {
+        "id": "quick_check",
+        "stepType": "quick_check",
+        "title": "Quick Check!",
+        "studentText": "What is a half?",
+        "owlText": "Choose the best answer.",
+        "visualType": "owl_teacher",
+        "interaction": {
+          "type": "multiple_choice",
+          "question": "What is a half?",
+          "options": [
+            "One of four parts",
+            "One of two equal parts",
+            "Two parts",
+            "The whole"
+          ],
+          "correctIndex": 1,
+          "explanation": "Correct! A half is one of two equal parts."
+        },
+        "media": {}
+      },
+      {
+        "id": "reflect",
+        "stepType": "reflect",
+        "title": "Think About Learning",
+        "studentText": "What did you learn about 1/2 and 1/4 today? Write your answer below.",
+        "owlText": "You worked hard today!",
+        "visualType": "owl_teacher",
+        "interaction": {
+          "type": "open_response",
+          "prompt": "What did you learn?",
+          "placeholder": "Write here..."
+        },
+        "media": {}
+      },
+      {
+        "id": "complete",
+        "stepType": "complete",
+        "title": "Well Done!",
+        "studentText": "Congratulations! You completed the lesson about 1/2 and 1/4!",
+        "owlText": "Excellent work today!",
+        "visualType": "owl_teacher",
+        "interaction": {
+          "type": "none"
+        },
+        "media": {}
+      }
+    ],
+    "isAvailable": true
+  },
+  "updatedAt": "2026-06-10T08:15:34.942+00:00",
+  "backedUpAt": "2026-06-17T11:08:15.150Z"
+}
