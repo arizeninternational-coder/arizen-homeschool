@@ -1,5 +1,5 @@
 {
-  "version": "1.0.1",
+  "version": "1.0.2",
   "lessonId": "0767b9f0-4a75-4a27-b2a2-fa9833c8dae8",
   "title": "Introduction to Halves Using Rectangular Cut-outs",
   "subject": "Mathematics",
@@ -42,7 +42,7 @@
       "stepType": "mission",
       "title": "Our Mission",
       "purpose": "Tell the child what they will learn in child-friendly language",
-      "owlText": "",
+      "owlText": "Today we are going to learn about halves. A half means one of two equal parts of something whole. Are you ready to explore? Let us begin!",
       "studentText": "Today you will learn what a half is. A half means one of two equal parts of something whole.",
       "media": {
         "type": "none",
@@ -81,12 +81,17 @@
         "fallbackType": "text",
         "fallbackText": "Think about sharing one chapati fairly with a friend."
       },
-      "interaction": { "type": "none" },
+      "interaction": {
+        "type": "text_input",
+        "question": "How would you share one chapati fairly with a friend? Draw or describe your answer.",
+        "placeholder": "I would cut it into...",
+        "requiresSave": false
+      },
       "validation": {
         "requiresOwlText": true,
         "requiresStudentText": true,
         "requiresMedia": false,
-        "requiresInteraction": false
+        "requiresInteraction": true
       }
     },
     {
@@ -124,7 +129,7 @@
       "title": "Real Life Connection",
       "purpose": "Connect halves to real life — Kenyan context",
       "owlText": "We see halves every day! When you cut a chapati into two equal pieces, each piece is one half. When you fold a paper into two equal parts, each part is one half. Halves are all around us!",
-      "studentText": "Happens every day! A chapati cut into 2 equal pieces. Each piece is one half. A paper folded into 2 equal parts. Each part is one half.",
+      "studentText": "We see halves every day! When you cut a chapati into two equal pieces, each piece is one half. When you fold a paper into two equal parts, each part is one half. Halves are all around us!",
       "media": {
         "type": "svg",
         "source": "generated",
@@ -153,7 +158,7 @@
       "title": "Watch and Learn",
       "purpose": "Show a worked example of identifying halves",
       "owlText": "Let me show you. This rectangle is divided into 2 equal parts. One part is shaded. The shaded part is one half of the whole rectangle. We write it as 1/2. Both parts are the same size — that is what makes them equal.",
-      "studentText": "This rectangle has 2 equal parts. One part is shaded. The shaded part is 1/2. Both parts are the same size.",
+      "studentText": "Look at this rectangle. It is divided into 2 equal parts. One part is shaded. The shaded part is one half of the whole rectangle. We write: 1/2. Both parts are the same size — that is what makes them equal.",
       "media": {
         "type": "svg",
         "source": "generated",
@@ -253,7 +258,7 @@
         "correctAnswer": "one half (1/2)",
         "correctIndex": 0,
         "feedbackCorrect": "Correct! One out of two equal parts is one half. We write it as 1/2. Excellent work!",
-        "feedbackIncorrect": "Not quite. Count the equal parts. There are 2. One part is shaded. That is one half. We write it as 1/2. Try again!",
+        "feedbackIncorrect": "Good effort. A half means one of two equal parts. The circle is divided into 2 equal parts and one is shaded, so the answer is one half (1/2).",
         "requiresSave": true
       },
       "validation": {
