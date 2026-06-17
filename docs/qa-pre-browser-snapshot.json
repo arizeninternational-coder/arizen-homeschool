@@ -1,0 +1,77 @@
+{
+  "timestamp": "2026-06-17T16:22:56.791326",
+  "lessons": [
+    {
+      "id": "9b887eb8-0a48-4f37-9689-b53113904728",
+      "name": "Quarters",
+      "title": "Introduction to Quarters Using Rectangular Cut-outs",
+      "status": "PUBLISHED",
+      "updatedAt": "2026-06-10T08:15:34.154+00:00",
+      "sj_step_count": 0,
+      "sjd_step_count": 10
+    },
+    {
+      "id": "839653eb-cd5e-405b-a483-b6d307fee352",
+      "name": "Comparing",
+      "title": "Comparing Fractions: 1/2 and 1/4",
+      "status": "PUBLISHED",
+      "updatedAt": "2026-06-10T08:15:34.942+00:00",
+      "sj_step_count": 10,
+      "sjd_step_count": 10
+    },
+    {
+      "id": "159f92b9-69c7-45ea-8376-2b15af491360",
+      "name": "Halves Real Life",
+      "title": "Identifying 1/2 in Everyday Objects",
+      "status": "PUBLISHED",
+      "updatedAt": "2026-06-10T08:15:33.755+00:00",
+      "sj_step_count": 0,
+      "sjd_step_count": 10
+    },
+    {
+      "id": "60441bd5-774f-4135-9871-666fc481b13b",
+      "name": "Quarters Real Life",
+      "title": "Identifying 1/4 in Everyday Objects",
+      "status": "PUBLISHED",
+      "updatedAt": "2026-06-10T08:15:34.557+00:00",
+      "sj_step_count": 0,
+      "sjd_step_count": 10
+    },
+    {
+      "id": "b163de06-c0e5-4a42-8bce-ba7dcab330a9",
+      "name": "Patterns",
+      "title": "Making Patterns with Fractions",
+      "status": "PUBLISHED",
+      "updatedAt": "2026-06-10T08:15:35.329+00:00",
+      "sj_step_count": 0,
+      "sjd_step_count": 10
+    },
+    {
+      "id": "dbadac3a-b59b-4f76-bebf-efda6fb3e261",
+      "name": "Digital Games",
+      "title": "Digital Games with Fractions",
+      "status": "PUBLISHED",
+      "updatedAt": "2026-06-10T08:15:35.789+00:00",
+      "sj_step_count": 0,
+      "sjd_step_count": 10
+    },
+    {
+      "id": "c71a49c8-e9c6-41e5-b6ef-ad0aa386a59f",
+      "name": "Practice",
+      "title": "Fractions: Practice and Application",
+      "status": "PUBLISHED",
+      "updatedAt": "2026-06-10T08:15:36.203+00:00",
+      "sj_step_count": 10,
+      "sjd_step_count": 10
+    },
+    {
+      "id": "2e1869d6-f5df-46a1-9d02-b4b53a1062fe",
+      "name": "Assessment",
+      "title": "Fractions: Assessment and Reflection",
+      "status": "PUBLISHED",
+      "updatedAt": "2026-06-10T08:15:36.589+00:00",
+      "sj_step_count": 10,
+      "sjd_step_count": 10
+    }
+  ]
+}
