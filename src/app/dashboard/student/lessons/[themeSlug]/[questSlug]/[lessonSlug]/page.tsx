@@ -118,6 +118,12 @@ const STEP_THEME: Record<JourneyStepType, { accent: string; bg: string; border: 
   complete:   { accent: "text-yellow-700",  bg: "bg-yellow-50/60",   border: "border-yellow-200/60",  gradient: "from-yellow-500 to-amber-500", softBg: "from-yellow-50/80 to-amber-50/50", iconBg: "bg-yellow-100", iconColor: "text-yellow-600" },
 };
 
+function normalizeStepType(type: string): JourneyStepType {
+  if (type === "real_life") return "connect";
+  if (["welcome","mission","think_first","learn","connect","example","practice","quick_check","reflect","complete"].includes(type)) return type as JourneyStepType;
+  return "welcome";
+}
+
 const CELEBRATION_CSS = `
 @keyframes float { 0% { transform: translateY(0) rotate(0deg); opacity: .8 } 100% { transform: translateY(-20px) rotate(15deg); opacity: 1 } }
 @keyframes popIn { 0% { transform: scale(.5); opacity: 0 } 70% { transform: scale(1.1) } 100% { transform: scale(1); opacity: 1 } }
@@ -184,14 +190,19 @@ function IllustrationArea({ step, stepType }: { step: JourneyStep; stepType: Jou
     );
   }
 
-  // No real image exists — show a clean, minimal placeholder (never raw prompt text)
-  // Only show this if there's also no video (video case handled above)
-  return (
-    <div className={`rounded-2xl border border-dashed border-slate-200/60 bg-slate-50/40 px-4 py-3 flex items-center gap-2.5`}>
-      <span className="text-base opacity-40">🖼️</span>
-      <p className="text-[11px] text-slate-400 font-medium">Illustration coming soon</p>
-    </div>
-  );
+  // Handle flat media structure (POC journeys with media.url / media.altText / media.fallbackText)
+  const flatMedia = step.media;
+  if (flatMedia && !flatMedia.illustration && !flatMedia.video && flatMedia.altText) {
+    // Draft illustration with alt text — render accessible fallback
+    return (
+      <div className={`rounded-2xl border border-dashed border-slate-200/60 bg-slate-50/40 px-4 py-3`}>
+        <p className="text-[11px] text-slate-500 font-medium italic">{flatMedia.altText}</p>
+      </div>
+    );
+  }
+
+  // No media at all — render nothing (no placeholder, no "coming soon")
+  return null;
 }
 
 function VideoArea({ step }: { step: JourneyStep }) {
@@ -355,7 +366,7 @@ function SlideStepView({ step, stepNumber, totalSteps, interaction, setInteracti
   onSaveReflection: () => Promise<void>;
 }) {
   if (!step) return null;
-  const theme = STEP_THEME[step.stepType] || STEP_THEME.welcome;
+  const theme = STEP_THEME[normalizeStepType(step.stepType)] || STEP_THEME.welcome;
   const paragraphs = splitIntoParagraphs(step.studentText);
   const isComplete = step.stepType === "complete";
 
@@ -465,20 +476,66 @@ function SlideStepView({ step, stepNumber, totalSteps, interaction, setInteracti
       )}
 
       {/* ── Guided Practice ── */}
-      {step.stepType === "practice" && (
+      {step.stepType === "practice" && (() => {
+        const practiceInteraction = step.interaction;
+        const practiceType = normalizeInteractionType(practiceInteraction?.type);
+        const practiceQuestion = practiceInteraction?.question || practiceInteraction?.prompt || null;
+        const hasOptions = practiceInteraction?.options && practiceInteraction.options.length > 0;
+        const practiceCorrectIdx = typeof practiceInteraction?.correctIndex === "number" ? practiceInteraction.correctIndex
+          : (typeof practiceInteraction?.correctAnswer === "number" ? practiceInteraction.correctAnswer
+          : (hasOptions && practiceInteraction?.correctAnswer ? practiceInteraction.options.indexOf(practiceInteraction.correctAnswer) : null));
+        return (
         <div className="mt-4 px-5 py-4 rounded-xl bg-sky-50/80 border border-sky-200/60">
           {step.studentText && step.studentText !== "Practice" && (
             <div className="prose prose-sm max-w-none text-sky-900 mb-3" dangerouslySetInnerHTML={{ __html: step.studentText.replace(/\\n/g, '<br/>') }} />
           )}
-          {!step.studentText || step.studentText === "Practice" ? (
+          {(!step.studentText || step.studentText === "Practice") && !practiceQuestion ? (
             <p className="text-base font-bold text-sky-900 mb-1.5 flex items-center gap-2"><Pencil className="w-4 h-4" /> {PRACTICE_LABELS[lang] || PRACTICE_LABELS.en}</p>
           ) : null}
+          {practiceType === "multiple_choice" && hasOptions && practiceQuestion && (
+            <>
+              <p className="text-base font-bold text-sky-900 mt-2 mb-3">{practiceQuestion}</p>
+              <div className="flex flex-col gap-2">
+                {practiceInteraction.options.map((opt, i) => {
+                  const isSelected = interaction.selectedChoice === i;
+                  const isCorrect = practiceCorrectIdx !== null ? i === practiceCorrectIdx : true;
+                  const showFeedback = interaction.choiceFeedback !== null;
+                  let btnClass = "bg-white border-sky-200 text-sky-800 hover:bg-sky-50 hover:shadow-md";
+                  if (isSelected && !showFeedback) btnClass = "bg-sky-600 text-white border-sky-600 shadow-lg shadow-sky-200";
+                  if (showFeedback && isSelected && isCorrect) btnClass = "bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-200";
+                  if (showFeedback && isSelected && !isCorrect) btnClass = "bg-orange-500 text-white border-orange-500 shadow-lg shadow-orange-200";
+                  if (showFeedback && !isSelected && isCorrect && practiceCorrectIdx !== null) btnClass = "bg-emerald-100 border-emerald-400 text-emerald-800";
+                  return (
+                    <button key={i} onClick={() => {
+                      if (interaction.choiceFeedback !== null) return;
+                      const correct = practiceCorrectIdx !== null ? i === practiceCorrectIdx : true;
+                      setInteraction((p) => ({ ...p, selectedChoice: i, choiceFeedback: correct ? "correct" : "incorrect" }));
+                    }} disabled={interaction.choiceFeedback !== null}
+                      className={"text-left px-4 py-3 rounded-xl text-sm font-semibold transition-all border-2 " + btnClass + " disabled:cursor-default"}>
+                      <span className="mr-2 text-base">{String.fromCharCode(65 + i)}.</span> {opt}
+                    </button>
+                  );
+                })}
+              </div>
+              {interaction.choiceFeedback === "correct" && (
+                <div className="mt-3 px-4 py-2.5 rounded-xl bg-emerald-100 border border-emerald-300">
+                  <p className="text-sm font-bold text-emerald-800">{"✅"} Correct! Well done! {practiceInteraction?.feedbackCorrect || practiceInteraction?.hint || ""}</p>
+                </div>
+              )}
+              {interaction.choiceFeedback === "incorrect" && (
+                <div className="mt-3 px-4 py-2.5 rounded-xl bg-orange-100 border border-orange-300">
+                  <p className="text-sm font-bold text-orange-800">Not quite. {practiceInteraction?.feedbackIncorrect || practiceInteraction?.hint || "Think about it again!"}</p>
+                </div>
+              )}
+            </>
+          )}
         </div>
-      )}
+        );
+      })()}
 
       {/* ── Quick Check (multiple choice) ── */}
       {step.stepType === "quick_check" && normalizedType === "multiple_choice" && effectiveQuestion && (() => {
-        const _hasCorrectAnswer = effectiveInteraction?.correctAnswer !== undefined && effectiveInteraction?.correctAnswer !== null;
+        const _qcCorrectIdx = typeof effectiveInteraction?.correctIndex === "number" ? effectiveInteraction.correctIndex : (typeof effectiveInteraction?.correctAnswer === "number" ? effectiveInteraction.correctAnswer : (effectiveInteraction?.options && effectiveInteraction?.correctAnswer ? effectiveInteraction.options.indexOf(effectiveInteraction.correctAnswer) : null));
         return (
         <div className="mt-4 px-5 py-4 rounded-xl bg-lime-50/80 border border-lime-200/60">
           <p className="text-base font-bold text-lime-900 mb-0.5 flex items-center gap-2"><HelpCircle className="w-4 h-4" /> {lang === 'sw' ? 'Ukaguzi wa Haraka' : 'Quick Check'}</p>
@@ -487,17 +544,17 @@ function SlideStepView({ step, stepNumber, totalSteps, interaction, setInteracti
             <div className="flex flex-col gap-2">
               {effectiveInteraction.options.map((opt: string, i: number) => {
                 const isSelected = interaction.selectedChoice === i;
-                const isCorrect = _hasCorrectAnswer ? i === effectiveInteraction?.correctAnswer : true;
+                const isCorrect = _qcCorrectIdx !== null ? i === _qcCorrectIdx : true;
                 const showFeedback = interaction.choiceFeedback !== null;
                 let btnClass = "bg-white border-lime-200 text-lime-800 hover:bg-lime-50 hover:shadow-md";
                 if (isSelected && !showFeedback) btnClass = "bg-lime-600 text-white border-lime-600 shadow-lg shadow-lime-200";
                 if (showFeedback && isSelected && isCorrect) btnClass = "bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-200";
                 if (showFeedback && isSelected && !isCorrect) btnClass = "bg-orange-500 text-white border-orange-500 shadow-lg shadow-orange-200";
-                if (showFeedback && !isSelected && isCorrect && _hasCorrectAnswer) btnClass = "bg-emerald-100 border-emerald-400 text-emerald-800";
+                if (showFeedback && !isSelected && isCorrect && _qcCorrectIdx !== null) btnClass = "bg-emerald-100 border-emerald-400 text-emerald-800";
                 return (
                   <button key={i} onClick={() => {
                     if (interaction.choiceFeedback !== null) return;
-                    const correct = _hasCorrectAnswer ? i === effectiveInteraction?.correctAnswer : true;
+                    const correct = _qcCorrectIdx !== null ? i === _qcCorrectIdx : true;
                     setInteraction((p: any) => ({ ...p, selectedChoice: i, choiceFeedback: correct ? "correct" : "incorrect" }));
                   }} disabled={interaction.choiceFeedback !== null}
                     className={`text-left px-4 py-3 rounded-xl text-sm font-semibold transition-all border-2 ${btnClass} disabled:cursor-default`}>
@@ -510,13 +567,13 @@ function SlideStepView({ step, stepNumber, totalSteps, interaction, setInteracti
           {interaction.choiceFeedback === "correct" && (
             <div className="mt-3 px-4 py-2.5 rounded-xl bg-emerald-100 border border-emerald-300">
               <p className="text-sm font-bold text-emerald-800">
-                {_hasCorrectAnswer ? "✅ Correct! Well done!" : "✅ Great choice!"} {effectiveInteraction?.hint || ""}
+                {_qcCorrectIdx !== null ? "✅ Correct! Well done!" : "✅ Great choice!"} {effectiveInteraction?.feedbackCorrect || effectiveInteraction?.hint || ""}
               </p>
             </div>
           )}
           {interaction.choiceFeedback === "incorrect" && (
             <div className="mt-3 px-4 py-2.5 rounded-xl bg-orange-100 border border-orange-300">
-              <p className="text-sm font-bold text-orange-800">Not quite. {effectiveInteraction?.hint || "Think about it again!"} Try a different answer.</p>
+              <p className="text-sm font-bold text-orange-800">Not quite. {effectiveInteraction?.feedbackIncorrect || effectiveInteraction?.hint || "Think about it again!"} Try a different answer.</p>
             </div>
           )}
         </div>
@@ -558,9 +615,9 @@ function SlideStepView({ step, stepNumber, totalSteps, interaction, setInteracti
           <p className="text-base font-bold text-rose-900 mb-0.5 flex items-center gap-2"><MessageCircle className="w-4 h-4" /> {lang === 'sw' ? 'Wakati wa Tafakari' : 'Reflection Time'}</p>
           <p className="text-lg font-bold text-rose-800 mb-3">{step.interaction?.question || REFLECTION_QUESTIONS[lang] || REFLECTION_QUESTIONS.en}</p>
 
-          {step.reflectionOptions && step.reflectionOptions.length > 0 && (
+          {(step.reflectionOptions && step.reflectionOptions.length > 0 || step.interaction?.options && step.interaction.options.length > 0) && (
             <div className="flex flex-wrap gap-1.5 mb-3">
-              {step.reflectionOptions.map((opt: string, i: number) => (
+              {(step.reflectionOptions || step.interaction?.options || []).map((opt: string, i: number) => (
                 <button key={i} onClick={() => setInteraction((p: any) => ({ ...p, reflectionChip: p.reflectionChip === i ? null : i }))}
                   className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all border-2 ${
                     interaction.reflectionChip === i ? "bg-rose-600 text-white border-rose-600 shadow-md" : "bg-white border-rose-200 text-rose-700 hover:bg-rose-50"
@@ -855,7 +912,7 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
     }
 
     const stepLabel = currentJourneyStep ? (STEP_LABELS[currentJourneyStep.stepType] || "Next") : "Next";
-    const theme = (currentJourneyStep ? STEP_THEME[currentJourneyStep.stepType] : STEP_THEME.welcome) || STEP_THEME.welcome;
+    const theme = (currentJourneyStep ? STEP_THEME[normalizeStepType(currentJourneyStep.stepType)] : STEP_THEME.welcome) || STEP_THEME.welcome;
 
     console.log("[LessonPlayer] about to render journey view, currentJourneyStep:", currentJourneyStep?.stepType, "theme:", theme?.accent);
 

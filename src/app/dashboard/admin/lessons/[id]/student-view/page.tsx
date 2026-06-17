@@ -98,7 +98,8 @@ function buildLessonJourney(lesson: LessonData | null): JourneyStep[] {
     }
     // Dict format — use published journey (non-empty), then draft, otherwise empty
     const publishedJourney = Array.isArray(cb?.studentJourney) ? cb.studentJourney : [];
-    const draftJourney = Array.isArray(cb?.studentJourneyDraft) ? cb.studentJourneyDraft : [];
+    const rawDraft = cb?.studentJourneyDraft;
+    const draftJourney = Array.isArray(rawDraft) ? rawDraft : (rawDraft && Array.isArray(rawDraft.steps) ? rawDraft.steps : []);
     return publishedJourney.length > 0 ? publishedJourney : draftJourney;
   } catch { return [];
   }
@@ -659,6 +660,22 @@ function AdminIllustration({ step, stepIndex, meta, generating, onGenerate }: an
       </div>
     );
   }
+  // Handle flat media structure (POC journeys with media.altText / media.fallbackText)
+  const flatMedia = step.media;
+  if (flatMedia && !flatMedia.illustration && !flatMedia.video && flatMedia.altText) {
+    return (
+      <div className={`mt-4 rounded-2xl border-2 border-dashed ${meta.border} overflow-hidden`}>
+        <div className={`bg-gradient-to-br ${meta.softBg || ""} p-5 flex flex-col items-center gap-2.5`}>
+          <div className={`w-12 h-12 rounded-xl ${meta.iconBg || "bg-slate-100"} flex items-center justify-center`}>
+            <span className="text-xl">🖼️</span>
+          </div>
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Illustration (Draft)</p>
+          <p className={`text-sm font-semibold ${meta.accent} text-center max-w-xs leading-snug`}>{flatMedia.altText}</p>
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-[9px] font-bold text-amber-600">Draft — not yet approved</span>
+        </div>
+      </div>
+    );
+  }
   const prompt = step.illustrationPrompt;
   if (!prompt) return null;
   return (
@@ -745,13 +762,39 @@ function AdminVideo({ step, stepIndex, videoUrl, videoTitle, adding, onUrlChange
 }
 
 function AdminInteraction({ step, interaction, setInteraction }: any) {
-  if (step.stepType === "think_first" && step.interaction?.question) {
+  const ix = step.interaction;
+  const ixType = ix?.type || "none";
+  const question = ix?.question || ix?.prompt;
+  const options = ix?.options || [];
+  const correctIdx = typeof ix?.correctIndex === "number" ? ix.correctIndex
+    : (typeof ix?.correctAnswer === "number" ? ix.correctAnswer
+    : (options.length && ix?.correctAnswer ? options.indexOf(ix.correctAnswer) : null));
+
+  if (step.stepType === "think_first" && question) {
     return (
       <div className="mt-4 px-5 py-4 rounded-xl bg-amber-50/80 border border-amber-200/60">
-        <p className="text-base font-bold text-amber-900 mb-2 flex items-center gap-2"><Pencil className="w-4 h-4" /> {step.interaction.question}</p>
+        <p className="text-base font-bold text-amber-900 mb-2 flex items-center gap-2"><Pencil className="w-4 h-4" /> {question}</p>
         <div className="px-3 py-2 rounded-lg bg-amber-50/50 border border-amber-200/40">
           <p className="text-xs text-amber-600 italic">Student will type their guess here</p>
         </div>
+      </div>
+    );
+  }
+  if (step.stepType === "practice" && ixType === "multiple_choice" && options.length > 0 && question) {
+    return (
+      <div className="mt-4 px-5 py-4 rounded-xl bg-sky-50/80 border border-sky-200/60">
+        <p className="text-base font-bold text-sky-900 mb-2 flex items-center gap-2"><Pencil className="w-4 h-4" /> Practice</p>
+        <p className="text-sm font-semibold text-sky-800 mb-2">{question}</p>
+        <div className="flex flex-col gap-1.5">
+          {options.map((opt, i) => (
+            <div key={i} className={"px-3 py-2 rounded-lg text-sm font-medium border " + (i === correctIdx ? "bg-emerald-50 border-emerald-300 text-emerald-800" : "bg-white border-sky-200 text-sky-700")}>
+              <span className="mr-2 font-bold">{String.fromCharCode(65 + i)}.</span> {opt}
+              {i === correctIdx && <span className="ml-2 text-emerald-600 font-bold">✓ Correct</span>}
+            </div>
+          ))}
+        </div>
+        {ix?.feedbackCorrect && <p className="text-xs text-emerald-600 mt-2">Feedback (correct): {ix.feedbackCorrect}</p>}
+        {ix?.feedbackIncorrect && <p className="text-xs text-orange-600 mt-1">Feedback (incorrect): {ix.feedbackIncorrect}</p>}
       </div>
     );
   }
@@ -765,10 +808,27 @@ function AdminInteraction({ step, interaction, setInteraction }: any) {
       </div>
     );
   }
-  if (step.stepType === "quick_check" && step.interaction?.question) {
+  if (step.stepType === "quick_check" && ixType === "multiple_choice" && options.length > 0 && question) {
     return (
       <div className="mt-4 px-5 py-4 rounded-xl bg-lime-50/80 border border-lime-200/60">
-        <p className="text-base font-bold text-lime-900 mb-2">Quick Check: {step.interaction.question}</p>
+        <p className="text-base font-bold text-lime-900 mb-2">Quick Check: {question}</p>
+        <div className="flex flex-col gap-1.5">
+          {options.map((opt, i) => (
+            <div key={i} className={"px-3 py-2 rounded-lg text-sm font-medium border " + (i === correctIdx ? "bg-emerald-50 border-emerald-300 text-emerald-800" : "bg-white border-lime-200 text-lime-700")}>
+              <span className="mr-2 font-bold">{String.fromCharCode(65 + i)}.</span> {opt}
+              {i === correctIdx && <span className="ml-2 text-emerald-600 font-bold">✓ Correct</span>}
+            </div>
+          ))}
+        </div>
+        {ix?.feedbackCorrect && <p className="text-xs text-emerald-600 mt-2">Feedback (correct): {ix.feedbackCorrect}</p>}
+        {ix?.feedbackIncorrect && <p className="text-xs text-orange-600 mt-1">Feedback (incorrect): {ix.feedbackIncorrect}</p>}
+      </div>
+    );
+  }
+  if (step.stepType === "quick_check" && question) {
+    return (
+      <div className="mt-4 px-5 py-4 rounded-xl bg-lime-50/80 border border-lime-200/60">
+        <p className="text-base font-bold text-lime-900 mb-2">Quick Check: {question}</p>
         <div className="px-3 py-2 rounded-lg bg-lime-50/50 border border-lime-200/40">
           <p className="text-xs text-lime-600 italic">Student will select an answer here</p>
         </div>
@@ -776,17 +836,29 @@ function AdminInteraction({ step, interaction, setInteraction }: any) {
     );
   }
   if (step.stepType === "reflect") {
+    const reflectQuestion = ix?.question || "What did you learn today?";
+    const reflectOptions = ix?.options || [];
     return (
       <div className="mt-4 px-5 py-4 rounded-xl bg-rose-50/80 border border-rose-200/60">
         <p className="text-base font-bold text-rose-900 mb-2 flex items-center gap-2"><MessageCircle className="w-4 h-4" /> Reflection</p>
-        <div className="px-3 py-2 rounded-lg bg-rose-50/50 border border-rose-200/40">
-          <p className="text-xs text-rose-600 italic">Student will write their reflection here</p>
-        </div>
+        <p className="text-sm font-semibold text-rose-800 mb-2">{reflectQuestion}</p>
+        {reflectOptions.length > 0 ? (
+          <div className="flex flex-wrap gap-1.5">
+            {reflectOptions.map((opt, i) => (
+              <span key={i} className="px-2.5 py-1 rounded-full bg-rose-100 text-rose-700 text-xs font-semibold">{opt}</span>
+            ))}
+          </div>
+        ) : (
+          <div className="px-3 py-2 rounded-lg bg-rose-50/50 border border-rose-200/40">
+            <p className="text-xs text-rose-600 italic">Student will write their reflection here</p>
+          </div>
+        )}
       </div>
     );
   }
   return null;
 }
+
 
 // Need to import GradientButton for the empty state link
 function GradientButton({ variant = "primary", size = "md", icon, children, className, ...props }: any) {

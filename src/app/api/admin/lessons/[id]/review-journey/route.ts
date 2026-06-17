@@ -93,7 +93,7 @@ export async function POST(
 
       return NextResponse.json({
         success: true,
-        message: "Journey approved and is now student-visible.",
+        message: "Journey approved and copied to published journey field. It will become learner-visible only when the lesson status is set to PUBLISHED.",
         reviewStatus: "APPROVED",
         readiness,
       });

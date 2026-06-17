@@ -888,7 +888,8 @@ export function checkLessonReadiness(contentBlocks: any): LessonReadiness {
 
   // ── First: check if an approved student journey exists ──
   const hasApprovedJourney = Array.isArray(blocks.studentJourney) && blocks.studentJourney.length > 0;
-  const hasDraftJourney = Array.isArray(blocks.studentJourneyDraft) && blocks.studentJourneyDraft.length > 0;
+  const rawDraft = blocks.studentJourneyDraft;
+  const hasDraftJourney = (Array.isArray(rawDraft) && rawDraft.length > 0) || (rawDraft && Array.isArray(rawDraft.steps) && rawDraft.steps.length > 0);
   const aiMeta = blocks.aiMetadata || {};
   const reviewStatus = aiMeta.reviewStatus || null;
 
@@ -1190,7 +1191,7 @@ export function getStudentJourney(contentBlocks: any): JourneyStep[] | null {
 export function hasAiDraft(contentBlocks: any): boolean {
   const blocks = parseContentBlocks(contentBlocks);
   const draft = blocks.studentJourneyDraft;
-  return Array.isArray(draft) && draft.length > 0;
+  return (Array.isArray(draft) && draft.length > 0) || (draft && Array.isArray(draft.steps) && draft.steps.length > 0);
 }
 
 /** Helper: Check if contentBlocks has an approved student journey */
