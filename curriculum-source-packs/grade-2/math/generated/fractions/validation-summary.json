@@ -1,0 +1,2094 @@
+{
+  "validatedAt": "2026-06-17T12:00:00.000Z",
+  "validationVersion": "1.0-generated",
+  "totalChecks": 232,
+  "passedChecks": 232,
+  "allPassed": true,
+  "lessons": [
+    {
+      "filename": "9b887eb8-quarters-journey.json",
+      "lessonId": "9b887eb8-0a48-4f37-9689-b53113904728",
+      "title": "Introduction to Quarters Using Rectangular Cut-outs",
+      "passed": 29,
+      "total": 29,
+      "all_passed": true,
+      "checks": [
+        {
+          "name": "10 steps present",
+          "passed": true,
+          "detail": "10 steps found"
+        },
+        {
+          "name": "Correct step order",
+          "passed": true,
+          "detail": "welcome → mission → think_first → learn → real_life → example → practice → quick_check → reflect → complete"
+        },
+        {
+          "name": "No duplicate step types",
+          "passed": true,
+          "detail": "10 unique types"
+        },
+        {
+          "name": "No title-copying",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "Step 1 has specific greeting",
+          "passed": true,
+          "detail": "Hello friend! Today we are going to learn about quarters! A "
+        },
+        {
+          "name": "No raw curriculum text",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No placeholder text",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No unsupported fractions/concepts",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No fraction arithmetic",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No abstract fraction comparison",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "QC has 4 options",
+          "passed": true,
+          "detail": "4 options"
+        },
+        {
+          "name": "QC has correctIndex",
+          "passed": true,
+          "detail": "Index: 1"
+        },
+        {
+          "name": "QC has feedbackCorrect",
+          "passed": true,
+          "detail": "Yes! One out of four equal parts is one "
+        },
+        {
+          "name": "QC has feedbackIncorrect",
+          "passed": true,
+          "detail": "Count the equal parts. There are 4. One "
+        },
+        {
+          "name": "QC tests relevant concept",
+          "passed": true,
+          "detail": "Q: This rectangle is divided into 4 equal parts. One part is sh"
+        },
+        {
+          "name": "QC feedbackIncorrect is one-shot",
+          "passed": true,
+          "detail": "Count the equal parts. There are 4. One part is shaded. That"
+        },
+        {
+          "name": "Practice different from QC",
+          "passed": true,
+          "detail": "P: Which shape shows one quarter (1/4)?"
+        },
+        {
+          "name": "Video not required",
+          "passed": true,
+          "detail": "SVG-first"
+        },
+        {
+          "name": "All SVG media has altText",
+          "passed": true,
+          "detail": "8 SVG items"
+        },
+        {
+          "name": "All media has fallbackType",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No broken media",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "Practice has interaction",
+          "passed": true,
+          "detail": "multiple_choice"
+        },
+        {
+          "name": "Practice requiresSave",
+          "passed": true,
+          "detail": "requiresSave: true"
+        },
+        {
+          "name": "Think First has interaction",
+          "passed": true,
+          "detail": "none"
+        },
+        {
+          "name": "All steps have studentText",
+          "passed": true,
+          "detail": "All present"
+        },
+        {
+          "name": "All non-mission steps have owlText",
+          "passed": true,
+          "detail": "All present"
+        },
+        {
+          "name": "Learn has studentText",
+          "passed": true,
+          "detail": "Length: 125"
+        },
+        {
+          "name": "No explicit answer leaks before QC",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No thirds (1/3)",
+          "passed": true,
+          "detail": "Clean"
+        }
+      ],
+      "warnings": [],
+      "media_summary": [
+        {
+          "step": 1,
+          "type": "welcome",
+          "mediaType": "svg",
+          "assetId": "svg-welcome-one-quarter-(1-4)-gen",
+          "altText": "Owl teacher waving hello with a rectangle divided into 4 equ",
+          "required": false,
+          "fallbackType": "text"
+        },
+        {
+          "step": 2,
+          "type": "mission",
+          "mediaType": "none",
+          "assetId": "",
+          "altText": "",
+          "required": false,
+          "fallbackType": "none"
+        },
+        {
+          "step": 3,
+          "type": "think_first",
+          "mediaType": "svg",
+          "assetId": "svg-think-one-quarter-(1-4)-gen",
+          "altText": "A whole cake with a question mark above it",
+          "required": false,
+          "fallbackType": "text"
+        },
+        {
+          "step": 4,
+          "type": "learn",
+          "mediaType": "svg",
+          "assetId": "svg-learn-one-quarter-(1-4)-gen",
+          "altText": "A rectangle being folded into 4 equal parts. One part is sha",
+          "required": true,
+          "fallbackType": "text"
+        },
+        {
+          "step": 5,
+          "type": "real_life",
+          "mediaType": "svg",
+          "assetId": "svg-reallife-one-quarter-(1-4)-gen",
+          "altText": "A cake cut into 4 equal slices. A paper folded into 4 equal ",
+          "required": false,
+          "fallbackType": "text"
+        },
+        {
+          "step": 6,
+          "type": "example",
+          "mediaType": "svg",
+          "assetId": "svg-example-one-quarter-(1-4)-gen",
+          "altText": "A rectangle divided into 4 equal parts. One part is shaded. ",
+          "required": true,
+          "fallbackType": "text"
+        },
+        {
+          "step": 7,
+          "type": "practice",
+          "mediaType": "svg",
+          "assetId": "svg-practice-one-quarter-(1-4)-gen",
+          "altText": "Two shapes side by side. Shape A: rectangle divided into 4 e",
+          "required": true,
+          "fallbackType": "text"
+        },
+        {
+          "step": 8,
+          "type": "quick_check",
+          "mediaType": "svg",
+          "assetId": "svg-qc-one-quarter-(1-4)-gen",
+          "altText": "A circle divided into 4 equal parts. One part is shaded.",
+          "required": true,
+          "fallbackType": "text"
+        },
+        {
+          "step": 9,
+          "type": "reflect",
+          "mediaType": "none",
+          "assetId": "",
+          "altText": "",
+          "required": false,
+          "fallbackType": "none"
+        },
+        {
+          "step": 10,
+          "type": "complete",
+          "mediaType": "svg",
+          "assetId": "svg-complete-one-quarter-(1-4)-gen",
+          "altText": "Celebration with stars and a badge that says 'I know quarter",
+          "required": false,
+          "fallbackType": "text"
+        }
+      ],
+      "rules": {
+        "name": "Quarters (Rectangular Cut-outs)",
+        "expected_fraction": "1/4",
+        "qc_correct": "one quarter (1/4)",
+        "scope_check": "quarters_only",
+        "forbidden": [
+          "1/3",
+          "thirds",
+          "1/5",
+          "1/6",
+          "1/8"
+        ]
+      }
+    },
+    {
+      "filename": "839653eb-comparing-fractions-journey.json",
+      "lessonId": "839653eb-cd5e-405b-a483-b6d307fee352",
+      "title": "Comparing Fractions: 1/2 and 1/4",
+      "passed": 29,
+      "total": 29,
+      "all_passed": true,
+      "checks": [
+        {
+          "name": "10 steps present",
+          "passed": true,
+          "detail": "10 steps found"
+        },
+        {
+          "name": "Correct step order",
+          "passed": true,
+          "detail": "welcome → mission → think_first → learn → real_life → example → practice → quick_check → reflect → complete"
+        },
+        {
+          "name": "No duplicate step types",
+          "passed": true,
+          "detail": "10 unique types"
+        },
+        {
+          "name": "No title-copying",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "Step 1 has specific greeting",
+          "passed": true,
+          "detail": "Hello friend! Today we are going to learn about two special "
+        },
+        {
+          "name": "No raw curriculum text",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No placeholder text",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No unsupported fractions/concepts",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No fraction arithmetic",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No abstract fraction comparison",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "QC has 4 options",
+          "passed": true,
+          "detail": "4 options"
+        },
+        {
+          "name": "QC has correctIndex",
+          "passed": true,
+          "detail": "Index: 0"
+        },
+        {
+          "name": "QC has feedbackCorrect",
+          "passed": true,
+          "detail": "Yes! Only Shape A has equal parts. Fract"
+        },
+        {
+          "name": "QC has feedbackIncorrect",
+          "passed": true,
+          "detail": "Remember: fractions need parts that are "
+        },
+        {
+          "name": "QC tests relevant concept",
+          "passed": true,
+          "detail": "Q: Which shape shows equal parts?"
+        },
+        {
+          "name": "QC feedbackIncorrect is one-shot",
+          "passed": true,
+          "detail": "Remember: fractions need parts that are the same size. Look "
+        },
+        {
+          "name": "Practice different from QC",
+          "passed": true,
+          "detail": "P: What fraction is shaded?"
+        },
+        {
+          "name": "Video not required",
+          "passed": true,
+          "detail": "SVG-first"
+        },
+        {
+          "name": "All SVG media has altText",
+          "passed": true,
+          "detail": "8 SVG items"
+        },
+        {
+          "name": "All media has fallbackType",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No broken media",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "Practice has interaction",
+          "passed": true,
+          "detail": "multiple_choice"
+        },
+        {
+          "name": "Practice requiresSave",
+          "passed": true,
+          "detail": "requiresSave: true"
+        },
+        {
+          "name": "Think First has interaction",
+          "passed": true,
+          "detail": "text_input"
+        },
+        {
+          "name": "All steps have studentText",
+          "passed": true,
+          "detail": "All present"
+        },
+        {
+          "name": "All non-mission steps have owlText",
+          "passed": true,
+          "detail": "All present"
+        },
+        {
+          "name": "Learn has studentText",
+          "passed": true,
+          "detail": "Length: 184"
+        },
+        {
+          "name": "No explicit answer leaks before QC",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No thirds (1/3)",
+          "passed": true,
+          "detail": "Clean"
+        }
+      ],
+      "warnings": [],
+      "media_summary": [
+        {
+          "step": 1,
+          "type": "welcome",
+          "mediaType": "svg",
+          "assetId": "svg-welcome-compare-fractions-gen",
+          "altText": "Owl teacher waving hello with two shapes: one showing 1/2 an",
+          "required": false,
+          "fallbackType": "text"
+        },
+        {
+          "step": 2,
+          "type": "mission",
+          "mediaType": "none",
+          "assetId": "",
+          "altText": "",
+          "required": false,
+          "fallbackType": "none"
+        },
+        {
+          "step": 3,
+          "type": "think_first",
+          "mediaType": "svg",
+          "assetId": "svg-think-compare-fractions-gen",
+          "altText": "Two chapatis side by side: one cut into 2 pieces, one cut in",
+          "required": false,
+          "fallbackType": "text"
+        },
+        {
+          "step": 4,
+          "type": "learn",
+          "mediaType": "svg",
+          "assetId": "svg-learn-compare-fractions-gen",
+          "altText": "Two same-size rectangles side by side. Left: divided into 2 ",
+          "required": true,
+          "fallbackType": "text"
+        },
+        {
+          "step": 5,
+          "type": "real_life",
+          "mediaType": "svg",
+          "assetId": "svg-reallife-compare-fractions-gen",
+          "altText": "Two pizzas: one cut into 2 big slices, one cut into 4 small ",
+          "required": false,
+          "fallbackType": "text"
+        },
+        {
+          "step": 6,
+          "type": "example",
+          "mediaType": "svg",
+          "assetId": "svg-example-compare-fractions-gen",
+          "altText": "Two shapes: one labeled 1/2 (2 parts, 1 shaded), one labeled",
+          "required": true,
+          "fallbackType": "text"
+        },
+        {
+          "step": 7,
+          "type": "practice",
+          "mediaType": "svg",
+          "assetId": "svg-practice-compare-fractions-gen",
+          "altText": "A rectangle divided into 4 equal parts with 1 part shaded.",
+          "required": true,
+          "fallbackType": "text"
+        },
+        {
+          "step": 8,
+          "type": "quick_check",
+          "mediaType": "svg",
+          "assetId": "svg-qc-equal-unequal-gen",
+          "altText": "Four shapes: A has 2 equal parts, B has 2 unequal parts, C h",
+          "required": true,
+          "fallbackType": "text"
+        },
+        {
+          "step": 9,
+          "type": "reflect",
+          "mediaType": "none",
+          "assetId": "",
+          "altText": "",
+          "required": false,
+          "fallbackType": "none"
+        },
+        {
+          "step": 10,
+          "type": "complete",
+          "mediaType": "svg",
+          "assetId": "svg-complete-compare-fractions-gen",
+          "altText": "Celebration with stars and a badge that says 'I know 1/2 and",
+          "required": false,
+          "fallbackType": "text"
+        }
+      ],
+      "rules": {
+        "name": "Comparing 1/2 and 1/4",
+        "expected_fraction": "1/2_and_1/4",
+        "qc_correct": null,
+        "scope_check": "halves_and_quarters",
+        "forbidden": [
+          "1/3",
+          "thirds",
+          "1/5",
+          "equivalent",
+          "which is bigger",
+          "which is more",
+          "greater than",
+          "less than"
+        ]
+      }
+    },
+    {
+      "filename": "b163de06-fraction-patterns-journey.json",
+      "lessonId": "b163de06-c0e5-4a42-8bce-ba7dcab330a9",
+      "title": "Making Patterns with Fractions",
+      "passed": 29,
+      "total": 29,
+      "all_passed": true,
+      "checks": [
+        {
+          "name": "10 steps present",
+          "passed": true,
+          "detail": "10 steps found"
+        },
+        {
+          "name": "Correct step order",
+          "passed": true,
+          "detail": "welcome → mission → think_first → learn → real_life → example → practice → quick_check → reflect → complete"
+        },
+        {
+          "name": "No duplicate step types",
+          "passed": true,
+          "detail": "10 unique types"
+        },
+        {
+          "name": "No title-copying",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "Step 1 has specific greeting",
+          "passed": true,
+          "detail": "Hello friend! Today we are going to have fun making patterns"
+        },
+        {
+          "name": "No raw curriculum text",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No placeholder text",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No unsupported fractions/concepts",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No fraction arithmetic",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No abstract fraction comparison",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "QC has 4 options",
+          "passed": true,
+          "detail": "4 options"
+        },
+        {
+          "name": "QC has correctIndex",
+          "passed": true,
+          "detail": "Index: 1"
+        },
+        {
+          "name": "QC has feedbackCorrect",
+          "passed": true,
+          "detail": "Yes! The pattern is quarter, half, quart"
+        },
+        {
+          "name": "QC has feedbackIncorrect",
+          "passed": true,
+          "detail": "The pattern repeats: quarter, half, quar"
+        },
+        {
+          "name": "QC tests relevant concept",
+          "passed": true,
+          "detail": "Q: What comes next in the pattern: quarter, half, quarter, half"
+        },
+        {
+          "name": "QC feedbackIncorrect is one-shot",
+          "passed": true,
+          "detail": "The pattern repeats: quarter, half, quarter, half... After q"
+        },
+        {
+          "name": "Practice different from QC",
+          "passed": true,
+          "detail": "P: What comes next in the pattern: half, qu"
+        },
+        {
+          "name": "Video not required",
+          "passed": true,
+          "detail": "SVG-first"
+        },
+        {
+          "name": "All SVG media has altText",
+          "passed": true,
+          "detail": "8 SVG items"
+        },
+        {
+          "name": "All media has fallbackType",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No broken media",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "Practice has interaction",
+          "passed": true,
+          "detail": "multiple_choice"
+        },
+        {
+          "name": "Practice requiresSave",
+          "passed": true,
+          "detail": "requiresSave: true"
+        },
+        {
+          "name": "Think First has interaction",
+          "passed": true,
+          "detail": "text_input"
+        },
+        {
+          "name": "All steps have studentText",
+          "passed": true,
+          "detail": "All present"
+        },
+        {
+          "name": "All non-mission steps have owlText",
+          "passed": true,
+          "detail": "All present"
+        },
+        {
+          "name": "Learn has studentText",
+          "passed": true,
+          "detail": "Length: 201"
+        },
+        {
+          "name": "No explicit answer leaks before QC",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No thirds (1/3)",
+          "passed": true,
+          "detail": "Clean"
+        }
+      ],
+      "warnings": [],
+      "media_summary": [
+        {
+          "step": 1,
+          "type": "welcome",
+          "mediaType": "svg",
+          "assetId": "svg-welcome-patterns-gen",
+          "altText": "Owl teacher waving hello with a pattern of shaded shapes: ha",
+          "required": false,
+          "fallbackType": "text"
+        },
+        {
+          "step": 2,
+          "type": "mission",
+          "mediaType": "none",
+          "assetId": "",
+          "altText": "",
+          "required": false,
+          "fallbackType": "none"
+        },
+        {
+          "step": 3,
+          "type": "think_first",
+          "mediaType": "svg",
+          "assetId": "svg-think-patterns-gen",
+          "altText": "A simple pattern: big, small, big, small... with a question ",
+          "required": false,
+          "fallbackType": "text"
+        },
+        {
+          "step": 4,
+          "type": "learn",
+          "mediaType": "svg",
+          "assetId": "svg-learn-patterns-gen",
+          "altText": "A sequence of 6 shapes: half-shaded, quarter-shaded, half-sh",
+          "required": true,
+          "fallbackType": "text"
+        },
+        {
+          "step": 5,
+          "type": "real_life",
+          "mediaType": "svg",
+          "assetId": "svg-reallife-patterns-gen",
+          "altText": "Real-life pattern: half chapati, quarter cake, half chapati,",
+          "required": false,
+          "fallbackType": "text"
+        },
+        {
+          "step": 6,
+          "type": "example",
+          "mediaType": "svg",
+          "assetId": "svg-example-patterns-gen",
+          "altText": "Pattern sequence: half, quarter, half, quarter, half, [quest",
+          "required": true,
+          "fallbackType": "text"
+        },
+        {
+          "step": 7,
+          "type": "practice",
+          "mediaType": "svg",
+          "assetId": "svg-practice-patterns-gen",
+          "altText": "Pattern: half-shaded, quarter-shaded, half-shaded, quarter-s",
+          "required": true,
+          "fallbackType": "text"
+        },
+        {
+          "step": 8,
+          "type": "quick_check",
+          "mediaType": "svg",
+          "assetId": "svg-qc-patterns-gen",
+          "altText": "Pattern sequence: quarter-shaded, half-shaded, quarter-shade",
+          "required": true,
+          "fallbackType": "text"
+        },
+        {
+          "step": 9,
+          "type": "reflect",
+          "mediaType": "none",
+          "assetId": "",
+          "altText": "",
+          "required": false,
+          "fallbackType": "none"
+        },
+        {
+          "step": 10,
+          "type": "complete",
+          "mediaType": "svg",
+          "assetId": "svg-complete-patterns-gen",
+          "altText": "Celebration with stars and a badge that says 'I know fractio",
+          "required": false,
+          "fallbackType": "text"
+        }
+      ],
+      "rules": {
+        "name": "Patterns with Fractions",
+        "expected_fraction": "1/2_and_1/4",
+        "qc_correct": null,
+        "scope_check": "halves_and_quarters",
+        "forbidden": [
+          "1/3",
+          "thirds",
+          "1/5",
+          "2/4",
+          "3/4",
+          "arithmetic"
+        ]
+      }
+    },
+    {
+      "filename": "dbadac3a-digital-games-fractions-journey.json",
+      "lessonId": "dbadac3a-b59b-4f76-bebf-efda6fb3e261",
+      "title": "Digital Games with Fractions",
+      "passed": 29,
+      "total": 29,
+      "all_passed": true,
+      "checks": [
+        {
+          "name": "10 steps present",
+          "passed": true,
+          "detail": "10 steps found"
+        },
+        {
+          "name": "Correct step order",
+          "passed": true,
+          "detail": "welcome → mission → think_first → learn → real_life → example → practice → quick_check → reflect → complete"
+        },
+        {
+          "name": "No duplicate step types",
+          "passed": true,
+          "detail": "10 unique types"
+        },
+        {
+          "name": "No title-copying",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "Step 1 has specific greeting",
+          "passed": true,
+          "detail": "Hello friend! Today we are going to play fun games with frac"
+        },
+        {
+          "name": "No raw curriculum text",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No placeholder text",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No unsupported fractions/concepts",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No fraction arithmetic",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No abstract fraction comparison",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "QC has 4 options",
+          "passed": true,
+          "detail": "4 options"
+        },
+        {
+          "name": "QC has correctIndex",
+          "passed": true,
+          "detail": "Index: 2"
+        },
+        {
+          "name": "QC has feedbackCorrect",
+          "passed": true,
+          "detail": "Correct! When 2 children share fairly, e"
+        },
+        {
+          "name": "QC has feedbackIncorrect",
+          "passed": true,
+          "detail": "If 2 children share one chapati fairly, "
+        },
+        {
+          "name": "QC tests relevant concept",
+          "passed": true,
+          "detail": "Q: 2 children share one chapati fairly. What fraction does each"
+        },
+        {
+          "name": "QC feedbackIncorrect is one-shot",
+          "passed": true,
+          "detail": "If 2 children share one chapati fairly, we cut it into 2 equ"
+        },
+        {
+          "name": "Practice different from QC",
+          "passed": true,
+          "detail": "P: Which shape shows one quarter (1/4)?"
+        },
+        {
+          "name": "Video not required",
+          "passed": true,
+          "detail": "SVG-first"
+        },
+        {
+          "name": "All SVG media has altText",
+          "passed": true,
+          "detail": "8 SVG items"
+        },
+        {
+          "name": "All media has fallbackType",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No broken media",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "Practice has interaction",
+          "passed": true,
+          "detail": "multiple_choice"
+        },
+        {
+          "name": "Practice requiresSave",
+          "passed": true,
+          "detail": "requiresSave: true"
+        },
+        {
+          "name": "Think First has interaction",
+          "passed": true,
+          "detail": "text_input"
+        },
+        {
+          "name": "All steps have studentText",
+          "passed": true,
+          "detail": "All present"
+        },
+        {
+          "name": "All non-mission steps have owlText",
+          "passed": true,
+          "detail": "All present"
+        },
+        {
+          "name": "Learn has studentText",
+          "passed": true,
+          "detail": "Length: 156"
+        },
+        {
+          "name": "No explicit answer leaks before QC",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No thirds (1/3)",
+          "passed": true,
+          "detail": "Clean"
+        }
+      ],
+      "warnings": [],
+      "media_summary": [
+        {
+          "step": 1,
+          "type": "welcome",
+          "mediaType": "svg",
+          "assetId": "svg-welcome-digital-gen",
+          "altText": "Owl teacher waving hello with game-style elements: shapes, f",
+          "required": false,
+          "fallbackType": "text"
+        },
+        {
+          "step": 2,
+          "type": "mission",
+          "mediaType": "none",
+          "assetId": "",
+          "altText": "",
+          "required": false,
+          "fallbackType": "none"
+        },
+        {
+          "step": 3,
+          "type": "think_first",
+          "mediaType": "svg",
+          "assetId": "svg-think-digital-gen",
+          "altText": "Two shapes: one showing 1/2 and one showing 1/4, with a ques",
+          "required": false,
+          "fallbackType": "text"
+        },
+        {
+          "step": 4,
+          "type": "learn",
+          "mediaType": "svg",
+          "assetId": "svg-learn-digital-gen",
+          "altText": "Game-style layout: fraction cards on one side, shapes on the",
+          "required": true,
+          "fallbackType": "text"
+        },
+        {
+          "step": 5,
+          "type": "real_life",
+          "mediaType": "svg",
+          "assetId": "svg-reallife-digital-gen",
+          "altText": "Real objects: chapati cut in half (labeled 1/2), cake cut in",
+          "required": false,
+          "fallbackType": "text"
+        },
+        {
+          "step": 6,
+          "type": "example",
+          "mediaType": "svg",
+          "assetId": "svg-example-digital-gen",
+          "altText": "Fraction cards: 1/2 and 1/4. Shapes below with matching arro",
+          "required": true,
+          "fallbackType": "text"
+        },
+        {
+          "step": 7,
+          "type": "practice",
+          "mediaType": "svg",
+          "assetId": "svg-practice-digital-gen",
+          "altText": "Fraction card showing 1/4. Below: 4 shape options — one with",
+          "required": true,
+          "fallbackType": "text"
+        },
+        {
+          "step": 8,
+          "type": "quick_check",
+          "mediaType": "svg",
+          "assetId": "svg-qc-fair-sharing-gen",
+          "altText": "A chapati with 2 children beside it. The chapati is divided ",
+          "required": true,
+          "fallbackType": "text"
+        },
+        {
+          "step": 9,
+          "type": "reflect",
+          "mediaType": "none",
+          "assetId": "",
+          "altText": "",
+          "required": false,
+          "fallbackType": "none"
+        },
+        {
+          "step": 10,
+          "type": "complete",
+          "mediaType": "svg",
+          "assetId": "svg-complete-digital-gen",
+          "altText": "Celebration with stars and a badge that says 'I played fract",
+          "required": false,
+          "fallbackType": "text"
+        }
+      ],
+      "rules": {
+        "name": "Digital Games with Fractions",
+        "expected_fraction": "1/2_and_1/4",
+        "qc_correct": null,
+        "scope_check": "halves_and_quarters",
+        "forbidden": [
+          "1/3",
+          "thirds",
+          "1/5",
+          "arithmetic"
+        ]
+      }
+    },
+    {
+      "filename": "c71a49c8-fractions-practice-application-journey.json",
+      "lessonId": "c71a49c8-e9c6-41e5-b6ef-ad0aa386a59f",
+      "title": "Fractions: Practice and Application",
+      "passed": 29,
+      "total": 29,
+      "all_passed": true,
+      "checks": [
+        {
+          "name": "10 steps present",
+          "passed": true,
+          "detail": "10 steps found"
+        },
+        {
+          "name": "Correct step order",
+          "passed": true,
+          "detail": "welcome → mission → think_first → learn → real_life → example → practice → quick_check → reflect → complete"
+        },
+        {
+          "name": "No duplicate step types",
+          "passed": true,
+          "detail": "10 unique types"
+        },
+        {
+          "name": "No title-copying",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "Step 1 has specific greeting",
+          "passed": true,
+          "detail": "Hello friend! Today we are going to practice everything we k"
+        },
+        {
+          "name": "No raw curriculum text",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No placeholder text",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No unsupported fractions/concepts",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No fraction arithmetic",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No abstract fraction comparison",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "QC has 4 options",
+          "passed": true,
+          "detail": "4 options"
+        },
+        {
+          "name": "QC has correctIndex",
+          "passed": true,
+          "detail": "Index: 2"
+        },
+        {
+          "name": "QC has feedbackCorrect",
+          "passed": true,
+          "detail": "Correct! When 2 children share fairly, e"
+        },
+        {
+          "name": "QC has feedbackIncorrect",
+          "passed": true,
+          "detail": "If 2 children share one chapati fairly, "
+        },
+        {
+          "name": "QC tests relevant concept",
+          "passed": true,
+          "detail": "Q: 2 children share one chapati fairly. What fraction does each"
+        },
+        {
+          "name": "QC feedbackIncorrect is one-shot",
+          "passed": true,
+          "detail": "If 2 children share one chapati fairly, we cut it into 2 equ"
+        },
+        {
+          "name": "Practice different from QC",
+          "passed": true,
+          "detail": "P: What fraction is shaded?"
+        },
+        {
+          "name": "Video not required",
+          "passed": true,
+          "detail": "SVG-first"
+        },
+        {
+          "name": "All SVG media has altText",
+          "passed": true,
+          "detail": "8 SVG items"
+        },
+        {
+          "name": "All media has fallbackType",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No broken media",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "Practice has interaction",
+          "passed": true,
+          "detail": "multiple_choice"
+        },
+        {
+          "name": "Practice requiresSave",
+          "passed": true,
+          "detail": "requiresSave: true"
+        },
+        {
+          "name": "Think First has interaction",
+          "passed": true,
+          "detail": "text_input"
+        },
+        {
+          "name": "All steps have studentText",
+          "passed": true,
+          "detail": "All present"
+        },
+        {
+          "name": "All non-mission steps have owlText",
+          "passed": true,
+          "detail": "All present"
+        },
+        {
+          "name": "Learn has studentText",
+          "passed": true,
+          "detail": "Length: 171"
+        },
+        {
+          "name": "No explicit answer leaks before QC",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No thirds (1/3)",
+          "passed": true,
+          "detail": "Clean"
+        }
+      ],
+      "warnings": [],
+      "media_summary": [
+        {
+          "step": 1,
+          "type": "welcome",
+          "mediaType": "svg",
+          "assetId": "svg-welcome-practice-gen",
+          "altText": "Owl teacher waving hello with various fraction shapes: halve",
+          "required": false,
+          "fallbackType": "text"
+        },
+        {
+          "step": 2,
+          "type": "mission",
+          "mediaType": "none",
+          "assetId": "",
+          "altText": "",
+          "required": false,
+          "fallbackType": "none"
+        },
+        {
+          "step": 3,
+          "type": "think_first",
+          "mediaType": "svg",
+          "assetId": "svg-think-practice-gen",
+          "altText": "A mind-map style image with 'fractions' in the center and br",
+          "required": false,
+          "fallbackType": "text"
+        },
+        {
+          "step": 4,
+          "type": "learn",
+          "mediaType": "svg",
+          "assetId": "svg-learn-practice-gen",
+          "altText": "Four panels: (1) rectangle 2 parts 1 shaded = 1/2, (2) recta",
+          "required": true,
+          "fallbackType": "text"
+        },
+        {
+          "step": 5,
+          "type": "real_life",
+          "mediaType": "svg",
+          "assetId": "svg-reallife-practice-gen",
+          "altText": "Real life collage: chapati cut in half, cake in 4 slices, pa",
+          "required": false,
+          "fallbackType": "text"
+        },
+        {
+          "step": 6,
+          "type": "example",
+          "mediaType": "svg",
+          "assetId": "svg-example-practice-gen",
+          "altText": "Three worked examples: (1) 1/2 shape, (2) 1/4 shape, (3) fai",
+          "required": true,
+          "fallbackType": "text"
+        },
+        {
+          "step": 7,
+          "type": "practice",
+          "mediaType": "svg",
+          "assetId": "svg-practice-practice-gen",
+          "altText": "A rectangle divided into 2 equal parts with 1 part shaded.",
+          "required": true,
+          "fallbackType": "text"
+        },
+        {
+          "step": 8,
+          "type": "quick_check",
+          "mediaType": "svg",
+          "assetId": "svg-qc-fair-sharing-2-gen",
+          "altText": "A chapati with 2 children beside it. The chapati is divided ",
+          "required": true,
+          "fallbackType": "text"
+        },
+        {
+          "step": 9,
+          "type": "reflect",
+          "mediaType": "none",
+          "assetId": "",
+          "altText": "",
+          "required": false,
+          "fallbackType": "none"
+        },
+        {
+          "step": 10,
+          "type": "complete",
+          "mediaType": "svg",
+          "assetId": "svg-complete-practice-gen",
+          "altText": "Celebration with stars and a badge that says 'I practiced fr",
+          "required": false,
+          "fallbackType": "text"
+        }
+      ],
+      "rules": {
+        "name": "Practice and Application",
+        "expected_fraction": "1/2_and_1/4",
+        "qc_correct": null,
+        "scope_check": "halves_and_quarters",
+        "forbidden": [
+          "1/3",
+          "thirds",
+          "1/5",
+          "arithmetic"
+        ]
+      }
+    },
+    {
+      "filename": "2e1869d6-fractions-assessment-reflection-journey.json",
+      "lessonId": "2e1869d6-f5df-46a1-9d02-b4b53a1062fe",
+      "title": "Fractions: Assessment and Reflection",
+      "passed": 29,
+      "total": 29,
+      "all_passed": true,
+      "checks": [
+        {
+          "name": "10 steps present",
+          "passed": true,
+          "detail": "10 steps found"
+        },
+        {
+          "name": "Correct step order",
+          "passed": true,
+          "detail": "welcome → mission → think_first → learn → real_life → example → practice → quick_check → reflect → complete"
+        },
+        {
+          "name": "No duplicate step types",
+          "passed": true,
+          "detail": "10 unique types"
+        },
+        {
+          "name": "No title-copying",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "Step 1 has specific greeting",
+          "passed": true,
+          "detail": "Hello friend! Today we are going to show what we know about "
+        },
+        {
+          "name": "No raw curriculum text",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No placeholder text",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No unsupported fractions/concepts",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No fraction arithmetic",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No abstract fraction comparison",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "QC has 4 options",
+          "passed": true,
+          "detail": "4 options"
+        },
+        {
+          "name": "QC has correctIndex",
+          "passed": true,
+          "detail": "Index: 0"
+        },
+        {
+          "name": "QC has feedbackCorrect",
+          "passed": true,
+          "detail": "Yes! Only Shape A has equal parts. Fract"
+        },
+        {
+          "name": "QC has feedbackIncorrect",
+          "passed": true,
+          "detail": "Remember: fractions need parts that are "
+        },
+        {
+          "name": "QC tests relevant concept",
+          "passed": true,
+          "detail": "Q: Which shape shows equal parts?"
+        },
+        {
+          "name": "QC feedbackIncorrect is one-shot",
+          "passed": true,
+          "detail": "Remember: fractions need parts that are the same size. Look "
+        },
+        {
+          "name": "Practice different from QC",
+          "passed": true,
+          "detail": "P: What fraction is shaded?"
+        },
+        {
+          "name": "Video not required",
+          "passed": true,
+          "detail": "SVG-first"
+        },
+        {
+          "name": "All SVG media has altText",
+          "passed": true,
+          "detail": "8 SVG items"
+        },
+        {
+          "name": "All media has fallbackType",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No broken media",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "Practice has interaction",
+          "passed": true,
+          "detail": "multiple_choice"
+        },
+        {
+          "name": "Practice requiresSave",
+          "passed": true,
+          "detail": "requiresSave: true"
+        },
+        {
+          "name": "Think First has interaction",
+          "passed": true,
+          "detail": "text_input"
+        },
+        {
+          "name": "All steps have studentText",
+          "passed": true,
+          "detail": "All present"
+        },
+        {
+          "name": "All non-mission steps have owlText",
+          "passed": true,
+          "detail": "All present"
+        },
+        {
+          "name": "Learn has studentText",
+          "passed": true,
+          "detail": "Length: 132"
+        },
+        {
+          "name": "No explicit answer leaks before QC",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No thirds (1/3)",
+          "passed": true,
+          "detail": "Clean"
+        }
+      ],
+      "warnings": [],
+      "media_summary": [
+        {
+          "step": 1,
+          "type": "welcome",
+          "mediaType": "svg",
+          "assetId": "svg-welcome-assessment-gen",
+          "altText": "Owl teacher waving hello with a checklist and fraction shape",
+          "required": false,
+          "fallbackType": "text"
+        },
+        {
+          "step": 2,
+          "type": "mission",
+          "mediaType": "none",
+          "assetId": "",
+          "altText": "",
+          "required": false,
+          "fallbackType": "none"
+        },
+        {
+          "step": 3,
+          "type": "think_first",
+          "mediaType": "svg",
+          "assetId": "svg-think-assessment-gen",
+          "altText": "A brain with fraction symbols inside: 1/2, 1/4, equal signs,",
+          "required": false,
+          "fallbackType": "text"
+        },
+        {
+          "step": 4,
+          "type": "learn",
+          "mediaType": "svg",
+          "assetId": "svg-learn-assessment-gen",
+          "altText": "Four review panels: (1) 1/2 shape, (2) 1/4 shape, (3) equal ",
+          "required": true,
+          "fallbackType": "text"
+        },
+        {
+          "step": 5,
+          "type": "real_life",
+          "mediaType": "svg",
+          "assetId": "svg-reallife-assessment-gen",
+          "altText": "Real life collage: chapati half, cake quarters, paper foldin",
+          "required": false,
+          "fallbackType": "text"
+        },
+        {
+          "step": 6,
+          "type": "example",
+          "mediaType": "svg",
+          "assetId": "svg-example-assessment-gen",
+          "altText": "Two example questions with answers: (1) shape showing 1/2 wi",
+          "required": true,
+          "fallbackType": "text"
+        },
+        {
+          "step": 7,
+          "type": "practice",
+          "mediaType": "svg",
+          "assetId": "svg-practice-assessment-gen",
+          "altText": "A circle divided into 2 equal parts. One part is shaded.",
+          "required": true,
+          "fallbackType": "text"
+        },
+        {
+          "step": 8,
+          "type": "quick_check",
+          "mediaType": "svg",
+          "assetId": "svg-qc-equal-unequal-2-gen",
+          "altText": "Four shapes: A has 2 equal parts, B has 2 unequal parts, C h",
+          "required": true,
+          "fallbackType": "text"
+        },
+        {
+          "step": 9,
+          "type": "reflect",
+          "mediaType": "none",
+          "assetId": "",
+          "altText": "",
+          "required": false,
+          "fallbackType": "none"
+        },
+        {
+          "step": 10,
+          "type": "complete",
+          "mediaType": "svg",
+          "assetId": "svg-complete-assessment-gen",
+          "altText": "Celebration with stars and a trophy that says 'Fractions Cha",
+          "required": false,
+          "fallbackType": "text"
+        }
+      ],
+      "rules": {
+        "name": "Assessment and Reflection",
+        "expected_fraction": "1/2_and_1/4",
+        "qc_correct": null,
+        "scope_check": "halves_and_quarters",
+        "forbidden": [
+          "1/3",
+          "thirds",
+          "1/5",
+          "arithmetic"
+        ]
+      }
+    },
+    {
+      "filename": "159f92b9-identifying-halves-reallife-journey.json",
+      "lessonId": "159f92b9-69c7-45ea-8376-2b15af491360",
+      "title": "Identifying 1/2 in Everyday Objects",
+      "passed": 29,
+      "total": 29,
+      "all_passed": true,
+      "checks": [
+        {
+          "name": "10 steps present",
+          "passed": true,
+          "detail": "10 steps found"
+        },
+        {
+          "name": "Correct step order",
+          "passed": true,
+          "detail": "welcome → mission → think_first → learn → real_life → example → practice → quick_check → reflect → complete"
+        },
+        {
+          "name": "No duplicate step types",
+          "passed": true,
+          "detail": "10 unique types"
+        },
+        {
+          "name": "No title-copying",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "Step 1 has specific greeting",
+          "passed": true,
+          "detail": "Hello friend! Today we are going to look for halves in every"
+        },
+        {
+          "name": "No raw curriculum text",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No placeholder text",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No unsupported fractions/concepts",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No fraction arithmetic",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No abstract fraction comparison",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "QC has 4 options",
+          "passed": true,
+          "detail": "4 options"
+        },
+        {
+          "name": "QC has correctIndex",
+          "passed": true,
+          "detail": "Index: 1"
+        },
+        {
+          "name": "QC has feedbackCorrect",
+          "passed": true,
+          "detail": "Correct! One piece out of 2 equal pieces"
+        },
+        {
+          "name": "QC has feedbackIncorrect",
+          "passed": true,
+          "detail": "The chapati was cut into 2 equal pieces."
+        },
+        {
+          "name": "QC tests relevant concept",
+          "passed": true,
+          "detail": "Q: A chapati is cut into 2 equal pieces. You get 1 piece. What "
+        },
+        {
+          "name": "QC feedbackIncorrect is one-shot",
+          "passed": true,
+          "detail": "The chapati was cut into 2 equal pieces. You have 1 of those"
+        },
+        {
+          "name": "Practice different from QC",
+          "passed": true,
+          "detail": "P: Which object shows halves?"
+        },
+        {
+          "name": "Video not required",
+          "passed": true,
+          "detail": "SVG-first"
+        },
+        {
+          "name": "All SVG media has altText",
+          "passed": true,
+          "detail": "8 SVG items"
+        },
+        {
+          "name": "All media has fallbackType",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No broken media",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "Practice has interaction",
+          "passed": true,
+          "detail": "multiple_choice"
+        },
+        {
+          "name": "Practice requiresSave",
+          "passed": true,
+          "detail": "requiresSave: true"
+        },
+        {
+          "name": "Think First has interaction",
+          "passed": true,
+          "detail": "text_input"
+        },
+        {
+          "name": "All steps have studentText",
+          "passed": true,
+          "detail": "All present"
+        },
+        {
+          "name": "All non-mission steps have owlText",
+          "passed": true,
+          "detail": "All present"
+        },
+        {
+          "name": "Learn has studentText",
+          "passed": true,
+          "detail": "Length: 120"
+        },
+        {
+          "name": "No explicit answer leaks before QC",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No thirds (1/3)",
+          "passed": true,
+          "detail": "Clean"
+        }
+      ],
+      "warnings": [],
+      "media_summary": [
+        {
+          "step": 1,
+          "type": "welcome",
+          "mediaType": "svg",
+          "assetId": "svg-welcome-halves-reallife-gen",
+          "altText": "Owl teacher waving hello with everyday objects: chapati, ora",
+          "required": false,
+          "fallbackType": "text"
+        },
+        {
+          "step": 2,
+          "type": "mission",
+          "mediaType": "none",
+          "assetId": "",
+          "altText": "",
+          "required": false,
+          "fallbackType": "none"
+        },
+        {
+          "step": 3,
+          "type": "think_first",
+          "mediaType": "svg",
+          "assetId": "svg-think-halves-reallife-gen",
+          "altText": "A home scene with various objects: chapati, paper, fruit, cl",
+          "required": false,
+          "fallbackType": "text"
+        },
+        {
+          "step": 4,
+          "type": "learn",
+          "mediaType": "svg",
+          "assetId": "svg-learn-halves-reallife-gen",
+          "altText": "Three examples: (1) chapati cut into 2 equal pieces, (2) pap",
+          "required": true,
+          "fallbackType": "text"
+        },
+        {
+          "step": 5,
+          "type": "real_life",
+          "mediaType": "svg",
+          "assetId": "svg-reallife-halves-reallife-gen",
+          "altText": "Collage of everyday objects showing halves: chapati, paper, ",
+          "required": false,
+          "fallbackType": "text"
+        },
+        {
+          "step": 6,
+          "type": "example",
+          "mediaType": "svg",
+          "assetId": "svg-example-halves-reallife-gen",
+          "altText": "Two examples: (1) chapati cut into 2 equal pieces with '1/2'",
+          "required": true,
+          "fallbackType": "text"
+        },
+        {
+          "step": 7,
+          "type": "practice",
+          "mediaType": "svg",
+          "assetId": "svg-practice-halves-reallife-gen",
+          "altText": "Two objects: (A) a chapati cut into 2 equal pieces, (B) a ch",
+          "required": true,
+          "fallbackType": "text"
+        },
+        {
+          "step": 8,
+          "type": "quick_check",
+          "mediaType": "svg",
+          "assetId": "svg-qc-halves-reallife-gen",
+          "altText": "A chapati cut into 2 equal pieces. One piece is highlighted ",
+          "required": true,
+          "fallbackType": "text"
+        },
+        {
+          "step": 9,
+          "type": "reflect",
+          "mediaType": "none",
+          "assetId": "",
+          "altText": "",
+          "required": false,
+          "fallbackType": "none"
+        },
+        {
+          "step": 10,
+          "type": "complete",
+          "mediaType": "svg",
+          "assetId": "svg-complete-halves-reallife-gen",
+          "altText": "Celebration with stars and a badge that says 'I found halves",
+          "required": false,
+          "fallbackType": "text"
+        }
+      ],
+      "rules": {
+        "name": "Identifying 1/2 in Everyday Objects",
+        "expected_fraction": "1/2",
+        "qc_correct": null,
+        "scope_check": "halves_and_quarters",
+        "forbidden": [
+          "1/3",
+          "thirds",
+          "1/5"
+        ]
+      }
+    },
+    {
+      "filename": "60441bd5-identifying-quarters-reallife-journey.json",
+      "lessonId": "60441bd5-774f-4135-9871-666fc481b13b",
+      "title": "Identifying 1/4 in Everyday Objects",
+      "passed": 29,
+      "total": 29,
+      "all_passed": true,
+      "checks": [
+        {
+          "name": "10 steps present",
+          "passed": true,
+          "detail": "10 steps found"
+        },
+        {
+          "name": "Correct step order",
+          "passed": true,
+          "detail": "welcome → mission → think_first → learn → real_life → example → practice → quick_check → reflect → complete"
+        },
+        {
+          "name": "No duplicate step types",
+          "passed": true,
+          "detail": "10 unique types"
+        },
+        {
+          "name": "No title-copying",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "Step 1 has specific greeting",
+          "passed": true,
+          "detail": "Hello friend! Today we are going to look for quarters in eve"
+        },
+        {
+          "name": "No raw curriculum text",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No placeholder text",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No unsupported fractions/concepts",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No fraction arithmetic",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No abstract fraction comparison",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "QC has 4 options",
+          "passed": true,
+          "detail": "4 options"
+        },
+        {
+          "name": "QC has correctIndex",
+          "passed": true,
+          "detail": "Index: 1"
+        },
+        {
+          "name": "QC has feedbackCorrect",
+          "passed": true,
+          "detail": "Correct! One slice out of 4 equal slices"
+        },
+        {
+          "name": "QC has feedbackIncorrect",
+          "passed": true,
+          "detail": "The cake was cut into 4 equal slices. Yo"
+        },
+        {
+          "name": "QC tests relevant concept",
+          "passed": true,
+          "detail": "Q: A cake is cut into 4 equal slices. You eat 1 slice. What fra"
+        },
+        {
+          "name": "QC feedbackIncorrect is one-shot",
+          "passed": true,
+          "detail": "The cake was cut into 4 equal slices. You ate 1 slice. That "
+        },
+        {
+          "name": "Practice different from QC",
+          "passed": true,
+          "detail": "P: Which object shows quarters?"
+        },
+        {
+          "name": "Video not required",
+          "passed": true,
+          "detail": "SVG-first"
+        },
+        {
+          "name": "All SVG media has altText",
+          "passed": true,
+          "detail": "8 SVG items"
+        },
+        {
+          "name": "All media has fallbackType",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No broken media",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "Practice has interaction",
+          "passed": true,
+          "detail": "multiple_choice"
+        },
+        {
+          "name": "Practice requiresSave",
+          "passed": true,
+          "detail": "requiresSave: true"
+        },
+        {
+          "name": "Think First has interaction",
+          "passed": true,
+          "detail": "text_input"
+        },
+        {
+          "name": "All steps have studentText",
+          "passed": true,
+          "detail": "All present"
+        },
+        {
+          "name": "All non-mission steps have owlText",
+          "passed": true,
+          "detail": "All present"
+        },
+        {
+          "name": "Learn has studentText",
+          "passed": true,
+          "detail": "Length: 132"
+        },
+        {
+          "name": "No explicit answer leaks before QC",
+          "passed": true,
+          "detail": "Clean"
+        },
+        {
+          "name": "No thirds (1/3)",
+          "passed": true,
+          "detail": "Clean"
+        }
+      ],
+      "warnings": [],
+      "media_summary": [
+        {
+          "step": 1,
+          "type": "welcome",
+          "mediaType": "svg",
+          "assetId": "svg-welcome-quarters-reallife-gen",
+          "altText": "Owl teacher waving hello with everyday objects: cake, pizza,",
+          "required": false,
+          "fallbackType": "text"
+        },
+        {
+          "step": 2,
+          "type": "mission",
+          "mediaType": "none",
+          "assetId": "",
+          "altText": "",
+          "required": false,
+          "fallbackType": "none"
+        },
+        {
+          "step": 3,
+          "type": "think_first",
+          "mediaType": "svg",
+          "assetId": "svg-think-quarters-reallife-gen",
+          "altText": "A home scene with various objects: cake, pizza, paper, choco",
+          "required": false,
+          "fallbackType": "text"
+        },
+        {
+          "step": 4,
+          "type": "learn",
+          "mediaType": "svg",
+          "assetId": "svg-learn-quarters-reallife-gen",
+          "altText": "Three examples: (1) cake cut into 4 equal slices, (2) paper ",
+          "required": true,
+          "fallbackType": "text"
+        },
+        {
+          "step": 5,
+          "type": "real_life",
+          "mediaType": "svg",
+          "assetId": "svg-reallife-quarters-reallife-gen",
+          "altText": "Collage of everyday objects showing quarters: cake, pizza, p",
+          "required": false,
+          "fallbackType": "text"
+        },
+        {
+          "step": 6,
+          "type": "example",
+          "mediaType": "svg",
+          "assetId": "svg-example-quarters-reallife-gen",
+          "altText": "Two examples: (1) cake cut into 4 equal slices with '1/4' la",
+          "required": true,
+          "fallbackType": "text"
+        },
+        {
+          "step": 7,
+          "type": "practice",
+          "mediaType": "svg",
+          "assetId": "svg-practice-quarters-reallife-gen",
+          "altText": "Two objects: (A) a cake cut into 4 equal slices, (B) a cake ",
+          "required": true,
+          "fallbackType": "text"
+        },
+        {
+          "step": 8,
+          "type": "quick_check",
+          "mediaType": "svg",
+          "assetId": "svg-qc-quarters-reallife-gen",
+          "altText": "A cake cut into 4 equal slices. One slice is highlighted as ",
+          "required": true,
+          "fallbackType": "text"
+        },
+        {
+          "step": 9,
+          "type": "reflect",
+          "mediaType": "none",
+          "assetId": "",
+          "altText": "",
+          "required": false,
+          "fallbackType": "none"
+        },
+        {
+          "step": 10,
+          "type": "complete",
+          "mediaType": "svg",
+          "assetId": "svg-complete-quarters-reallife-gen",
+          "altText": "Celebration with stars and a badge that says 'I found quarte",
+          "required": false,
+          "fallbackType": "text"
+        }
+      ],
+      "rules": {
+        "name": "Identifying 1/4 in Everyday Objects",
+        "expected_fraction": "1/4",
+        "qc_correct": null,
+        "scope_check": "halves_and_quarters",
+        "forbidden": [
+          "1/3",
+          "thirds",
+          "1/5"
+        ]
+      }
+    }
+  ]
+}

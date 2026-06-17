@@ -1,0 +1,357 @@
+{
+  "version": "1.0.0",
+  "lessonId": "60441bd5-774f-4135-9871-666fc481b13b",
+  "title": "Identifying 1/4 in Everyday Objects",
+  "subject": "Mathematics",
+  "grade": 2,
+  "language": "en",
+  "generatedFrom": "fractions-source-pack-draft-v1",
+  "generatedAt": "2026-06-17T12:00:00+00:00",
+  "steps": [
+    {
+      "stepNumber": 1,
+      "stepType": "welcome",
+      "title": "Welcome!",
+      "purpose": "Greet the child and set emotional tone",
+      "owlText": "Hello friend! Today we are going to look for quarters in everyday things around us! Food, objects, nature — quarters are everywhere! Ready to go on a quarters hunt?",
+      "studentText": "Today we look for quarters (1/4) in everyday objects around us!",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-welcome-quarters-reallife-gen",
+        "altText": "Owl teacher waving hello with everyday objects: cake, pizza, chocolate — all cut into 4 equal parts",
+        "caption": "",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": false,
+        "fallbackType": "text",
+        "fallbackText": "Owl teacher waving hello with everyday objects: cake, pizza, chocolate — all cut into 4 equal parts"
+      },
+      "interaction": {
+        "type": "none"
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": false,
+        "requiresInteraction": false
+      }
+    },
+    {
+      "stepNumber": 2,
+      "stepType": "mission",
+      "title": "Our Mission",
+      "purpose": "Tell the child what they will learn",
+      "owlText": "",
+      "studentText": "Today you will learn to find quarters in everyday objects. A quarter means one of four equal parts. You will see quarters in food, paper, and things around you!",
+      "media": {
+        "type": "none",
+        "approvalStatus": "approved",
+        "approved": true,
+        "humanReviewed": false,
+        "required": false,
+        "fallbackType": "none"
+      },
+      "interaction": {
+        "type": "none"
+      },
+      "validation": {
+        "requiresOwlText": false,
+        "requiresStudentText": true,
+        "requiresMedia": false,
+        "requiresInteraction": false
+      }
+    },
+    {
+      "stepNumber": 3,
+      "stepType": "think_first",
+      "title": "Think First!",
+      "purpose": "Activate prior knowledge about quarters in real life",
+      "owlText": "Before we start, think about this: Can you think of something at home that you can cut or fold into four equal parts? What would each part be called?",
+      "studentText": "What things at home can you cut or fold into four equal parts? What is each part called?",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-think-quarters-reallife-gen",
+        "altText": "A home scene with various objects: cake, pizza, paper, chocolate — with question marks",
+        "caption": "",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": false,
+        "fallbackType": "text",
+        "fallbackText": "A home scene with various objects: cake, pizza, paper, chocolate — with question marks"
+      },
+      "interaction": {
+        "type": "text_input",
+        "question": "Name something at home that you can divide into four equal parts. What would each part be called?",
+        "placeholder": "I can cut/fold... into four equal parts. Each part is...",
+        "requiresSave": false
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": false,
+        "requiresInteraction": true
+      }
+    },
+    {
+      "stepNumber": 4,
+      "stepType": "learn",
+      "title": "Learn It",
+      "purpose": "Teach identifying quarters in everyday objects",
+      "owlText": "Let me show you. When you cut a cake into four equal slices, each slice is one quarter of the cake. When you fold a paper twice to make four equal parts, each part is one quarter. When you break a chocolate bar into four equal pieces, each piece is one quarter. The key is: the four parts must be equal — the same size!",
+      "studentText": "A quarter in real life: Cut or fold something into four equal parts. Each part is one quarter. All four parts must be the same size!",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-learn-quarters-reallife-gen",
+        "altText": "Three examples: (1) cake cut into 4 equal slices, (2) paper folded into 4 equal parts, (3) chocolate bar split into 4 equal pieces. Each labeled '1/4'.",
+        "caption": "Quarters in everyday objects: cake, paper, chocolate.",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": true,
+        "fallbackType": "text",
+        "fallbackText": "Three examples: (1) cake cut into 4 equal slices, (2) paper folded into 4 equal parts, (3) chocolate bar split into 4 equal pieces. Each labeled '1/4'."
+      },
+      "interaction": {
+        "type": "none"
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": true,
+        "requiresInteraction": false
+      }
+    },
+    {
+      "stepNumber": 5,
+      "stepType": "real_life",
+      "title": "Real Life Connection",
+      "purpose": "Connect quarters to many real-life contexts",
+      "owlText": "We see quarters everywhere! A cake cut into four equal slices. A pizza cut into four equal pieces. A paper folded into four equal parts. A chocolate bar split into four equal pieces. Even a window with four equal panes — each pane is one quarter of the window! Quarters are all around us!",
+      "studentText": "Quarters are everywhere: cake, pizza, paper, chocolate, windows. Look for things divided into four equal parts!",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-reallife-quarters-reallife-gen",
+        "altText": "Collage of everyday objects showing quarters: cake, pizza, paper, chocolate, window",
+        "caption": "",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": false,
+        "fallbackType": "text",
+        "fallbackText": "Collage of everyday objects showing quarters: cake, pizza, paper, chocolate, window"
+      },
+      "interaction": {
+        "type": "none"
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": false,
+        "requiresInteraction": false
+      }
+    },
+    {
+      "stepNumber": 6,
+      "stepType": "example",
+      "title": "Watch and Learn",
+      "purpose": "Show worked examples of identifying quarters in objects",
+      "owlText": "Let me show you how to spot quarters. This cake is cut into four equal slices. Each slice is one quarter. How do I know? All four slices are the same size! This paper is folded into four equal parts. Each part is one quarter. All four parts match exactly — that is how you know they are equal.",
+      "studentText": "To spot quarters: Look for four parts that are the same size. If all four parts match exactly, each one is one quarter.",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-example-quarters-reallife-gen",
+        "altText": "Two examples: (1) cake cut into 4 equal slices with '1/4' label on each, (2) paper folded into 4 equal parts with matching edges shown.",
+        "caption": "",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": true,
+        "fallbackType": "text",
+        "fallbackText": "Two examples: (1) cake cut into 4 equal slices with '1/4' label on each, (2) paper folded into 4 equal parts with matching edges shown."
+      },
+      "interaction": {
+        "type": "none"
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": true,
+        "requiresInteraction": false
+      }
+    },
+    {
+      "stepNumber": 7,
+      "stepType": "practice",
+      "title": "Your Turn!",
+      "purpose": "Practice identifying which object shows quarters",
+      "owlText": "Now it is your turn! Look at these two objects. One object is divided into four equal parts. The other is not. Which object shows quarters? Tap the correct one.",
+      "studentText": "Which object shows quarters? Look for four equal parts.",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-practice-quarters-reallife-gen",
+        "altText": "Two objects: (A) a cake cut into 4 equal slices, (B) a cake cut into 4 unequal slices.",
+        "caption": "",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": true,
+        "fallbackType": "text",
+        "fallbackText": "Two objects: (A) a cake cut into 4 equal slices, (B) a cake cut into 4 unequal slices."
+      },
+      "interaction": {
+        "type": "multiple_choice",
+        "question": "Which object shows quarters?",
+        "options": [
+          "Object A: cake cut into 4 equal slices",
+          "Object B: cake cut into 4 unequal slices",
+          "Both objects",
+          "Neither object"
+        ],
+        "correctAnswer": "Object A: cake cut into 4 equal slices",
+        "correctIndex": 0,
+        "feedbackCorrect": "Yes! Object A has four equal slices. Each slice is one quarter. All parts are the same size!",
+        "feedbackIncorrect": "Look for the object where all four parts are the same size. That is what makes quarters — four equal parts!",
+        "requiresSave": true,
+        "practiceLabel": "practice-identify-quarters-reallife"
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": true,
+        "requiresInteraction": true
+      }
+    },
+    {
+      "stepNumber": 8,
+      "stepType": "quick_check",
+      "title": "Quick Check!",
+      "purpose": "Test understanding of quarters in real objects (QC-Q2)",
+      "owlText": "Quick check! A cake is cut into 4 equal slices. You eat 1 slice. What fraction of the cake did you eat?",
+      "studentText": "A cake is cut into 4 equal slices. You eat 1 slice. What fraction of the cake did you eat?",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-qc-quarters-reallife-gen",
+        "altText": "A cake cut into 4 equal slices. One slice is highlighted as eaten.",
+        "caption": "",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": true,
+        "fallbackType": "text",
+        "fallbackText": "A cake cut into 4 equal slices. One slice is highlighted as eaten."
+      },
+      "interaction": {
+        "type": "multiple_choice",
+        "question": "A cake is cut into 4 equal slices. You eat 1 slice. What fraction did you eat?",
+        "options": [
+          "1/2",
+          "1/4",
+          "1/3",
+          "1 whole"
+        ],
+        "correctAnswer": "1/4",
+        "correctIndex": 1,
+        "feedbackCorrect": "Correct! One slice out of 4 equal slices is one quarter. Well done!",
+        "feedbackIncorrect": "The cake was cut into 4 equal slices. You ate 1 slice. That is one quarter of the cake.",
+        "requiresSave": true
+      },
+      "validation": {
+        "requiresOwlText": false,
+        "requiresStudentText": true,
+        "requiresMedia": true,
+        "requiresInteraction": true
+      }
+    },
+    {
+      "stepNumber": 9,
+      "stepType": "reflect",
+      "title": "Think About Your Learning",
+      "purpose": "Help the child reflect",
+      "owlText": "You did great today! Think about what you learned. Where can you find quarters in everyday life? What does 'four equal parts' mean? You are a quarters detective!",
+      "studentText": "What did you learn about finding quarters in everyday objects?",
+      "media": {
+        "type": "none",
+        "approvalStatus": "approved",
+        "approved": true,
+        "humanReviewed": false,
+        "required": false,
+        "fallbackType": "none"
+      },
+      "interaction": {
+        "type": "reflection",
+        "question": "How do you feel about finding quarters in everyday objects?",
+        "options": [
+          "😊 I can find quarters everywhere!",
+          "🤔 I am still learning",
+          "😟 I need more help"
+        ],
+        "correctAnswer": "",
+        "correctIndex": null,
+        "feedbackCorrect": "",
+        "feedbackIncorrect": "",
+        "requiresSave": false
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": false,
+        "requiresInteraction": false
+      }
+    },
+    {
+      "stepNumber": 10,
+      "stepType": "complete",
+      "title": "You Did It!",
+      "purpose": "Celebrate completion",
+      "owlText": "Wonderful! You learned to find quarters in everyday objects today. Look around you — quarters are in your food, your paper, your world! Keep being a quarters detective!",
+      "studentText": "You learned to find quarters in everyday objects! Look for quarters everywhere!",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-complete-quarters-reallife-gen",
+        "altText": "Celebration with stars and a badge that says 'I found quarters!'",
+        "caption": "",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": false,
+        "fallbackType": "text",
+        "fallbackText": "Celebration with stars and a badge that says 'I found quarters!'"
+      },
+      "interaction": {
+        "type": "none"
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": false,
+        "requiresInteraction": false
+      }
+    }
+  ],
+  "metadata": {
+    "generatedAt": "2026-06-17T12:00:00+00:00",
+    "generator": "fractions-source-pack-generated-v1",
+    "sourcePackVersion": "1.0.0-draft",
+    "validated": false,
+    "humanReviewed": false,
+    "approvedForLearners": false
+  }
+}

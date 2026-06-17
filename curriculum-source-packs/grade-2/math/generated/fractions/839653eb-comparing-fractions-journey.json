@@ -1,0 +1,357 @@
+{
+  "version": "1.0.0",
+  "lessonId": "839653eb-cd5e-405b-a483-b6d307fee352",
+  "title": "Comparing Fractions: 1/2 and 1/4",
+  "subject": "Mathematics",
+  "grade": 2,
+  "language": "en",
+  "generatedFrom": "fractions-source-pack-draft-v1",
+  "generatedAt": "2026-06-17T12:00:00+00:00",
+  "steps": [
+    {
+      "stepNumber": 1,
+      "stepType": "welcome",
+      "title": "Welcome!",
+      "purpose": "Greet the child and set emotional tone",
+      "owlText": "Hello friend! Today we are going to learn about two special fractions: one half and one quarter. Are you ready?",
+      "studentText": "Today we learn about one half (1/2) and one quarter (1/4)!",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-welcome-compare-fractions-gen",
+        "altText": "Owl teacher waving hello with two shapes: one showing 1/2 and one showing 1/4",
+        "caption": "",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": false,
+        "fallbackType": "text",
+        "fallbackText": "Owl teacher waving hello with two shapes: one showing 1/2 and one showing 1/4"
+      },
+      "interaction": {
+        "type": "none"
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": false,
+        "requiresInteraction": false
+      }
+    },
+    {
+      "stepNumber": 2,
+      "stepType": "mission",
+      "title": "Our Mission",
+      "purpose": "Tell the child what they will learn",
+      "owlText": "",
+      "studentText": "Today you will learn to tell the difference between one half (1/2) and one quarter (1/4). Both are fractions, but they are different!",
+      "media": {
+        "type": "none",
+        "approvalStatus": "approved",
+        "approved": true,
+        "humanReviewed": false,
+        "required": false,
+        "fallbackType": "none"
+      },
+      "interaction": {
+        "type": "none"
+      },
+      "validation": {
+        "requiresOwlText": false,
+        "requiresStudentText": true,
+        "requiresMedia": false,
+        "requiresInteraction": false
+      }
+    },
+    {
+      "stepNumber": 3,
+      "stepType": "think_first",
+      "title": "Think First!",
+      "purpose": "Activate prior knowledge about halves and quarters",
+      "owlText": "Before we start, think about this: If you cut a chapati into 2 equal pieces, and your friend cuts the same size chapati into 4 equal pieces, which piece is bigger — your piece or your friend's piece?",
+      "studentText": "Think about it: Is a half bigger or smaller than a quarter? Draw or describe your thinking.",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-think-compare-fractions-gen",
+        "altText": "Two chapatis side by side: one cut into 2 pieces, one cut into 4 pieces, with a question mark",
+        "caption": "",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": false,
+        "fallbackType": "text",
+        "fallbackText": "Two chapatis side by side: one cut into 2 pieces, one cut into 4 pieces, with a question mark"
+      },
+      "interaction": {
+        "type": "text_input",
+        "question": "Is one half (1/2) bigger or smaller than one quarter (1/4)? Why do you think so?",
+        "placeholder": "I think... because...",
+        "requiresSave": false
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": false,
+        "requiresInteraction": true
+      }
+    },
+    {
+      "stepNumber": 4,
+      "stepType": "learn",
+      "title": "Learn It",
+      "purpose": "Teach the difference between 1/2 and 1/4 visually",
+      "owlText": "Let me show you. Here are two same-size rectangles. The first is divided into 2 equal parts. One part is shaded — that is one half (1/2). The second is divided into 4 equal parts. One part is shaded — that is one quarter (1/4). Look at the shaded parts. The half is bigger! Both are fractions, but they are different.",
+      "studentText": "One half (1/2) and one quarter (1/4) are both fractions. When the wholes are the same size, one half is bigger than one quarter. The more parts you make, the smaller each part becomes.",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-learn-compare-fractions-gen",
+        "altText": "Two same-size rectangles side by side. Left: divided into 2 equal parts, 1 shaded (1/2). Right: divided into 4 equal parts, 1 shaded (1/4). The 1/2 shaded area is visibly larger.",
+        "caption": "One half (1/2) and one quarter (1/4). The half is bigger.",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": true,
+        "fallbackType": "text",
+        "fallbackText": "Two same-size rectangles side by side. Left: divided into 2 equal parts, 1 shaded (1/2). Right: divided into 4 equal parts, 1 shaded (1/4). The 1/2 shaded area is visibly larger."
+      },
+      "interaction": {
+        "type": "none"
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": true,
+        "requiresInteraction": false
+      }
+    },
+    {
+      "stepNumber": 5,
+      "stepType": "real_life",
+      "title": "Real Life Connection",
+      "purpose": "Connect comparing fractions to real life",
+      "owlText": "We see this in real life! If you share a pizza with one friend (2 people), you get a bigger slice than if you share with 3 friends (4 people). More people means smaller pieces. The same chapati cut into 2 gives bigger pieces than cut into 4!",
+      "studentText": "When you share with more people, each person gets a smaller piece. A half is bigger than a quarter because there are fewer parts.",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-reallife-compare-fractions-gen",
+        "altText": "Two pizzas: one cut into 2 big slices, one cut into 4 small slices. People sharing.",
+        "caption": "",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": false,
+        "fallbackType": "text",
+        "fallbackText": "Two pizzas: one cut into 2 big slices, one cut into 4 small slices. People sharing."
+      },
+      "interaction": {
+        "type": "none"
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": false,
+        "requiresInteraction": false
+      }
+    },
+    {
+      "stepNumber": 6,
+      "stepType": "example",
+      "title": "Watch and Learn",
+      "purpose": "Show worked examples of identifying 1/2 vs 1/4",
+      "owlText": "Let me show you how to tell them apart. This shape is divided into 2 equal parts. One is shaded. That is one half (1/2). This shape is divided into 4 equal parts. One is shaded. That is one quarter (1/4). Count the total parts to know which fraction it is!",
+      "studentText": "To tell fractions apart: Count the total number of equal parts. 2 parts total = one half. 4 parts total = one quarter. One shaded part in both cases.",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-example-compare-fractions-gen",
+        "altText": "Two shapes: one labeled 1/2 (2 parts, 1 shaded), one labeled 1/4 (4 parts, 1 shaded). Counting arrows show total parts.",
+        "caption": "",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": true,
+        "fallbackType": "text",
+        "fallbackText": "Two shapes: one labeled 1/2 (2 parts, 1 shaded), one labeled 1/4 (4 parts, 1 shaded). Counting arrows show total parts."
+      },
+      "interaction": {
+        "type": "none"
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": true,
+        "requiresInteraction": false
+      }
+    },
+    {
+      "stepNumber": 7,
+      "stepType": "practice",
+      "title": "Your Turn!",
+      "purpose": "Practice identifying whether a shape shows 1/2 or 1/4",
+      "owlText": "Now it is your turn! Look at this shape. Is it showing one half (1/2) or one quarter (1/4)? Tap the correct answer.",
+      "studentText": "This shape has one part shaded. How many equal parts is the whole divided into? Is it 1/2 or 1/4?",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-practice-compare-fractions-gen",
+        "altText": "A rectangle divided into 4 equal parts with 1 part shaded.",
+        "caption": "",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": true,
+        "fallbackType": "text",
+        "fallbackText": "A rectangle divided into 4 equal parts with 1 part shaded."
+      },
+      "interaction": {
+        "type": "multiple_choice",
+        "question": "What fraction is shaded?",
+        "options": [
+          "one half (1/2)",
+          "one quarter (1/4)",
+          "one whole",
+          "one third (1/3)"
+        ],
+        "correctAnswer": "one quarter (1/4)",
+        "correctIndex": 1,
+        "feedbackCorrect": "Yes! The shape is divided into 4 equal parts and 1 is shaded. That is one quarter (1/4)!",
+        "feedbackIncorrect": "Count the total equal parts. There are 4. One is shaded. That is one quarter (1/4).",
+        "requiresSave": true,
+        "practiceLabel": "practice-identify-half-or-quarter"
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": true,
+        "requiresInteraction": true
+      }
+    },
+    {
+      "stepNumber": 8,
+      "stepType": "quick_check",
+      "title": "Quick Check!",
+      "purpose": "Test understanding of equal vs unequal parts (QC-E1)",
+      "owlText": "Quick check! Which shape shows equal parts? Remember: fractions need parts that are the same size.",
+      "studentText": "Which shape shows equal parts?",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-qc-equal-unequal-gen",
+        "altText": "Four shapes: A has 2 equal parts, B has 2 unequal parts, C has 3 unequal parts, D has 4 unequal parts.",
+        "caption": "",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": true,
+        "fallbackType": "text",
+        "fallbackText": "Four shapes: A has 2 equal parts, B has 2 unequal parts, C has 3 unequal parts, D has 4 unequal parts."
+      },
+      "interaction": {
+        "type": "multiple_choice",
+        "question": "Which shape shows equal parts?",
+        "options": [
+          "Shape A: rectangle divided into 2 equal parts",
+          "Shape B: rectangle divided into 2 unequal parts",
+          "Shape C: circle divided into 3 unequal parts",
+          "Shape D: square divided into 4 unequal parts"
+        ],
+        "correctAnswer": "Shape A: rectangle divided into 2 equal parts",
+        "correctIndex": 0,
+        "feedbackCorrect": "Yes! Only Shape A has equal parts. Fractions need equal parts!",
+        "feedbackIncorrect": "Remember: fractions need parts that are the same size. Look for the shape where all parts are equal.",
+        "requiresSave": true
+      },
+      "validation": {
+        "requiresOwlText": false,
+        "requiresStudentText": true,
+        "requiresMedia": true,
+        "requiresInteraction": true
+      }
+    },
+    {
+      "stepNumber": 9,
+      "stepType": "reflect",
+      "title": "Think About Your Learning",
+      "purpose": "Help the child reflect",
+      "owlText": "You did great today! Think about what you learned. What is the difference between one half and one quarter? Both are fractions, but they are different!",
+      "studentText": "What did you learn about one half (1/2) and one quarter (1/4) today?",
+      "media": {
+        "type": "none",
+        "approvalStatus": "approved",
+        "approved": true,
+        "humanReviewed": false,
+        "required": false,
+        "fallbackType": "none"
+      },
+      "interaction": {
+        "type": "reflection",
+        "question": "How do you feel about halves and quarters today?",
+        "options": [
+          "😊 I understand!",
+          "🤔 I am still learning",
+          "😟 I need more help"
+        ],
+        "correctAnswer": "",
+        "correctIndex": null,
+        "feedbackCorrect": "",
+        "feedbackIncorrect": "",
+        "requiresSave": false
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": false,
+        "requiresInteraction": false
+      }
+    },
+    {
+      "stepNumber": 10,
+      "stepType": "complete",
+      "title": "You Did It!",
+      "purpose": "Celebrate completion",
+      "owlText": "Wonderful! You learned about one half (1/2) and one quarter (1/4) today. Remember: count the equal parts to know the fraction. Keep practicing!",
+      "studentText": "You learned about halves and quarters! Count the equal parts to tell them apart!",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-complete-compare-fractions-gen",
+        "altText": "Celebration with stars and a badge that says 'I know 1/2 and 1/4!'",
+        "caption": "",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": false,
+        "fallbackType": "text",
+        "fallbackText": "Celebration with stars and a badge that says 'I know 1/2 and 1/4!'"
+      },
+      "interaction": {
+        "type": "none"
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": false,
+        "requiresInteraction": false
+      }
+    }
+  ],
+  "metadata": {
+    "generatedAt": "2026-06-17T12:00:00+00:00",
+    "generator": "fractions-source-pack-generated-v1",
+    "sourcePackVersion": "1.0.0-draft",
+    "validated": false,
+    "humanReviewed": false,
+    "approvedForLearners": false
+  }
+}

@@ -1,0 +1,357 @@
+{
+  "version": "1.0.0",
+  "lessonId": "2e1869d6-f5df-46a1-9d02-b4b53a1062fe",
+  "title": "Fractions: Assessment and Reflection",
+  "subject": "Mathematics",
+  "grade": 2,
+  "language": "en",
+  "generatedFrom": "fractions-source-pack-draft-v1",
+  "generatedAt": "2026-06-17T12:00:00+00:00",
+  "steps": [
+    {
+      "stepNumber": 1,
+      "stepType": "welcome",
+      "title": "Welcome!",
+      "purpose": "Greet the child and set emotional tone",
+      "owlText": "Hello friend! Today we are going to show what we know about fractions! We will answer questions about halves, quarters, equal parts, and fair sharing. Then we will think about what we have learned. Ready?",
+      "studentText": "Today we show what we know about fractions and think about our learning!",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-welcome-assessment-gen",
+        "altText": "Owl teacher waving hello with a checklist and fraction shapes",
+        "caption": "",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": false,
+        "fallbackType": "text",
+        "fallbackText": "Owl teacher waving hello with a checklist and fraction shapes"
+      },
+      "interaction": {
+        "type": "none"
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": false,
+        "requiresInteraction": false
+      }
+    },
+    {
+      "stepNumber": 2,
+      "stepType": "mission",
+      "title": "Our Mission",
+      "purpose": "Tell the child what they will learn",
+      "owlText": "",
+      "studentText": "Today you will answer questions about fractions to show what you know. Then you will think about what you have learned and how you feel. This is your fractions reflection!",
+      "media": {
+        "type": "none",
+        "approvalStatus": "approved",
+        "approved": true,
+        "humanReviewed": false,
+        "required": false,
+        "fallbackType": "none"
+      },
+      "interaction": {
+        "type": "none"
+      },
+      "validation": {
+        "requiresOwlText": false,
+        "requiresStudentText": true,
+        "requiresMedia": false,
+        "requiresInteraction": false
+      }
+    },
+    {
+      "stepNumber": 3,
+      "stepType": "think_first",
+      "title": "Think First!",
+      "purpose": "Activate prior knowledge — comprehensive review",
+      "owlText": "Before we begin, think about everything you know about fractions. What is a half? What is a quarter? What does 'equal parts' mean? What is fair sharing? Think about all the fraction things you have learned!",
+      "studentText": "What do you know about fractions? Think about halves, quarters, equal parts, and fair sharing.",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-think-assessment-gen",
+        "altText": "A brain with fraction symbols inside: 1/2, 1/4, equal signs, sharing images",
+        "caption": "",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": false,
+        "fallbackType": "text",
+        "fallbackText": "A brain with fraction symbols inside: 1/2, 1/4, equal signs, sharing images"
+      },
+      "interaction": {
+        "type": "text_input",
+        "question": "Tell me everything you know about fractions. What is a half? What is a quarter? What are equal parts?",
+        "placeholder": "I know that...",
+        "requiresSave": false
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": false,
+        "requiresInteraction": true
+      }
+    },
+    {
+      "stepNumber": 4,
+      "stepType": "learn",
+      "title": "Learn It",
+      "purpose": "Review all fraction concepts before assessment",
+      "owlText": "Let us review everything before we start! A half (1/2) is one of two equal parts. A quarter (1/4) is one of four equal parts. Fractions need equal parts — all parts must be the same size. Fair sharing means everyone gets the same amount. Now you are ready!",
+      "studentText": "Review: 1/2 = one of two equal parts. 1/4 = one of four equal parts. Equal parts = same size. Fair sharing = everyone gets the same.",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-learn-assessment-gen",
+        "altText": "Four review panels: (1) 1/2 shape, (2) 1/4 shape, (3) equal vs unequal, (4) fair sharing. Each with a checkmark.",
+        "caption": "Review: halves, quarters, equal parts, fair sharing.",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": true,
+        "fallbackType": "text",
+        "fallbackText": "Four review panels: (1) 1/2 shape, (2) 1/4 shape, (3) equal vs unequal, (4) fair sharing. Each with a checkmark."
+      },
+      "interaction": {
+        "type": "none"
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": true,
+        "requiresInteraction": false
+      }
+    },
+    {
+      "stepNumber": 5,
+      "stepType": "real_life",
+      "title": "Real Life Connection",
+      "purpose": "Connect all fraction concepts to real life",
+      "owlText": "Fractions are all around us! When you cut a chapati in half, that is 1/2. When you cut a cake into 4 equal slices, each is 1/4. When you share food fairly with friends, you are using fractions. When you fold paper evenly, you are making fractions. You have learned so much!",
+      "studentText": "Fractions are everywhere in real life. You have learned to see them in food, paper, sharing, and shapes!",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-reallife-assessment-gen",
+        "altText": "Real life collage: chapati half, cake quarters, paper folding, children sharing, shapes with fractions",
+        "caption": "",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": false,
+        "fallbackType": "text",
+        "fallbackText": "Real life collage: chapati half, cake quarters, paper folding, children sharing, shapes with fractions"
+      },
+      "interaction": {
+        "type": "none"
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": false,
+        "requiresInteraction": false
+      }
+    },
+    {
+      "stepNumber": 6,
+      "stepType": "example",
+      "title": "Watch and Learn",
+      "purpose": "Show examples of assessment-style questions",
+      "owlText": "Let me show you the kinds of questions you will see. Question: This shape is divided into 2 equal parts. One is shaded. What fraction? Answer: one half (1/2)! Question: A cake is cut into 4 equal slices. You eat 1. What fraction? Answer: one quarter (1/4)! You know this!",
+      "studentText": "Assessment questions ask you to: identify fractions from shapes, count equal parts, and solve fair sharing problems. You know how to do all of these!",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-example-assessment-gen",
+        "altText": "Two example questions with answers: (1) shape showing 1/2 with answer, (2) cake with 4 slices with answer",
+        "caption": "",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": true,
+        "fallbackType": "text",
+        "fallbackText": "Two example questions with answers: (1) shape showing 1/2 with answer, (2) cake with 4 slices with answer"
+      },
+      "interaction": {
+        "type": "none"
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": true,
+        "requiresInteraction": false
+      }
+    },
+    {
+      "stepNumber": 7,
+      "stepType": "practice",
+      "title": "Your Turn!",
+      "purpose": "Practice assessment-style question: identify fraction from shape",
+      "owlText": "Now it is your turn! This circle is divided into 2 equal parts. One part is shaded. What fraction is shaded? Choose the correct answer.",
+      "studentText": "This circle is divided into 2 equal parts. One part is shaded. What fraction is shaded?",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-practice-assessment-gen",
+        "altText": "A circle divided into 2 equal parts. One part is shaded.",
+        "caption": "",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": true,
+        "fallbackType": "text",
+        "fallbackText": "A circle divided into 2 equal parts. One part is shaded."
+      },
+      "interaction": {
+        "type": "multiple_choice",
+        "question": "What fraction is shaded?",
+        "options": [
+          "one quarter (1/4)",
+          "one half (1/2)",
+          "one whole",
+          "one third (1/3)"
+        ],
+        "correctAnswer": "one half (1/2)",
+        "correctIndex": 1,
+        "feedbackCorrect": "Yes! The circle is divided into 2 equal parts and 1 is shaded. That is one half!",
+        "feedbackIncorrect": "Count the equal parts. There are 2. One is shaded. That is one half (1/2).",
+        "requiresSave": true,
+        "practiceLabel": "practice-assessment-identify-fraction"
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": true,
+        "requiresInteraction": true
+      }
+    },
+    {
+      "stepNumber": 8,
+      "stepType": "quick_check",
+      "title": "Quick Check!",
+      "purpose": "Comprehensive assessment question: equal vs unequal (QC-E1)",
+      "owlText": "Quick check! Which shape shows equal parts? Remember: fractions need parts that are the same size.",
+      "studentText": "Which shape shows equal parts?",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-qc-equal-unequal-2-gen",
+        "altText": "Four shapes: A has 2 equal parts, B has 2 unequal parts, C has 3 unequal parts, D has 4 unequal parts.",
+        "caption": "",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": true,
+        "fallbackType": "text",
+        "fallbackText": "Four shapes: A has 2 equal parts, B has 2 unequal parts, C has 3 unequal parts, D has 4 unequal parts."
+      },
+      "interaction": {
+        "type": "multiple_choice",
+        "question": "Which shape shows equal parts?",
+        "options": [
+          "Shape A: rectangle divided into 2 equal parts",
+          "Shape B: rectangle divided into 2 unequal parts",
+          "Shape C: circle divided into 3 unequal parts",
+          "Shape D: square divided into 4 unequal parts"
+        ],
+        "correctAnswer": "Shape A: rectangle divided into 2 equal parts",
+        "correctIndex": 0,
+        "feedbackCorrect": "Yes! Only Shape A has equal parts. Fractions need equal parts!",
+        "feedbackIncorrect": "Remember: fractions need parts that are the same size. Look for the shape where all parts are equal.",
+        "requiresSave": true
+      },
+      "validation": {
+        "requiresOwlText": false,
+        "requiresStudentText": true,
+        "requiresMedia": true,
+        "requiresInteraction": true
+      }
+    },
+    {
+      "stepNumber": 9,
+      "stepType": "reflect",
+      "title": "Think About Your Learning",
+      "purpose": "Deep reflection on all fraction learning",
+      "owlText": "You did great today! Think about everything you have learned about fractions. You learned about halves, quarters, equal parts, fair sharing, patterns, and more. You are a fractions champion!",
+      "studentText": "What did you learn about fractions? How do you feel about what you know?",
+      "media": {
+        "type": "none",
+        "approvalStatus": "approved",
+        "approved": true,
+        "humanReviewed": false,
+        "required": false,
+        "fallbackType": "none"
+      },
+      "interaction": {
+        "type": "reflection",
+        "question": "How do you feel about fractions now?",
+        "options": [
+          "😊 I am a fractions champion!",
+          "🤔 I know some things, still learning",
+          "😟 I need more practice"
+        ],
+        "correctAnswer": "",
+        "correctIndex": null,
+        "feedbackCorrect": "",
+        "feedbackIncorrect": "",
+        "requiresSave": false
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": false,
+        "requiresInteraction": false
+      }
+    },
+    {
+      "stepNumber": 10,
+      "stepType": "complete",
+      "title": "You Did It!",
+      "purpose": "Celebrate completion",
+      "owlText": "Wonderful! You completed your fractions assessment today! You know about halves, quarters, equal parts, fair sharing, and patterns. You are a fractions champion! Keep practicing and looking for fractions everywhere!",
+      "studentText": "You completed your fractions assessment! You are a fractions champion!",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-complete-assessment-gen",
+        "altText": "Celebration with stars and a trophy that says 'Fractions Champion!'",
+        "caption": "",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": false,
+        "fallbackType": "text",
+        "fallbackText": "Celebration with stars and a trophy that says 'Fractions Champion!'"
+      },
+      "interaction": {
+        "type": "none"
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": false,
+        "requiresInteraction": false
+      }
+    }
+  ],
+  "metadata": {
+    "generatedAt": "2026-06-17T12:00:00+00:00",
+    "generator": "fractions-source-pack-generated-v1",
+    "sourcePackVersion": "1.0.0-draft",
+    "validated": false,
+    "humanReviewed": false,
+    "approvedForLearners": false
+  }
+}

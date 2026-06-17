@@ -1,0 +1,357 @@
+{
+  "version": "1.0.0",
+  "lessonId": "dbadac3a-b59b-4f76-bebf-efda6fb3e261",
+  "title": "Digital Games with Fractions",
+  "subject": "Mathematics",
+  "grade": 2,
+  "language": "en",
+  "generatedFrom": "fractions-source-pack-draft-v1",
+  "generatedAt": "2026-06-17T12:00:00+00:00",
+  "steps": [
+    {
+      "stepNumber": 1,
+      "stepType": "welcome",
+      "title": "Welcome!",
+      "purpose": "Greet the child and set emotional tone",
+      "owlText": "Hello friend! Today we are going to play fun games with fractions! We will match, sort, and identify halves and quarters. Ready to play?",
+      "studentText": "Today we play fraction games! We match fractions to shapes and sort them.",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-welcome-digital-gen",
+        "altText": "Owl teacher waving hello with game-style elements: shapes, fraction cards, and a score board",
+        "caption": "",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": false,
+        "fallbackType": "text",
+        "fallbackText": "Owl teacher waving hello with game-style elements: shapes, fraction cards, and a score board"
+      },
+      "interaction": {
+        "type": "none"
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": false,
+        "requiresInteraction": false
+      }
+    },
+    {
+      "stepNumber": 2,
+      "stepType": "mission",
+      "title": "Our Mission",
+      "purpose": "Tell the child what they will learn",
+      "owlText": "",
+      "studentText": "Today you will practice fractions by playing matching and sorting games. You will match fractions to shapes and sort shapes into halves and quarters!",
+      "media": {
+        "type": "none",
+        "approvalStatus": "approved",
+        "approved": true,
+        "humanReviewed": false,
+        "required": false,
+        "fallbackType": "none"
+      },
+      "interaction": {
+        "type": "none"
+      },
+      "validation": {
+        "requiresOwlText": false,
+        "requiresStudentText": true,
+        "requiresMedia": false,
+        "requiresInteraction": false
+      }
+    },
+    {
+      "stepNumber": 3,
+      "stepType": "think_first",
+      "title": "Think First!",
+      "purpose": "Activate prior knowledge about fractions",
+      "owlText": "Before we play, think about this: What is a half? What is a quarter? How can you tell them apart? Remember: count the equal parts!",
+      "studentText": "What is a half? What is a quarter? How are they different? Think about it!",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-think-digital-gen",
+        "altText": "Two shapes: one showing 1/2 and one showing 1/4, with a question mark between them",
+        "caption": "",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": false,
+        "fallbackType": "text",
+        "fallbackText": "Two shapes: one showing 1/2 and one showing 1/4, with a question mark between them"
+      },
+      "interaction": {
+        "type": "text_input",
+        "question": "What is the difference between one half (1/2) and one quarter (1/4)?",
+        "placeholder": "One half is... and one quarter is...",
+        "requiresSave": false
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": false,
+        "requiresInteraction": true
+      }
+    },
+    {
+      "stepNumber": 4,
+      "stepType": "learn",
+      "title": "Learn It",
+      "purpose": "Teach fraction matching and sorting",
+      "owlText": "Let me show you how the games work. In the matching game, you see a fraction like 1/2 and you tap the shape that shows one half. In the sorting game, you drag shapes into the correct group: halves or quarters. Count the equal parts to know which is which!",
+      "studentText": "Game 1 — Matching: See a fraction, tap the correct shape. Game 2 — Sorting: Drag shapes into 'halves' or 'quarters' groups. Count the equal parts to decide!",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-learn-digital-gen",
+        "altText": "Game-style layout: fraction cards on one side, shapes on the other. Arrows show matching. Two sorting bins labeled 'halves' and 'quarters'.",
+        "caption": "Match the fraction to the shape. Sort shapes into halves and quarters.",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": true,
+        "fallbackType": "text",
+        "fallbackText": "Game-style layout: fraction cards on one side, shapes on the other. Arrows show matching. Two sorting bins labeled 'halves' and 'quarters'."
+      },
+      "interaction": {
+        "type": "none"
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": true,
+        "requiresInteraction": false
+      }
+    },
+    {
+      "stepNumber": 5,
+      "stepType": "real_life",
+      "title": "Real Life Connection",
+      "purpose": "Connect digital fraction practice to real life",
+      "owlText": "These games help you recognize fractions quickly! When you see a chapati cut in half, you will know it is 1/2. When you see a cake cut into 4 equal slices, you will know each slice is 1/4. The games train your eyes to spot fractions everywhere!",
+      "studentText": "Practicing fractions in games helps you recognize them in real life. Look for halves and quarters around you!",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-reallife-digital-gen",
+        "altText": "Real objects: chapati cut in half (labeled 1/2), cake cut in 4 slices (labeled 1/4 each)",
+        "caption": "",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": false,
+        "fallbackType": "text",
+        "fallbackText": "Real objects: chapati cut in half (labeled 1/2), cake cut in 4 slices (labeled 1/4 each)"
+      },
+      "interaction": {
+        "type": "none"
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": false,
+        "requiresInteraction": false
+      }
+    },
+    {
+      "stepNumber": 6,
+      "stepType": "example",
+      "title": "Watch and Learn",
+      "purpose": "Show worked example of fraction matching",
+      "owlText": "Let me show you. Here is the fraction 1/2. Which shape matches? This shape is divided into 2 equal parts with 1 shaded. That is one half! It matches. Here is 1/4. Which shape matches? This shape is divided into 4 equal parts with 1 shaded. That is one quarter! It matches.",
+      "studentText": "To match a fraction to a shape: Count the total equal parts. 2 parts = 1/2. 4 parts = 1/4. Find the shape that matches the fraction.",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-example-digital-gen",
+        "altText": "Fraction cards: 1/2 and 1/4. Shapes below with matching arrows. One correct match shown.",
+        "caption": "",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": true,
+        "fallbackType": "text",
+        "fallbackText": "Fraction cards: 1/2 and 1/4. Shapes below with matching arrows. One correct match shown."
+      },
+      "interaction": {
+        "type": "none"
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": true,
+        "requiresInteraction": false
+      }
+    },
+    {
+      "stepNumber": 7,
+      "stepType": "practice",
+      "title": "Your Turn!",
+      "purpose": "Practice fraction matching game",
+      "owlText": "Now it is your turn! Play the matching game. Here is the fraction 1/4. Which shape shows one quarter? Tap the correct shape.",
+      "studentText": "Match the fraction to the shape. Which shape shows 1/4?",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-practice-digital-gen",
+        "altText": "Fraction card showing 1/4. Below: 4 shape options — one with 4 equal parts 1 shaded, others with different divisions.",
+        "caption": "",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": true,
+        "fallbackType": "text",
+        "fallbackText": "Fraction card showing 1/4. Below: 4 shape options — one with 4 equal parts 1 shaded, others with different divisions."
+      },
+      "interaction": {
+        "type": "multiple_choice",
+        "question": "Which shape shows one quarter (1/4)?",
+        "options": [
+          "Shape A: 4 equal parts, 1 shaded",
+          "Shape B: 2 equal parts, 1 shaded",
+          "Shape C: 3 equal parts, 1 shaded",
+          "Shape D: 4 unequal parts, 1 shaded"
+        ],
+        "correctAnswer": "Shape A: 4 equal parts, 1 shaded",
+        "correctIndex": 0,
+        "feedbackCorrect": "Yes! Shape A has 4 equal parts with 1 shaded. That is one quarter!",
+        "feedbackIncorrect": "Look for a shape with 4 equal parts. One of those parts should be shaded. That shows one quarter.",
+        "requiresSave": true,
+        "practiceLabel": "practice-fraction-matching"
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": true,
+        "requiresInteraction": true
+      }
+    },
+    {
+      "stepNumber": 8,
+      "stepType": "quick_check",
+      "title": "Quick Check!",
+      "purpose": "Test understanding of fair sharing (QC-F1)",
+      "owlText": "Quick check! 2 children want to share a chapati fairly. What fraction does each child get?",
+      "studentText": "2 children share one chapati fairly. What fraction does each child get?",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-qc-fair-sharing-gen",
+        "altText": "A chapati with 2 children beside it. The chapati is divided into 2 equal parts.",
+        "caption": "",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": true,
+        "fallbackType": "text",
+        "fallbackText": "A chapati with 2 children beside it. The chapati is divided into 2 equal parts."
+      },
+      "interaction": {
+        "type": "multiple_choice",
+        "question": "2 children share one chapati fairly. What fraction does each child get?",
+        "options": [
+          "1/4",
+          "1/3",
+          "1/2",
+          "1 whole"
+        ],
+        "correctAnswer": "1/2",
+        "correctIndex": 2,
+        "feedbackCorrect": "Correct! When 2 children share fairly, each gets one half. That is fair sharing!",
+        "feedbackIncorrect": "If 2 children share one chapati fairly, we cut it into 2 equal parts. Each child gets 1 out of 2 parts. That is one half.",
+        "requiresSave": true
+      },
+      "validation": {
+        "requiresOwlText": false,
+        "requiresStudentText": true,
+        "requiresMedia": true,
+        "requiresInteraction": true
+      }
+    },
+    {
+      "stepNumber": 9,
+      "stepType": "reflect",
+      "title": "Think About Your Learning",
+      "purpose": "Help the child reflect",
+      "owlText": "You did great today! Think about what you learned. How do you match a fraction to a shape? How do you sort shapes into halves and quarters?",
+      "studentText": "What did you learn about fraction games today?",
+      "media": {
+        "type": "none",
+        "approvalStatus": "approved",
+        "approved": true,
+        "humanReviewed": false,
+        "required": false,
+        "fallbackType": "none"
+      },
+      "interaction": {
+        "type": "reflection",
+        "question": "How do you feel about fraction games today?",
+        "options": [
+          "😊 I understand!",
+          "🤔 I am still learning",
+          "😟 I need more help"
+        ],
+        "correctAnswer": "",
+        "correctIndex": null,
+        "feedbackCorrect": "",
+        "feedbackIncorrect": "",
+        "requiresSave": false
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": false,
+        "requiresInteraction": false
+      }
+    },
+    {
+      "stepNumber": 10,
+      "stepType": "complete",
+      "title": "You Did It!",
+      "purpose": "Celebrate completion",
+      "owlText": "Wonderful! You played fraction games today! You matched fractions to shapes and sorted them. Remember: count the equal parts to know the fraction. Keep practicing!",
+      "studentText": "You played fraction games! You can match and sort fractions!",
+      "media": {
+        "type": "svg",
+        "source": "generated",
+        "url": "",
+        "assetId": "svg-complete-digital-gen",
+        "altText": "Celebration with stars and a badge that says 'I played fraction games!'",
+        "caption": "",
+        "approvalStatus": "draft",
+        "approved": false,
+        "humanReviewed": false,
+        "required": false,
+        "fallbackType": "text",
+        "fallbackText": "Celebration with stars and a badge that says 'I played fraction games!'"
+      },
+      "interaction": {
+        "type": "none"
+      },
+      "validation": {
+        "requiresOwlText": true,
+        "requiresStudentText": true,
+        "requiresMedia": false,
+        "requiresInteraction": false
+      }
+    }
+  ],
+  "metadata": {
+    "generatedAt": "2026-06-17T12:00:00+00:00",
+    "generator": "fractions-source-pack-generated-v1",
+    "sourcePackVersion": "1.0.0-draft",
+    "validated": false,
+    "humanReviewed": false,
+    "approvedForLearners": false
+  }
+}
