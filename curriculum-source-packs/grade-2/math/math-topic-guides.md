@@ -93,3 +93,112 @@ Distractors: Numbers close to the answer
 - MUST have visual number support (chart, counters, number line)
 - Practice must require counting or number recognition
 - Quick Check must test number recognition
+
+---
+
+# Math Topic Guide: Numbers — Addition and Subtraction Relationships
+
+## Scope
+Grade 2 Mathematics, Strand 1: Numbers, Sub-strand 1.5: Subtraction
+Focus: Relationship between addition and subtraction, finding missing numbers
+
+## Prerequisite Knowledge
+- Addition within 100
+- Subtraction within 100
+- Understanding that addition and subtraction are related
+- Counting forward and backward
+
+## Learning Outcome
+By the end of the lesson, the learner should be able to work out missing numbers in patterns involving subtraction up to 100.
+
+## Child-Friendly Goal
+"Today we will learn how addition and subtraction are connected. We will find missing numbers by thinking about what was added or taken away."
+
+## Key Vocabulary
+- Add: put together, find the total
+- Subtract: take away, find what is left
+- Missing number: the number we need to find
+- Pattern: numbers that follow a rule
+- Fact family: addition and subtraction sentences using the same numbers
+- Inverse: opposite operation
+
+## Concrete Examples
+- If 5 + 3 = 8, then 8 - 3 = 5 and 8 - 5 = 3
+- If 12 - 4 = 8, then 8 + 4 = 12
+- Missing number: 7 + ___ = 15 → think: 15 - 7 = 8
+- Pattern: 2, 4, 6, 8, ___ → the missing number is 10
+
+## Visual/Manipulative Ideas
+- Number line (jump forward for addition, jump backward for subtraction)
+- Counters/beans (put together, take away)
+- Fact family triangles (three numbers connected by + and -)
+- Balance scale (both sides must be equal)
+- Missing box notation: □ + 5 = 12
+
+## Worked Example Pattern
+1. Show a fact family: 6 + 4 = 10, 4 + 6 = 10, 10 - 4 = 6, 10 - 6 = 4
+2. Show the connection: "Addition puts numbers together. Subtraction takes them apart."
+3. Find a missing number: "7 + ___ = 15. Think: what number added to 7 makes 15? Count forward from 7: 8, 9, 10, 11, 12, 13, 14, 15. That's 8 numbers. So 7 + 8 = 15."
+4. Check with subtraction: "15 - 7 = 8. Yes, it matches!"
+
+## Guided Practice Pattern
+- "If 9 + 6 = 15, what is 15 - 6? What is 15 - 9?"
+- "Find the missing number: 8 + ___ = 14. Think: 14 - 8 = ?"
+- "Complete the fact family: 5 + 7 = 12 → 7 + 5 = ___ → 12 - 5 = ___ → 12 - 7 = ___"
+- "What is the missing number in this pattern: 10, 8, 6, ___, 2?"
+
+## Independent Practice Pattern
+- Find missing numbers in addition and subtraction sentences
+- Complete fact families
+- Solve missing number patterns
+- Word problems with objects (not reading comprehension): "A basket has 12 fruits. 5 are oranges. How many are mangoes?"
+
+## Quick Check Template
+Question: "What is the missing number? 9 + ___ = 17"
+Options: ["6", "7", "8", "9"]
+Correct: 8 (because 17 - 9 = 8)
+Distractors: Numbers close to the answer
+
+## Correct Answer Rules
+- Correct answer must be the actual missing number
+- Explanation must show the inverse operation: "17 - 9 = 8, so 9 + 8 = 17"
+
+## Distractor Rules
+- ±1 from correct answer
+- The other number in the sentence (e.g., 9 in "9 + ___ = 17")
+- A number that is too large or too small
+
+## Common Mistakes
+- Confusing addition and subtraction
+- Not using the inverse operation to find missing numbers
+- Arithmetic errors in simple addition/subtraction
+- Not checking the answer
+
+## Grade 2 Difficulty Limits
+- Numbers up to 100 only
+- No negative answers
+- No multiplication or division
+- No multi-step word problems
+- Focus: single missing number in addition or subtraction
+- No reading comprehension content
+- No English grammar/vocabulary content
+
+## Media Guidance
+- **Primary**: Number line SVG, fact family triangle SVG, counter illustrations
+- **Secondary**: Balance scale SVG
+- **Video**: Optional — addition/subtraction relationship songs
+- **No video required** for this topic
+
+## Contamination Rules (STRICT)
+- MUST NOT contain "reading comprehension"
+- MUST NOT contain "read a short passage"
+- MUST NOT contain "main idea"
+- MUST NOT contain "good readers"
+- MUST NOT contain "what did you learn about reading"
+- MUST NOT contain "sentence mostly about"
+- MUST NOT contain story comprehension language
+- MUST contain Math-specific language (add, subtract, missing number, fact family, pattern)
+- MUST have visual support (number line, counters, fact family triangles)
+- Practice must require finding missing numbers or completing fact families
+- Quick Check must test missing number finding
+- Reflection must ask about the Math concept (addition/subtraction relationship)

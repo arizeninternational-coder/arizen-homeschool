@@ -500,7 +500,7 @@ function buildLessonBlueprint(lesson, meta) {
   const keyVocabulary = themeContent ? themeContent.vocabulary.slice(0, 5) : extractKeyVocabulary(title, learningOutcome);
 
   // Build concept to teach
-  const conceptToTeach = skillContent ? skillContent.teach : deriveConcept(strand, subStrand);
+  const conceptToTeach = skillContent ? skillContent.teach : deriveConcept(strand, subStrand, subject);
 
   // Build misconception
   const misconceptionToAvoid = deriveMisconception(skillType);
@@ -803,9 +803,16 @@ function extractKeyVocabulary(title, learningOutcome) {
   return [...vocab].slice(0, 5);
 }
 
-function deriveConcept(strand, subStrand) {
+function deriveConcept(strand, subStrand, subject) {
+  const sub = (subject || '').toLowerCase();
+  const isNonEnglish = sub.includes('math') || sub.includes('kiswahili') || 
+    sub.includes('environmental') || sub.includes('hygiene') || 
+    sub.includes('movement') || sub.includes('science') || sub.includes('social');
   const text = `${strand} ${subStrand}`.toLowerCase();
-  if (text.includes('reading')) return 'reading comprehension';
+  if (text.includes('reading')) {
+    if (isNonEnglish) return 'unsupported_needs_source_pack';
+    return 'reading comprehension';
+  }
   if (text.includes('writing')) return 'writing skills';
   if (text.includes('listening')) return 'listening skills';
   if (text.includes('speaking')) return 'speaking skills';
@@ -813,6 +820,7 @@ function deriveConcept(strand, subStrand) {
   if (text.includes('vocabulary')) return 'vocabulary';
   if (text.includes('grammar') || text.includes('sentence')) return 'grammar';
   if (text.includes('punctuation')) return 'punctuation';
+  if (isNonEnglish) return 'unsupported_needs_source_pack';
   return 'language skills';
 }
 

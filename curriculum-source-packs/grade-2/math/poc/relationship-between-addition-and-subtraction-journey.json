@@ -1,0 +1,148 @@
+{
+  "lessonId": "cd845a68-f275-4f7f-b8a8-7d4887b95cda",
+  "title": "Relationship Between Addition and Subtraction",
+  "subject": "Mathematics",
+  "strand": "Numbers",
+  "subStrand": "1.5 Subtraction",
+  "learningOutcome": "By the end of the lesson, the learner should be able to work out missing numbers in patterns involving subtraction up to 100",
+  "childFriendlyGoal": "Today we will learn how addition and subtraction are connected. We will find missing numbers by thinking about what was added or taken away.",
+  "grade": 2,
+  "journey": [
+    {
+      "id": "step-01",
+      "stepType": "welcome",
+      "title": "Welcome!",
+      "studentText": "",
+      "owlText": "Hello, friend! Today we will learn a special Math secret: addition and subtraction are connected! If you know an addition fact, you can find a subtraction fact. Are you ready to discover this secret?",
+      "interaction": { "type": "none" },
+      "media": {
+        "illustration": {
+          "altText": "Fact family triangle showing 5, 3, 8 with + and - signs",
+          "description": "A triangle with 5, 3, and 8 at the corners, showing 5+3=8, 3+5=8, 8-3=5, 8-5=3"
+        }
+      }
+    },
+    {
+      "id": "step-02",
+      "stepType": "mission",
+      "title": "Our Mission",
+      "studentText": "",
+      "owlText": "Today we will learn how to find missing numbers using the connection between addition and subtraction. If you know 5 + 3 = 8, you also know 8 - 3 = 5! Let us begin!",
+      "interaction": { "type": "none" },
+      "media": {}
+    },
+    {
+      "id": "step-03",
+      "stepType": "think_first",
+      "title": "Think First!",
+      "studentText": "",
+      "owlText": "If you have 7 mangoes and your friend gives you 4 more, how many mangoes do you have altogether? Now if you eat 4 mangoes, how many are left? Did you notice? We added 4, then we took away 4. Addition and subtraction are opposites!",
+      "interaction": {
+        "type": "open_response",
+        "prompt": "Tell a story about adding something and then taking the same amount away. What happens?",
+        "hint": "Think about getting something and then giving back the same amount."
+      },
+      "media": {}
+    },
+    {
+      "id": "step-04",
+      "stepType": "learn",
+      "title": "Learn It",
+      "studentText": "Addition and subtraction are **opposites**.\n\nIf you know: **5 + 3 = 8**\n\nYou also know:\n- **3 + 5 = 8** (add the same numbers, different order)\n- **8 - 3 = 5** (take away what you added)\n- **8 - 5 = 3** (take away the other number)\n\nThese four sentences are called a **fact family**.\n\n**Finding missing numbers:**\n\nIf 7 + ___ = 15, think: what number added to 7 makes 15?\n\nUse subtraction: 15 - 7 = 8\n\nSo 7 + **8** = 15\n\n**Check:** 15 - 8 = 7 ✓",
+      "owlText": "",
+      "interaction": { "type": "none" },
+      "media": {
+        "illustration": {
+          "altText": "Fact family triangle: 5, 3, 8 with all four number sentences",
+          "description": "A triangle diagram showing 5, 3, and 8 at corners with arrows showing 5+3=8, 3+5=8, 8-3=5, 8-5=3"
+        }
+      }
+    },
+    {
+      "id": "step-05",
+      "stepType": "connect",
+      "title": "Real Life Connection",
+      "studentText": "We use addition and subtraction every day:\n\n• **Shopping:** You have 20 shillings. You buy a book for 12 shillings. How much is left? 20 - 12 = 8 shillings.\n\n• **Sharing fruits:** There are 15 bananas. 6 are eaten. How many are left? 15 - 6 = 9 bananas.\n\n• **Counting people:** 8 children are playing. 3 more join. How many now? 8 + 3 = 11 children.\n\nAddition puts groups together. Subtraction takes them apart. They are opposites!",
+      "owlText": "Can you think of a time you added something and then took some away? Tell someone your story!",
+      "interaction": {
+        "type": "open_response",
+        "prompt": "Write or say: A time when you added something and then took some away.",
+        "hint": "Think about sharing food, counting toys, or spending money."
+      },
+      "media": {}
+    },
+    {
+      "id": "step-06",
+      "stepType": "example",
+      "title": "Watch and Learn",
+      "studentText": "**Worked Example 1:** Find the missing number.\n\n9 + ___ = 17\n\nStep 1: Think: what number added to 9 makes 17?\nStep 2: Use subtraction: 17 - 9 = 8\nStep 3: So 9 + **8** = 17\nStep 4: Check: 17 - 8 = 9 ✓\n\n**Worked Example 2:** Complete the fact family.\n\n6 + 9 = 15\n\nThe fact family is:\n- 6 + 9 = 15\n- 9 + 6 = 15\n- 15 - 6 = 9\n- 15 - 9 = 6\n\n**Worked Example 3:** Find the pattern.\n\n20, 17, 14, 11, ___\n\nStep 1: What is the pattern? 20 - 3 = 17, 17 - 3 = 14, 14 - 3 = 11\nStep 2: The pattern is subtract 3\nStep 3: 11 - 3 = **8**\n\nThe missing number is **8**.",
+      "owlText": "",
+      "interaction": { "type": "none" },
+      "media": {
+        "illustration": {
+          "altText": "Number line showing 9 to 17 with 8 jumps",
+          "description": "A number line from 0 to 20 with an arrow jumping from 9 to 15, showing 9 + 8 = 17"
+        }
+      }
+    },
+    {
+      "id": "step-07",
+      "stepType": "practice",
+      "title": "Your Turn!",
+      "studentText": "**Find the missing number:**\n\n1) 8 + ___ = 14 → Think: 14 - 8 = ___\n\n2) ___ + 6 = 13 → Think: 13 - 6 = ___\n\n3) 16 - ___ = 9 → Think: 16 - 9 = ___\n\n4) 7 + 9 = ___\n\n5) ___ - 5 = 8 → Think: 8 + 5 = ___\n\n**Complete the fact family:**\n\n6) 7 + 8 = 15 → 8 + ___ = 15 → 15 - 7 = ___ → 15 - 8 = ___\n\n**Find the missing number in the pattern:**\n\n7) 25, 22, 19, ___, 13 → Pattern: subtract ___\n\n8) ___, 18, 15, 12, 9 → Pattern: subtract 3",
+      "owlText": "Use subtraction to find missing addition numbers. Use addition to find missing subtraction numbers. Draw a number line if you need help!",
+      "interaction": {
+        "type": "open_response",
+        "prompt": "Write your answers. Show your working!",
+        "hint": "For missing addition: subtract. For missing subtraction: think what was taken away."
+      },
+      "media": {}
+    },
+    {
+      "id": "step-08",
+      "stepType": "quick_check",
+      "title": "Quick Check!",
+      "studentText": "",
+      "owlText": "",
+      "interaction": {
+        "type": "multiple_choice",
+        "question": "What is the missing number? 8 + ___ = 15",
+        "options": ["6", "7", "8", "9"],
+        "correctIndex": 1,
+        "explanation": "Correct! 15 - 8 = 7, so 8 + 7 = 15. We used subtraction to find the missing addition number."
+      },
+      "media": {}
+    },
+    {
+      "id": "step-09",
+      "stepType": "reflect",
+      "title": "Think About Your Learning",
+      "studentText": "",
+      "owlText": "What did you learn about addition and subtraction today? How can you find a missing number in an addition sentence? What about in a subtraction sentence? Can you explain the connection to someone?",
+      "interaction": {
+        "type": "open_response",
+        "prompt": "Tell or write: How are addition and subtraction connected? How do you find a missing number?",
+        "hint": "Think about fact families and using the opposite operation."
+      },
+      "media": {}
+    },
+    {
+      "id": "step-10",
+      "stepType": "complete",
+      "title": "You Did It! 🏆",
+      "studentText": "",
+      "owlText": "Amazing work! Today you learned that addition and subtraction are opposites. You can use one to check the other. You found missing numbers and completed fact families. Keep practising and you will be a Math champion! 🌟",
+      "interaction": { "type": "none" },
+      "media": {}
+    }
+  ],
+  "metadata": {
+    "generator": "manual-poc",
+    "sourcePack": "curriculum-source-packs/grade-2/math/math-topic-guides.md",
+    "topic": "Numbers/Addition and Subtraction Relationships",
+    "grade": 2,
+    "subject": "Mathematics",
+    "contaminationCheck": "PASSED",
+    "createdAt": "2026-06-21"
+  }
+}

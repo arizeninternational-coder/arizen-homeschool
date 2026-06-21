@@ -41,6 +41,41 @@ function determineSkillType(strand, subStrand, title, subject) {
     return 'reading comprehension';
   }
   
+  // Same guard for strand/sub-strand fallback
+  
+  // DEFAULT: Never return 'reading comprehension'
+  if (isNonEnglish) return 'unsupported_needs_source_pack';
+  return 'unsupported_needs_source_pack';
+}
+```
+
+### Fix 2: Call site now passes subject
+
+```javascript
+// Before:
+const skillType = determineSkillType(strand, subStrand, title);
+
+// After:
+const skillType = determineSkillType(strand, subStrand, title, subject);
+```
+
+### Fix 3: `deriveConcept()` also guarded
+
+The `deriveConcept()` function had the same bug — if strand/sub-strand contained "reading", it returned "reading comprehension" regardless of subject. Now also accepts subject parameter and returns `unsupported_needs_source_pack` for non-English subjects.
+
+```javascript
+function determineSkillType(strand, subStrand, title, subject) {
+  const sub = (subject || '').toLowerCase();
+  const isNonEnglish = sub.includes('math') || sub.includes('kiswahili') || 
+    sub.includes('environmental') || sub.includes('hygiene') || 
+    sub.includes('movement') || sub.includes('science') || sub.includes('social');
+  
+  // For "reading comprehension" detection:
+  if (titleLower.includes('reading') || titleLower.includes('read') || titleLower.includes('comprehension')) {
+    if (isNonEnglish) return 'unsupported_needs_source_pack';
+    return 'reading comprehension';
+  }
+  
   // Same for strand/sub-strand fallback
   
   // DEFAULT: Never return 'reading comprehension'
