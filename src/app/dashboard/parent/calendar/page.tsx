@@ -67,21 +67,9 @@ export default function ParentCalendarPage() {
               }
             }
           }
-          // Add streak days
-          if (child.streak > 0) {
-            for (let i = 0; i < Math.min(child.streak, 7); i++) {
-              const d = new Date();
-              d.setDate(d.getDate() - i);
-              newEvents.push({
-                id: `streak-${child.id}-${d.toISOString().split("T")[0]}`,
-                title: "Learning streak",
-                date: d.toISOString().split("T")[0],
-                type: "achievement",
-                completed: true,
-                childName: child.name || child.displayName,
-              });
-            }
-          }
+          // Note: streak days are no longer fabricated from a counter.
+          // The streak is shown as a single summary metric on the dashboard.
+          // Real activity events (lessons, check-ins) are what matter on the calendar.
         }
       }
 

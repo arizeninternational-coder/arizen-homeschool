@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { getAuthUser } from "@/lib/api-guard";
+import { updateStreak } from "@/lib/streak";
 export const dynamic = "force-dynamic";
 
 const VALID_EMOTIONS = ["HAPPY", "CALM", "CURIOUS", "OKAY", "SAD", "WORRIED", "TIRED", "FRUSTRATED"];
@@ -71,7 +72,11 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (error) throw error;
-    return NextResponse.json({ checkin: created, updated: false }, { status: 201 });
+
+    // Update streak — check-in counts as a learning day
+    const streak = await updateStreak(learnerId);
+
+    return NextResponse.json({ checkin: created, updated: false, streak }, { status: 201 });
   } catch (err: any) {
     console.error("[CHECKIN] Error:", err);
     return NextResponse.json({ error: err.message || "Failed to save check-in" }, { status: 500 });

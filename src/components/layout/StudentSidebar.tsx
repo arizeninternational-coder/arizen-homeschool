@@ -10,8 +10,6 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
-const DAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
-
 const NAV_ITEMS = [
   { icon: Home, label: "Dashboard", href: "/dashboard/student", active: true },
   { icon: BookOpen, label: "My Subjects", href: "/dashboard/student/subjects", active: true },
@@ -25,20 +23,12 @@ const NAV_ITEMS = [
   { icon: Settings, label: "Settings", href: "/dashboard/student/settings", active: true },
 ];
 
-function getMonday(d: Date): Date {
-  const date = new Date(d);
-  const day = date.getDay();
-  const diff = date.getDate() - day + (day === 0 ? -6 : 1);
-  date.setDate(diff);
-  date.setHours(0, 0, 0, 0);
-  return date;
-}
-
 export function StudentSidebar({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profile, setProfile] = useState<any>(null);
   const [summary, setSummary] = useState<any>(null);
+  const [streakData, setStreakData] = useState<any>(null);
 
   useEffect(() => {
     fetch("/api/learner/profile", { credentials: "include" })
@@ -51,6 +41,11 @@ export function StudentSidebar({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
+    fetch("/api/learner/streak-history", { credentials: "include" })
+      .then(r => r.json()).then(d => setStreakData(d)).catch(() => {});
+  }, []);
+
+  useEffect(() => {
     if (mobileOpen) document.body.style.overflow = "hidden";
     else document.body.style.overflow = "";
     return () => { document.body.style.overflow = ""; };
@@ -58,20 +53,11 @@ export function StudentSidebar({ children }: { children: React.ReactNode }) {
 
   const studentName = profile?.displayName || profile?.name || "Student";
   const grade = profile?.grade || "";
-  const currentStreak = summary?.streak || profile?.currentStreak || 0;
+  const currentStreak = streakData?.currentStreak || summary?.streak || profile?.currentStreak || 0;
   const initials = studentName.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2);
 
-  const today = new Date();
-  const monday = getMonday(today);
-  const streakDays = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(monday);
-    d.setDate(d.getDate() + i);
-    const isToday = d.getDate() === today.getDate() && d.getMonth() === today.getMonth();
-    const isPast = d < new Date(today.setHours(0, 0, 0, 0));
-    const isWeekend = i >= 5;
-    const isActive = currentStreak > 0 && isPast && !isWeekend;
-    return { isToday, isPast, isWeekend, isActive, dayLabel: DAY_LABELS[i] };
-  });
+  // Use real active days from streak-history API, fallback to empty
+  const streakDays = streakData?.activeDays || [];
 
   const sidebarContent = (
     <div className="flex flex-col h-full bg-white shadow-[2px_0_16px_rgba(0,0,0,0.04)]">
@@ -94,7 +80,7 @@ export function StudentSidebar({ children }: { children: React.ReactNode }) {
             <span className="text-lg font-black text-orange-600 leading-none">{currentStreak}<span className="text-xs font-bold">d</span></span>
           </div>
           <div className="grid grid-cols-7 gap-1">
-            {streakDays.map((day, i) => (
+            {streakDays.map((day: any, i: number) => (
               <div key={i} className="flex flex-col items-center gap-0.5">
                 <span className={cn(
                   "text-[8px] font-bold",
@@ -106,11 +92,10 @@ export function StudentSidebar({ children }: { children: React.ReactNode }) {
                   "w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-bold border transition-all",
                   day.isToday ? "bg-indigo-600 text-white border-indigo-600 shadow-sm" :
                   day.isActive ? "bg-emerald-500 text-white border-emerald-500" :
-                  day.isPast && !day.isWeekend ? "bg-red-50 text-red-300 border-red-100" :
                   day.isWeekend ? "bg-gray-50 text-gray-300 border-gray-100" :
                   "bg-white text-gray-300 border-gray-100"
                 )}>
-                  {day.isToday ? "★" : day.isActive ? "✓" : day.isWeekend ? "·" : day.isPast ? "○" : "·"}
+                  {day.isToday ? "★" : day.isActive ? "✓" : day.isWeekend ? "·" : "·"}
                 </div>
               </div>
             ))}

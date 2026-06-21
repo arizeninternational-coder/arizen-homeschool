@@ -4,6 +4,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { getAuthUser } from "@/lib/api-guard";
+import { updateStreak } from "@/lib/streak";
 export const dynamic = "force-dynamic";
 
 function safeRewardValue(reward: any): number {
@@ -16,45 +17,7 @@ function safeRewardValue(reward: any): number {
   return 0;
 }
 
-// ── Nairobi timezone helpers ──
-// Kenya uses Africa/Nairobi (UTC+3). All streak day boundaries must use
-// Nairobi calendar dates, not UTC, so that a learner completing lessons
-// late at night (e.g. 11 PM EAT = 8 PM UTC) is counted on the correct day.
-const NAIROBI_TZ = "Africa/Nairobi";
 
-/**
- * Returns a YYYY-MM-DD string representing the date in Africa/Nairobi
- * for the given Date object (defaults to now).
- */
-function getNairobiDateKey(d: Date = new Date()): string {
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: NAIROBI_TZ,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(d); // en-CA gives YYYY-MM-DD
-}
-
-/**
- * Returns the number of calendar days (in Nairobi time) between two dates.
- * Positive when `later` is after `earlier`.
- */
-function nairobiDaysBetween(earlier: Date, later: Date): number {
-  const fmt = new Intl.DateTimeFormat("en-CA", {
-    timeZone: NAIROBI_TZ,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
-  // Parse the YYYY-MM-DD back into a Date at midnight Nairobi
-  // We compare using UTC representations of the Nairobi midnight
-  const earlierKey = fmt.format(earlier);
-  const laterKey = fmt.format(later);
-  // Use noon UTC of each date key to avoid DST edge cases
-  const earlierMs = new Date(earlierKey + "T12:00:00Z").getTime();
-  const laterMs = new Date(laterKey + "T12:00:00Z").getTime();
-  return Math.round((laterMs - earlierMs) / (1000 * 60 * 60 * 24));
-}
 
 export async function POST(req: NextRequest) {
   try {
@@ -277,59 +240,8 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // ── Streak logic (Africa/Nairobi timezone) ──
-    const nowDate = new Date();
-    const todayKey = getNairobiDateKey(nowDate);
-
-    const { data: streakRecord } = await supabase
-      .from("Streak")
-      .select("id, currentCount, lastDate, bestCount")
-      .eq("learnerId", learnerId)
-      .eq("streakType", "daily_learning")
-      .maybeSingle();
-
-    let newStreak = 1;
-    if (streakRecord) {
-      const lastDate = new Date(streakRecord.lastDate);
-      const diffDays = nairobiDaysBetween(lastDate, nowDate);
-
-      if (diffDays === 0) {
-        // Same Nairobi calendar day — streak unchanged
-        newStreak = streakRecord.currentCount;
-      } else if (diffDays === 1) {
-        // Consecutive Nairobi day — increment
-        newStreak = streakRecord.currentCount + 1;
-      } else {
-        // Gap of 2+ Nairobi days — reset to 1
-        newStreak = 1;
-      }
-
-      // Only write to DB if the streak count actually changes
-      if (newStreak !== streakRecord.currentCount || diffDays > 0) {
-        await supabase
-          .from("Streak")
-          .update({
-            currentCount: newStreak,
-            lastDate: nowDate.toISOString(),
-            bestCount: Math.max(streakRecord.bestCount || 0, newStreak),
-          })
-          .eq("id", streakRecord.id);
-      }
-    } else {
-      await supabase.from("Streak").insert({
-        learnerId,
-        streakType: "daily_learning",
-        currentCount: 1,
-        lastDate: nowDate.toISOString(),
-        bestCount: 1,
-      });
-    }
-
-    // Update learner profile lastActivityDate
-    await supabase
-      .from("LearnerProfile")
-      .update({ lastActivityDate: nowDate.toISOString() })
-      .eq("id", learnerId);
+    // ── Streak logic (delegated to shared helper) ──
+    const newStreak = await updateStreak(learnerId);
 
     // ── Badge unlocking ──
     const newlyUnlocked: string[] = [];
@@ -343,13 +255,14 @@ export async function POST(req: NextRequest) {
 
     const { data: latestProfile } = await supabase
       .from("LearnerProfile")
-      .select("totalXp, currentStreak")
+      .select("totalXp")
       .eq("id", learnerId)
       .maybeSingle();
 
     const completedCount = totalCompletedLessons || 0;
     const currentXp = latestProfile?.totalXp || 0;
-    const currentStreakVal = latestProfile?.currentStreak || 0;
+    // Use the freshly computed streak value, not the denormalized profile field
+    const currentStreakVal = newStreak;
 
     // Check each badge rule and award if newly earned
     const badgeRules = [
