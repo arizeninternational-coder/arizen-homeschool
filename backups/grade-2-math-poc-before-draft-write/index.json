@@ -1,0 +1,16 @@
+{
+  "id": "cd845a68-f275-4f7f-b8a8-7d4887b95cda",
+  "title": "Relationship Between Addition and Subtraction",
+  "grade": "2",
+  "subject": "Mathematics",
+  "strand": "Numbers",
+  "sub_strand": "1.5 Subtraction",
+  "status": "PUBLISHED",
+  "isAvailable": true,
+  "updatedAt": "2026-06-10T08:16:11.338+00:00",
+  "studentJourneySteps": 10,
+  "studentJourneyDraftSteps": 10,
+  "studentJourneyFirstStepType": "welcome",
+  "studentJourneyDraftFirstStepType": "welcome",
+  "backupTimestamp": "2026-06-10T08:16:11.338+00:00"
+}
