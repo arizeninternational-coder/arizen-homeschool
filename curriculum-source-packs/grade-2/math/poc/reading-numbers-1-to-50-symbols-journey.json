@@ -1,0 +1,148 @@
+{
+  "lessonId": "377e0d32-066d-4bb2-8fb3-a3c790989905",
+  "title": "Reading Numbers 1 to 50 in Symbols",
+  "subject": "Mathematics",
+  "strand": "Numbers",
+  "subStrand": "1.1 Number Concept",
+  "learningOutcome": "By the end of the lesson, the learner should be able to read numbers 1-50 in symbols",
+  "childFriendlyGoal": "Today we will learn to read number symbols from 1 to 50. We will match numbers to groups of objects.",
+  "grade": 2,
+  "journey": [
+    {
+      "id": "step-01",
+      "stepType": "welcome",
+      "title": "Welcome!",
+      "studentText": "",
+      "owlText": "Hello, friend! Today we will learn to read number symbols. We will count objects and find the number that shows how many. Are you ready to be a number detective?",
+      "interaction": { "type": "none" },
+      "media": {
+        "illustration": {
+          "altText": "Number chart 1-50 with colorful numbers",
+          "description": "A colorful number chart showing numbers 1 to 50 in rows of 10"
+        }
+      }
+    },
+    {
+      "id": "step-02",
+      "stepType": "mission",
+      "title": "Our Mission",
+      "studentText": "",
+      "owlText": "Today we will read number symbols from 1 to 50. We will count objects and match them to the correct number. Let us begin!",
+      "interaction": { "type": "none" },
+      "media": {}
+    },
+    {
+      "id": "step-03",
+      "stepType": "think_first",
+      "title": "Think First!",
+      "studentText": "",
+      "owlText": "Look around your home. Where do you see numbers? On a clock? On a door? On a phone? Numbers are everywhere! Can you think of a number you know?",
+      "interaction": {
+        "type": "open_response",
+        "prompt": "Write or say a number you know. Where did you see it?",
+        "hint": "Think about numbers you see every day — on clocks, doors, or books!"
+      },
+      "media": {}
+    },
+    {
+      "id": "step-04",
+      "stepType": "learn",
+      "title": "Learn It",
+      "studentText": "Every group of objects has a number that shows how many.\n\n**Example:** If we have 23 beans, the number symbol is **23**.\n\nWe can count: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23!\n\nThe number **23** means twenty-three.\n\n**Tip:** We can use a number chart to help us. Find 23 on the chart. It comes after 22 and before 24.",
+      "owlText": "",
+      "interaction": { "type": "none" },
+      "media": {
+        "illustration": {
+          "altText": "23 beans with number symbol 23 and number chart showing position",
+          "description": "A drawing of 23 beans grouped near the number symbol 23, with a number chart highlighting where 23 appears"
+        }
+      }
+    },
+    {
+      "id": "step-05",
+      "stepType": "connect",
+      "title": "Real Life Connection",
+      "studentText": "We see numbers everywhere:\n• On the clock — what number is the short hand pointing to?\n• On the door — what is your house number?\n• On a book — what page are you on?\n• On a phone — what numbers do you press?\n\nNumbers help us count, tell time, and find things!",
+      "owlText": "Can you find 5 numbers in your home? Look around — numbers are hiding everywhere!",
+      "interaction": {
+        "type": "open_response",
+        "prompt": "Write or say 5 numbers you can find in your home.",
+        "hint": "Look at clocks, doors, books, calendars, or phones!"
+      },
+      "media": {}
+    },
+    {
+      "id": "step-06",
+      "stepType": "example",
+      "title": "Watch and Learn",
+      "studentText": "**Worked Example:**\n\nCount these objects: 🫘🫘🫘🫘🫘 🫘🫘🫘🫘🫘 🫘🫘🫘\n\nLet us count: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13\n\nThe number symbol is **13**.\n\nOn the number chart, 13 comes after 12 and before 14.\n\n**Another Example:**\n\n🪘🪘🪘🪘🪘 🪘🪘🪘🪘🪘 🪘🪘🪘🪘🪘 🪘🪘🪘🪘🪘 🪘🪘🪘🪘🪘\n\nCount: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25\n\nThe number symbol is **25**.",
+      "owlText": "",
+      "interaction": { "type": "none" },
+      "media": {
+        "illustration": {
+          "altText": "Number chart 1-50 with 13 and 25 highlighted",
+          "description": "A number chart from 1 to 50 with circles around 13 and 25, showing groups of objects above each"
+        }
+      }
+    },
+    {
+      "id": "step-07",
+      "stepType": "practice",
+      "title": "Your Turn!",
+      "studentText": "**Count and write the number:**\n\n1) 🫘🫘🫘🫘🫘 🫘🫘🫘🫘🫘 🫘🫘🫘 = ___\n\n2) 🪘🪘🪘🪘🪘 🪘🪘🪘🪘🪘 🪘🪘🪘🪘🪘 🪘🪘🪘🪘🪘 = ___\n\n3) ⭐⭐⭐⭐⭐ ⭐⭐⭐⭐⭐ ⭐⭐⭐⭐⭐ ⭐⭐⭐⭐⭐ ⭐⭐⭐⭐⭐ ⭐⭐⭐⭐⭐ ⭐⭐⭐⭐⭐ = ___\n\n**Match the number to the group:**\n\n4) 15 beans → which number? ___\n\n5) 30 stones → which number? ___\n\n6) Find 40 on the number chart. What number comes before it? ___ What number comes after it? ___",
+      "owlText": "Count carefully. Use the number chart if you need help. Remember: count each object once!",
+      "interaction": {
+        "type": "open_response",
+        "prompt": "Write your answers. Show your counting!",
+        "hint": "Count by ones. Use a number chart to check your answers."
+      },
+      "media": {}
+    },
+    {
+      "id": "step-08",
+      "stepType": "quick_check",
+      "title": "Quick Check!",
+      "studentText": "",
+      "owlText": "",
+      "interaction": {
+        "type": "multiple_choice",
+        "question": "What number is this? 🫘🫘🫘🫘🫘 🫘🫘🫘🫘🫘 🫘🫘🫘🫘🫘 🫘🫘🫘🫘🪘 🫘🫘🫘🫘🫘",
+        "options": ["24", "25", "26", "20"],
+        "correctIndex": 1,
+        "explanation": "Correct! Let us count: 5 + 5 + 5 + 5 + 5 = 25. The number symbol is 25."
+      },
+      "media": {}
+    },
+    {
+      "id": "step-09",
+      "stepType": "reflect",
+      "title": "Think About Your Learning",
+      "studentText": "",
+      "owlText": "What numbers did you learn to read today? How do you know which number shows how many objects? What helps you remember big numbers like 25 or 40?",
+      "interaction": {
+        "type": "open_response",
+        "prompt": "Tell or write: What is one thing you learned about numbers today?",
+        "hint": "Think about counting, number symbols, or the number chart!"
+      },
+      "media": {}
+    },
+    {
+      "id": "step-10",
+      "stepType": "complete",
+      "title": "You Did It! 🏆",
+      "studentText": "",
+      "owlText": "Amazing work! Today you learned to read number symbols from 1 to 50. You counted objects, matched numbers, and found numbers on the chart. Keep practising and you will know all your numbers! 🌟",
+      "interaction": { "type": "none" },
+      "media": {}
+    }
+  ],
+  "metadata": {
+    "generator": "manual-poc",
+    "sourcePack": "curriculum-source-packs/grade-2/math/math-topic-guides.md",
+    "topic": "Numbers/Reading and Representing Numbers",
+    "grade": 2,
+    "subject": "Mathematics",
+    "contaminationCheck": "PASSED",
+    "createdAt": "2026-06-21"
+  }
+}

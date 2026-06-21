@@ -482,8 +482,9 @@ function buildLessonBlueprint(lesson, meta) {
   const theme = extractTheme(title);
   const themeKey = getThemeKey(theme);
 
-  // Determine skill type from strand/sub-strand
-  const skillType = determineSkillType(strand, subStrand, title);
+  // Determine skill type from strand/sub-strand/subject
+  // SAFETY: subject is passed to prevent cross-subject contamination
+  const skillType = determineSkillType(strand, subStrand, title, subject);
 
   // Get theme-specific content
   const themeContent = THEME_CONTENT[themeKey] || null;
@@ -600,7 +601,14 @@ function getThemeKey(theme) {
   return null;
 }
 
-function determineSkillType(strand, subStrand, title) {
+function determineSkillType(strand, subStrand, title, subject) {
+  // SAFETY: If subject is explicitly non-English, never return English skill types
+  const sub = (subject || '').toLowerCase();
+  const isEnglish = sub.includes('english') || sub.includes('language activities');
+  const isMath = sub.includes('math');
+  const isKiswahili = sub.includes('kiswahili');
+  const isNonEnglish = isMath || isKiswahili || sub.includes('environmental') || sub.includes('hygiene') || sub.includes('movement') || sub.includes('science') || sub.includes('social');
+
   // Check title first — it's the most specific indicator
   const titleLower = (title || '').toLowerCase();
   if (titleLower.includes('rhyme') || titleLower.includes('syllable') || titleLower.includes('phonics') || titleLower.includes('sound') || titleLower.includes('pronunciation') || titleLower.includes('vocabulary') || titleLower.includes('word meaning')) return 'vocabulary';
@@ -608,7 +616,11 @@ function determineSkillType(strand, subStrand, title) {
   if (titleLower.includes('punctuation') || titleLower.includes('capital letter') || titleLower.includes('full stop') || titleLower.includes('question mark')) return 'punctuation';
   if (titleLower.includes('spelling') || titleLower.includes('spell')) return 'spelling';
   if (titleLower.includes('writing') || titleLower.includes('write') || titleLower.includes('handwriting') || titleLower.includes('guided writing') || titleLower.includes('sentence building')) return 'writing skills';
-  if (titleLower.includes('reading') || titleLower.includes('read') || titleLower.includes('comprehension')) return 'reading comprehension';
+  if (titleLower.includes('reading') || titleLower.includes('read') || titleLower.includes('comprehension')) {
+    // SAFETY: Only return reading comprehension for English subjects
+    if (isNonEnglish) return 'unsupported_needs_source_pack';
+    return 'reading comprehension';
+  }
   if (titleLower.includes('listening') || titleLower.includes('listen')) return 'listening skills';
   if (titleLower.includes('speaking') || titleLower.includes('speak') || titleLower.includes('greeting') || titleLower.includes('conversation')) return 'speaking skills';
 
@@ -619,11 +631,19 @@ function determineSkillType(strand, subStrand, title) {
   if (strandText.includes('punctuation')) return 'punctuation';
   if (strandText.includes('spelling')) return 'spelling';
   if (strandText.includes('writing') || strandText.includes('handwriting') || strandText.includes('guided writing')) return 'writing skills';
-  if (strandText.includes('reading') || strandText.includes('comprehension')) return 'reading comprehension';
+  if (strandText.includes('reading') || strandText.includes('comprehension')) {
+    // SAFETY: Only return reading comprehension for English subjects
+    if (isNonEnglish) return 'unsupported_needs_source_pack';
+    return 'reading comprehension';
+  }
   if (strandText.includes('listening')) return 'listening skills';
   if (strandText.includes('speaking') || strandText.includes('conversation')) return 'speaking skills';
 
-  return 'reading comprehension';
+  // SAFETY: Never default to reading comprehension for non-English subjects
+  if (isNonEnglish) return 'unsupported_needs_source_pack';
+
+  // For English subjects with no specific match, return unsupported rather than guessing
+  return 'unsupported_needs_source_pack';
 }
 
 function deriveChildFriendlyTitle(title, strand, subStrand) {
