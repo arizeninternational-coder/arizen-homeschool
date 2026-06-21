@@ -205,7 +205,6 @@ export function ViewerOwlGuide({ step, editable, onEdit }: { step: JourneyStep; 
     <div className="flex items-start gap-3 px-4 py-3 rounded-2xl bg-gradient-to-br from-sky-50/90 via-indigo-50/60 to-purple-50/40 border border-sky-200/50 shadow-sm mb-4">
       <OwlIcon size={44} expression={expression} />
       <div className="flex-1 min-w-0">
-        <p className="text-[10px] font-extrabold uppercase tracking-[0.12em] text-sky-600/70 mb-0.5">Owl Teacher says:</p>
         {editable && onEdit ? (
           <textarea
             value={step.owlText}

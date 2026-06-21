@@ -448,7 +448,6 @@ export default function AdminStudentLessonEditor({ params }: { params: Promise<{
               <div className="flex items-start gap-3 px-4 py-3 rounded-2xl bg-gradient-to-br from-sky-50/90 via-indigo-50/60 to-purple-50/40 border border-sky-200/50 shadow-sm mb-4">
                 <MessageCircle className="w-5 h-5 text-sky-500 flex-shrink-0 mt-0.5" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-[10px] font-extrabold uppercase tracking-[0.12em] text-sky-600/70 mb-0.5">Owl Teacher says:</p>
                   <p className="text-slate-700 text-sm leading-relaxed font-medium">{currentJourneyStep.owlText}</p>
                 </div>
               </div>

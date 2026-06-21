@@ -224,7 +224,7 @@ export default function ParentDashboard() {
             <SectionHeader title="Recent Activity" subtitle="Latest progress across your children" />
             {children.some(c => c.recentActivity && c.recentActivity.length > 0) ? (
               <div className="space-y-3">
-                {children.map((child) => (
+                {children.map((child) =>
                   (child.recentActivity || []).slice(0, 3).map((activity: any, i: number) => (
                     <div key={`${child.id}-${i}`} className="rounded-[1.25rem] bg-white/90 backdrop-blur-sm p-4 flex items-center gap-4 shadow-[0_1px_8px_rgba(0,0,0,0.02)] border border-white/60">
                       <div className="w-10 h-10 rounded-xl bg-primary-soft flex items-center justify-center flex-shrink-0">
@@ -233,7 +233,8 @@ export default function ParentDashboard() {
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-bold text-text truncate">{child.name || child.displayName}</p>
                         <p className="text-xs text-text-muted">
-                          {activity.completedAt ? "Completed" : "Worked on"} a lesson
+                          {activity.completedAt ? "Completed" : "Worked on"}{" "}
+                          <span className="font-semibold">{activity.lessonTitle || "a lesson"}</span>
                           {activity.lastAccessed && ` • ${new Date(activity.lastAccessed).toLocaleDateString()}`}
                         </p>
                       </div>
@@ -242,7 +243,7 @@ export default function ParentDashboard() {
                       )}
                     </div>
                   ))
-                ))}
+                )}
               </div>
             ) : (
               <div className="rounded-[1.75rem] bg-white/60 backdrop-blur-sm p-8 text-center border border-white/60">

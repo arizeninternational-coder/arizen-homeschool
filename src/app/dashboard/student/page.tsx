@@ -355,8 +355,9 @@ export default function StudentDashboard() {
           <div className="flex flex-wrap gap-2">
             {subjects.map((subject: string) => {
               const colors = getSubjectColor(subject);
+              const subjectSlug = subject.toLowerCase().replace(/\s+/g, "-");
               return (
-                <Link key={subject} href="/dashboard/student/subjects">
+                <Link key={subject} href={`/dashboard/student/subjects/${subjectSlug}`}>
                   <span className={cn(
                     "inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold border transition-all hover:shadow-sm",
                     colors.bg, colors.text, "border-transparent"

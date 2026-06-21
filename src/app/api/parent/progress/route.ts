@@ -58,15 +58,20 @@ export async function GET(req: NextRequest) {
       completedCounts[learnerId] = count || 0;
     }
 
-    // Get recent activity per learner
+    // Get recent activity per learner (with lesson titles)
     const children = [];
     for (const profile of profiles) {
       const { data: recent } = await supabase
         .from("Progress")
-        .select("lessonId, completedAt, lastAccessed")
+        .select(`
+          lessonId,
+          completedAt,
+          lastAccessed,
+          lesson:Lesson(title)
+        `)
         .eq("learnerId", profile.id)
         .order("lastAccessed", { ascending: false })
-        .limit(3);
+        .limit(5);
 
       children.push({
         id: profile.userId,
@@ -78,8 +83,9 @@ export async function GET(req: NextRequest) {
         bestStreak: profile.bestStreak || 0,
         coins: walletMap.get(profile.id) || 0,
         lessonsCompleted: completedCounts[profile.id] || 0,
-        recentActivity: (recent || []).map(r => ({
+        recentActivity: (recent || []).map((r: any) => ({
           lessonId: r.lessonId,
+          lessonTitle: r.lesson?.title || "Lesson",
           completedAt: r.completedAt,
           lastAccessed: r.lastAccessed,
         })),

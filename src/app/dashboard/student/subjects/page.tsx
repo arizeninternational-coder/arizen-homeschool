@@ -118,10 +118,12 @@ export default function SubjectsPage() {
           const color = CARD_COLORS[idx % CARD_COLORS.length];
           const hasLessons = subject.lessonCount > 0;
 
+          const subjectSlug = subject.name.toLowerCase().replace(/\s+/g, "-");
+
           return (
             <div key={subject.id} className="group">
               {hasLessons ? (
-                <Link href={`/dashboard/student/lessons/${subject.themeSlug}`} className="block">
+                <Link href={`/dashboard/student/subjects/${subjectSlug}`} className="block">
                   <FloatingCard className={cn("text-center", color.border)}>
                     <div className={cn("w-11 h-11 rounded-xl mx-auto mb-2.5 flex items-center justify-center", color.iconBg)}>
                       <Icon size={22} className={color.textColor} />

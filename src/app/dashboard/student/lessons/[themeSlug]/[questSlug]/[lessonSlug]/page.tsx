@@ -145,7 +145,6 @@ function OwlGuideInline({ step }: { step: JourneyStep }) {
         <OwlTeacher size={36} expression={expression} />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-[9px] font-extrabold uppercase tracking-[0.1em] text-sky-600/60 mb-0.5">Owl says:</p>
         <p className="text-slate-700 text-sm leading-snug font-medium">{step.owlText}</p>
       </div>
     </div>
@@ -422,7 +421,6 @@ function SlideStepView({ step, stepNumber, totalSteps, interaction, setInteracti
             <OwlTeacher size={48} expression={OWL_EXPRESSIONS[step.stepType] || 'happy'} />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[10px] font-extrabold uppercase tracking-[0.12em] text-sky-600/70 mb-1">Owl Teacher says:</p>
             <p className="text-slate-700 text-base lg:text-lg leading-relaxed font-medium">{safeOwlText}</p>
           </div>
         </div>
@@ -490,7 +488,10 @@ function SlideStepView({ step, stepNumber, totalSteps, interaction, setInteracti
             <div className="prose prose-sm max-w-none text-sky-900 mb-3" dangerouslySetInnerHTML={{ __html: step.studentText.replace(/\\n/g, '<br/>') }} />
           )}
           {(!step.studentText || step.studentText === "Practice") && !practiceQuestion ? (
-            <p className="text-base font-bold text-sky-900 mb-1.5 flex items-center gap-2"><Pencil className="w-4 h-4" /> {PRACTICE_LABELS[lang] || PRACTICE_LABELS.en}</p>
+            <div>
+              <p className="text-base font-bold text-sky-900 mb-1.5 flex items-center gap-2"><Pencil className="w-4 h-4" /> {PRACTICE_LABELS[lang] || PRACTICE_LABELS.en}</p>
+              <p className="text-sm text-sky-700">Try what you just learned! Look back at the example if you need help.</p>
+            </div>
           ) : null}
           {practiceType === "multiple_choice" && hasOptions && practiceQuestion && (
             <>
