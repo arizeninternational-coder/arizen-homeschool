@@ -87,7 +87,7 @@ function getRewardValue(value: any): number {
   return 0;
 }
 
-function buildLessonJourney(lesson: LessonData | null): JourneyStep[] {
+function buildLessonJourney(lesson: LessonData | null, mode: "live" | "draft" = "live"): JourneyStep[] {
   if (!lesson?.contentBlocks) return [];
   try {
     const cb = typeof lesson.contentBlocks === "string" ? JSON.parse(lesson.contentBlocks) : lesson.contentBlocks;
@@ -96,17 +96,27 @@ function buildLessonJourney(lesson: LessonData | null): JourneyStep[] {
       // Legacy array format — convert to journey steps
       return convertLegacyBlocksToJourney(cb, lesson.title || "Lesson");
     }
-    // Dict format — use published journey (non-empty), then draft, otherwise empty
+    // Dict format — use mode to select which journey to show
+    if (mode === "draft") {
+      const rawDraft = cb?.studentJourneyDraft;
+      const draftJourney = Array.isArray(rawDraft) ? rawDraft : (rawDraft && Array.isArray(rawDraft.steps) ? rawDraft.steps : []);
+      if (draftJourney.length > 0) return draftJourney;
+      // Fallback to live if no draft
+      const publishedJourney = Array.isArray(cb?.studentJourney) ? cb.studentJourney : [];
+      return publishedJourney;
+    }
+    // Live mode: published journey first
     const publishedJourney = Array.isArray(cb?.studentJourney) ? cb.studentJourney : [];
+    if (publishedJourney.length > 0) return publishedJourney;
+    // Fallback to draft if no published
     const rawDraft = cb?.studentJourneyDraft;
     const draftJourney = Array.isArray(rawDraft) ? rawDraft : (rawDraft && Array.isArray(rawDraft.steps) ? rawDraft.steps : []);
-    return publishedJourney.length > 0 ? publishedJourney : draftJourney;
-  } catch { return [];
-  }
+    return draftJourney;
+  } catch { return []; }
 }
+
 export default function AdminStudentLessonEditor({ params }: { params: Promise<{ id: string }> }) {
   const [lessonId, setLessonId] = useState<string>("");
-  const [lesson, setLesson] = useState<LessonData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
@@ -123,8 +133,9 @@ export default function AdminStudentLessonEditor({ params }: { params: Promise<{
   const [videoTitle, setVideoTitle] = useState<Record<number, string>>({});
   const [addingVideo, setAddingVideo] = useState<number | null>(null);
   const hasCompletedRef = useRef(false);
+  const [viewMode, setViewMode] = useState<"live" | "draft">("draft");
 
-  const journey = buildLessonJourney(lesson);
+  const journey = buildLessonJourney(lesson, viewMode);
   const totalSteps = journey.length;
   const isLastStep = currentStep >= totalSteps - 1;
   const clampedStep = Math.min(currentStep, Math.max(totalSteps - 1, 0));
@@ -344,6 +355,20 @@ export default function AdminStudentLessonEditor({ params }: { params: Promise<{
               {lesson?.isAvailable !== false ? "Visible" : "Hidden"}
             </span>
           )}
+          <div className="flex items-center gap-1 ml-2">
+            <button
+              onClick={() => { setViewMode("draft"); setCurrentStep(0); }}
+              className={`text-[10px] font-bold px-2 py-1 rounded-lg transition-all ${viewMode === "draft" ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}
+            >
+              📝 Draft
+            </button>
+            <button
+              onClick={() => { setViewMode("live"); setCurrentStep(0); }}
+              className={`text-[10px] font-bold px-2 py-1 rounded-lg transition-all ${viewMode === "live" ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}
+            >
+              🌐 Live
+            </button>
+          </div>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           {(missingIllustrations > 0 || missingVideos > 0) && (
@@ -403,14 +428,36 @@ export default function AdminStudentLessonEditor({ params }: { params: Promise<{
     </div>
   );
 
+  // ── Contamination detection ──
+  const contaminationInfo = (() => {
+    if (!lesson?.contentBlocks) return null;
+    try {
+      const cb = typeof lesson.contentBlocks === "string" ? JSON.parse(lesson.contentBlocks) : lesson.contentBlocks;
+      const CONTAMINATION_PHRASES = [
+        "reading comprehension", "main idea", "read a short passage",
+        "good readers", "reading passage", "passage about",
+        "tell the main idea", "what the story is mostly about",
+      ];
+      function check(steps: any[]): string[] {
+        if (!Array.isArray(steps) || steps.length === 0) return [];
+        const text = JSON.stringify(steps).toLowerCase();
+        return CONTAMINATION_PHRASES.filter(p => text.includes(p));
+      }
+      const liveContamination = check(cb?.studentJourney || []);
+      const draftContamination = check(cb?.studentJourneyDraft || []);
+      const hasDraft = Array.isArray(cb?.studentJourneyDraft) && cb.studentJourneyDraft.length > 0;
+      return { liveContamination, draftContamination, hasDraft };
+    } catch { return null; }
+  })();
+
   // ── Main slide view (reuses student rendering logic) ──
   const renderSlideView = () => {
-    if (!currentJourneyStep) {
+    if (!currentJourneyStep && journey.length === 0) {
       return (
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center bg-white rounded-2xl p-10 shadow-lg border border-slate-100 max-w-md">
             <BookOpen className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-            <h3 className="text-lg font-bold text-slate-800 mb-2">No journey steps yet</h3>
+            <h3 className="text-lg font-bold text-slate-800 mb-2">No {viewMode} journey steps</h3>
             <p className="text-sm text-slate-500 mb-4">Generate a journey draft from the lesson editor to preview it here.</p>
             <Link href={`/dashboard/admin/lessons/${lessonId}`}>
               <GradientButton variant="primary" size="sm" icon={<Sparkles className="w-4 h-4" />}>

@@ -74,6 +74,7 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
   const [aiDraft, setAiDraft] = useState<any[] | null>(null);
   const [aiMetadata, setAiMetadata] = useState<any>(null);
   const [hasApprovedJourney, setHasApprovedJourney] = useState(false);
+  const [activeJourneyTab, setActiveJourneyTab] = useState<"draft" | "live">("draft");
 
   // Video state
   const [videoStates, setVideoStates] = useState<Record<number, { loading: boolean; error: string | null; url: string; title: string }>>({});
@@ -608,6 +609,82 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
             </div>
           </div>
 
+          {/* Contamination warning + Draft/Live tabs */}
+          {(() => {
+            // Contamination detection
+            const CONTAMINATION_PHRASES = [
+              "reading comprehension", "main idea", "read a short passage",
+              "good readers", "reading passage", "passage about",
+              "tell the main idea", "what the story is mostly about",
+            ];
+            function checkContamination(steps: any[]): string[] {
+              if (!Array.isArray(steps) || steps.length === 0) return [];
+              const text = JSON.stringify(steps).toLowerCase();
+              return CONTAMINATION_PHRASES.filter(p => text.includes(p));
+            }
+            let liveContamination: string[] = [];
+            let draftContamination: string[] = [];
+            try {
+              const cb = typeof lesson?.contentBlocks === "string" ? JSON.parse(lesson.contentBlocks) : lesson?.contentBlocks;
+              liveContamination = checkContamination(cb?.studentJourney || []);
+              draftContamination = checkContamination(cb?.studentJourneyDraft || []);
+            } catch { /* ignore */ }
+            const liveHasContamination = liveContamination.length > 0;
+            const draftIsClean = draftContamination.length === 0 && (aiDraft?.length || 0) > 0;
+            const showWarning = liveHasContamination && draftIsClean;
+            const hasBothJourneys = (hasApprovedJourney || (aiDraft && aiDraft.length > 0));
+
+            if (!showWarning && !hasBothJourneys) return null;
+
+            return (
+              <div style={{ marginBottom: "1rem" }}>
+                {showWarning && (
+                  <div style={{
+                    padding: "10px 14px", borderRadius: 8,
+                    background: "#FEF3C7", border: "1px solid #F59E0B",
+                    marginBottom: "0.75rem", display: "flex", alignItems: "flex-start", gap: 8,
+                  }}>
+                    <AlertTriangle style={{ width: 16, height: 16, color: "#D97706", flexShrink: 0, marginTop: 2 }} />
+                    <div>
+                      <p style={{ fontSize: "0.75rem", fontWeight: 700, color: "#92400E", marginBottom: 2 }}>
+                        Live journey appears contaminated. Draft journey is clean and ready for review.
+                      </p>
+                      <p style={{ fontSize: "0.6875rem", color: "#B45309" }}>
+                        Live journey contains: {liveContamination.slice(0, 3).map(p => `"${p}"`).join(", ")}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                {hasBothJourneys && (
+                  <div style={{ display: "flex", gap: 4, marginBottom: "0.75rem" }}>
+                    <button
+                      onClick={() => setActiveJourneyTab("draft")}
+                      style={{
+                        padding: "4px 12px", borderRadius: 6, border: "1.5px solid #6366F1",
+                        background: activeJourneyTab === "draft" ? "#6366F1" : "#fff",
+                        color: activeJourneyTab === "draft" ? "#fff" : "#6366F1",
+                        fontWeight: 700, fontSize: "0.75rem", cursor: "pointer",
+                      }}
+                    >
+                      📝 Draft — not visible to students
+                    </button>
+                    <button
+                      onClick={() => setActiveJourneyTab("live")}
+                      style={{
+                        padding: "4px 12px", borderRadius: 6, border: `1.5px solid ${hasApprovedJourney ? "#10B981" : "#9CA3AF"}`,
+                        background: activeJourneyTab === "live" ? (hasApprovedJourney ? "#10B981" : "#9CA3AF") : "#fff",
+                        color: activeJourneyTab === "live" ? "#fff" : (hasApprovedJourney ? "#10B981" : "#9CA3AF"),
+                        fontWeight: 700, fontSize: "0.75rem", cursor: "pointer",
+                      }}
+                    >
+                      🌐 Live — currently visible to students
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+
           {/* Generate + Preview buttons */}
           <div style={{ display: "flex", gap: 8, marginBottom: "1rem", flexWrap: "wrap" }}>
             <button
@@ -699,26 +776,23 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
 
           {/* Journey steps display */}
           {(() => {
-            // Determine which journey to show: approved > draft > fallback
-            const journeyToShow = hasApprovedJourney
-              ? (() => {
-                  try {
-                    const cb = typeof lesson?.contentBlocks === "string"
-                      ? JSON.parse(lesson.contentBlocks)
-                      : lesson?.contentBlocks;
-                    return cb?.studentJourney || [];
-                  } catch { return []; }
-                })()
-              : (aiDraft || []);
+            // Determine which journey to show based on active tab
+            const cb = typeof lesson?.contentBlocks === "string"
+              ? JSON.parse(lesson.contentBlocks || "{}")
+              : (lesson?.contentBlocks || {});
+            const liveJourney: any[] = Array.isArray(cb?.studentJourney) ? cb.studentJourney : [];
+            const draftJourney: any[] = Array.isArray(cb?.studentJourneyDraft) ? cb.studentJourneyDraft : [];
+            const journeyToShow = activeJourneyTab === "live" ? liveJourney : (aiDraft || draftJourney);
+            const isLiveTab = activeJourneyTab === "live";
 
             if (journeyToShow.length === 0) {
               return (
                 <div style={{ textAlign: "center", padding: "1.5rem", color: colors.textMuted, fontSize: "0.8125rem" }}>
-                  <p style={{ marginBottom: "0.5rem" }}>No student journey yet.</p>
-                  <p>Fill in curriculum fields above, then click <strong>Generate Journey Draft</strong> to create one.</p>
-                  <p style={{ marginTop: "0.5rem", fontSize: "0.75rem" }}>
+                  <p style={{ marginBottom: "0.5rem" }}>No {isLiveTab ? "live" : "draft"} journey yet.</p>
+                  {!isLiveTab && <p>Fill in curriculum fields above, then click <strong>Generate Journey Draft</strong> to create one.</p>}
+                  {!isLiveTab && <p style={{ marginTop: "0.5rem", fontSize: "0.75rem" }}>
                     Or add content manually — a fallback journey will be built from your CBC fields.
-                  </p>
+                  </p>}
                 </div>
               );
             }
@@ -805,17 +879,16 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
           })()}
 
           {/* Student Journey Preview — list + step-by-step walkthrough */}
-          {showJourneyPreview && (hasApprovedJourney || (aiDraft && aiDraft.length > 0)) && (() => {
-            const previewJourney = hasApprovedJourney
-              ? (() => {
-                  try {
-                    const cb = typeof lesson?.contentBlocks === "string"
-                      ? JSON.parse(lesson.contentBlocks)
-                      : lesson?.contentBlocks;
-                    return cb?.studentJourney || [];
-                  } catch { return []; }
-                })()
-              : (aiDraft || []);
+          {showJourneyPreview && (() => {
+            const cb = typeof lesson?.contentBlocks === "string"
+              ? JSON.parse(lesson.contentBlocks || "{}")
+              : (lesson?.contentBlocks || {});
+            const liveJourney: any[] = Array.isArray(cb?.studentJourney) ? cb.studentJourney : [];
+            const draftJourney: any[] = Array.isArray(cb?.studentJourneyDraft) ? cb.studentJourneyDraft : [];
+            const previewJourney = activeJourneyTab === "live" ? liveJourney : (aiDraft || draftJourney);
+            const isLivePreview = activeJourneyTab === "live";
+
+            if (previewJourney.length === 0) return null;
 
             const stepIcons: Record<string, string> = {
               welcome: "🦉", mission: "🎯", think_first: "💭", learn: "📖",
@@ -833,7 +906,7 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
                   <div style={{ padding: "10px 16px", background: colors.success, color: "#fff", fontWeight: 700, fontSize: "0.8125rem", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <Play style={{ width: 14, height: 14 }} />
-                      Student Walkthrough — Step {currentPreviewStep + 1} of {previewJourney.length}
+                      {isLivePreview ? "Live" : "Draft"} Walkthrough — Step {currentPreviewStep + 1} of {previewJourney.length}
                     </div>
                     <button onClick={() => { setShowJourneyPreview(false); setPreviewMode("list"); }} style={{ background: "none", border: "none", color: "#fff", cursor: "pointer", fontSize: "0.75rem", fontWeight: 600 }}>
                       ✕ Exit
@@ -934,7 +1007,7 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
               <div style={{ marginTop: "1rem", border: `2px solid ${colors.primary}`, borderRadius: 12, overflow: "hidden" }}>
                 <div style={{ padding: "10px 16px", background: colors.primary, color: "#fff", fontWeight: 700, fontSize: "0.8125rem", display: "flex", alignItems: "center", gap: 8 }}>
                   <Eye style={{ width: 14, height: 14 }} />
-                  Student Preview — {previewJourney.length} steps
+                  {isLivePreview ? "Live" : "Draft"} Preview — {previewJourney.length} steps {isLivePreview ? "(visible to students)" : "(not visible to students)"}
                 </div>
                 <div style={{ padding: "12px 16px", background: "#fff" }}>
                   {previewJourney.map((step: any, i: number) => (
