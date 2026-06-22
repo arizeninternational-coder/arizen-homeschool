@@ -1,15 +1,17 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import {
   ArrowLeft, AlertCircle, Save, BookOpen, CheckCircle2, AlertTriangle, Info,
-  Sparkles, Eye, ThumbsUp, ThumbsDown, ChevronDown, ChevronUp, Play,
-  Trash2, ExternalLink, Video, Link2, X,
+  Sparkles, Eye, ChevronDown, ChevronUp, Play, Trash2, ExternalLink, Video,
+  Plus, GripVertical, Edit3, X, Check, Image, MessageCircle, HelpCircle,
+  Target, Lightbulb, PenTool, Award, Star, Flame, Copy, EyeOff,
 } from "lucide-react";
 import { ds, colors } from "@/lib/design-system";
+import { STEP_TYPE_ICONS, STEP_TYPE_LABELS, JOURNEY_STEP_TYPES, type JourneyStepType } from "@/lib/curriculum/lesson-journey";
+
+// ── Types ────────────────────────────────────────────────────────────────────
 
 interface LessonDetail {
   id: string;
@@ -25,7 +27,6 @@ interface LessonDetail {
   createdAt: string;
   updatedAt: string;
   quest?: { id: string; title: string; theme?: { id: string; title: string; grade: number } };
-  // CSV-imported meta fields
   strand: string;
   subStrand: string;
   learningOutcome: string;
@@ -50,11 +51,46 @@ interface LessonDetail {
   } | null;
 }
 
-const STATUS_OPTIONS = [
-  { value: "DRAFT", label: "Content Missing (Draft)" },
-  { value: "REVIEW", label: "In Review" },
-  { value: "PUBLISHED", label: "Published" },
-];
+interface JourneyStepData {
+  id: string;
+  stepType: JourneyStepType;
+  title: string;
+  studentText: string;
+  owlText: string;
+  mathDisplay?: string;
+  visualType?: string;
+  illustrationPrompt?: string;
+  interaction?: {
+    type: string;
+    question?: string;
+    prompt?: string;
+    options?: string[];
+    correctAnswer?: number | string;
+    hint?: string;
+  };
+  reflectionOptions?: string[];
+  materials?: string[];
+  video?: any;
+  media?: any;
+  estimatedMinutes?: number;
+}
+
+// ── Step type config ─────────────────────────────────────────────────────────
+
+const STEP_CONFIG: Record<JourneyStepType, { icon: string; label: string; color: string; description: string }> = {
+  welcome:    { icon: "🦉", label: "Welcome",     color: "#6366F1", description: "Greet the learner and set the tone" },
+  mission:    { icon: "🎯", label: "Mission",     color: "#7C3AED", description: "What will the learner achieve?" },
+  think_first:{ icon: "💭", label: "Think First",  color: "#D97706", description: "Activate prior knowledge" },
+  learn:      { icon: "📖", label: "Learn It",    color: "#059669", description: "Core teaching content" },
+  connect:    { icon: "🔗", label: "Connect",     color: "#0891B2", description: "Real-world connection" },
+  example:    { icon: "💡", label: "Example",     color: "#0284C7", description: "Worked examples" },
+  practice:   { icon: "✏️", label: "Practice",   color: "#0D9488", description: "Guided practice activities" },
+  quick_check:{ icon: "✅", label: "Quick Check",  color: "#65A30D", description: "Check understanding" },
+  reflect:    { icon: "🪞", label: "Reflect",     color: "#E11D48", description: "Reflection prompts" },
+  complete:   { icon: "🏆", label: "Done",        color: "#CA8A04", description: "Celebrate completion" },
+};
+
+// ── Main Component ───────────────────────────────────────────────────────────
 
 export default function AdminLessonEditPage({ params }: { params: { id: string } }) {
   const [lesson, setLesson] = useState<LessonDetail | null>(null);
@@ -63,65 +99,34 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
   const [error, setError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
-  // Journey state
-  const [generating, setGenerating] = useState(false);
-  const [generateError, setGenerateError] = useState<string | null>(null);
-  const [generateSuccess, setGenerateSuccess] = useState(false);
-  const [showJourneyPreview, setShowJourneyPreview] = useState(false);
-  const [previewMode, setPreviewMode] = useState<"list" | "step">("list");
-  const [currentPreviewStep, setCurrentPreviewStep] = useState(0);
+  // Journey steps state
+  const [journeySteps, setJourneySteps] = useState<JourneyStepData[]>([]);
+  const [editingStepIndex, setEditingStepIndex] = useState<number | null>(null);
+  const [editBuffer, setEditBuffer] = useState<JourneyStepData | null>(null);
   const [expandedStep, setExpandedStep] = useState<number | null>(null);
-  const [aiDraft, setAiDraft] = useState<any[] | null>(null);
-  const [aiMetadata, setAiMetadata] = useState<any>(null);
-  const [hasApprovedJourney, setHasApprovedJourney] = useState(false);
+
+  // Preview state
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewStep, setPreviewStep] = useState(0);
   const [activeJourneyTab, setActiveJourneyTab] = useState<"draft" | "live">("draft");
 
-  // Video state
-  const [videoStates, setVideoStates] = useState<Record<number, { loading: boolean; error: string | null; url: string; title: string }>>({});
-  const [illustrationStates, setIllustrationStates] = useState<Record<number, { loading: boolean; error: string | null }>>({});
-
-  // Extract journey info from lesson data
-  useEffect(() => {
-    if (lesson?.contentBlocks) {
-      try {
-        const cb = typeof lesson.contentBlocks === "string"
-          ? JSON.parse(lesson.contentBlocks)
-          : lesson.contentBlocks;
-        setAiDraft(cb?.studentJourneyDraft || null);
-        setAiMetadata(cb?.aiMetadata || null);
-        setHasApprovedJourney(
-          Array.isArray(cb?.studentJourney) && cb.studentJourney.length > 0
-        );
-      } catch {
-        setAiDraft(null);
-        setAiMetadata(null);
-        setHasApprovedJourney(false);
-      }
-    }
-  }, [lesson?.contentBlocks]);
-
-  // Form state
+  // Form state for lesson metadata
   const [form, setForm] = useState({
-    title: "",
-    description: "",
-    status: "DRAFT",
-    strand: "",
-    subStrand: "",
-    learningOutcome: "",
-    term: "",
-    week: "",
-    activityTitle: "",
-    activityInstructions: "",
-    questTitle: "",
-    questInstructions: "",
-    reflectionPrompt: "",
-    rewardCoins: 10,
-    rewardStars: 0,
-    estimatedDurationMinutes: 30,
-    difficulty: "medium",
-    xpReward: 50,
+    title: "", description: "", status: "DRAFT", strand: "", subStrand: "",
+    learningOutcome: "", term: "", week: "", activityTitle: "", activityInstructions: "",
+    questTitle: "", questInstructions: "", reflectionPrompt: "", rewardCoins: 10,
+    rewardStars: 0, estimatedDurationMinutes: 30, difficulty: "medium", xpReward: 50,
   });
 
+  // Dirty state tracking
+  const [dirtySteps, setDirtySteps] = useState<Set<number>>(new Set());
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  // Generation state
+  const [generating, setGenerating] = useState(false);
+  const [generateError, setGenerateError] = useState<string | null>(null);
+
+  // Load lesson
   useEffect(() => {
     async function load() {
       try {
@@ -131,28 +136,27 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
           const l = data.lesson;
           setLesson(l);
           setForm({
-            title: l.title || "",
-            description: l.description || "",
-            status: l.status || "DRAFT",
-            strand: l.strand || "",
-            subStrand: l.subStrand || "",
-            learningOutcome: l.learningOutcome || "",
-            term: l.term || "",
-            week: l.week || "",
-            activityTitle: l.activityTitle || "",
-            activityInstructions: l.activityInstructions || "",
-            questTitle: l.questTitle || "",
-            questInstructions: l.questInstructions || "",
-            reflectionPrompt: l.reflectionPrompt || "",
-            rewardCoins: l.rewardCoins || 10,
-            rewardStars: l.rewardStars || 0,
+            title: l.title || "", description: l.description || "", status: l.status || "DRAFT",
+            strand: l.strand || "", subStrand: l.subStrand || "", learningOutcome: l.learningOutcome || "",
+            term: l.term || "", week: l.week || "", activityTitle: l.activityTitle || "",
+            activityInstructions: l.activityInstructions || "", questTitle: l.questTitle || "",
+            questInstructions: l.questInstructions || "", reflectionPrompt: l.reflectionPrompt || "",
+            rewardCoins: l.rewardCoins || 10, rewardStars: l.rewardStars || 0,
             estimatedDurationMinutes: l.estimatedDurationMinutes || 30,
             difficulty: (typeof l.difficulty === "object" ? l.difficulty?.level : l.difficulty) || "medium",
             xpReward: (typeof l.xpReward === "object" ? l.xpReward?.base : l.xpReward) || 50,
           });
+          // Parse journey steps from contentBlocks
+          let cb: any = {};
+          try { cb = typeof l.contentBlocks === "string" ? JSON.parse(l.contentBlocks) : l.contentBlocks || {}; } catch {}
+          const steps = Array.isArray(cb.studentJourneyDraft) && cb.studentJourneyDraft.length > 0
+            ? cb.studentJourneyDraft
+            : Array.isArray(cb.studentJourney) && cb.studentJourney.length > 0
+              ? cb.studentJourney
+              : [];
+          setJourneySteps(steps);
         } else {
-          const errBody = await res.json().catch(() => ({}));
-          setError(errBody.error || "Failed to load lesson");
+          setError("Failed to load lesson");
         }
       } catch (err: any) {
         setError(err?.message || "Failed to load lesson");
@@ -163,25 +167,134 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
     load();
   }, [params.id]);
 
-  const updateField = (field: string, value: any) => {
-    setForm(prev => ({ ...prev, [field]: value }));
+  // Track unsaved changes
+  useEffect(() => {
+    setHasUnsavedChanges(dirtySteps.size > 0);
+  }, [dirtySteps]);
+
+  // Warn before leaving with unsaved changes
+  useEffect(() => {
+    const handler = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) e.preventDefault();
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [hasUnsavedChanges]);
+
+  // ── Step editing ──────────────────────────────────────────────────────────
+
+  const startEditingStep = (index: number) => {
+    setEditingStepIndex(index);
+    setEditBuffer({ ...journeySteps[index] });
+    setExpandedStep(index);
   };
+
+  const cancelEditingStep = () => {
+    setEditingStepIndex(null);
+    setEditBuffer(null);
+  };
+
+  const saveStepEdit = () => {
+    if (editBuffer === null || editingStepIndex === null) return;
+    const newSteps = [...journeySteps];
+    newSteps[editingStepIndex] = { ...editBuffer };
+    setJourneySteps(newSteps);
+    setDirtySteps(prev => new Set(prev).add(editingStepIndex));
+    setEditingStepIndex(null);
+    setEditBuffer(null);
+  };
+
+  const updateEditField = (field: string, value: any) => {
+    if (!editBuffer) return;
+    setEditBuffer({ ...editBuffer, [field]: value });
+  };
+
+  const addNewStep = (afterIndex: number) => {
+    const newStep: JourneyStepData = {
+      id: `step-${Date.now()}`,
+      stepType: "learn",
+      title: "New Step",
+      studentText: "",
+      owlText: "",
+    };
+    const newSteps = [...journeySteps];
+    newSteps.splice(afterIndex + 1, 0, newStep);
+    setJourneySteps(newSteps);
+    setDirtySteps(prev => new Set(prev).add(afterIndex + 1));
+    startEditingStep(afterIndex + 1);
+  };
+
+  const deleteStep = (index: number) => {
+    if (journeySteps.length <= 1) return;
+    const newSteps = journeySteps.filter((_, i) => i !== index);
+    setJourneySteps(newSteps);
+    setDirtySteps(prev => {
+      const next = new Set<number>();
+      dirtySteps.forEach(i => { if (i < index) next.add(i); if (i > index) next.add(i - 1); });
+      return next;
+    });
+    if (editingStepIndex === index) {
+      setEditingStepIndex(null);
+      setEditBuffer(null);
+    }
+  };
+
+  const moveStep = (index: number, direction: "up" | "down") => {
+    const newIndex = direction === "up" ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= journeySteps.length) return;
+    const newSteps = [...journeySteps];
+    [newSteps[index], newSteps[newIndex]] = [newSteps[newIndex], newSteps[index]];
+    setJourneySteps(newSteps);
+    setDirtySteps(prev => new Set(prev).add(index).add(newIndex));
+  };
+
+  const duplicateStep = (index: number) => {
+    const original = journeySteps[index];
+    const duplicate: JourneyStepData = {
+      ...original,
+      id: `step-${Date.now()}`,
+      title: `${original.title} (copy)`,
+    };
+    const newSteps = [...journeySteps];
+    newSteps.splice(index + 1, 0, duplicate);
+    setJourneySteps(newSteps);
+    setDirtySteps(prev => new Set(prev).add(index + 1));
+  };
+
+  // ── Save all changes ─────────────────────────────────────────────────────
 
   const handleSave = async () => {
     setSaving(true);
     setSaveSuccess(false);
     setError(null);
     try {
+      // Build contentBlocks with updated journey
+      let existingCb: any = {};
+      try {
+        existingCb = typeof lesson?.contentBlocks === "string"
+          ? JSON.parse(lesson.contentBlocks)
+          : lesson?.contentBlocks || {};
+      } catch {}
+
+      const updatedCb = {
+        ...existingCb,
+        studentJourneyDraft: journeySteps,
+      };
+
       const res = await fetch(`/api/admin/lessons/${params.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          contentBlocks: updatedCb,
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Save failed");
       setSaveSuccess(true);
       setLesson(data.lesson);
+      setDirtySteps(new Set());
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (err: any) {
       setError(err.message || "Failed to save");
@@ -190,11 +303,11 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
     }
   };
 
-  // Generate journey draft
+  // ── Generate journey ─────────────────────────────────────────────────────
+
   const handleGenerateJourney = useCallback(async () => {
     setGenerating(true);
     setGenerateError(null);
-    setGenerateSuccess(false);
     try {
       const res = await fetch(`/api/admin/lessons/${params.id}/generate-journey`, {
         method: "POST",
@@ -202,18 +315,8 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Generation failed");
-      setGenerateSuccess(true);
-      setAiDraft(data.studentJourneyDraft || []);
-      setAiMetadata(data.aiMetadata || null);
-      // Reload lesson to get updated readiness
-      const lessonRes = await fetch(`/api/admin/lessons/${params.id}`, { credentials: "include" });
-      if (lessonRes.ok) {
-        const lessonData = await lessonRes.json();
-        if (lessonData.lesson) {
-          setLesson((prev: any) => prev ? { ...prev, ...lessonData.lesson } : prev);
-        }
-      }
-      setTimeout(() => setGenerateSuccess(false), 5000);
+      setJourneySteps(data.studentJourneyDraft || []);
+      setDirtySteps(new Set());
     } catch (err: any) {
       setGenerateError(err.message || "Failed to generate journey");
     } finally {
@@ -221,9 +324,9 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
     }
   }, [params.id]);
 
-  // Approve draft journey
+  // ── Approve journey ──────────────────────────────────────────────────────
+
   const handleApproveJourney = useCallback(async () => {
-    if (!aiDraft) return;
     try {
       const res = await fetch(`/api/admin/lessons/${params.id}/review-journey`, {
         method: "POST",
@@ -233,135 +336,36 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to approve journey");
-      setHasApprovedJourney(true);
-      setAiDraft(null);
-      setAiMetadata({ ...aiMetadata, reviewStatus: "APPROVED" });
-      // Reload lesson to get updated readiness
-      const lessonRes = await fetch(`/api/admin/lessons/${params.id}`, { credentials: "include" });
-      if (lessonRes.ok) {
-        const lessonData = await lessonRes.json();
-        if (lessonData.lesson) {
-          setLesson((prev: any) => prev ? { ...prev, ...lessonData.lesson } : prev);
-        }
-      }
-    } catch (err: any) {
-      setError(err.message || "Failed to approve journey");
-    }
-  }, [params.id, aiDraft, aiMetadata]);
-
-  // Reject draft journey
-  const handleRejectJourney = useCallback(async () => {
-    try {
-      const res = await fetch(`/api/admin/lessons/${params.id}/review-journey`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ action: "reject" }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to reject journey");
-      setAiMetadata({ ...aiMetadata, reviewStatus: "REJECTED" });
-    } catch (err: any) {
-      setError(err.message || "Failed to reject journey");
-    }
-  }, [params.id, aiMetadata]);
-
-  // ── Video handlers ──
-  const handleAddVideo = useCallback(async (step: any, videoUrl: string, videoTitle: string) => {
-    const idx = step._index;
-    setVideoStates(prev => ({ ...prev, [idx]: { ...prev[idx], loading: true, error: null, url: videoUrl, title: videoTitle } }));
-    try {
-      const res = await fetch(`/api/admin/lessons/${params.id}/video`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ stepIndex: idx, action: "add", videoUrl, videoTitle }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to add video");
       // Reload lesson
       const lessonRes = await fetch(`/api/admin/lessons/${params.id}`, { credentials: "include" });
       if (lessonRes.ok) {
         const lessonData = await lessonRes.json();
-        if (lessonData.lesson) {
-          setLesson((prev: any) => prev ? { ...prev, ...lessonData.lesson } : prev);
-        }
+        if (lessonData.lesson) setLesson(lessonData.lesson);
       }
-      setVideoStates(prev => ({ ...prev, [idx]: { ...prev[idx], loading: false, error: null } }));
     } catch (err: any) {
-      setVideoStates(prev => ({ ...prev, [idx]: { ...prev[idx], loading: false, error: err.message || "Failed to add video" } }));
+      setError(err.message || "Failed to approve journey");
     }
   }, [params.id]);
 
-  const handleApproveVideo = useCallback(async (step: any) => {
-    const idx = step._index;
-    setVideoStates(prev => ({ ...prev, [idx]: { ...prev[idx], loading: true, error: null } }));
-    try {
-      const res = await fetch(`/api/admin/lessons/${params.id}/video`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ stepIndex: idx, action: "approve" }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to approve video");
-      const lessonRes = await fetch(`/api/admin/lessons/${params.id}`, { credentials: "include" });
-      if (lessonRes.ok) {
-        const lessonData = await lessonRes.json();
-        if (lessonData.lesson) {
-          setLesson((prev: any) => prev ? { ...prev, ...lessonData.lesson } : prev);
-        }
-      }
-      setVideoStates(prev => ({ ...prev, [idx]: { ...prev[idx], loading: false, error: null } }));
-    } catch (err: any) {
-      setVideoStates(prev => ({ ...prev, [idx]: { ...prev[idx], loading: false, error: err.message || "Failed to approve video" } }));
-    }
-  }, [params.id]);
-
-  const handleRemoveVideo = useCallback(async (step: any) => {
-    const idx = step._index;
-    setVideoStates(prev => ({ ...prev, [idx]: { ...prev[idx], loading: true, error: null } }));
-    try {
-      const res = await fetch(`/api/admin/lessons/${params.id}/video`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ stepIndex: idx, action: "remove" }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to remove video");
-      const lessonRes = await fetch(`/api/admin/lessons/${params.id}`, { credentials: "include" });
-      if (lessonRes.ok) {
-        const lessonData = await lessonRes.json();
-        if (lessonData.lesson) {
-          setLesson((prev: any) => prev ? { ...prev, ...lessonData.lesson } : prev);
-        }
-      }
-      setVideoStates(prev => ({ ...prev, [idx]: { loading: false, error: null, url: "", title: "" } }));
-    } catch (err: any) {
-      setVideoStates(prev => ({ ...prev, [idx]: { ...prev[idx], loading: false, error: err.message || "Failed to remove video" } }));
-    }
-  }, [params.id]);
+  // ── Render ────────────────────────────────────────────────────────────────
 
   if (loading) {
     return (
       <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: colors.bg }}>
-        <p style={{ color: colors.textMuted }}>Loading lesson...</p>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+          <div style={{ width: 40, height: 40, border: `3px solid ${colors.border}`, borderTopColor: colors.primary, borderRadius: "50%", animation: "spin 1s linear infinite" }} />
+          <p style={{ color: colors.textMuted, fontSize: 14, fontWeight: 600 }}>Loading lesson editor...</p>
+        </div>
       </div>
     );
   }
 
   if (error && !lesson) {
     return (
-      <div style={{ minHeight: "100vh", background: colors.bg }}>
-        <div style={{ maxWidth: 800, margin: "0 auto", padding: "2rem 1.5rem" }}>
-          <Link href="/dashboard/admin/lessons" style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", color: colors.textMuted, textDecoration: "none", fontSize: "0.875rem", fontWeight: 600, marginBottom: "1.5rem" }}>
-            <ArrowLeft style={{ width: 16, height: 16 }} /> Back to Lessons
-          </Link>
-          <div style={{ ...ds.alertError }}>
-            <AlertCircle style={{ width: 16, height: 16, flexShrink: 0, marginTop: 2 }} />
-            <span>{error || "Lesson not found"}</span>
-          </div>
+      <div style={{ minHeight: "100vh", background: colors.bg, padding: "2rem" }}>
+        <div style={{ ...ds.alertError, maxWidth: 600, margin: "0 auto" }}>
+          <AlertTriangle style={{ width: 16, height: 16 }} />
+          <span>{error}</span>
         </div>
       </div>
     );
@@ -374,74 +378,43 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
   };
 
   const labelStyle: React.CSSProperties = {
-    fontSize: "0.8125rem", fontWeight: 700, color: colors.text,
-    marginBottom: 4, display: "block",
+    fontSize: "0.8125rem", fontWeight: 700, color: colors.text, marginBottom: 4, display: "block",
   };
 
   return (
     <div style={{ minHeight: "100vh", background: colors.bg }}>
-      <div style={{ maxWidth: 900, margin: "0 auto", padding: "2rem 1.5rem" }}>
-        {/* Top bar */}
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <div style={{ maxWidth: showPreview ? 1400 : 900, margin: "0 auto", padding: "1.5rem" }}>
+
+        {/* ── Top bar ─────────────────────────────────────────────────────── */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", flexWrap: "wrap", gap: 8 }}>
           <Link href="/dashboard/admin/lessons" style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", color: colors.textMuted, textDecoration: "none", fontSize: "0.875rem", fontWeight: 600 }}>
             <ArrowLeft style={{ width: 16, height: 16 }} /> Back to Lessons
           </Link>
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            {hasUnsavedChanges && (
+              <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#D97706", background: "#FEF3C7", padding: "4px 10px", borderRadius: 6 }}>
+                ● Unsaved changes
+              </span>
+            )}
             <button
-              onClick={async () => {
-                if (!confirm("Are you sure you want to delete this lesson? If students have progress, it will be archived instead.")) return;
-                try {
-                  const res = await fetch(`/api/admin/lessons/${params.id}`, {
-                    method: "DELETE",
-                    headers: { "Content-Type": "application/json" },
-                    credentials: "include",
-                    body: JSON.stringify({ forceDelete: false }),
-                  });
-                  const data = await res.json();
-                  if (data.requiresConfirmation) {
-                    if (confirm("This lesson has no student progress. Permanently delete it? This cannot be undone.")) {
-                      const res2 = await fetch(`/api/admin/lessons/${params.id}`, {
-                        method: "DELETE",
-                        headers: { "Content-Type": "application/json" },
-                        credentials: "include",
-                        body: JSON.stringify({ forceDelete: true }),
-                      });
-                      const data2 = await res2.json();
-                      if (data2.success) {
-                        alert(data2.message);
-                        window.location.href = "/dashboard/admin/lessons";
-                        return;
-                      }
-                    }
-                    return;
-                  }
-                  if (data.success) {
-                    alert(data.message);
-                    window.location.href = "/dashboard/admin/lessons";
-                    return;
-                  }
-                  alert(data.error || "Failed to delete lesson");
-                } catch (err: any) {
-                  alert(err.message || "Failed to delete lesson");
-                }
-              }}
+              onClick={() => setShowPreview(!showPreview)}
               style={{
-                display: "inline-flex", alignItems: "center", gap: "0.35rem",
+                display: "inline-flex", alignItems: "center", gap: "0.5rem",
                 padding: "8px 14px", borderRadius: 8, border: `1.5px solid ${colors.border}`,
-                background: "#fff", color: "#DC2626",
-                fontWeight: 700, fontSize: "0.8125rem",
-                cursor: "pointer",
+                background: showPreview ? colors.primary : "#fff",
+                color: showPreview ? "#fff" : colors.text,
+                fontWeight: 700, fontSize: "0.8125rem", cursor: "pointer",
               }}
             >
-              <Trash2 style={{ width: 14, height: 14 }} />
-              Delete
+              {showPreview ? <EyeOff style={{ width: 14, height: 14 }} /> : <Eye style={{ width: 14, height: 14 }} />}
+              {showPreview ? "Close Preview" : "Live Preview"}
             </button>
             <button onClick={handleSave} disabled={saving} style={{
               display: "inline-flex", alignItems: "center", gap: "0.5rem",
               padding: "10px 22px", borderRadius: 10, border: "none",
               background: saveSuccess ? "#22C55E" : colors.primary,
-              color: "#fff", fontWeight: 700, fontSize: "0.875rem",
-              cursor: "pointer",
+              color: "#fff", fontWeight: 700, fontSize: "0.875rem", cursor: "pointer",
             }}>
               <Save style={{ width: 16, height: 16 }} />
               {saving ? "Saving..." : saveSuccess ? "Saved ✓" : "Save Changes"}
@@ -461,1196 +434,533 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
           </div>
         )}
 
-        {/* Header card */}
-        <div style={{ ...ds.card, padding: "1.5rem", marginBottom: "1.5rem" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.75rem", flexWrap: "wrap" }}>
-            <span style={{
-              fontSize: "0.6875rem", fontWeight: 700, color: form.status === "PUBLISHED" ? colors.success : colors.warning,
-              background: form.status === "PUBLISHED" ? `${colors.success}15` : `${colors.warning}15`,
-              padding: "0.2rem 0.5rem", borderRadius: 6,
-            }}>
-              {form.status}
-            </span>
-            {lesson?.quest?.theme && (
-              <span style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", fontSize: "0.6875rem", color: colors.textMuted, background: colors.bgSoft, padding: "0.2rem 0.5rem", borderRadius: 6 }}>
-                <BookOpen style={{ width: 10, height: 10 }} /> Grade {lesson.quest.theme.grade} · {lesson.quest.theme.title}
-              </span>
-            )}
-          </div>
-          <h1 style={{ fontSize: "1.5rem", fontWeight: 800, color: colors.text, marginBottom: "0.5rem" }}>
-            Edit Lesson: {form.title}
-          </h1>
-          <p style={{ color: colors.textMuted, fontSize: "0.875rem" }}>Slug: {lesson?.slug}</p>
-        </div>
+        {/* ── Main content ─────────────────────────────────────────────────── */}
+        <div style={{ display: showPreview ? "grid" : "block", gridTemplateColumns: showPreview ? "1fr 1fr" : "none", gap: "1.5rem" }}>
 
-        {/* Lesson Readiness */}
-        {lesson?.readiness && (
-          <div style={{ ...ds.card, padding: "1.25rem 1.5rem", marginBottom: "1.5rem" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.75rem", flexWrap: "wrap", gap: 8 }}>
-              <h3 style={{ fontSize: "0.9375rem", fontWeight: 800, color: colors.text, display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                <Info style={{ width: 16, height: 16, color: colors.primary }} />
-                Lesson Readiness
-              </h3>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                {lesson.readiness.isReady ? (
-                  <CheckCircle2 style={{ width: 14, height: 14, color: colors.success }} />
-                ) : (
-                  <AlertTriangle style={{ width: 14, height: 14, color: colors.warning }} />
-                )}
-                <span style={{
-                  fontSize: "0.75rem", fontWeight: 700,
-                  color: lesson.readiness.isReady ? colors.success : colors.warning,
-                  background: lesson.readiness.isReady ? `${colors.success}15` : `${colors.warning}15`,
-                  padding: "0.15rem 0.5rem", borderRadius: 6,
-                }}>
-                  {lesson.readiness.score >= 70 ? "Ready to publish" :
-                   lesson.readiness.score >= 42 ? "Almost ready" :
-                   lesson.readiness.score >= 28 ? "Needs work" : "Not ready"}
+          {/* ── LEFT: Editor ──────────────────────────────────────────────── */}
+          <div style={{ minWidth: 0 }}>
+
+            {/* Header card */}
+            <div style={{ ...ds.card, padding: "1.25rem", marginBottom: "1rem" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem", flexWrap: "wrap" }}>
+                <span style={{ fontSize: "0.6875rem", fontWeight: 700, color: form.status === "PUBLISHED" ? colors.success : colors.warning, background: form.status === "PUBLISHED" ? `${colors.success}15` : `${colors.warning}15`, padding: "0.2rem 0.5rem", borderRadius: 6 }}>
+                  {form.status}
                 </span>
+                {lesson?.quest?.theme && (
+                  <span style={{ fontSize: "0.6875rem", color: colors.textMuted, background: colors.bgSoft, padding: "0.2rem 0.5rem", borderRadius: 6 }}>
+                    Grade {lesson.quest.theme.grade} · {lesson.quest.theme.title}
+                  </span>
+                )}
               </div>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.75rem" }}>
-              <div style={{ flex: 1, height: 8, background: colors.bgSoft, borderRadius: 4, overflow: "hidden" }}>
-                <div style={{
-                  width: `${Math.min(lesson.readiness.score, 100)}%`,
-                  height: "100%",
-                  background: lesson.readiness.isReady ? colors.success : colors.warning,
-                  borderRadius: 4,
-                  transition: "width 0.3s ease",
-                }} />
-              </div>
-              <span style={{ fontSize: "0.8125rem", fontWeight: 700, color: colors.text, whiteSpace: "nowrap" }}>
-                {lesson.readiness.score}/100
-              </span>
+              <input
+                value={form.title}
+                onChange={e => setForm(prev => ({ ...prev, title: e.target.value }))}
+                placeholder="Lesson title..."
+                style={{ fontSize: "1.25rem", fontWeight: 800, color: colors.text, border: "none", outline: "none", width: "100%", background: "transparent", marginBottom: "0.5rem" }}
+              />
+              <input
+                value={form.description || ""}
+                onChange={e => setForm(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="Add a short description..."
+                style={{ fontSize: "0.875rem", color: colors.textMuted, border: "none", outline: "none", width: "100%", background: "transparent" }}
+              />
             </div>
 
-            {/* Missing CBC fields warning */}
-            {lesson.readiness.missingSteps && lesson.readiness.missingSteps.length > 0 && (
-              <div style={{ marginBottom: "0.5rem", padding: "0.5rem 0.75rem", borderRadius: 8, background: "#FEF3C7", border: "1px solid #FDE68A" }}>
-                <p style={{ fontSize: "0.6875rem", fontWeight: 700, color: "#92400E", marginBottom: "0.25rem", display: "flex", alignItems: "center", gap: "0.35rem" }}>
-                  <AlertTriangle style={{ width: 12, height: 12 }} />
-                  Missing CBC fields ({lesson.readiness.missingSteps.length}):
-                </p>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-                  {lesson.readiness.missingSteps.map((step, i) => (
-                    <span key={i} style={{
-                      fontSize: "0.6875rem", fontWeight: 600,
-                      color: "#92400E",
-                      background: "#FDE68A",
-                      padding: "0.15rem 0.4rem", borderRadius: 4,
-                    }}>
-                      {step.replace(/_/g, " ")}
-                    </span>
-                  ))}
+            {/* ── Journey Steps Editor ──────────────────────────────────────── */}
+            <div style={{ ...ds.card, padding: "1.25rem", marginBottom: "1rem" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
+                <h3 style={{ fontSize: "0.9375rem", fontWeight: 800, color: colors.text, display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  <BookOpen style={{ width: 16, height: 16, color: colors.primary }} />
+                  Journey Steps
+                  <span style={{ fontSize: "0.75rem", fontWeight: 600, color: colors.textMuted }}>({journeySteps.length} steps)</span>
+                </h3>
+                <button
+                  onClick={handleGenerateJourney}
+                  disabled={generating}
+                  style={{
+                    display: "inline-flex", alignItems: "center", gap: "0.35rem",
+                    padding: "6px 12px", borderRadius: 8, border: "none",
+                    background: colors.primary, color: "#fff", fontWeight: 700,
+                    fontSize: "0.75rem", cursor: "pointer",
+                  }}
+                >
+                  <Sparkles style={{ width: 12, height: 12 }} />
+                  {generating ? "Generating..." : "Generate Journey"}
+                </button>
+              </div>
+
+              {generateError && (
+                <div style={{ ...ds.alertError, marginBottom: "0.75rem", fontSize: "0.75rem" }}>
+                  <AlertCircle style={{ width: 14, height: 14 }} />
+                  <span>{generateError}</span>
                 </div>
-                <p style={{ fontSize: "0.625rem", color: "#B45309", marginTop: "0.25rem" }}>
-                  AI drafts may be weaker than expected. Fill these fields for better quality.
-                </p>
-              </div>
-            )}
-
-            {/* Recommendations */}
-            {lesson.readiness.recommendations && lesson.readiness.recommendations.length > 0 && (
-              <div style={{ borderTop: `1px solid ${colors.border}`, paddingTop: "0.5rem" }}>
-                {lesson.readiness.recommendations.slice(0, 3).map((rec, i) => (
-                  <p key={i} style={{ fontSize: "0.75rem", color: colors.textMuted, marginBottom: "0.2rem", display: "flex", alignItems: "flex-start", gap: "0.35rem" }}>
-                    <span style={{ color: colors.warning, flexShrink: 0 }}>•</span>
-                    {rec}
-                  </p>
-                ))}
-              </div>
-            )}
-
-            {/* Draft warning */}
-            {aiDraft && aiDraft.length > 0 && aiMetadata?.reviewStatus === "NEEDS_REVIEW" && (
-              <div style={{ marginTop: "0.5rem", padding: "0.5rem 0.75rem", borderRadius: 8, background: "#FEF3C7", border: "1px solid #FDE68A", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                <AlertTriangle style={{ width: 14, height: 14, color: "#D97706", flexShrink: 0 }} />
-                <span style={{ fontSize: "0.75rem", fontWeight: 600, color: "#92400E" }}>
-                  Generated journey needs review. Approve below to make it student-visible.
-                </span>
-              </div>
-            )}
-
-            {/* Unapproved video warning */}
-            {lesson.readiness.hasUnapprovedVideo && (
-              <div style={{ marginTop: "0.5rem", padding: "0.5rem 0.75rem", borderRadius: 8, background: "#FEE2E2", border: "1px solid #FECACA", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                <AlertTriangle style={{ width: 14, height: 14, color: "#DC2626", flexShrink: 0 }} />
-                <span style={{ fontSize: "0.75rem", fontWeight: 600, color: "#991B1B" }}>
-                  Lesson has unapproved video. Approve or remove video before publishing.
-                </span>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Student Journey Review */}
-        <div style={{ ...ds.card, padding: "1.25rem 1.5rem", marginBottom: "1.5rem" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem", flexWrap: "wrap", gap: 8 }}>
-            <h3 style={{ fontSize: "0.9375rem", fontWeight: 800, color: colors.text, display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <BookOpen style={{ width: 16, height: 16, color: colors.primary }} />
-              Student Journey
-            </h3>
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-              {hasApprovedJourney && (
-                <span style={{ fontSize: "0.6875rem", fontWeight: 700, color: colors.success, background: `${colors.success}15`, padding: "0.15rem 0.5rem", borderRadius: 6 }}>
-                  ✓ Approved
-                </span>
               )}
-              {aiMetadata?.reviewStatus === "NEEDS_REVIEW" && (
-                <span style={{ fontSize: "0.6875rem", fontWeight: 700, color: "#D97706", background: "#FEF3C7", padding: "0.15rem 0.5rem", borderRadius: 6 }}>
-                  Draft pending review
-                </span>
-              )}
-              {aiMetadata?.reviewStatus === "REJECTED" && (
-                <span style={{ fontSize: "0.6875rem", fontWeight: 700, color: "#DC2626", background: "#FEF2F2", padding: "0.15rem 0.5rem", borderRadius: 6 }}>
-                  Draft rejected
-                </span>
+
+              {/* Step list */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                {journeySteps.map((step, index) => {
+                  const config = STEP_CONFIG[step.stepType] || STEP_CONFIG.welcome;
+                  const isEditing = editingStepIndex === index;
+                  const isExpanded = expandedStep === index;
+                  const isDirty = dirtySteps.has(index);
+
+                  return (
+                    <div key={step.id} style={{
+                      border: `1.5px solid ${isEditing ? config.color : isDirty ? "#D97706" : colors.border}`,
+                      borderRadius: 12, overflow: "hidden",
+                      background: isEditing ? `${config.color}08` : "#fff",
+                    }}>
+                      {/* Step header */}
+                      <div
+                        onClick={() => !isEditing && setExpandedStep(isExpanded ? null : index)}
+                        style={{
+                          display: "flex", alignItems: "center", gap: 8, padding: "10px 12px",
+                          cursor: isEditing ? "default" : "pointer", userSelect: "none",
+                        }}
+                      >
+                        <span style={{ fontSize: "0.75rem", fontWeight: 700, color: colors.textMuted, width: 24, textAlign: "center" }}>
+                          {index + 1}
+                        </span>
+                        <span style={{ fontSize: "1rem" }}>{config.icon}</span>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                            <span style={{ fontSize: "0.8125rem", fontWeight: 700, color: colors.text }}>
+                              {step.title || "Untitled Step"}
+                            </span>
+                            {isDirty && (
+                              <span style={{ fontSize: "0.625rem", fontWeight: 700, color: "#D97706", background: "#FEF3C7", padding: "1px 5px", borderRadius: 4 }}>
+                                edited
+                              </span>
+                            )}
+                          </div>
+                          <span style={{ fontSize: "0.6875rem", color: colors.textMuted }}>
+                            {config.label} — {config.description}
+                          </span>
+                        </div>
+                        <div style={{ display: "flex", gap: 2, alignItems: "center" }}>
+                          {index > 0 && (
+                            <button onClick={(e) => { e.stopPropagation(); moveStep(index, "up"); }} style={stepActionBtn}>
+                              <ChevronUp style={{ width: 12, height: 12 }} />
+                            </button>
+                          )}
+                          {index < journeySteps.length - 1 && (
+                            <button onClick={(e) => { e.stopPropagation(); moveStep(index, "down"); }} style={stepActionBtn}>
+                              <ChevronDown style={{ width: 12, height: 12 }} />
+                            </button>
+                          )}
+                          {!isEditing ? (
+                            <button onClick={(e) => { e.stopPropagation(); startEditingStep(index); }} style={stepActionBtn}>
+                              <Edit3 style={{ width: 12, height: 12 }} />
+                            </button>
+                          ) : (
+                            <>
+                              <button onClick={(e) => { e.stopPropagation(); saveStepEdit(); }} style={{ ...stepActionBtn, color: "#059669" }}>
+                                <Check style={{ width: 12, height: 12 }} />
+                              </button>
+                              <button onClick={(e) => { e.stopPropagation(); cancelEditingStep(); }} style={{ ...stepActionBtn, color: "#DC2626" }}>
+                                <X style={{ width: 12, height: 12 }} />
+                              </button>
+                            </>
+                          )}
+                          <button onClick={(e) => { e.stopPropagation(); duplicateStep(index); }} style={stepActionBtn} title="Duplicate">
+                            <Copy style={{ width: 12, height: 12 }} />
+                          </button>
+                          {journeySteps.length > 1 && (
+                            <button onClick={(e) => { e.stopPropagation(); deleteStep(index); }} style={{ ...stepActionBtn, color: "#DC2626" }}>
+                              <Trash2 style={{ width: 12, height: 12 }} />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Expanded step editor */}
+                      {(isExpanded || isEditing) && (
+                        <div style={{ padding: "0 12px 12px", borderTop: `1px solid ${colors.border}` }}>
+                          {isEditing && editBuffer ? (
+                            <div style={{ paddingTop: "0.75rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                              {/* Step type selector */}
+                              <div>
+                                <label style={labelStyle}>Step Type</label>
+                                <select
+                                  value={editBuffer.stepType}
+                                  onChange={e => updateEditField("stepType", e.target.value)}
+                                  style={{ ...inputStyle, width: "auto" }}
+                                >
+                                  {JOURNEY_STEP_TYPES.map(st => (
+                                    <option key={st} value={st}>{STEP_CONFIG[st].icon} {STEP_CONFIG[st].label}</option>
+                                  ))}
+                                </select>
+                              </div>
+
+                              {/* Title */}
+                              <div>
+                                <label style={labelStyle}>Step Title</label>
+                                <input
+                                  value={editBuffer.title}
+                                  onChange={e => updateEditField("title", e.target.value)}
+                                  placeholder="e.g., Welcome!, Learn It, Your Turn!"
+                                  style={inputStyle}
+                                />
+                              </div>
+
+                              {/* Owl text */}
+                              <div>
+                                <label style={labelStyle}>🦉 Owl Teacher Says</label>
+                                <textarea
+                                  value={editBuffer.owlText}
+                                  onChange={e => updateEditField("owlText", e.target.value)}
+                                  placeholder="Warm, encouraging guidance for the student..."
+                                  rows={3}
+                                  style={{ ...inputStyle, resize: "vertical" }}
+                                />
+                              </div>
+
+                              {/* Student text */}
+                              <div>
+                                <label style={labelStyle}>📖 Student Content</label>
+                                <textarea
+                                  value={editBuffer.studentText}
+                                  onChange={e => updateEditField("studentText", e.target.value)}
+                                  placeholder="Main content for this step — clear, child-friendly..."
+                                  rows={4}
+                                  style={{ ...inputStyle, resize: "vertical" }}
+                                />
+                              </div>
+
+                              {/* Math display */}
+                              <div>
+                                <label style={labelStyle}>🔢 Math Display (optional)</label>
+                                <input
+                                  value={editBuffer.mathDisplay || ""}
+                                  onChange={e => updateEditField("mathDisplay", e.target.value)}
+                                  placeholder="e.g., 5 + 3 = 8"
+                                  style={inputStyle}
+                                />
+                              </div>
+
+                              {/* Interaction */}
+                              <div>
+                                <label style={labelStyle}>✋ Interaction Type</label>
+                                <select
+                                  value={editBuffer.interaction?.type || "none"}
+                                  onChange={e => updateEditField("interaction", { ...editBuffer.interaction, type: e.target.value })}
+                                  style={{ ...inputStyle, width: "auto" }}
+                                >
+                                  <option value="none">None</option>
+                                  <option value="open_response">Open Response</option>
+                                  <option value="multiple_choice">Multiple Choice</option>
+                                  <option value="self_check">Self Check</option>
+                                </select>
+                              </div>
+
+                              {(editBuffer.interaction?.type === "multiple_choice" || editBuffer.interaction?.type === "open_response") && (
+                                <>
+                                  <div>
+                                    <label style={labelStyle}>Question / Prompt</label>
+                                    <textarea
+                                      value={editBuffer.interaction?.question || editBuffer.interaction?.prompt || ""}
+                                      onChange={e => updateEditField("interaction", { ...editBuffer.interaction, question: e.target.value, prompt: e.target.value })}
+                                      placeholder="The question or prompt for the student..."
+                                      rows={2}
+                                      style={{ ...inputStyle, resize: "vertical" }}
+                                    />
+                                  </div>
+                                  {editBuffer.interaction?.type === "multiple_choice" && (
+                                    <div>
+                                      <label style={labelStyle}>Answer Options (one per line)</label>
+                                      <textarea
+                                        value={(editBuffer.interaction?.options || []).join("\n")}
+                                        onChange={e => updateEditField("interaction", { ...editBuffer.interaction, options: e.target.value.split("\n").filter(Boolean) })}
+                                        placeholder="Option A&#10;Option B&#10;Option C&#10;Option D"
+                                        rows={4}
+                                        style={{ ...inputStyle, resize: "vertical" }}
+                                      />
+                                      <label style={{ ...labelStyle, marginTop: 4 }}>Correct Answer Index (0-based)</label>
+                                      <input
+                                        type="number"
+                                        min={0}
+                                        value={editBuffer.interaction?.correctAnswer ?? 0}
+                                        onChange={e => updateEditField("interaction", { ...editBuffer.interaction, correctAnswer: parseInt(e.target.value) || 0 })}
+                                        style={{ ...inputStyle, width: 80 }}
+                                      />
+                                    </div>
+                                  )}
+                                </>
+                              )}
+
+                              {/* Materials */}
+                              <div>
+                                <label style={labelStyle}>📦 Materials Needed (one per line)</label>
+                                <textarea
+                                  value={(editBuffer.materials || []).join("\n")}
+                                  onChange={e => updateEditField("materials", e.target.value.split("\n").filter(Boolean))}
+                                  placeholder="counters&#10;paper&#10;bottle tops"
+                                  rows={2}
+                                  style={{ ...inputStyle, resize: "vertical" }}
+                                />
+                              </div>
+                            </div>
+                          ) : (
+                            /* Read-only preview when expanded but not editing */
+                            <div style={{ paddingTop: "0.5rem", fontSize: "0.8125rem", color: colors.textMuted }}>
+                              {step.owlText && (
+                                <div style={{ marginBottom: "0.5rem" }}>
+                                  <span style={{ fontWeight: 700, color: colors.text }}>🦉 Owl: </span>
+                                  {step.owlText.slice(0, 120)}{step.owlText.length > 120 ? "..." : ""}
+                                </div>
+                              )}
+                              {step.studentText && (
+                                <div>
+                                  <span style={{ fontWeight: 700, color: colors.text }}>📖 Content: </span>
+                                  {step.studentText.slice(0, 120)}{step.studentText.length > 120 ? "..." : ""}
+                                </div>
+                              )}
+                              {!step.owlText && !step.studentText && (
+                                <em>No content yet. Click edit to add content.</em>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Add step button */}
+              <button
+                onClick={() => addNewStep(journeySteps.length - 1)}
+                style={{
+                  width: "100%", padding: "10px", borderRadius: 10,
+                  border: `2px dashed ${colors.border}`, background: "transparent",
+                  color: colors.textMuted, fontWeight: 700, fontSize: "0.8125rem",
+                  cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                  marginTop: "0.5rem",
+                }}
+              >
+                <Plus style={{ width: 14, height: 14 }} /> Add Step
+              </button>
+
+              {/* Approve journey button */}
+              {journeySteps.length > 0 && form.status !== "PUBLISHED" && (
+                <button
+                  onClick={handleApproveJourney}
+                  style={{
+                    width: "100%", padding: "12px", borderRadius: 10, border: "none",
+                    background: "linear-gradient(135deg, #059669, #10B981)", color: "#fff",
+                    fontWeight: 800, fontSize: "0.875rem", cursor: "pointer",
+                    marginTop: "0.75rem", display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                  }}
+                >
+                  <CheckCircle2 style={{ width: 16, height: 16 }} /> Approve Journey & Make Live
+                </button>
               )}
             </div>
           </div>
 
-          {/* Contamination warning + Draft/Live tabs */}
-          {(() => {
-            // Contamination detection
-            const CONTAMINATION_PHRASES = [
-              "reading comprehension", "main idea", "read a short passage",
-              "good readers", "reading passage", "passage about",
-              "tell the main idea", "what the story is mostly about",
-            ];
-            function checkContamination(steps: any[]): string[] {
-              if (!Array.isArray(steps) || steps.length === 0) return [];
-              const text = JSON.stringify(steps).toLowerCase();
-              return CONTAMINATION_PHRASES.filter(p => text.includes(p));
-            }
-            let liveContamination: string[] = [];
-            let draftContamination: string[] = [];
-            try {
-              const cb = typeof lesson?.contentBlocks === "string" ? JSON.parse(lesson.contentBlocks) : lesson?.contentBlocks;
-              liveContamination = checkContamination(cb?.studentJourney || []);
-              draftContamination = checkContamination(cb?.studentJourneyDraft || []);
-            } catch { /* ignore */ }
-            const liveHasContamination = liveContamination.length > 0;
-            const draftIsClean = draftContamination.length === 0 && (aiDraft?.length || 0) > 0;
-            const showWarning = liveHasContamination && draftIsClean;
-            const hasBothJourneys = (hasApprovedJourney || (aiDraft && aiDraft.length > 0));
-
-            if (!showWarning && !hasBothJourneys) return null;
-
-            return (
-              <div style={{ marginBottom: "1rem" }}>
-                {showWarning && (
-                  <div style={{
-                    padding: "10px 14px", borderRadius: 8,
-                    background: "#FEF3C7", border: "1px solid #F59E0B",
-                    marginBottom: "0.75rem", display: "flex", alignItems: "flex-start", gap: 8,
-                  }}>
-                    <AlertTriangle style={{ width: 16, height: 16, color: "#D97706", flexShrink: 0, marginTop: 2 }} />
-                    <div>
-                      <p style={{ fontSize: "0.75rem", fontWeight: 700, color: "#92400E", marginBottom: 2 }}>
-                        Live journey appears contaminated. Draft journey is clean and ready for review.
-                      </p>
-                      <p style={{ fontSize: "0.6875rem", color: "#B45309" }}>
-                        Live journey contains: {liveContamination.slice(0, 3).map(p => `"${p}"`).join(", ")}
-                      </p>
-                    </div>
-                  </div>
-                )}
-                {hasBothJourneys && (
-                  <div style={{ display: "flex", gap: 4, marginBottom: "0.75rem" }}>
+          {/* ── RIGHT: Live Preview ─────────────────────────────────────────── */}
+          {showPreview && (
+            <div style={{ minWidth: 0 }}>
+              <div style={{ ...ds.card, padding: "1rem", position: "sticky", top: "1rem" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
+                  <h3 style={{ fontSize: "0.875rem", fontWeight: 800, color: colors.text, display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <Eye style={{ width: 14, height: 14, color: colors.primary }} />
+                    Live Preview
+                  </h3>
+                  <div style={{ display: "flex", gap: 4 }}>
                     <button
                       onClick={() => setActiveJourneyTab("draft")}
                       style={{
-                        padding: "4px 12px", borderRadius: 6, border: "1.5px solid #6366F1",
+                        padding: "4px 10px", borderRadius: 6, border: "1.5px solid #6366F1",
                         background: activeJourneyTab === "draft" ? "#6366F1" : "#fff",
                         color: activeJourneyTab === "draft" ? "#fff" : "#6366F1",
-                        fontWeight: 700, fontSize: "0.75rem", cursor: "pointer",
+                        fontWeight: 700, fontSize: "0.6875rem", cursor: "pointer",
                       }}
                     >
-                      📝 Draft — not visible to students
+                      📝 Draft
                     </button>
                     <button
                       onClick={() => setActiveJourneyTab("live")}
                       style={{
-                        padding: "4px 12px", borderRadius: 6, border: `1.5px solid ${hasApprovedJourney ? "#10B981" : "#9CA3AF"}`,
-                        background: activeJourneyTab === "live" ? (hasApprovedJourney ? "#10B981" : "#9CA3AF") : "#fff",
-                        color: activeJourneyTab === "live" ? "#fff" : (hasApprovedJourney ? "#10B981" : "#9CA3AF"),
-                        fontWeight: 700, fontSize: "0.75rem", cursor: "pointer",
+                        padding: "4px 10px", borderRadius: 6, border: "1.5px solid #059669",
+                        background: activeJourneyTab === "live" ? "#059669" : "#fff",
+                        color: activeJourneyTab === "live" ? "#fff" : "#059669",
+                        fontWeight: 700, fontSize: "0.6875rem", cursor: "pointer",
                       }}
                     >
-                      🌐 Live — currently visible to students
+                      🌐 Live
                     </button>
+                  </div>
+                </div>
+
+                {/* Progress bar */}
+                {journeySteps.length > 0 && (
+                  <div style={{ marginBottom: "1rem" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.25rem" }}>
+                      <span style={{ fontSize: "0.6875rem", fontWeight: 700, color: colors.textMuted }}>
+                        Step {previewStep + 1} of {journeySteps.length}
+                      </span>
+                      <span style={{ fontSize: "0.6875rem", fontWeight: 700, color: colors.textMuted }}>
+                        {Math.round(((previewStep + 1) / journeySteps.length) * 100)}% Complete
+                      </span>
+                    </div>
+                    <div style={{ height: 6, background: colors.bgSoft, borderRadius: 3, overflow: "hidden" }}>
+                      <div style={{
+                        width: `${((previewStep + 1) / journeySteps.length) * 100}%`,
+                        height: "100%", background: "linear-gradient(90deg, #6366F1, #8B5CF6)",
+                        borderRadius: 3, transition: "width 0.3s ease",
+                      }} />
+                    </div>
                   </div>
                 )}
-              </div>
-            );
-          })()}
 
-          {/* Generate + Preview buttons */}
-          <div style={{ display: "flex", gap: 8, marginBottom: "1rem", flexWrap: "wrap" }}>
-            <button
-              onClick={handleGenerateJourney}
-              disabled={generating}
-              style={{
-                display: "inline-flex", alignItems: "center", gap: "0.5rem",
-                padding: "8px 16px", borderRadius: 8, border: "none",
-                background: generating ? colors.textMuted : colors.primary,
-                color: "#fff", fontWeight: 700, fontSize: "0.8125rem",
-                cursor: generating ? "not-allowed" : "pointer",
-              }}
-            >
-              {generating ? (
-                <><span className="spinner" style={{ width: 14, height: 14, border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%", display: "inline-block" }} /> Generating...</>
-              ) : (
-                <><Sparkles style={{ width: 14, height: 14 }} /> Generate Journey Draft</>
-              )}
-            </button>
-            {(hasApprovedJourney || (aiDraft && aiDraft.length > 0)) && (
-              <div style={{ display: "flex", gap: 6 }}>
-                <button
-                  onClick={() => {
-                    setShowJourneyPreview(!showJourneyPreview);
-                    setPreviewMode("list");
-                    setCurrentPreviewStep(0);
-                  }}
-                  style={{
-                    display: "inline-flex", alignItems: "center", gap: "0.5rem",
-                    padding: "8px 16px", borderRadius: 8, border: `1.5px solid ${colors.primary}`,
-                    background: showJourneyPreview && previewMode === "list" ? colors.primary : "#fff",
-                    color: showJourneyPreview && previewMode === "list" ? "#fff" : colors.primary,
-                    fontWeight: 700, fontSize: "0.8125rem",
-                    cursor: "pointer",
-                  }}
-                >
-                  <Eye style={{ width: 14, height: 14 }} />
-                  {showJourneyPreview && previewMode === "list" ? "Hide Preview" : "Preview Steps"}
-                </button>
-                <button
-                  onClick={() => {
-                    setShowJourneyPreview(!showJourneyPreview);
-                    setPreviewMode("step");
-                    setCurrentPreviewStep(0);
-                  }}
-                  style={{
-                    display: "inline-flex", alignItems: "center", gap: "0.5rem",
-                    padding: "8px 16px", borderRadius: 8, border: `1.5px solid ${colors.success}`,
-                    background: showJourneyPreview && previewMode === "step" ? colors.success : "#fff",
-                    color: showJourneyPreview && previewMode === "step" ? "#fff" : colors.success,
-                    fontWeight: 700, fontSize: "0.8125rem",
-                    cursor: "pointer",
-                  }}
-                >
-                  <Play style={{ width: 14, height: 14 }} />
-                  {showJourneyPreview && previewMode === "step" ? "Exit Walkthrough" : "Walkthrough"}
-                </button>
-                <button
-                  onClick={() => {
-                    window.open(`/dashboard/admin/lessons/${params.id}/student-view`, "_blank");
-                  }}
-                  style={{
-                    display: "inline-flex", alignItems: "center", gap: "0.5rem",
-                    padding: "8px 16px", borderRadius: 8, border: "none",
-                    background: "#4F46E5",
-                    color: "#fff",
-                    fontWeight: 700, fontSize: "0.8125rem",
-                    cursor: "pointer",
-                  }}
-                >
-                  <ExternalLink style={{ width: 14, height: 14 }} />
-                  Preview as Student
-                </button>
-              </div>
-            )}
-          </div>
-
-          {generateError && (
-            <div style={{ ...ds.alertError, marginBottom: "0.75rem", fontSize: "0.8125rem" }}>
-              <AlertCircle style={{ width: 14, height: 14, flexShrink: 0 }} />
-              <span>{generateError}</span>
-            </div>
-          )}
-          {generateSuccess && (
-            <div style={{ ...ds.alertSuccess, marginBottom: "0.75rem", fontSize: "0.8125rem" }}>
-              ✓ Journey draft generated! Review below and approve when ready.
-            </div>
-          )}
-
-          {/* Journey steps display */}
-          {(() => {
-            // Determine which journey to show based on active tab
-            const cb = typeof lesson?.contentBlocks === "string"
-              ? JSON.parse(lesson.contentBlocks || "{}")
-              : (lesson?.contentBlocks || {});
-            const liveJourney: any[] = Array.isArray(cb?.studentJourney) ? cb.studentJourney : [];
-            const draftJourney: any[] = Array.isArray(cb?.studentJourneyDraft) ? cb.studentJourneyDraft : [];
-            const journeyToShow = activeJourneyTab === "live" ? liveJourney : (aiDraft || draftJourney);
-            const isLiveTab = activeJourneyTab === "live";
-
-            if (journeyToShow.length === 0) {
-              return (
-                <div style={{ textAlign: "center", padding: "1.5rem", color: colors.textMuted, fontSize: "0.8125rem" }}>
-                  <p style={{ marginBottom: "0.5rem" }}>No {isLiveTab ? "live" : "draft"} journey yet.</p>
-                  {!isLiveTab && <p>Fill in curriculum fields above, then click <strong>Generate Journey Draft</strong> to create one.</p>}
-                  {!isLiveTab && <p style={{ marginTop: "0.5rem", fontSize: "0.75rem" }}>
-                    Or add content manually — a fallback journey will be built from your CBC fields.
-                  </p>}
-                </div>
-              );
-            }
-
-            const stepIcons: Record<string, string> = {
-              welcome: "🦉", mission: "🎯", think_first: "💭", learn: "📖",
-              connect: "🔗", example: "💡", practice: "✏️", quick_check: "✅",
-              reflect: "🪞", complete: "🏆",
-            };
-
-            return (
-              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                {journeyToShow.filter((step: any) => step && typeof step === "object").map((step: any, i: number) => {
-                  const isExpanded = expandedStep === i;
-                  const stepType = step.stepType || "welcome";
-                  return (
-                    <div key={i} style={{
-                      border: `1px solid ${colors.border}`,
-                      borderRadius: 8,
-                      overflow: "hidden",
-                    }}>
+                {/* Journey map */}
+                <div style={{ display: "flex", gap: 4, marginBottom: "1rem", flexWrap: "wrap" }}>
+                  {journeySteps.map((step, i) => {
+                    const config = STEP_CONFIG[step.stepType] || STEP_CONFIG.welcome;
+                    const isCompleted = i < previewStep;
+                    const isCurrent = i === previewStep;
+                    return (
                       <button
-                        onClick={() => setExpandedStep(isExpanded ? null : i)}
+                        key={step.id}
+                        onClick={() => setPreviewStep(i)}
                         style={{
-                          width: "100%", display: "flex", alignItems: "center", gap: 8,
-                          padding: "8px 12px", background: isExpanded ? colors.bgSoft : "#fff",
-                          border: "none", cursor: "pointer", textAlign: "left",
+                          width: 32, height: 32, borderRadius: 8, border: "none",
+                          background: isCurrent ? config.color : isCompleted ? "#10B981" : colors.bgSoft,
+                          color: isCurrent || isCompleted ? "#fff" : colors.textMuted,
+                          fontSize: "0.75rem", fontWeight: 700, cursor: "pointer",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          boxShadow: isCurrent ? `0 2px 8px ${config.color}40` : "none",
                         }}
+                        title={step.title}
                       >
-                        <span style={{ fontSize: "1rem" }}>{stepIcons[stepType] || "📌"}</span>
-                        <span style={{ fontSize: "0.75rem", fontWeight: 700, color: colors.text, flex: 1 }}>
-                          {i + 1}. {step.title || stepType}
-                        </span>
-                        <span style={{ fontSize: "0.625rem", color: colors.textMuted, textTransform: "uppercase" }}>
-                          {stepType}
-                        </span>
-                        {isExpanded ? <ChevronUp size={14} style={{ color: colors.textMuted }} /> : <ChevronDown size={14} style={{ color: colors.textMuted }} />}
+                        {isCompleted ? "✓" : config.icon}
                       </button>
-                      {isExpanded && (
-                        <div style={{ padding: "10px 12px", borderTop: `1px solid ${colors.border}`, background: "#fff" }}>
-                          {step.studentText && (
-                            <div style={{ marginBottom: "0.5rem" }}>
-                              <p style={{ fontSize: "0.625rem", fontWeight: 700, color: colors.textMuted, textTransform: "uppercase", marginBottom: 2 }}>Student text</p>
-                              <p style={{ fontSize: "0.8125rem", color: colors.text }}>{step.studentText}</p>
-                            </div>
-                          )}
-                          {step.owlText && (
-                            <div style={{ marginBottom: "0.5rem" }}>
-                              <p style={{ fontSize: "0.625rem", fontWeight: 700, color: colors.textMuted, textTransform: "uppercase", marginBottom: 2 }}>Owl Teacher</p>
-                              <p style={{ fontSize: "0.8125rem", color: colors.text, fontStyle: "italic" }}>{step.owlText}</p>
-                            </div>
-                          )}
-                          {step.interaction?.type && step.interaction.type !== "none" && (
-                            <div style={{ marginBottom: "0.5rem" }}>
-                              <p style={{ fontSize: "0.625rem", fontWeight: 700, color: colors.textMuted, textTransform: "uppercase", marginBottom: 2 }}>Interaction</p>
-                              <span style={{ fontSize: "0.75rem", fontWeight: 600, color: colors.primary, background: `${colors.primary}10`, padding: "2px 8px", borderRadius: 4 }}>
-                                {step.interaction.type}
-                              </span>
-                              {step.interaction.question && (
-                                <p style={{ fontSize: "0.75rem", color: colors.textMuted, marginTop: 4 }}>{step.interaction.question}</p>
-                              )}
-                            </div>
-                          )}
-                          {step.illustrationPrompt && (
-                            <div style={{ marginBottom: "0.5rem" }}>
-                              <p style={{ fontSize: "0.625rem", fontWeight: 700, color: colors.textMuted, textTransform: "uppercase", marginBottom: 2 }}>Illustration</p>
-                              <p style={{ fontSize: "0.75rem", color: colors.textMuted, fontStyle: "italic" }}>{step.illustrationPrompt}</p>
-                            </div>
-                          )}
-                          {step.video?.required && (
-                            <div>
-                              <p style={{ fontSize: "0.625rem", fontWeight: 700, color: colors.textMuted, textTransform: "uppercase", marginBottom: 2 }}>Video</p>
-                              <span style={{ fontSize: "0.6875rem", fontWeight: 600, color: step.video.approvedByAdmin ? colors.success : "#D97706", background: step.video.approvedByAdmin ? `${colors.success}10` : "#FEF3C7", padding: "2px 8px", borderRadius: 4 }}>
-                                {step.video.approvedByAdmin ? "✓ Approved" : "⚠ Not approved"}
-                              </span>
-                            </div>
-                          )}
+                    );
+                  })}
+                </div>
+
+                {/* Current step preview */}
+                {journeySteps[previewStep] && (() => {
+                  const step = journeySteps[previewStep];
+                  const config = STEP_CONFIG[step.stepType] || STEP_CONFIG.welcome;
+                  return (
+                    <div style={{ borderRadius: 12, border: `2px solid ${config.color}`, padding: "1.25rem", background: "#fff" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: "0.75rem" }}>
+                        <div style={{
+                          width: 36, height: 36, borderRadius: 10,
+                          background: `linear-gradient(135deg, ${config.color}, ${config.color}CC)`,
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          color: "#fff", fontSize: "1rem", fontWeight: 800,
+                        }}>
+                          {previewStep + 1}
                         </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            );
-          })()}
-
-          {/* Student Journey Preview — list + step-by-step walkthrough */}
-          {showJourneyPreview && (() => {
-            const cb = typeof lesson?.contentBlocks === "string"
-              ? JSON.parse(lesson.contentBlocks || "{}")
-              : (lesson?.contentBlocks || {});
-            const liveJourney: any[] = Array.isArray(cb?.studentJourney) ? cb.studentJourney : [];
-            const draftJourney: any[] = Array.isArray(cb?.studentJourneyDraft) ? cb.studentJourneyDraft : [];
-            const previewJourney = activeJourneyTab === "live" ? liveJourney : (aiDraft || draftJourney);
-            const isLivePreview = activeJourneyTab === "live";
-
-            if (previewJourney.length === 0) return null;
-
-            const stepIcons: Record<string, string> = {
-              welcome: "🦉", mission: "🎯", think_first: "💭", learn: "📖",
-              connect: "🔗", example: "💡", practice: "✏️", quick_check: "✅",
-              reflect: "🪞", complete: "🏆",
-            };
-
-            // ── Step-by-step walkthrough mode ──
-            if (previewMode === "step" && previewJourney.length > 0) {
-              const step = previewJourney[currentPreviewStep] || previewJourney[0];
-              const isFirst = currentPreviewStep === 0;
-              const isLast = currentPreviewStep === previewJourney.length - 1;
-              return (
-                <div style={{ marginTop: "1rem", border: `2px solid ${colors.success}`, borderRadius: 12, overflow: "hidden" }}>
-                  <div style={{ padding: "10px 16px", background: colors.success, color: "#fff", fontWeight: 700, fontSize: "0.8125rem", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <Play style={{ width: 14, height: 14 }} />
-                      {isLivePreview ? "Live" : "Draft"} Walkthrough — Step {currentPreviewStep + 1} of {previewJourney.length}
-                    </div>
-                    <button onClick={() => { setShowJourneyPreview(false); setPreviewMode("list"); }} style={{ background: "none", border: "none", color: "#fff", cursor: "pointer", fontSize: "0.75rem", fontWeight: 600 }}>
-                      ✕ Exit
-                    </button>
-                  </div>
-                  <div style={{ padding: "20px 24px", background: "#fff", minHeight: 200 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-                      <span style={{ fontSize: "1.5rem" }}>{stepIcons[step.stepType] || "📌"}</span>
-                      <span style={{ fontSize: "1rem", fontWeight: 800, color: colors.text }}>
-                        {step.title || step.stepType}
-                      </span>
-                      <span style={{ fontSize: "0.6875rem", fontWeight: 600, color: colors.textMuted, background: colors.bgSoft, padding: "2px 8px", borderRadius: 4, textTransform: "uppercase" }}>
-                        {step.stepType}
-                      </span>
-                      {step.interaction?.type && step.interaction.type !== "none" && (
-                        <span style={{ fontSize: "0.6875rem", fontWeight: 600, color: colors.primary, background: `${colors.primary}15`, padding: "2px 8px", borderRadius: 4 }}>
-                          ✋ {step.interaction.type.replace(/_/g, " ")}
-                        </span>
-                      )}
-                    </div>
-                    {step.studentText && (
-                      <div style={{ marginBottom: 12, padding: "12px 16px", borderRadius: 10, background: "#F0F9FF", border: "1px solid #BAE6FD" }}>
-                        <p style={{ fontSize: "0.6875rem", fontWeight: 700, color: "#0369A1", textTransform: "uppercase", marginBottom: 4 }}>Student Text</p>
-                        <p style={{ fontSize: "0.875rem", color: colors.text, lineHeight: 1.6 }}>{step.studentText}</p>
+                        <div>
+                          <h4 style={{ fontSize: "1rem", fontWeight: 800, color: colors.text }}>{step.title}</h4>
+                          <span style={{ fontSize: "0.6875rem", color: colors.textMuted }}>{config.label}</span>
+                        </div>
                       </div>
-                    )}
-                    {step.owlText && (
-                      <div style={{ marginBottom: 12, padding: "12px 16px", borderRadius: 10, background: "#FFFBEB", border: "1px solid #FDE68A" }}>
-                        <p style={{ fontSize: "0.6875rem", fontWeight: 700, color: "#92400E", textTransform: "uppercase", marginBottom: 4 }}>🦉 Owl Teacher</p>
-                        <p style={{ fontSize: "0.875rem", color: colors.text, lineHeight: 1.6, fontStyle: "italic" }}>{step.owlText}</p>
-                      </div>
-                    )}
-                    {step.interaction?.type && step.interaction.type !== "none" && (
-                      <div style={{ marginBottom: 12, padding: "10px 16px", borderRadius: 10, background: colors.bgSoft, border: `1px solid ${colors.border}` }}>
-                        <p style={{ fontSize: "0.6875rem", fontWeight: 700, color: colors.textMuted, textTransform: "uppercase", marginBottom: 4 }}>Interaction: {step.interaction.type}</p>
-                        {step.interaction.question && <p style={{ fontSize: "0.8125rem", color: colors.text }}>{step.interaction.question}</p>}
-                        {step.interaction.options && (
-                          <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 4 }}>
-                            {step.interaction.options.map((opt: string, oi: number) => (
-                              <span key={oi} style={{ fontSize: "0.75rem", padding: "2px 8px", borderRadius: 4, background: "white", border: `1px solid ${colors.border}`, color: colors.text }}>
-                                {String.fromCharCode(65 + oi)}. {opt}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                    <div style={{ marginBottom: 8, padding: "8px 16px", borderRadius: 8, background: "#F8FAFC", border: "1px solid #E2E8F0", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                      <span style={{ fontSize: "0.6875rem", fontWeight: 700, color: colors.textMuted, textTransform: "uppercase" }}>Media (admin only):</span>
-                      <span style={{ fontSize: "0.6875rem", fontWeight: 600, color: step.illustrationPrompt ? "#92400E" : "#6B7280", background: step.illustrationPrompt ? "#FEF3C7" : "#F3F4F6", padding: "2px 8px", borderRadius: 4 }}>
-                        {step.illustrationPrompt ? "🎨 Illustration prompt set" : "🎨 No illustration"}
-                      </span>
-                      {(() => {
-                        const vData = step.media?.video || step.video;
-                        const vApproved = vData?.approvedUrl && vData?.approvedByAdmin;
-                        const vSuggested = vData?.suggestedUrl && !vData?.approvedByAdmin;
-                        const vKeywords = vData?.searchKeywords && (Array.isArray(vData.searchKeywords) ? vData.searchKeywords.length > 0 : vData.searchKeywords.trim().length > 0);
-                        const vColor = vApproved ? "#065F46" : vSuggested ? "#B45309" : vKeywords ? "#92400E" : "#6B7280";
-                        const vBg = vApproved ? "#D1FAE5" : vSuggested ? "#FEF3C7" : vKeywords ? "#FEF3C7" : "#F3F4F6";
-                        const vLabel = vApproved ? "🎬 Video approved" : vSuggested ? "🎬 Video pending approval" : vKeywords ? "🎬 Video keywords set" : "🎬 No video";
-                        return (
-                          <span style={{ fontSize: "0.6875rem", fontWeight: 600, color: vColor, background: vBg, padding: "2px 8px", borderRadius: 4 }}>
-                            {vLabel}
-                          </span>
-                        );
-                      })()}
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 16, paddingTop: 12, borderTop: `1px solid ${colors.border}` }}>
-                      <button
-                        onClick={() => setCurrentPreviewStep(Math.max(0, currentPreviewStep - 1))}
-                        disabled={isFirst}
-                        style={{
-                          padding: "8px 16px", borderRadius: 8, border: `1px solid ${colors.border}`,
-                          background: isFirst ? colors.bgSoft : "white", color: isFirst ? colors.textMuted : colors.text,
-                          fontWeight: 700, fontSize: "0.8125rem", cursor: isFirst ? "default" : "pointer",
-                        }}
-                      >← Back</button>
-                      <span style={{ fontSize: "0.75rem", color: colors.textMuted, fontWeight: 600 }}>
-                        {currentPreviewStep + 1} / {previewJourney.length}
-                      </span>
-                      <button
-                        onClick={() => setCurrentPreviewStep(Math.min(previewJourney.length - 1, currentPreviewStep + 1))}
-                        disabled={isLast}
-                        style={{
-                          padding: "8px 16px", borderRadius: 8, border: "none",
-                          background: isLast ? colors.bgSoft : colors.success, color: isLast ? colors.textMuted : "#fff",
-                          fontWeight: 700, fontSize: "0.8125rem", cursor: isLast ? "default" : "pointer",
-                        }}
-                      >Next →</button>
-                    </div>
-                  </div>
-                </div>
-              );
-            }
 
-            // ── List mode (default) ──
-            return (
-              <div style={{ marginTop: "1rem", border: `2px solid ${colors.primary}`, borderRadius: 12, overflow: "hidden" }}>
-                <div style={{ padding: "10px 16px", background: colors.primary, color: "#fff", fontWeight: 700, fontSize: "0.8125rem", display: "flex", alignItems: "center", gap: 8 }}>
-                  <Eye style={{ width: 14, height: 14 }} />
-                  {isLivePreview ? "Live" : "Draft"} Preview — {previewJourney.length} steps {isLivePreview ? "(visible to students)" : "(not visible to students)"}
-                </div>
-                <div style={{ padding: "12px 16px", background: "#fff" }}>
-                  {previewJourney.map((step: any, i: number) => (
-                    <div key={i} style={{ marginBottom: 8, padding: "8px 10px", borderRadius: 8, background: colors.bgSoft, border: `1px solid ${colors.border}` }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
-                        <span style={{ fontSize: "1rem" }}>{stepIcons[step.stepType] || "📌"}</span>
-                        <span style={{ fontSize: "0.75rem", fontWeight: 700, color: colors.text }}>
-                          Step {i + 1}: {step.title || step.stepType}
-                        </span>
-                        {step.interaction?.type && step.interaction.type !== "none" && (
-                          <span style={{ fontSize: "0.625rem", fontWeight: 600, color: colors.primary, background: `${colors.primary}15`, padding: "1px 6px", borderRadius: 4 }}>
-                            ✋ {step.interaction.type.replace(/_/g, " ")}
-                          </span>
-                        )}
-                      </div>
-                      {step.studentText && (
-                        <p style={{ fontSize: "0.75rem", color: colors.text, lineHeight: 1.4, margin: "4px 0 0 22px" }}>
-                          {step.studentText.length > 150 ? step.studentText.slice(0, 150) + "…" : step.studentText}
-                        </p>
-                      )}
                       {step.owlText && (
-                        <p style={{ fontSize: "0.6875rem", color: colors.textMuted, fontStyle: "italic", margin: "2px 0 0 22px" }}>
-                          🦉 {step.owlText.length > 100 ? step.owlText.slice(0, 100) + "…" : step.owlText}
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            );
-          })()}
-          {aiDraft && aiDraft.length > 0 && aiMetadata?.reviewStatus === "NEEDS_REVIEW" && (
-            <div style={{ display: "flex", gap: 8, marginTop: "1rem", paddingTop: "1rem", borderTop: `1px solid ${colors.border}` }}>
-              <button
-                onClick={handleApproveJourney}
-                style={{
-                  display: "inline-flex", alignItems: "center", gap: "0.5rem",
-                  padding: "8px 16px", borderRadius: 8, border: "none",
-                  background: colors.success, color: "#fff",
-                  fontWeight: 700, fontSize: "0.8125rem", cursor: "pointer",
-                }}
-              >
-                <ThumbsUp style={{ width: 14, height: 14 }} />
-                Approve Journey
-              </button>
-              <button
-                onClick={handleRejectJourney}
-                style={{
-                  display: "inline-flex", alignItems: "center", gap: "0.5rem",
-                  padding: "8px 16px", borderRadius: 8, border: `1.5px solid ${colors.border}`,
-                  background: "#fff", color: colors.textMuted,
-                  fontWeight: 700, fontSize: "0.8125rem", cursor: "pointer",
-                }}
-              >
-                <ThumbsDown style={{ width: 14, height: 14 }} />
-                Reject Draft
-              </button>
-            </div>
-          )}
-
-          {/* AI metadata */}
-          {aiMetadata && (
-            <div style={{ marginTop: "0.75rem", padding: "0.5rem 0.75rem", borderRadius: 6, background: colors.bgSoft, fontSize: "0.6875rem", color: colors.textMuted }}>
-              {aiMetadata.model && <span>Model: {aiMetadata.model} · </span>}
-              {aiMetadata.generatedAt && <span>Generated: {new Date(aiMetadata.generatedAt).toLocaleString()} · </span>}
-              <span>Status: {aiMetadata.reviewStatus}</span>
-            </div>
-          )}
-        </div>
-
-        {/* ── Illustrations Section ── */}
-        {(() => {
-          const journeyForIllustrations = (() => {
-            try {
-              const cb = typeof lesson?.contentBlocks === "string" ? JSON.parse(lesson.contentBlocks) : lesson?.contentBlocks;
-              return (cb?.studentJourney || cb?.studentJourneyDraft || []).map((s: any, i: number) => ({ ...s, _index: i })).filter((s: any) => s.illustrationPrompt);
-            } catch { return []; }
-          })();
-
-          if (journeyForIllustrations.length === 0) return null;
-
-          const stepIcons: Record<string, string> = {
-            welcome: "🦉", mission: "🎯", think_first: "💭", learn: "📖",
-            connect: "🔗", example: "💡", practice: "✏️", quick_check: "✅",
-            reflect: "🪞", complete: "🏆",
-          };
-
-          const getStatusLabel = (step: any) => {
-            const ill = step.media?.illustration;
-            if (!ill) return "Missing";
-            return ill.status || "Missing";
-          };
-
-          const getStatusColor = (status: string) => {
-            switch (status) {
-              case "APPROVED": return colors.success;
-              case "GENERATED": case "UPLOADED": return "#D97706";
-              case "FAILED": return "#DC2626";
-              case "GENERATING": return colors.primary;
-              default: return colors.textMuted;
-            }
-          };
-
-          const handleGenerate = async (step: any) => {
-            const idx = step._index;
-            setIllustrationStates(prev => ({ ...prev, [idx]: { loading: true, error: null } }));
-            try {
-              const res = await fetch(`/api/admin/lessons/${params.id}/illustrations/generate`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify({
-                  stepIndex: idx,
-                  illustrationPrompt: step.illustrationPrompt,
-                  stylePreset: "warm, child-friendly, Kenyan classroom/home context, clear objects, not too busy, Grade 2 appropriate, visually consistent",
-                }),
-              });
-              const data = await res.json();
-              if (!res.ok) throw new Error(data.error || "Generation failed");
-              // Reload lesson to get updated data
-              const lessonRes = await fetch(`/api/admin/lessons/${params.id}`, { credentials: "include" });
-              if (lessonRes.ok) {
-                const lessonData = await lessonRes.json();
-                if (lessonData.lesson) {
-                  setLesson((prev: any) => prev ? { ...prev, ...lessonData.lesson } : prev);
-                }
-              }
-              setSaveSuccess(true);
-              setTimeout(() => setSaveSuccess(false), 3000);
-            } catch (err: any) {
-              setIllustrationStates(prev => ({ ...prev, [idx]: { loading: false, error: err.message || "Generation failed" } }));
-            } finally {
-              setIllustrationStates(prev => ({ ...prev, [idx]: { loading: false, error: prev[idx]?.error || null } }));
-            }
-          };
-
-          const handleUpload = async (step: any) => {
-            const idx = step._index;
-            setIllustrationStates(prev => ({ ...prev, [idx]: { loading: true, error: null } }));
-            try {
-              // In a real implementation, this would open a file picker and upload
-              // For now, show a message that file upload is coming soon
-              throw new Error("File upload coming soon. Use AI generation for now.");
-            } catch (err: any) {
-              setIllustrationStates(prev => ({ ...prev, [idx]: { loading: false, error: err.message || "Upload failed" } }));
-            } finally {
-              setIllustrationStates(prev => ({ ...prev, [idx]: { loading: false, error: prev[idx]?.error || null } }));
-            }
-          };
-
-          const handleApprove = async (step: any) => {
-            const idx = step._index;
-            setIllustrationStates(prev => ({ ...prev, [idx]: { loading: true, error: null } }));
-            try {
-              const res = await fetch(`/api/admin/lessons/${params.id}/illustrations/approve`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify({ stepIndex: idx, action: "approve" }),
-              });
-              const data = await res.json();
-              if (!res.ok) throw new Error(data.error || "Approval failed");
-              const lessonRes = await fetch(`/api/admin/lessons/${params.id}`, { credentials: "include" });
-              if (lessonRes.ok) {
-                const lessonData = await lessonRes.json();
-                if (lessonData.lesson) {
-                  setLesson((prev: any) => prev ? { ...prev, ...lessonData.lesson } : prev);
-                }
-              }
-            } catch (err: any) {
-              setIllustrationStates(prev => ({ ...prev, [idx]: { loading: false, error: err.message } }));
-            } finally {
-              setIllustrationStates(prev => ({ ...prev, [idx]: { loading: false, error: prev[idx]?.error || null } }));
-            }
-          };
-
-          const handleRemove = async (step: any) => {
-            const idx = step._index;
-            setIllustrationStates(prev => ({ ...prev, [idx]: { loading: true, error: null } }));
-            try {
-              const res = await fetch(`/api/admin/lessons/${params.id}/illustrations/approve`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify({ stepIndex: idx, action: "remove" }),
-              });
-              const data = await res.json();
-              if (!res.ok) throw new Error(data.error || "Remove failed");
-              const lessonRes = await fetch(`/api/admin/lessons/${params.id}`, { credentials: "include" });
-              if (lessonRes.ok) {
-                const lessonData = await lessonRes.json();
-                if (lessonData.lesson) {
-                  setLesson((prev: any) => prev ? { ...prev, ...lessonData.lesson } : prev);
-                }
-              }
-            } catch (err: any) {
-              setIllustrationStates(prev => ({ ...prev, [idx]: { loading: false, error: err.message } }));
-            } finally {
-              setIllustrationStates(prev => ({ ...prev, [idx]: { loading: false, error: prev[idx]?.error || null } }));
-            }
-          };
-
-          return (
-            <div style={{ ...ds.card, padding: "1.25rem 1.5rem", marginBottom: "1.5rem" }}>
-              <h3 style={{ fontSize: "0.9375rem", fontWeight: 800, color: colors.text, display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1rem" }}>
-                <Sparkles style={{ width: 16, height: 16, color: colors.primary }} />
-                Illustrations
-                <span style={{ fontSize: "0.6875rem", fontWeight: 600, color: colors.textMuted, background: colors.bgSoft, padding: "0.15rem 0.5rem", borderRadius: 6 }}>
-                  {journeyForIllustrations.length} steps
-                </span>
-              </h3>
-              <p style={{ fontSize: "0.75rem", color: colors.textMuted, marginBottom: "1rem" }}>
-                Generate or upload images for each lesson step. Students only see approved images.
-              </p>
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-                {journeyForIllustrations.map((step: any) => {
-                  const idx = step._index;
-                  const state = illustrationStates[idx] || { loading: false, error: null };
-                  const status = getStatusLabel(step);
-                  const statusColor = getStatusColor(status);
-                  const isApproved = status === "APPROVED";
-                  const hasGenerated = status === "GENERATED" || status === "UPLOADED";
-
-                  return (
-                    <div key={idx} style={{ border: `1px solid ${colors.border}`, borderRadius: 10, padding: "12px 14px", background: "#fff" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
-                        <span style={{ fontSize: "1.1rem" }}>{stepIcons[step.stepType] || "📌"}</span>
-                        <span style={{ fontSize: "0.8125rem", fontWeight: 700, color: colors.text }}>
-                          Step {idx + 1}: {step.title || step.stepType}
-                        </span>
-                        <span style={{ fontSize: "0.625rem", fontWeight: 600, color: statusColor, background: `${statusColor}15`, padding: "1px 6px", borderRadius: 4 }}>
-                          {status}
-                        </span>
-                      </div>
-                      <div style={{ background: colors.bgSoft, borderRadius: 8, padding: "8px 10px", marginBottom: "8px" }}>
-                        <p style={{ fontSize: "0.625rem", fontWeight: 700, color: colors.textMuted, textTransform: "uppercase", marginBottom: "2px" }}>Prompt</p>
-                        <p style={{ fontSize: "0.75rem", color: colors.text, fontStyle: "italic" }}>{step.illustrationPrompt}</p>
-                      </div>
-                      {state.error && (
-                        <div style={{ marginBottom: "8px", padding: "6px 10px", borderRadius: 6, background: "#FEE2E2", border: "1px solid #FECACA" }}>
-                          <p style={{ fontSize: "0.6875rem", color: "#DC2626", fontWeight: 600 }}>⚠ {state.error}</p>
+                        <div style={{
+                          padding: "10px 12px", borderRadius: 10, marginBottom: "0.75rem",
+                          background: "linear-gradient(135deg, #F0F9FF, #E0E7FF)",
+                          border: "1px solid #BAE6FD",
+                        }}>
+                          <p style={{ fontSize: "0.8125rem", color: "#1E40AF", lineHeight: 1.5 }}>
+                            <span style={{ fontWeight: 700 }}>🦉 Owl Teacher: </span>
+                            {step.owlText}
+                          </p>
                         </div>
                       )}
-                      <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
-                        <button
-                          onClick={() => handleGenerate(step)}
-                          disabled={state.loading}
-                          style={{
-                            display: "inline-flex", alignItems: "center", gap: "0.35rem",
-                            padding: "5px 12px", borderRadius: 6, border: "none",
-                            background: state.loading ? colors.textMuted : colors.primary,
-                            color: "#fff", fontWeight: 700, fontSize: "0.6875rem",
-                            cursor: state.loading ? "not-allowed" : "pointer",
-                          }}
-                        >
-                          {state.loading ? (
-                            <><span className="spinner" style={{ width: 12, height: 12, border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%", display: "inline-block" }} /> Generating...</>
-                          ) : (
-                            <><Sparkles style={{ width: 12, height: 12 }} /> Generate with AI</>
+
+                      {step.studentText && (
+                        <div style={{ fontSize: "0.875rem", color: colors.text, lineHeight: 1.6, marginBottom: "0.75rem" }}>
+                          {step.studentText}
+                        </div>
+                      )}
+
+                      {step.mathDisplay && (
+                        <div style={{
+                          padding: "12px", borderRadius: 10, textAlign: "center",
+                          background: "#F8FAFC", border: `1px solid ${colors.border}`,
+                          marginBottom: "0.75rem",
+                        }}>
+                          <span style={{ fontSize: "1.25rem", fontFamily: "monospace", fontWeight: 700, color: colors.text }}>
+                            {step.mathDisplay}
+                          </span>
+                        </div>
+                      )}
+
+                      {step.interaction?.question && (
+                        <div style={{
+                          padding: "10px 12px", borderRadius: 10,
+                          background: "#FEF3C7", border: "1px solid #FDE68A",
+                          marginBottom: "0.75rem",
+                        }}>
+                          <p style={{ fontSize: "0.8125rem", fontWeight: 700, color: "#92400E" }}>
+                            ✋ {step.interaction.question}
+                          </p>
+                          {step.interaction.options && (
+                            <div style={{ marginTop: "0.5rem", display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+                              {step.interaction.options.map((opt, oi) => (
+                                <div key={oi} style={{
+                                  padding: "6px 10px", borderRadius: 6,
+                                  background: oi === step.interaction?.correctAnswer ? "#D1FAE5" : "#fff",
+                                  border: `1px solid ${oi === step.interaction?.correctAnswer ? "#10B981" : colors.border}`,
+                                  fontSize: "0.75rem", color: colors.text,
+                                }}>
+                                  {String.fromCharCode(65 + oi)}. {opt}
+                                  {oi === step.interaction?.correctAnswer && " ✓"}
+                                </div>
+                              ))}
+                            </div>
                           )}
-                        </button>
+                        </div>
+                      )}
+
+                      {/* Navigation */}
+                      <div style={{ display: "flex", justifyContent: "space-between", marginTop: "1rem" }}>
                         <button
-                          onClick={() => handleUpload(step)}
-                          disabled={state.loading}
+                          onClick={() => setPreviewStep(Math.max(0, previewStep - 1))}
+                          disabled={previewStep === 0}
                           style={{
-                            display: "inline-flex", alignItems: "center", gap: "0.35rem",
-                            padding: "5px 12px", borderRadius: 6, border: `1.5px solid ${colors.border}`,
-                            background: "#fff", color: colors.textMuted,
-                            fontWeight: 700, fontSize: "0.6875rem",
-                            cursor: state.loading ? "not-allowed" : "pointer",
+                            padding: "8px 16px", borderRadius: 8,
+                            border: `1px solid ${colors.border}`, background: "#fff",
+                            color: colors.text, fontWeight: 700, fontSize: "0.75rem",
+                            cursor: previewStep === 0 ? "not-allowed" : "pointer",
+                            opacity: previewStep === 0 ? 0.5 : 1,
                           }}
                         >
-                          Upload Image
+                          ← Back
                         </button>
-                        {hasGenerated && !isApproved && (
-                          <button
-                            onClick={() => handleApprove(step)}
-                            disabled={state.loading}
-                            style={{
-                              display: "inline-flex", alignItems: "center", gap: "0.35rem",
-                              padding: "5px 12px", borderRadius: 6, border: "none",
-                              background: colors.success, color: "#fff",
-                              fontWeight: 700, fontSize: "0.6875rem",
-                              cursor: state.loading ? "not-allowed" : "pointer",
-                            }}
-                          >
-                            <CheckCircle2 style={{ width: 12, height: 12 }} /> Approve
-                          </button>
-                        )}
-                        {(hasGenerated || isApproved) && (
-                          <button
-                            onClick={() => handleRemove(step)}
-                            disabled={state.loading}
-                            style={{
-                              display: "inline-flex", alignItems: "center", gap: "0.35rem",
-                              padding: "5px 12px", borderRadius: 6, border: `1.5px solid ${colors.border}`,
-                              background: "#fff", color: "#DC2626",
-                              fontWeight: 700, fontSize: "0.6875rem",
-                              cursor: state.loading ? "not-allowed" : "pointer",
-                            }}
-                          >
-                            Remove
-                          </button>
-                        )}
+                        <button
+                          onClick={() => setPreviewStep(Math.min(journeySteps.length - 1, previewStep + 1))}
+                          disabled={previewStep === journeySteps.length - 1}
+                          style={{
+                            padding: "8px 16px", borderRadius: 8, border: "none",
+                            background: config.color, color: "#fff",
+                            fontWeight: 700, fontSize: "0.75rem",
+                            cursor: previewStep === journeySteps.length - 1 ? "not-allowed" : "pointer",
+                            opacity: previewStep === journeySteps.length - 1 ? 0.5 : 1,
+                          }}
+                        >
+                          Next →
+                        </button>
                       </div>
                     </div>
                   );
-                })}
+                })()}
               </div>
             </div>
-          );
-        })()}
-
-        {/* ── Video Section ── */}
-        {(() => {
-          const journeyForVideos = (() => {
-            try {
-              const cb = typeof lesson?.contentBlocks === "string" ? JSON.parse(lesson.contentBlocks) : lesson?.contentBlocks;
-              return (cb?.studentJourney || cb?.studentJourneyDraft || []).map((s: any, i: number) => ({ ...s, _index: i }));
-            } catch { return []; }
-          })();
-
-          if (journeyForVideos.length === 0) return null;
-
-          const stepIcons: Record<string, string> = {
-            welcome: "🦉", mission: "🎯", think_first: "💭", learn: "📖",
-            connect: "🔗", example: "💡", practice: "✏️", quick_check: "✅",
-            reflect: "🪞", complete: "🏆",
-          };
-
-          return (
-            <div style={{ ...ds.card, padding: "1.25rem 1.5rem", marginBottom: "1.5rem" }}>
-              <h3 style={{ fontSize: "0.9375rem", fontWeight: 800, color: colors.text, display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1rem" }}>
-                <Video style={{ width: 16, height: 16, color: colors.primary }} />
-                Videos
-                <span style={{ fontSize: "0.6875rem", fontWeight: 600, color: colors.textMuted, background: colors.bgSoft, padding: "0.15rem 0.5rem", borderRadius: 6 }}>
-                  {journeyForVideos.length} steps
-                </span>
-              </h3>
-              <p style={{ fontSize: "0.75rem", color: colors.textMuted, marginBottom: "1rem" }}>
-                Add YouTube videos to lesson steps. Students only see approved videos. Supports youtube.com/watch, youtu.be, youtube.com/shorts, and youtube.com/embed links.
-              </p>
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-                {journeyForVideos.map((step: any) => {
-                  const idx = step._index;
-                  const vState = videoStates[idx] || { loading: false, error: null, url: "", title: "" };
-                  const videoData = step.media?.video;
-                  const hasApproved = videoData?.approvedUrl && videoData?.approvedByAdmin;
-                  const hasSuggested = videoData?.suggestedUrl && !videoData?.approvedByAdmin;
-                  const hasSearchKeywords = videoData?.searchKeywords && videoData.searchKeywords.length > 0;
-
-                  return (
-                    <div key={idx} style={{ border: `1px solid ${colors.border}`, borderRadius: 10, padding: "12px 14px", background: "#fff" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
-                        <span style={{ fontSize: "1.1rem" }}>{stepIcons[step.stepType] || "📌"}</span>
-                        <span style={{ fontSize: "0.8125rem", fontWeight: 700, color: colors.text }}>
-                          Step {idx + 1}: {step.title || step.stepType}
-                        </span>
-                        {hasApproved && (
-                          <span style={{ fontSize: "0.625rem", fontWeight: 600, color: colors.success, background: `${colors.success}15`, padding: "1px 6px", borderRadius: 4 }}>
-                            ✓ Approved
-                          </span>
-                        )}
-                        {hasSuggested && (
-                          <span style={{ fontSize: "0.625rem", fontWeight: 600, color: "#D97706", background: "#FEF3C7", padding: "1px 6px", borderRadius: 4 }}>
-                            Pending approval
-                          </span>
-                        )}
-                        {!hasApproved && !hasSuggested && hasSearchKeywords && (
-                          <span style={{ fontSize: "0.625rem", fontWeight: 600, color: colors.textMuted, background: colors.bgSoft, padding: "1px 6px", borderRadius: 4 }}>
-                            No video
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Show approved video preview */}
-                      {hasApproved && videoData.approvedUrl && (
-                        <div style={{ marginBottom: "8px", borderRadius: 8, overflow: "hidden", border: `1px solid ${colors.border}` }}>
-                          <div style={{ position: "relative", width: "100%", paddingBottom: "40%", background: "#f1f5f9" }}>
-                            <iframe
-                              src={`https://www.youtube.com/embed/${(() => {
-                                const patterns = [
-                                  /(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/,
-                                  /(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/,
-                                  /(?:youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
-                                  /(?:youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/,
-                                ];
-                                for (const p of patterns) { const m = videoData.approvedUrl.match(p); if (m) return m[1]; }
-                                return "";
-                              })()}`}
-                              title={videoData.approvedTitle || "Lesson video"}
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                              allowFullScreen
-                              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: "none" }}
-                            />
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Show suggested video link */}
-                      {hasSuggested && videoData.suggestedUrl && (
-                        <div style={{ marginBottom: "8px", padding: "6px 10px", borderRadius: 6, background: "#FEF3C7", border: "1px solid #FDE68A", display: "flex", alignItems: "center", gap: 6 }}>
-                          <Link2 style={{ width: 12, height: 12, color: "#D97706", flexShrink: 0 }} />
-                          <a href={videoData.suggestedUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: "0.6875rem", color: "#92400E", fontWeight: 600, textDecoration: "underline" }}>
-                            {videoData.suggestedUrl}
-                          </a>
-                        </div>
-                      )}
-
-                      {vState.error && (
-                        <div style={{ marginBottom: "8px", padding: "6px 10px", borderRadius: 6, background: "#FEE2E2", border: "1px solid #FECACA" }}>
-                          <p style={{ fontSize: "0.6875rem", color: "#DC2626", fontWeight: 600 }}>⚠ {vState.error}</p>
-                        </div>
-                      )}
-
-                      {/* URL input */}
-                      <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", alignItems: "flex-end" }}>
-                        <div style={{ flex: 1, minWidth: 200 }}>
-                          <label style={{ fontSize: "0.625rem", fontWeight: 700, color: colors.textMuted, textTransform: "uppercase", marginBottom: 2, display: "block" }}>YouTube URL</label>
-                          <input
-                            type="url"
-                            placeholder="https://www.youtube.com/watch?v=..."
-                            value={vState.url || ""}
-                            onChange={e => setVideoStates(prev => ({ ...prev, [idx]: { ...prev[idx], url: e.target.value, error: null } }))}
-                            style={{ width: "100%", padding: "6px 10px", borderRadius: 6, border: `1px solid ${colors.border}`, fontSize: "0.75rem", color: colors.text, outline: "none" }}
-                          />
-                        </div>
-                        <div style={{ width: 140 }}>
-                          <label style={{ fontSize: "0.625rem", fontWeight: 700, color: colors.textMuted, textTransform: "uppercase", marginBottom: 2, display: "block" }}>Title (optional)</label>
-                          <input
-                            type="text"
-                            placeholder="Video title"
-                            value={vState.title || ""}
-                            onChange={e => setVideoStates(prev => ({ ...prev, [idx]: { ...prev[idx], title: e.target.value } }))}
-                            style={{ width: "100%", padding: "6px 10px", borderRadius: 6, border: `1px solid ${colors.border}`, fontSize: "0.75rem", color: colors.text, outline: "none" }}
-                          />
-                        </div>
-                      </div>
-
-                      {/* Action buttons */}
-                      <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginTop: "8px" }}>
-                        <button
-                          onClick={() => {
-                            if (!vState.url.trim()) {
-                              setVideoStates(prev => ({ ...prev, [idx]: { ...prev[idx], error: "Please enter a YouTube URL" } }));
-                              return;
-                            }
-                            handleAddVideo(step, vState.url.trim(), vState.title.trim());
-                          }}
-                          disabled={vState.loading}
-                          style={{
-                            display: "inline-flex", alignItems: "center", gap: "0.35rem",
-                            padding: "5px 12px", borderRadius: 6, border: "none",
-                            background: vState.loading ? colors.textMuted : colors.primary,
-                            color: "#fff", fontWeight: 700, fontSize: "0.6875rem",
-                            cursor: vState.loading ? "not-allowed" : "pointer",
-                          }}
-                        >
-                          {vState.loading ? (
-                            <><span className="spinner" style={{ width: 12, height: 12, border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%", display: "inline-block" }} /> Saving...</>
-                          ) : hasApproved || hasSuggested ? (
-                            <><Link2 style={{ width: 12, height: 12 }} /> Replace Video</>
-                          ) : (
-                            <><Link2 style={{ width: 12, height: 12 }} /> Add Video</>
-                          )}
-                        </button>
-                        {hasSuggested && !hasApproved && (
-                          <button
-                            onClick={() => handleApproveVideo(step)}
-                            disabled={vState.loading}
-                            style={{
-                              display: "inline-flex", alignItems: "center", gap: "0.35rem",
-                              padding: "5px 12px", borderRadius: 6, border: "none",
-                              background: colors.success, color: "#fff",
-                              fontWeight: 700, fontSize: "0.6875rem",
-                              cursor: vState.loading ? "not-allowed" : "pointer",
-                            }}
-                          >
-                            <CheckCircle2 style={{ width: 12, height: 12 }} /> Approve
-                          </button>
-                        )}
-                        {(hasApproved || hasSuggested) && (
-                          <button
-                            onClick={() => handleRemoveVideo(step)}
-                            disabled={vState.loading}
-                            style={{
-                              display: "inline-flex", alignItems: "center", gap: "0.35rem",
-                              padding: "5px 12px", borderRadius: 6, border: `1.5px solid ${colors.border}`,
-                              background: "#fff", color: "#DC2626",
-                              fontWeight: 700, fontSize: "0.6875rem",
-                              cursor: vState.loading ? "not-allowed" : "pointer",
-                            }}
-                          >
-                            Remove
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          );
-        })()}
-
-        {/* Edit form */}
-        <div style={{ display: "grid", gap: "1.5rem" }}>
-          {/* Basic Info */}
-          <div style={{ ...ds.card, padding: "1.5rem" }}>
-            <h2 style={{ fontSize: "1.125rem", fontWeight: 800, color: colors.text, marginBottom: "1rem" }}>Basic Information</h2>
-            <div style={{ display: "grid", gap: "1rem" }}>
-              <div>
-                <label style={labelStyle}>Lesson Title *</label>
-                <input style={inputStyle} value={form.title} onChange={e => updateField("title", e.target.value)} />
-              </div>
-              <div>
-                <label style={labelStyle}>Description</label>
-                <textarea style={{ ...inputStyle, minHeight: 80, resize: "vertical" }} value={form.description} onChange={e => updateField("description", e.target.value)} />
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-                <div>
-                  <label style={labelStyle}>Status</label>
-                  <select style={inputStyle} value={form.status} onChange={e => updateField("status", e.target.value)}>
-                    {STATUS_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label style={labelStyle}>XP Reward</label>
-                  <input type="number" style={inputStyle} value={form.xpReward} onChange={e => updateField("xpReward", Number(e.target.value))} />
-                </div>
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
-                <div>
-                  <label style={labelStyle}>Difficulty</label>
-                  <select style={inputStyle} value={form.difficulty} onChange={e => updateField("difficulty", e.target.value)}>
-                    <option value="easy">Easy</option>
-                    <option value="medium">Medium</option>
-                    <option value="hard">Hard</option>
-                  </select>
-                </div>
-                <div>
-                  <label style={labelStyle}>Estimated Duration (min)</label>
-                  <input type="number" style={inputStyle} value={form.estimatedDurationMinutes} onChange={e => updateField("estimatedDurationMinutes", Number(e.target.value))} />
-                </div>
-                <div style={{ display: "none" }} />
-              </div>
-            </div>
-          </div>
-
-          {/* Curriculum Details */}
-          <div style={{ ...ds.card, padding: "1.5rem" }}>
-            <h2 style={{ fontSize: "1.125rem", fontWeight: 800, color: colors.text, marginBottom: "1rem" }}>Curriculum Details</h2>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-              <div>
-                <label style={labelStyle}>Strand</label>
-                <input style={inputStyle} value={form.strand} onChange={e => updateField("strand", e.target.value)} />
-              </div>
-              <div>
-                <label style={labelStyle}>Sub-Strand</label>
-                <input style={inputStyle} value={form.subStrand} onChange={e => updateField("subStrand", e.target.value)} />
-              </div>
-              <div style={{ gridColumn: "1 / -1" }}>
-                <label style={labelStyle}>Learning Outcome</label>
-                <textarea style={{ ...inputStyle, minHeight: 60, resize: "vertical" }} value={form.learningOutcome} onChange={e => updateField("learningOutcome", e.target.value)} />
-              </div>
-              <div>
-                <label style={labelStyle}>Term</label>
-                <input style={inputStyle} value={form.term} onChange={e => updateField("term", e.target.value)} placeholder="Term 1" />
-              </div>
-              <div>
-                <label style={labelStyle}>Week</label>
-                <input style={inputStyle} value={form.week} onChange={e => updateField("week", e.target.value)} placeholder="Week 1" />
-              </div>
-            </div>
-          </div>
-
-          {/* Activity */}
-          <div style={{ ...ds.card, padding: "1.5rem" }}>
-            <h2 style={{ fontSize: "1.125rem", fontWeight: 800, color: colors.text, marginBottom: "1rem" }}>Activity</h2>
-            <div style={{ display: "grid", gap: "1rem" }}>
-              <div>
-                <label style={labelStyle}>Activity Title</label>
-                <input style={inputStyle} value={form.activityTitle} onChange={e => updateField("activityTitle", e.target.value)} />
-              </div>
-              <div>
-                <label style={labelStyle}>Activity Instructions</label>
-                <textarea style={{ ...inputStyle, minHeight: 100, resize: "vertical" }} value={form.activityInstructions} onChange={e => updateField("activityInstructions", e.target.value)} />
-              </div>
-            </div>
-          </div>
-
-          {/* Quest */}
-          <div style={{ ...ds.card, padding: "1.5rem" }}>
-            <h2 style={{ fontSize: "1.125rem", fontWeight: 800, color: colors.text, marginBottom: "1rem" }}>Quest</h2>
-            <div style={{ display: "grid", gap: "1rem" }}>
-              <div>
-                <label style={labelStyle}>Quest Title</label>
-                <input style={inputStyle} value={form.questTitle} onChange={e => updateField("questTitle", e.target.value)} />
-              </div>
-              <div>
-                <label style={labelStyle}>Quest Instructions</label>
-                <textarea style={{ ...inputStyle, minHeight: 100, resize: "vertical" }} value={form.questInstructions} onChange={e => updateField("questInstructions", e.target.value)} />
-              </div>
-            </div>
-          </div>
-
-          {/* Reflection & Rewards */}
-          <div style={{ ...ds.card, padding: "1.5rem" }}>
-            <h2 style={{ fontSize: "1.125rem", fontWeight: 800, color: colors.text, marginBottom: "1rem" }}>Reflection & Rewards</h2>
-            <div style={{ display: "grid", gap: "1rem" }}>
-              <div>
-                <label style={labelStyle}>Reflection Prompt</label>
-                <textarea style={{ ...inputStyle, minHeight: 80, resize: "vertical" }} value={form.reflectionPrompt} onChange={e => updateField("reflectionPrompt", e.target.value)} />
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-                <div>
-                  <label style={labelStyle}>Reward Coins</label>
-                  <input type="number" style={inputStyle} value={form.rewardCoins} onChange={e => updateField("rewardCoins", Number(e.target.value))} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Reward Stars</label>
-                  <input type="number" style={inputStyle} value={form.rewardStars} onChange={e => updateField("rewardStars", Number(e.target.value))} />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Save button at bottom too */}
-          <div style={{ display: "flex", justifyContent: "flex-end", paddingBottom: "2rem" }}>
-            <button onClick={handleSave} disabled={saving} style={{
-              display: "inline-flex", alignItems: "center", gap: "0.5rem",
-              padding: "12px 28px", borderRadius: 12, border: "none",
-              background: saveSuccess ? "#22C55E" : colors.primary,
-              color: "#fff", fontWeight: 700, fontSize: "0.9375rem",
-              cursor: "pointer",
-            }}>
-              <Save style={{ width: 18, height: 18 }} />
-              {saving ? "Saving..." : saveSuccess ? "Saved ✓" : "Save Changes"}
-            </button>
-          </div>
+          )}
         </div>
       </div>
     </div>
   );
 }
+
+const stepActionBtn: React.CSSProperties = {
+  padding: 4, borderRadius: 6, border: "none", background: "transparent",
+  color: "#94A3B8", cursor: "pointer", display: "flex", alignItems: "center",
+};
