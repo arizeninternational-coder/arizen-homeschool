@@ -1,23 +1,20 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
 import { useState, useEffect, useCallback, useRef, Component, ReactNode } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import {
   ArrowLeft, CheckCircle2, Zap, BookOpen, Flame,
-  Target, Star, ChevronRight, ChevronLeft, RotateCcw, Eye,
-  Pencil, HelpCircle, Trophy, MessageCircle, Play,
-  Map, Sparkles
+  ChevronRight, ChevronLeft, Trophy, MessageCircle, Play,
+  Star, Sparkles, Award, Target, Lightbulb, HelpCircle,
+  Pencil, Eye, Clock, Gift,
 } from "lucide-react";
 import { GradientButton } from "@/components/ui/Pill";
 import OwlTeacher from "@/components/ui/OwlTeacher";
-// confetti is dynamically imported in fireConfetti to avoid SSR issues
-import type { JourneyStep, JourneyStepType, JourneyInteraction } from "@/lib/curriculum/lesson-journey";
-import { STEP_TYPE_ICONS, buildUniversalJourney } from "@/lib/curriculum/lesson-journey";
+import type { JourneyStep, JourneyStepType } from "@/lib/curriculum/lesson-journey";
+import { STEP_TYPE_ICONS } from "@/lib/curriculum/lesson-journey";
 
-/* ─── helpers ─── */
+// ── Helpers ──────────────────────────────────────────────────────────────────
 
 function getRewardValue(value: any): number {
   if (typeof value === "number") return value;
@@ -61,43 +58,9 @@ function extractYouTubeId(url: string): string | null {
     /(?:youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
     /(?:youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/,
   ];
-  for (const p of patterns) {
-    const m = url.match(p);
-    if (m) return m[1];
-  }
+  for (const p of patterns) { const m = url.match(p); if (m) return m[1]; }
   return null;
 }
-
-const STEP_LABELS: Record<JourneyStepType, string> = {
-  welcome: "Welcome", mission: "Mission", think_first: "Predict",
-  learn: "Learn", connect: "Connect", example: "Example",
-  practice: "Practice", quick_check: "Check", reflect: "Reflect", complete: "Done",
-};
-
-const NEXT_BUTTON_LABELS: Record<JourneyStepType, string> = {
-  welcome: "Start Mission", mission: "I'm Ready", think_first: "Save My Guess",
-  learn: "I Understand", connect: "Continue", example: "Show Practice",
-  practice: "Save Work", quick_check: "Check Answer",
-  reflect: "Continue to Finish", complete: "",
-};
-
-// Localization map for Kiswahili
-const NEXT_BUTTON_LABELS_SW: Record<JourneyStepType, string> = {
-  welcome: "Anza Missheni", mission: "Niko Tayari", think_first: "Hifadhi Ndhana Yako",
-  learn: "Nimeelewa", connect: "Endelea", example: "Onyesha Mazoezi",
-  practice: "Hifadhi Kazi", quick_check: "Angalia Jibu",
-  reflect: "Endelea kumaliza", complete: "",
-};
-
-const REFLECTION_QUESTIONS: Record<string, string> = {
-  en: "What did you learn today?",
-  sw: "Ulijifunza nini leo?",
-};
-
-const PRACTICE_LABELS: Record<string, string> = {
-  en: "Your Turn",
-  sw: "Zoezi Lako",
-};
 
 const OWL_EXPRESSIONS: Record<JourneyStepType, 'happy' | 'thinking' | 'encouraging' | 'celebrating'> = {
   welcome: "happy", mission: "encouraging", think_first: "thinking",
@@ -105,634 +68,26 @@ const OWL_EXPRESSIONS: Record<JourneyStepType, 'happy' | 'thinking' | 'encouragi
   practice: "encouraging", quick_check: "thinking", reflect: "happy", complete: "celebrating",
 };
 
-const STEP_THEME: Record<JourneyStepType, { accent: string; bg: string; border: string; gradient: string; softBg: string; iconBg: string; iconColor: string }> = {
-  welcome:    { accent: "text-indigo-700", bg: "bg-indigo-50/60",   border: "border-indigo-200/60", gradient: "from-indigo-500 to-purple-500", softBg: "from-indigo-50/80 to-purple-50/50", iconBg: "bg-indigo-100", iconColor: "text-indigo-600" },
-  mission:    { accent: "text-violet-700",  bg: "bg-violet-50/60",   border: "border-violet-200/60", gradient: "from-violet-500 to-purple-500", softBg: "from-violet-50/80 to-purple-50/50", iconBg: "bg-violet-100", iconColor: "text-violet-600" },
-  think_first:{ accent: "text-amber-700",   bg: "bg-amber-50/60",    border: "border-amber-200/60",  gradient: "from-amber-500 to-orange-500", softBg: "from-amber-50/80 to-orange-50/50", iconBg: "bg-amber-100", iconColor: "text-amber-600" },
-  learn:      { accent: "text-emerald-700", bg: "bg-emerald-50/60",  border: "border-emerald-200/60", gradient: "from-emerald-500 to-teal-500", softBg: "from-emerald-50/80 to-teal-50/50", iconBg: "bg-emerald-100", iconColor: "text-emerald-600" },
-  connect:    { accent: "text-teal-700",    bg: "bg-teal-50/60",     border: "border-teal-200/60",    gradient: "from-teal-500 to-cyan-500", softBg: "from-teal-50/80 to-cyan-50/50", iconBg: "bg-teal-100", iconColor: "text-teal-600" },
-  example:    { accent: "text-cyan-700",    bg: "bg-cyan-50/60",     border: "border-cyan-200/60",    gradient: "from-cyan-500 to-blue-500", softBg: "from-cyan-50/80 to-blue-50/50", iconBg: "bg-cyan-100", iconColor: "text-cyan-600" },
-  practice:   { accent: "text-sky-700",     bg: "bg-sky-50/60",      border: "border-sky-200/60",     gradient: "from-sky-500 to-blue-500", softBg: "from-sky-50/80 to-blue-50/50", iconBg: "bg-sky-100", iconColor: "text-sky-600" },
-  quick_check:{ accent: "text-lime-700",    bg: "bg-lime-50/60",     border: "border-lime-200/60",    gradient: "from-lime-500 to-green-500", softBg: "from-lime-50/80 to-green-50/50", iconBg: "bg-lime-100", iconColor: "text-lime-600" },
-  reflect:    { accent: "text-rose-700",    bg: "bg-rose-50/60",     border: "border-rose-200/60",    gradient: "from-rose-500 to-pink-500", softBg: "from-rose-50/80 to-pink-50/50", iconBg: "bg-rose-100", iconColor: "text-rose-600" },
-  complete:   { accent: "text-yellow-700",  bg: "bg-yellow-50/60",   border: "border-yellow-200/60",  gradient: "from-yellow-500 to-amber-500", softBg: "from-yellow-50/80 to-amber-50/50", iconBg: "bg-yellow-100", iconColor: "text-yellow-600" },
-};
+// ── Error Boundary ───────────────────────────────────────────────────────────
 
-function normalizeStepType(type: string): JourneyStepType {
-  if (type === "real_life") return "connect";
-  if (["welcome","mission","think_first","learn","connect","example","practice","quick_check","reflect","complete"].includes(type)) return type as JourneyStepType;
-  return "welcome";
-}
+interface EBProps { children: ReactNode; fallback?: ReactNode; }
+interface EBState { error: Error | null; }
 
-const CELEBRATION_CSS = `
-@keyframes float { 0% { transform: translateY(0) rotate(0deg); opacity: .8 } 100% { transform: translateY(-20px) rotate(15deg); opacity: 1 } }
-@keyframes popIn { 0% { transform: scale(.5); opacity: 0 } 70% { transform: scale(1.1) } 100% { transform: scale(1); opacity: 1 } }
-@keyframes xpBurst { 0% { transform: scale(1) } 50% { transform: scale(1.3) } 100% { transform: scale(1) } }
-@keyframes shimmer { 0% { background-position: -200% 0 } 100% { background-position: 200% 0 } }
-@keyframes slideUp { 0% { transform: translateY(20px); opacity: 0 } 100% { transform: translateY(0); opacity: 1 } }
-@keyframes pulse-glow { 0%,100% { box-shadow: 0 0 0 0 rgba(79,70,229,.3) } 50% { box-shadow: 0 0 0 8px rgba(79,70,229,0) } }
-@keyframes sparkle { 0%,100% { opacity:0; transform: scale(0) rotate(0deg) } 50% { opacity:1; transform: scale(1) rotate(180deg) } }
-`;
-
-/* ─── Sub-components ─── */
-
-function OwlGuideInline({ step }: { step: JourneyStep }) {
-  if (!step.owlText) return null;
-  const expression = OWL_EXPRESSIONS[step.stepType] || 'happy';
-  return (
-    <div className="flex items-start gap-2.5 px-3 py-2 rounded-xl bg-gradient-to-br from-sky-50/80 via-indigo-50/50 to-purple-50/30 border border-sky-200/40">
-      <div className="flex-shrink-0 mt-0.5">
-        <OwlTeacher size={36} expression={expression} />
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-slate-700 text-sm leading-snug font-medium">{step.owlText}</p>
-      </div>
-    </div>
-  );
-}
-
-function IllustrationArea({ step, stepType }: { step: JourneyStep; stepType: JourneyStepType }) {
-  const illustration = step.media?.illustration;
-  const approvedUrl = illustration?.approvedUrl || step.media?.illustration?.approvedUrl;
-  const generatedUrl = illustration?.generatedUrl;
-  const uploadedUrl = illustration?.uploadedUrl;
-  // Check if this step also has video content
-  const videoData = step.media?.video || step.video;
-  const hasVideo = videoData?.approvedUrl || videoData?.suggestedUrl || videoData?.searchKeywords;
-
-  // If video exists and there's no approved image, hide illustration entirely
-  // Video takes priority; avoids competing media blocks
-  if (hasVideo && !approvedUrl) return null;
-
-  const theme = STEP_THEME[stepType];
-  const icon = STEP_TYPE_ICONS[stepType] || "📖";
-
-  // Show approved image
-  if (approvedUrl) {
-    return (
-      <div className="rounded-2xl overflow-hidden border border-slate-200/50 shadow-sm">
-        <img src={approvedUrl} alt="Lesson illustration" className="w-full h-auto max-h-[220px] object-cover" />
-      </div>
-    );
-  }
-
-  // Show generated/uploaded image with pending badge
-  if (generatedUrl || uploadedUrl) {
-    const url = generatedUrl || uploadedUrl!;
-    return (
-      <div className="rounded-2xl overflow-hidden border border-amber-200/50 shadow-sm relative">
-        <img src={url} alt="Lesson illustration" className="w-full h-auto max-h-[220px] object-cover" />
-        <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-amber-100 border border-amber-300 text-[9px] font-bold text-amber-700">
-          Pending approval
-        </div>
-      </div>
-    );
-  }
-
-  // Handle flat media structure (POC journeys with media.url / media.altText / media.fallbackText)
-  const flatMedia = step.media;
-  if (flatMedia && !flatMedia.illustration && !flatMedia.video && flatMedia.altText) {
-    // Draft illustration with alt text — render accessible fallback
-    return (
-      <div className={`rounded-2xl border border-dashed border-slate-200/60 bg-slate-50/40 px-4 py-3`}>
-        <p className="text-[11px] text-slate-500 font-medium italic">{flatMedia.altText}</p>
-      </div>
-    );
-  }
-
-  // No media at all — render nothing (no placeholder, no "coming soon")
-  return null;
-}
-
-function VideoArea({ step }: { step: JourneyStep }) {
-  const videoData = step.media?.video || step.video;
-  const hasApproved = videoData?.approvedUrl && videoData?.approvedByAdmin === true;
-  const searchKeywordsStr = Array.isArray(videoData?.searchKeywords) ? videoData.searchKeywords.join(', ') : (videoData?.searchKeywords || '');
-  const hasSearchKeywords = searchKeywordsStr.trim().length > 0;
-  const hasSuggestedUrl = videoData?.suggestedUrl;
-
-  if (hasApproved) {
-    const videoId = extractYouTubeId(videoData!.approvedUrl!);
-    const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}` : null;
-
-    return (
-      <div className="rounded-2xl border border-blue-200/50 overflow-hidden bg-gradient-to-br from-blue-50/80 to-cyan-50/60 shadow-sm">
-        <div className="px-4 py-2.5 flex items-center gap-2 border-b border-blue-200/40">
-          <Play className="w-4 h-4 text-blue-600" />
-          <span className="text-xs font-bold text-blue-700">Watch</span>
-        </div>
-        {embedUrl ? (
-          <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
-            <iframe
-              src={embedUrl}
-              title={videoData!.approvedTitle || "Lesson video"}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="absolute inset-0 w-full h-full"
-            />
-          </div>
-        ) : (
-          <div className="p-4 text-center">
-            <a href={videoData!.approvedUrl!} target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-blue-600 underline hover:text-blue-800">
-              Watch video →
-            </a>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  if (hasSuggestedUrl) {
-    const videoId = extractYouTubeId(videoData!.suggestedUrl!);
-    if (videoId) {
-      return (
-        <div className="rounded-2xl border border-amber-200/50 overflow-hidden bg-gradient-to-br from-amber-50/80 to-yellow-50/60 shadow-sm">
-          <div className="px-4 py-2.5 flex items-center gap-2 border-b border-amber-200/40">
-            <Play className="w-4 h-4 text-amber-600" />
-            <span className="text-xs font-bold text-amber-700">Suggested Video (pending approval)</span>
-          </div>
-          <div className="p-4 text-center">
-            <a href={videoData!.suggestedUrl!} target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-amber-600 underline hover:text-amber-800">
-              Preview on YouTube →
-            </a>
-          </div>
-        </div>
-      );
-    }
-  }
-
-  if (hasSearchKeywords) {
-    return (
-      <div className="rounded-2xl border border-slate-200/50 bg-slate-50/60 p-4 flex items-center gap-3">
-        <Play className="w-5 h-5 text-slate-400 flex-shrink-0" />
-        <div>
-          <p className="text-xs font-bold text-slate-500">Video coming soon</p>
-          <p className="text-[10px] text-slate-400 mt-0.5">Search: {searchKeywordsStr}</p>
-        </div>
-      </div>
-    );
-  }
-
-  return null;
-}
-
-/* ─── Fallback Quick Check Interaction Builder ─── */
-
-function buildFallbackQuickCheckInteraction(step: JourneyStep): JourneyInteraction | null {
-  // If step already has a valid interaction with a recognized type, return null (use as-is)
-  if (step.interaction && step.interaction.type && step.interaction.type !== "none") {
-    return null; // signal: use existing interaction
-  }
-
-  const text = step.studentText || "";
-  const title = step.title || "";
-  const combined = `${title} ${text}`;
-
-  // Detect numbered questions (1. 2. 3. or 1) 2) 3))
-  const numberedQ = combined.match(/(?:\d+[.)]\s*[^\n]+)/g);
-
-  // Detect option lists: patterns like "greater than, less than, or equal to"
-  // or lines starting with -, *, a), b), A), B)
-  const optionPatterns = combined.match(/(?:^|\n)\s*(?:[-*]|[a-dA-D][.)])\s*[^\n]+/g);
-
-  // Detect blanks (___)
-  const hasBlanks = /_{3,}/.test(combined);
-
-  // Detect yes/no or self-check patterns
-  const isYesNo = /\b(yes|no|true|false|agree|disagree)\b/i.test(combined) &&
-    (/\?/.test(combined) || /check|decide|choose/i.test(combined));
-
-  // Detect simple math questions (contains = ? or "what is")
-  const isMath = /\bwhat\s+is\b.*[=?]|[0-9]\s*[+−×÷]\s*[0-9].*\?/.test(combined);
-
-  // If we found option patterns, build multiple_choice
-  if (optionPatterns && optionPatterns.length >= 2) {
-    const options = optionPatterns.map(o => o.replace(/^\s*(?:[-*]|[a-dA-D][.)])\s*/, "").trim()).filter(Boolean);
-    if (options.length >= 2) {
-      return {
-        type: "multiple_choice",
-        question: step.interaction?.question || step.interaction?.prompt || title || "Quick Check",
-        options,
-        correctAnswer: undefined, // no answer key — will use self-check style
-        hint: "Think carefully about each option before choosing!",
-      };
-    }
-  }
-
-  // If we found numbered questions, build multiple_choice from them
-  if (numberedQ && numberedQ.length >= 2) {
-    const options = numberedQ.map(q => q.replace(/^\d+[.)]\s*/, "").trim()).filter(Boolean);
-    if (options.length >= 2) {
-      return {
-        type: "multiple_choice",
-        question: step.interaction?.question || step.interaction?.prompt || title || "Quick Check",
-        options,
-        correctAnswer: undefined,
-        hint: "Read each option carefully and pick the one you think is right!",
-      };
-    }
-  }
-
-  // If it's a yes/no or self-check pattern
-  if (isYesNo || hasBlanks || isMath) {
-    return {
-      type: "self_check",
-      question: step.interaction?.question || step.interaction?.prompt || title || "Quick Check",
-      hint: "Take your time and think through your answer!",
-    };
-  }
-
-  // Default: self-check with the student text as the prompt
-  return {
-    type: "self_check",
-    question: step.interaction?.question || step.interaction?.prompt || "Can you answer this question?",
-    hint: "Try your best — there's no wrong effort here!",
-  };
-}
-
-/* ─── Normalize interaction type from DB ─── */
-function normalizeInteractionType(type: string | undefined): string {
-  if (!type || type === "none") return "none";
-  if (type === "choice") return "multiple_choice"; // DB uses "choice", code expects "multiple_choice"
-  return type;
-}
-
-/* ─── Slide Step View ─── */
-
-function SlideStepView({ step, stepNumber, totalSteps, interaction, setInteraction, lesson, onSaveReflection }: {
-  step: JourneyStep; stepNumber: number; totalSteps: number;
-  interaction: any; setInteraction: any; lesson: any;
-  onSaveReflection: () => Promise<void>;
-}) {
-  if (!step) return null;
-  const theme = STEP_THEME[normalizeStepType(step.stepType)] || STEP_THEME.welcome;
-  const paragraphs = splitIntoParagraphs(step.studentText);
-  const isComplete = step.stepType === "complete";
-
-  // Effective interaction: for quick_check steps, normalize type and apply fallback if missing
-  const _rawQcInteraction = step.stepType === "quick_check" ? (step.interaction || null) : null;
-
-  // Detect language from lesson data
-  const lang = (() => {
-    try {
-      const cb = JSON.parse(lesson?.contentBlocks || '{}');
-      const subj = (cb.subject || cb.strand || '').toLowerCase();
-      return subj.includes('kiswahili') ? 'sw' : 'en';
-    } catch { return 'en'; }
-  })();
-  const _existingQcInteraction = _rawQcInteraction && _rawQcInteraction.type && _rawQcInteraction.type !== "none" ? _rawQcInteraction : null;
-  const _fallbackQcInteraction = !_existingQcInteraction && step.stepType === "quick_check" ? buildFallbackQuickCheckInteraction(step) : null;
-  const effectiveQcInteraction = _existingQcInteraction || _fallbackQcInteraction; // JourneyInteraction | null
-  const normalizedQcType = normalizeInteractionType(effectiveQcInteraction?.type);
-  // Use effective interaction for quick_check, otherwise use step.interaction as-is
-  const effectiveInteraction = step.stepType === "quick_check" ? effectiveQcInteraction : (step.interaction || null);
-  const normalizedType = step.stepType === "quick_check" ? normalizedQcType : normalizeInteractionType(step.interaction?.type);
-  // Question text: support both `question` and `prompt` field names (DB uses `prompt`)
-  const effectiveQuestion = effectiveInteraction?.question || effectiveInteraction?.prompt || null;
-
-  // Safe Owl text for Quick Check: encourage without revealing answers
-  // For quick_check steps, replace owlText with a safe encouraging version
-  const safeOwlText = step.stepType === "quick_check"
-    ? "Let's see what you remember! Take your time and think carefully. There's no rush — you've got this!"
-    : step.owlText;
-
-  // Determine if student text adds value beyond the owl message
-  // For welcome/mission steps, the owl text IS the main content — skip redundant body
-  const isOwlPrimaryStep = ["welcome", "mission", "complete"].includes(step.stepType);
-  const studentTextAddsValue = !isOwlPrimaryStep && paragraphs.length > 0;
-
-  return (
-    <div className="flex flex-col">
-      {/* Step header badge */}
-      <div className="flex items-center gap-3 mb-4">
-        <div className={`flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center bg-gradient-to-br ${theme.gradient} text-white shadow-md`}>
-          <span className="text-lg font-black">{stepNumber}</span>
-        </div>
-        <div className="flex-1 min-w-0">
-          <h2 className={`font-black text-xl lg:text-2xl ${theme.accent} tracking-tight leading-tight`}>{step.title}</h2>
-          <span className="text-[11px] font-semibold text-slate-400">Step {stepNumber} of {totalSteps}</span>
-        </div>
-      </div>
-
-      {/* For owl-primary steps (welcome, mission, complete), show owl as the main content */}
-      {isOwlPrimaryStep && safeOwlText ? (
-        <div className="flex items-start gap-3 px-5 py-4 rounded-2xl bg-gradient-to-br from-sky-50/90 via-indigo-50/60 to-purple-50/40 border border-sky-200/50 shadow-sm">
-          <div className="flex-shrink-0 mt-0.5">
-            <OwlTeacher size={48} expression={OWL_EXPRESSIONS[step.stepType] || 'happy'} />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-slate-700 text-base lg:text-lg leading-relaxed font-medium">{safeOwlText}</p>
-          </div>
-        </div>
-      ) : (
-        <>
-          {/* For other steps, show owl guidance inline (compact) */}
-          <OwlGuideInline step={step} />
-          {/* Student text is the main content for non-owl-primary steps */}
-          {studentTextAddsValue && (
-            <div className="mt-4 flex flex-col gap-3">
-              {paragraphs.map((p, i) => (
-                <p key={i} className="text-slate-700 text-base lg:text-lg leading-relaxed whitespace-pre-line">{p}</p>
-              ))}
-            </div>
-          )}
-        </>
-      )}
-
-      {/* Math display */}
-      {step.mathDisplay && (
-        <div className="mt-3 px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200/60 text-center">
-          <span className="text-lg font-mono font-bold text-slate-800">{step.mathDisplay}</span>
-        </div>
-      )}
-
-      {/* Media zone: illustration + video combined */}
-      <div className="mt-3 space-y-2">
-        <IllustrationArea step={step} stepType={step.stepType} />
-        <VideoArea step={step} />
-      </div>
-
-      {/* Materials */}
-      {step.materials && step.materials.length > 0 && (
-        <div className="mt-4 px-4 py-3 rounded-xl bg-amber-50/60 border border-amber-200/50">
-          <p className="text-[10px] font-extrabold uppercase tracking-wider text-amber-700 mb-1.5">What you might need:</p>
-          <div className="flex flex-wrap gap-1.5">
-            {step.materials.map((m: string, i: number) => <span key={i} className="px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-semibold">{m}</span>)}
-          </div>
-        </div>
-      )}
-
-      {/* ── Prediction step ── */}
-      {step.stepType === "think_first" && step.interaction?.question && (
-        <div className="mt-4 px-5 py-4 rounded-xl bg-amber-50/80 border border-amber-200/60">
-          <p className="text-base font-bold text-amber-900 mb-2 flex items-center gap-2"><HelpCircle className="w-4 h-4" /> {step.interaction.question}</p>
-          <textarea value={interaction.predictionText} onChange={e => setInteraction((p: any) => ({ ...p, predictionText: e.target.value }))}
-            placeholder="Type your guess here..."
-            className="w-full px-4 py-3 rounded-xl border border-amber-200 bg-white text-base text-slate-800 placeholder:text-slate-400 resize-none focus:outline-none focus:ring-2 focus:ring-amber-300" rows={3} />
-          {interaction.predictionText.trim() && <p className="text-xs text-amber-600 mt-1.5 font-semibold">✓ Your guess is saved! Click Next to continue.</p>}
-        </div>
-      )}
-
-      {/* ── Guided Practice ── */}
-      {step.stepType === "practice" && (() => {
-        const practiceInteraction = step.interaction;
-        const practiceType = normalizeInteractionType(practiceInteraction?.type);
-        const practiceQuestion = practiceInteraction?.question || practiceInteraction?.prompt || null;
-        const hasOptions = practiceInteraction?.options && practiceInteraction.options.length > 0;
-        const practiceCorrectIdx = typeof practiceInteraction?.correctIndex === "number" ? practiceInteraction.correctIndex
-          : (typeof practiceInteraction?.correctAnswer === "number" ? practiceInteraction.correctAnswer
-          : (hasOptions && practiceInteraction?.correctAnswer ? practiceInteraction.options.indexOf(practiceInteraction.correctAnswer) : null));
-        return (
-        <div className="mt-4 px-5 py-4 rounded-xl bg-sky-50/80 border border-sky-200/60">
-          {step.studentText && step.studentText !== "Practice" && (
-            <div className="prose prose-sm max-w-none text-sky-900 mb-3" dangerouslySetInnerHTML={{ __html: step.studentText.replace(/\\n/g, '<br/>') }} />
-          )}
-          {(!step.studentText || step.studentText === "Practice") && !practiceQuestion ? (
-            <div>
-              <p className="text-base font-bold text-sky-900 mb-1.5 flex items-center gap-2"><Pencil className="w-4 h-4" /> {PRACTICE_LABELS[lang] || PRACTICE_LABELS.en}</p>
-              <p className="text-sm text-sky-700">Try what you just learned! Look back at the example if you need help.</p>
-            </div>
-          ) : null}
-          {practiceType === "multiple_choice" && hasOptions && practiceQuestion && (
-            <>
-              <p className="text-base font-bold text-sky-900 mt-2 mb-3">{practiceQuestion}</p>
-              <div className="flex flex-col gap-2">
-                {practiceInteraction.options.map((opt, i) => {
-                  const isSelected = interaction.selectedChoice === i;
-                  const isCorrect = practiceCorrectIdx !== null ? i === practiceCorrectIdx : true;
-                  const showFeedback = interaction.choiceFeedback !== null;
-                  let btnClass = "bg-white border-sky-200 text-sky-800 hover:bg-sky-50 hover:shadow-md";
-                  if (isSelected && !showFeedback) btnClass = "bg-sky-600 text-white border-sky-600 shadow-lg shadow-sky-200";
-                  if (showFeedback && isSelected && isCorrect) btnClass = "bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-200";
-                  if (showFeedback && isSelected && !isCorrect) btnClass = "bg-orange-500 text-white border-orange-500 shadow-lg shadow-orange-200";
-                  if (showFeedback && !isSelected && isCorrect && practiceCorrectIdx !== null) btnClass = "bg-emerald-100 border-emerald-400 text-emerald-800";
-                  return (
-                    <button key={i} onClick={() => {
-                      if (interaction.choiceFeedback !== null) return;
-                      const correct = practiceCorrectIdx !== null ? i === practiceCorrectIdx : true;
-                      setInteraction((p) => ({ ...p, selectedChoice: i, choiceFeedback: correct ? "correct" : "incorrect" }));
-                    }} disabled={interaction.choiceFeedback !== null}
-                      className={"text-left px-4 py-3 rounded-xl text-sm font-semibold transition-all border-2 " + btnClass + " disabled:cursor-default"}>
-                      <span className="mr-2 text-base">{String.fromCharCode(65 + i)}.</span> {opt}
-                    </button>
-                  );
-                })}
-              </div>
-              {interaction.choiceFeedback === "correct" && (
-                <div className="mt-3 px-4 py-2.5 rounded-xl bg-emerald-100 border border-emerald-300">
-                  <p className="text-sm font-bold text-emerald-800">{"✅"} Correct! Well done! {practiceInteraction?.feedbackCorrect || practiceInteraction?.hint || ""}</p>
-                </div>
-              )}
-              {interaction.choiceFeedback === "incorrect" && (
-                <div className="mt-3 px-4 py-2.5 rounded-xl bg-orange-100 border border-orange-300">
-                  <p className="text-sm font-bold text-orange-800">Not quite. {practiceInteraction?.feedbackIncorrect || practiceInteraction?.hint || "Think about it again!"}</p>
-                </div>
-              )}
-            </>
-          )}
-        </div>
-        );
-      })()}
-
-      {/* ── Quick Check (multiple choice) ── */}
-      {step.stepType === "quick_check" && normalizedType === "multiple_choice" && effectiveQuestion && (() => {
-        const _qcCorrectIdx = typeof effectiveInteraction?.correctIndex === "number" ? effectiveInteraction.correctIndex : (typeof effectiveInteraction?.correctAnswer === "number" ? effectiveInteraction.correctAnswer : (effectiveInteraction?.options && effectiveInteraction?.correctAnswer ? effectiveInteraction.options.indexOf(effectiveInteraction.correctAnswer) : null));
-        return (
-        <div className="mt-4 px-5 py-4 rounded-xl bg-lime-50/80 border border-lime-200/60">
-          <p className="text-base font-bold text-lime-900 mb-0.5 flex items-center gap-2"><HelpCircle className="w-4 h-4" /> {lang === 'sw' ? 'Ukaguzi wa Haraka' : 'Quick Check'}</p>
-          <p className="text-lg font-bold text-lime-800 mb-3">{effectiveQuestion}</p>
-          {effectiveInteraction?.options && effectiveInteraction.options.length > 0 && (
-            <div className="flex flex-col gap-2">
-              {effectiveInteraction.options.map((opt: string, i: number) => {
-                const isSelected = interaction.selectedChoice === i;
-                const isCorrect = _qcCorrectIdx !== null ? i === _qcCorrectIdx : true;
-                const showFeedback = interaction.choiceFeedback !== null;
-                let btnClass = "bg-white border-lime-200 text-lime-800 hover:bg-lime-50 hover:shadow-md";
-                if (isSelected && !showFeedback) btnClass = "bg-lime-600 text-white border-lime-600 shadow-lg shadow-lime-200";
-                if (showFeedback && isSelected && isCorrect) btnClass = "bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-200";
-                if (showFeedback && isSelected && !isCorrect) btnClass = "bg-orange-500 text-white border-orange-500 shadow-lg shadow-orange-200";
-                if (showFeedback && !isSelected && isCorrect && _qcCorrectIdx !== null) btnClass = "bg-emerald-100 border-emerald-400 text-emerald-800";
-                return (
-                  <button key={i} onClick={() => {
-                    if (interaction.choiceFeedback !== null) return;
-                    const correct = _qcCorrectIdx !== null ? i === _qcCorrectIdx : true;
-                    setInteraction((p: any) => ({ ...p, selectedChoice: i, choiceFeedback: correct ? "correct" : "incorrect" }));
-                  }} disabled={interaction.choiceFeedback !== null}
-                    className={`text-left px-4 py-3 rounded-xl text-sm font-semibold transition-all border-2 ${btnClass} disabled:cursor-default`}>
-                    <span className="mr-2 text-base">{String.fromCharCode(65 + i)}.</span> {opt}
-                  </button>
-                );
-              })}
-            </div>
-          )}
-          {interaction.choiceFeedback === "correct" && (
-            <div className="mt-3 px-4 py-2.5 rounded-xl bg-emerald-100 border border-emerald-300">
-              <p className="text-sm font-bold text-emerald-800">
-                {_qcCorrectIdx !== null ? "✅ Correct! Well done!" : "✅ Great choice!"} {effectiveInteraction?.feedbackCorrect || effectiveInteraction?.hint || ""}
-              </p>
-            </div>
-          )}
-          {interaction.choiceFeedback === "incorrect" && (
-            <div className="mt-3 px-4 py-2.5 rounded-xl bg-orange-100 border border-orange-300">
-              <p className="text-sm font-bold text-orange-800">Not quite. {effectiveInteraction?.feedbackIncorrect || effectiveInteraction?.hint || "Think about it again!"} Try a different answer.</p>
-            </div>
-          )}
-        </div>
-        );
-      })()}
-
-      {/* ── Self check ── */}
-      {step.stepType === "quick_check" && (normalizedType === "self_check" || (normalizedType === "multiple_choice" && (!effectiveInteraction?.options || effectiveInteraction.options.length === 0))) && effectiveQuestion && (
-        <div className="mt-4 px-5 py-4 rounded-xl bg-lime-50/80 border border-lime-200/60">
-          <p className="text-base font-bold text-lime-900 mb-0.5 flex items-center gap-2"><HelpCircle className="w-4 h-4" /> {lang === 'sw' ? 'Ukaguzi wa Haraka' : 'Quick Check'}</p>
-          <p className="text-lg font-bold text-lime-800 mb-3">{effectiveQuestion}</p>
-          <p className="text-sm text-lime-700 mb-3 italic">Take a moment to think about your answer. There's no rush — trust your learning!</p>
-          <div className="flex gap-2">
-            <button onClick={() => setInteraction((p: any) => ({ ...p, selfChecked: true }))}
-              className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all border-2 ${interaction.selfChecked === true ? "bg-emerald-600 text-white border-emerald-600 shadow-lg" : "bg-white border-lime-200 text-lime-700 hover:bg-lime-50"}`}>
-              ✓ Yes, I worked it out!
-            </button>
-            <button onClick={() => setInteraction((p: any) => ({ ...p, selfChecked: false }))}
-              className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all border-2 ${interaction.selfChecked === false ? "bg-orange-500 text-white border-orange-500 shadow-lg" : "bg-white border-orange-200 text-orange-600 hover:bg-orange-50"}`}>
-              ↺ I want to review again
-            </button>
-          </div>
-          {interaction.selfChecked === true && (
-            <div className="mt-3 px-4 py-2.5 rounded-xl bg-emerald-100 border border-emerald-300">
-              <p className="text-sm font-bold text-emerald-800">🌟 Wonderful! Keep up the great thinking!</p>
-            </div>
-          )}
-          {interaction.selfChecked === false && (
-            <div className="mt-3 px-4 py-2.5 rounded-xl bg-amber-100 border border-amber-300">
-              <p className="text-sm font-bold text-amber-800">👍 That's okay! Reviewing helps us learn even more.</p>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* ── Reflection step ── */}
-      {step.stepType === "reflect" && (
-        <div className="mt-4 px-5 py-4 rounded-xl bg-rose-50/80 border border-rose-200/60">
-          <p className="text-base font-bold text-rose-900 mb-0.5 flex items-center gap-2"><MessageCircle className="w-4 h-4" /> {lang === 'sw' ? 'Wakati wa Tafakari' : 'Reflection Time'}</p>
-          <p className="text-lg font-bold text-rose-800 mb-3">{step.interaction?.question || REFLECTION_QUESTIONS[lang] || REFLECTION_QUESTIONS.en}</p>
-
-          {(step.reflectionOptions && step.reflectionOptions.length > 0 || step.interaction?.options && step.interaction.options.length > 0) && (
-            <div className="flex flex-wrap gap-1.5 mb-3">
-              {(step.reflectionOptions || step.interaction?.options || []).map((opt: string, i: number) => (
-                <button key={i} onClick={() => setInteraction((p: any) => ({ ...p, reflectionChip: p.reflectionChip === i ? null : i }))}
-                  className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all border-2 ${
-                    interaction.reflectionChip === i ? "bg-rose-600 text-white border-rose-600 shadow-md" : "bg-white border-rose-200 text-rose-700 hover:bg-rose-50"
-                  }`}>{opt}</button>
-              ))}
-            </div>
-          )}
-
-          <textarea value={interaction.reflectionText} onChange={e => setInteraction((p: any) => ({ ...p, reflectionText: e.target.value }))}
-            placeholder="Write what you learned... (optional)"
-            className="w-full px-4 py-3 rounded-xl border border-rose-200 bg-white text-base text-slate-800 placeholder:text-slate-400 resize-none focus:outline-none focus:ring-2 focus:ring-rose-300" rows={3} />
-
-          {(interaction.reflectionText.trim() || interaction.reflectionChip !== null) && !interaction.reflectionSaved && (
-            <button onClick={onSaveReflection} className="mt-2.5 px-4 py-2 rounded-xl bg-rose-600 text-white text-sm font-bold hover:bg-rose-700 transition-colors shadow-md">
-              💾 Save Reflection
-            </button>
-          )}
-          {interaction.reflectionSaved && <p className="text-xs text-rose-600 mt-1.5 font-semibold">✓ Reflection saved!</p>}
-        </div>
-      )}
-
-      {/* ── Completion step ── */}
-      {isComplete && (
-        <div className="mt-4 text-center py-4">
-          <div className="flex justify-center mb-3"><OwlTeacher size={72} expression="celebrating" /></div>
-          <h3 className="text-xl lg:text-2xl font-black text-slate-900 mb-1">{lang === 'sw' ? 'Umefanya vizuri! 🏆' : 'You did it! 🏆'}</h3>
-          <p className="text-slate-600 text-base lg:text-lg">You've completed this lesson. Great work!</p>
-        </div>
-      )}
-    </div>
-  );
-}
-
-/* ─── Compact Support Panel (right sidebar) ─── */
-
-function SupportPanel({ lesson, journeySteps, currentStep, xp, subject, grade, onStepClick }: {
-  lesson: any; journeySteps: JourneyStep[]; currentStep: number; xp: number; subject: string; grade: number;
-  onStepClick: (i: number) => void;
-}) {
-  const missionStep = journeySteps.find(s => s.stepType === "mission");
-
-  return (
-    <div className="space-y-3 sticky top-4">
-      {/* Mission Card */}
-      <div className="rounded-2xl border border-violet-200/50 bg-gradient-to-br from-violet-50/80 to-purple-50/60 p-4 shadow-sm">
-        <div className="flex items-center gap-1.5 mb-1.5">
-          <Target className="w-3.5 h-3.5 text-violet-600" />
-          <h3 className="font-bold text-violet-800 text-xs">Today's Mission</h3>
-        </div>
-        <p className="text-violet-700 text-xs leading-relaxed font-medium">{missionStep?.studentText?.slice(0, 120) || "Complete this lesson to learn something new!"}</p>
-      </div>
-
-      {/* Lesson Map */}
-      <div className="rounded-2xl border border-slate-200/50 bg-white/80 backdrop-blur-sm p-4 shadow-sm">
-        <div className="flex items-center gap-1.5 mb-2">
-          <Map className="w-3.5 h-3.5 text-slate-500" />
-          <h3 className="font-bold text-slate-800 text-xs">Lesson Map</h3>
-        </div>
-        <div className="space-y-0.5">
-          {journeySteps.map((s, i) => (
-            <button key={i} onClick={() => onStepClick(i)} className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-left transition-all text-[11px] font-semibold ${
-              i === currentStep ? "bg-indigo-100/80 text-indigo-800 shadow-sm" : i < currentStep ? "bg-emerald-50/80 text-emerald-700" : "text-slate-600 hover:bg-slate-50/80"
-            }`}>
-              <span className={`w-5 h-5 rounded-md flex items-center justify-center text-[10px] flex-shrink-0 ${
-                i === currentStep ? "bg-gradient-to-br from-indigo-500 to-purple-500 text-white" : i < currentStep ? "bg-emerald-200 text-emerald-700" : "bg-slate-100 text-slate-500"
-              }`}>
-                {i < currentStep ? "✓" : (STEP_TYPE_ICONS[s.stepType] || "•")}
-              </span>
-              <span className="truncate">{STEP_LABELS[s.stepType] || s.title}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Rewards */}
-      {xp > 0 && (
-        <div className="rounded-2xl border border-amber-200/50 bg-gradient-to-br from-amber-50/80 to-yellow-50/60 p-4 shadow-sm">
-          <div className="flex items-center gap-1.5 mb-1.5">
-            <Star className="w-3.5 h-3.5 text-amber-600" />
-            <h3 className="font-bold text-amber-800 text-xs">Rewards</h3>
-          </div>
-          <div className="flex gap-3">
-            <div className="flex items-center gap-1 text-amber-700"><Zap className="w-3.5 h-3.5" /><span className="font-bold text-xs">{xp} XP</span></div>
-            <div className="flex items-center gap-1 text-amber-700"><Flame className="w-3.5 h-3.5" /><span className="font-bold text-xs">{Math.floor(xp / 2)} coins</span></div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-/* ─── Error Boundary ─── */
-
-interface ErrorBoundaryState { error: Error | null; errorInfo: string; }
-interface ErrorBoundaryProps { children: ReactNode; fallback?: ReactNode; }
-
-class JourneyErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  constructor(props: ErrorBoundaryProps) {
-    super(props);
-    this.state = { error: null, errorInfo: "" };
-  }
-  static getDerivedStateFromError(error: Error) {
-    return { error, errorInfo: error.stack || error.message };
-  }
+class LessonErrorBoundary extends Component<EBProps, EBState> {
+  constructor(props: EBProps) { super(props); this.state = { error: null }; }
+  static getDerivedStateFromError(error: Error): EBState { return { error }; }
   render() {
     if (this.state.error) {
       return this.props.fallback || (
-        <div className="p-8 text-center">
-          <p className="text-lg font-bold text-red-600 mb-2">Something went wrong displaying this lesson step.</p>
-          <details className="text-left bg-red-50 p-4 rounded-lg text-xs font-mono text-red-800 max-w-xl mx-auto mt-4">
-            <summary className="cursor-pointer font-bold mb-2">Show error details</summary>
-            <pre className="whitespace-pre-wrap break-all">{this.state.error.message}\n\n{this.state.errorInfo}</pre>
-          </details>
-          <button onClick={() => this.setState({ error: null, errorInfo: "" })} className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-bold">Try Again</button>
+        <div style={{ minHeight: "50vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+          <div style={{ textAlign: "center", background: "#fff", padding: 32, borderRadius: 16, boxShadow: "0 4px 24px rgba(0,0,0,0.08)", maxWidth: 400 }}>
+            <p style={{ fontSize: 40, marginBottom: 12 }}>🦉</p>
+            <p style={{ fontSize: 16, fontWeight: 700, color: "#1e293b", marginBottom: 8 }}>Something went wrong</p>
+            <p style={{ fontSize: 13, color: "#64748b", marginBottom: 16 }}>This lesson step couldn't load properly.</p>
+            <button onClick={() => window.location.reload()} style={{ padding: "8px 20px", borderRadius: 8, border: "none", background: "#4f46e5", color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
+              Refresh
+            </button>
+          </div>
         </div>
       );
     }
@@ -740,73 +95,51 @@ class JourneyErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   }
 }
 
-/* ─── main page component ─── */
-export default function LessonPlayerPage({ params }: { params: Promise<{ themeSlug: string; questSlug: string; lessonSlug: string }> }) {
+// ── Main Component ───────────────────────────────────────────────────────────
+
+export default function StudentLessonPlayer({ params }: { params: Promise<{ themeSlug: string; questSlug: string; lessonSlug: string }> }) {
   const { data: session, status } = useSession();
   const [slugs, setSlugs] = useState<{ themeSlug: string; questSlug: string; lessonSlug: string } | null>(null);
   const [lesson, setLesson] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-
-  // Detect language from lesson data — computed once per render
-  const lang = (() => {
-    if (!lesson) return 'en';
-    try {
-      const cb = JSON.parse(lesson.contentBlocks || '{}');
-      const subj = (cb.subject || cb.strand || '').toLowerCase();
-      return subj.includes('kiswahili') ? 'sw' : 'en';
-    } catch { return 'en'; }
-  })();
-  const [viewing, setViewing] = useState(false);
-  const [currentStep, setCurrentStep] = useState(0);
   const [completed, setCompleted] = useState(false);
-  const [justCompleted, setJustCompleted] = useState(false);
-  const [completing, setCompleting] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [viewing, setViewing] = useState(false);
   const [xpEarned, setXpEarned] = useState(0);
-  const [streakCount, setStreakCount] = useState(0);
+  const [justCompleted, setJustCompleted] = useState(false);
   const [newBadges, setNewBadges] = useState<string[]>([]);
   const [showCelebration, setShowCelebration] = useState(false);
   const [completeError, setCompleteError] = useState<string | null>(null);
   const hasCompletedRef = useRef(false);
-
-  const [interaction, setInteraction] = useState({
-    predictionText: "",
-    practiceEntries: ["", "", ""] as string[],
-    selectedChoice: null as number | null,
-    choiceFeedback: null as "correct" | "incorrect" | null,
-    selfChecked: null as boolean | null,
-    reflectionText: "",
-    reflectionChip: null as number | null,
-    reflectionSaved: false,
+  const [interaction, setInteraction] = useState<any>({
+    predictionText: "", practiceEntries: ["", "", ""],
+    selectedChoice: null, choiceFeedback: null,
+    selfChecked: null, reflectionText: "",
+    reflectionChip: null, reflectionSaved: false,
   });
 
   const journey = buildLessonJourney(lesson);
   const journeySteps = journey?.steps || [];
-  const journeySource = journey?.source || "cbc_fallback";
-  const isJourney = journeySteps.length >= 5 && journeySource !== "legacy_array";
   const totalSteps = journeySteps.length;
   const isLastStep = currentStep >= totalSteps - 1;
   const clampedStep = Math.min(currentStep, Math.max(totalSteps - 1, 0));
-  const currentJourneyStep = isJourney && totalSteps > 0 ? journeySteps[clampedStep] : null;
+  const currentJourneyStep = totalSteps > 0 ? journeySteps[clampedStep] : null;
   const xp = getRewardValue(lesson?.xpReward);
   const subject = lesson?.quest?.theme?.themeSubjects?.[0]?.subject || "";
   const grade = lesson?.quest?.theme?.grade || 0;
 
-  // Next step label for the slide-style Next button
   const nextStepLabel = !isLastStep && journeySteps[clampedStep + 1]
-    ? (STEP_LABELS[journeySteps[clampedStep + 1].stepType] || journeySteps[clampedStep + 1].title)
+    ? STEP_TYPE_ICONS[journeySteps[clampedStep + 1].stepType] + " " + (journeySteps[clampedStep + 1].title || "Next")
     : null;
 
   useEffect(() => {
     setInteraction({
-      predictionText: "", practiceEntries: ["", "", ""], selectedChoice: null,
-      choiceFeedback: null, selfChecked: null, reflectionText: "",
+      predictionText: "", practiceEntries: ["", "", ""],
+      selectedChoice: null, choiceFeedback: null,
+      selfChecked: null, reflectionText: "",
       reflectionChip: null, reflectionSaved: false,
     });
   }, [currentStep]);
-
-  useEffect(() => {
-    if (status === "unauthenticated") window.location.replace("/auth/login");
-  }, [status]);
 
   useEffect(() => {
     params.then(p => {
@@ -817,7 +150,6 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
           if (data.lesson) {
             setLesson(data.lesson);
             setCompleted(data.lesson.isCompleted);
-            // Language detected from lesson data at render time, not stored in state
           }
         })
         .catch(console.error)
@@ -828,369 +160,424 @@ export default function LessonPlayerPage({ params }: { params: Promise<{ themeSl
   const fireConfetti = useCallback(async () => {
     try {
       const confetti = (await import("canvas-confetti")).default;
-      confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 }, colors: ["#2DD4BF", "#F59E0B", "#3B82F6", "#EC4899", "#10B981"] });
-      setTimeout(() => confetti({ particleCount: 40, angle: 60, spread: 55, origin: { x: 0, y: 0.6 }, colors: ["#2DD4BF", "#F59E0B", "#3B82F6"] }), 150);
-      setTimeout(() => confetti({ particleCount: 40, angle: 120, spread: 55, origin: { x: 1, y: 0.6 }, colors: ["#EC4899", "#10B981", "#F59E0B"] }), 300);
-      setTimeout(() => confetti({ particleCount: 30, spread: 100, origin: { y: 0.5 }, shapes: ["star"], colors: ["#FFD700", "#FFA500"], scalar: 1.5 }), 500);
+      confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+      setTimeout(() => confetti({ particleCount: 40, angle: 60, spread: 55, origin: { x: 0, y: 0.6 } }), 150);
+      setTimeout(() => confetti({ particleCount: 40, angle: 120, spread: 55, origin: { x: 1, y: 0.6 } }), 300);
     } catch { /* non-blocking */ }
   }, []);
 
   const handleComplete = useCallback(async () => {
-    if (!slugs || completing || hasCompletedRef.current) return;
+    if (!slugs || hasCompletedRef.current) return;
     hasCompletedRef.current = true;
-    setCompleting(true);
-    setCompleteError(null);
     try {
-      const questId = lesson?.questId || slugs.questSlug || null;
       const res = await fetch("/api/learner/progress", {
         method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include",
-        body: JSON.stringify({ lessonId: lesson?.id, questId, action: "complete" }),
+        body: JSON.stringify({ lessonId: lesson?.id, questId: slugs.questSlug || null, action: "complete" }),
       });
       const data = await res.json();
-      if (!res.ok) { setCompleteError(data.error || `Could not complete (status ${res.status})`); hasCompletedRef.current = false; return; }
       if (data.success || data.completed) {
-        const xpAmt = getRewardValue(data.rewards?.xp);
-        setCompleted(true); setJustCompleted(true); setXpEarned(xpAmt); setStreakCount(data.streak || 0);
-        setShowCelebration(true);
+        setCompleted(true); setJustCompleted(true);
+        setXpEarned(getRewardValue(data.rewards?.xp));
         if (data.newBadges?.length) setNewBadges(data.newBadges);
-        fireConfetti();
-      } else if (data.alreadyCompleted) {
-        setCompleted(true); setShowCelebration(false);
+        setShowCelebration(true); fireConfetti();
       } else {
-        setCompleteError("Unexpected response. Please try again.");
+        setCompleteError("Could not complete lesson");
         hasCompletedRef.current = false;
       }
     } catch {
-      setCompleteError("Network error. Please check your connection.");
+      setCompleteError("Network error. Please try again.");
       hasCompletedRef.current = false;
-    } finally { setCompleting(false); }
-  }, [slugs, completing, lesson, fireConfetti]);
-
-  const handleSaveReflection = useCallback(async () => {
-    const text = interaction.reflectionText.trim() || (interaction.reflectionChip !== null && currentJourneyStep?.reflectionOptions?.[interaction.reflectionChip]) || "";
-    if (!text) return;
-    try {
-      await fetch("/api/learner/reflections", {
-        method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include",
-        body: JSON.stringify({ prompt: currentJourneyStep?.interaction?.question || "Reflection", response: text, lessonId: lesson?.id || null, questId: lesson?.questId || null }),
-      });
-      setInteraction((prev: any) => ({ ...prev, reflectionSaved: true }));
-    } catch { /* non-blocking */ }
-  }, [interaction.reflectionText, interaction.reflectionChip, currentJourneyStep, lesson]);
-
-  const goNext = useCallback(() => {
-    if (currentJourneyStep?.stepType === "complete") {
-      if (!completed) handleComplete();
-    } else if (!isLastStep) {
-      setCurrentStep(clampedStep + 1);
     }
-  }, [currentJourneyStep, completed, isLastStep, clampedStep, handleComplete]);
+  }, [slugs, lesson, fireConfetti]);
 
-  const goBack = useCallback(() => {
-    if (clampedStep > 0) setCurrentStep(clampedStep - 1);
-  }, [clampedStep]);
+  if (status === "unauthenticated") return null;
 
-  /* ─── loading state ─── */
-  if (loading) return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="flex items-center justify-center min-h-[70vh]">
-        <div className="flex flex-col items-center gap-5 bg-white rounded-3xl p-12 shadow-lg border border-slate-100">
-          <OwlTeacher size={80} expression="happy" />
-          <p className="text-lg font-bold text-slate-500">Loading your lesson...</p>
-          <div className="relative w-8 h-8"><div className="absolute inset-0 rounded-full border-[3px] border-indigo-200/30" /><div className="absolute inset-0 rounded-full border-[3px] border-transparent border-t-indigo-500 animate-spin" /></div>
-        </div>
-      </div>
-    </div>
-  );
-
-  /* ─── Journey Slide View ─── */
-  if (viewing) {
-    // Debug: log journey data to console
-    console.log("[LessonPlayer] viewing=true, journeySteps:", journeySteps.length, "source:", journeySource, "isJourney:", isJourney);
-    if (journeySteps.length > 0) {
-      console.log("[LessonPlayer] step types:", journeySteps.map(s => s.stepType));
-      console.log("[LessonPlayer] first step:", JSON.stringify(journeySteps[0], null, 2));
-    }
-
-    const stepLabel = currentJourneyStep ? (STEP_LABELS[currentJourneyStep.stepType] || "Next") : "Next";
-    const theme = (currentJourneyStep ? STEP_THEME[normalizeStepType(currentJourneyStep.stepType)] : STEP_THEME.welcome) || STEP_THEME.welcome;
-
-    console.log("[LessonPlayer] about to render journey view, currentJourneyStep:", currentJourneyStep?.stepType, "theme:", theme?.accent);
-
+  if (loading) {
     return (
-      <div className="fixed inset-0 z-50 bg-slate-50 flex flex-col overflow-hidden">
-        <style>{CELEBRATION_CSS}</style>
-
-        {/* ── Compact Top Bar ── */}
-        <div className="relative z-10 bg-white/90 backdrop-blur-xl border-b border-slate-200/60 px-4 py-2.5 flex-shrink-0 shadow-sm">
-          <div className="max-w-[1200px] mx-auto flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3 min-w-0">
-              <button onClick={() => { setViewing(false); setShowCelebration(false); setCurrentStep(0); }}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs transition-all">
-                <ArrowLeft className="w-3.5 h-3.5" /> {completed ? "Exit" : "Back"}
-              </button>
-              <div className="min-w-0">
-                <h1 className="font-extrabold text-slate-900 text-sm lg:text-base truncate tracking-tight">{cleanTitle(lesson?.title)}</h1>
-                {subject && <p className="text-[10px] text-slate-500 font-semibold">{subject}{grade ? ` · Grade ${grade}` : ""}</p>}
-              </div>
-            </div>
-            <div className="flex items-center gap-2 flex-shrink-0">
-              {isJourney && <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">{clampedStep + 1}/{totalSteps}</span>}
-              {xp > 0 && (
-                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200/50">
-                  <Zap className="w-3 h-3" /> +{xp} XP
-                </span>
-              )}
-              {justCompleted ? (
-                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200/50">
-                  <CheckCircle2 className="w-3 h-3" /> Done
-                </span>
-              ) : completed ? (
-                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200/50">
-                  <Eye className="w-3 h-3" /> Review
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200/50">
-                  <Pencil className="w-3 h-3" /> In Progress
-                </span>
-              )}
-            </div>
-          </div>
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F8FAFC" }}>
+        <div style={{ textAlign: "center" }}>
+          <OwlTeacher size={64} expression="happy" />
+          <p style={{ marginTop: 16, fontSize: 16, fontWeight: 700, color: "#64748b" }}>Loading your lesson...</p>
         </div>
-
-        {/* ── Progress Bar ── */}
-        {isJourney && totalSteps > 0 && (
-          <div className="relative z-10 bg-white/60 backdrop-blur-sm border-b border-slate-200/40 px-4 py-2 flex-shrink-0">
-            <div className="max-w-[1200px] mx-auto">
-              <div className="flex gap-1">
-                {journeySteps.map((s, i) => (
-                  <button key={i} onClick={() => setCurrentStep(i)} className="flex-1 group" title={STEP_LABELS[s.stepType] || s.title}>
-                    <div className={`h-1.5 rounded-full transition-all duration-500 ${
-                      i < clampedStep
-                        ? "bg-gradient-to-r from-emerald-400 to-teal-400"
-                        : i === clampedStep
-                        ? `bg-gradient-to-r ${theme.gradient}`
-                        : "bg-slate-200/60 group-hover:bg-slate-300/60"
-                    }`} />
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ── Main Content Area ── */}
-        <div className="flex-1 overflow-y-auto relative z-10">
-          <div className="max-w-[1200px] mx-auto px-4 py-5 flex gap-5">
-
-            {/* ── Main Slide Card ── */}
-            <div className="flex-1 min-w-0 max-w-[720px]">
-
-              {/* Celebration overlay */}
-              {showCelebration && xpEarned > 0 && (
-                <div className="rounded-2xl p-8 mb-5 text-center overflow-hidden border-2 border-indigo-200/50 shadow-xl bg-gradient-to-br from-indigo-50 via-amber-50/50 to-rose-50/50">
-                  <div className="relative z-10">
-                    <div className="flex justify-center mb-3"><OwlTeacher size={80} expression="celebrating" /></div>
-                    <h2 className="text-2xl lg:text-3xl font-black text-slate-900 mb-2 tracking-tight">Lesson Complete!</h2>
-                    <p className="text-slate-600 text-base lg:text-lg mb-4 font-medium">You worked hard and learned something amazing!</p>
-                    <div className="flex items-center justify-center gap-3 flex-wrap">
-                      <div className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-white shadow-lg border border-indigo-100">
-                        <Zap className="w-5 h-5 text-indigo-600" /><span className="text-2xl font-black text-indigo-600">+{xpEarned}</span><span className="text-sm font-bold text-slate-500">XP</span>
-                      </div>
-                      {streakCount > 0 && (
-                        <div className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-white shadow-lg border border-pink-100">
-                          <Flame className="w-5 h-5 text-pink-500" /><span className="text-2xl font-black text-pink-500">+{streakCount}</span><span className="text-sm font-bold text-slate-500">streak</span>
-                        </div>
-                      )}
-                    </div>
-                    {newBadges.length > 0 && (
-                      <div className="mt-4 flex gap-2 justify-center flex-wrap">
-                        {newBadges.map((b, i) => (
-                          <div key={i} className="rounded-xl border-2 border-purple-200/60 bg-white px-3 py-2 flex items-center gap-1.5 shadow-md">
-                            <span className="text-lg">🏅</span><span className="font-bold text-xs text-slate-800">{b}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    <div className="mt-5 flex gap-3 justify-center flex-wrap">
-                      <button onClick={() => { setViewing(false); setShowCelebration(false); setCurrentStep(0); }}
-                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white border-2 border-slate-200/60 text-slate-700 font-bold text-sm hover:bg-slate-50 transition-all active:scale-[0.98] shadow-sm">
-                        <ArrowLeft className="w-4 h-4" /> {lang === 'sw' ? 'Rudi kwenye Quest' : 'Back to Quest'}
-                      </button>
-                      <button onClick={() => { setShowCelebration(false); setCurrentStep(0); }}
-                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold text-sm hover:from-indigo-600 hover:to-purple-600 transition-all shadow-lg shadow-indigo-200/50 active:scale-[0.98]">
-                        <RotateCcw className="w-4 h-4" /> Review Lesson
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Current step slide */}
-              {isJourney && currentJourneyStep ? (
-                <JourneyErrorBoundary>
-                <div className={`rounded-2xl border-2 ${theme.border} bg-white p-6 lg:p-8 shadow-lg`}>
-                  <SlideStepView step={currentJourneyStep} stepNumber={clampedStep + 1} totalSteps={totalSteps}
-                    interaction={interaction} setInteraction={setInteraction} lesson={lesson} onSaveReflection={handleSaveReflection} />
-                </div>
-                </JourneyErrorBoundary>
-              ) : journeySteps.length > 0 ? (
-                <div className="flex flex-col gap-4">
-                  {journeySteps.map((s, i) => (
-                    <div key={s.id} className="rounded-2xl border-2 border-slate-200/60 bg-white p-6 lg:p-8 shadow-lg">
-                      <SlideStepView step={s} stepNumber={i + 1} totalSteps={journeySteps.length}
-                        interaction={interaction} setInteraction={setInteraction} lesson={lesson} onSaveReflection={handleSaveReflection} />
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="rounded-2xl border border-slate-200/50 bg-white text-center p-10 shadow-lg">
-                  <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center mx-auto mb-3"><BookOpen className="w-6 h-6 text-slate-400" /></div>
-                  <h3 className="text-lg font-extrabold text-slate-800 mb-1">This lesson is being prepared</h3>
-                  <p className="text-slate-500 text-sm font-medium">Please check back soon.</p>
-                </div>
-              )}
-
-              {completeError && (
-                <div className="mt-4 rounded-xl border border-red-300/50 bg-red-50 p-4 text-center shadow-sm">
-                  <p className="text-sm font-bold text-red-700">{completeError}</p>
-                  <button onClick={() => setCompleteError(null)} className="mt-1.5 text-xs text-red-500 underline hover:text-red-700 font-semibold">Dismiss</button>
-                </div>
-              )}
-            </div>
-
-            {/* ── Right Support Panel (desktop) ── */}
-            <div className="hidden lg:block w-[260px] flex-shrink-0">
-              <SupportPanel lesson={lesson} journeySteps={journeySteps} currentStep={clampedStep} xp={xp} subject={subject} grade={grade} onStepClick={setCurrentStep} />
-            </div>
-          </div>
-        </div>
-
-        {/* ── Bottom Navigation Bar ── */}
-        {isJourney && currentJourneyStep && (
-          <div className="relative z-10 bg-white/90 backdrop-blur-xl border-t border-slate-200/60 px-4 py-3 flex-shrink-0 shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
-            <div className="max-w-[1200px] mx-auto flex items-center gap-3">
-
-              {/* Back button — compact floating style */}
-              {clampedStep > 0 ? (
-                <button onClick={goBack}
-                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm transition-all active:scale-[0.97]">
-                  <ChevronLeft className="w-4 h-4" /> Back
-                </button>
-              ) : (
-                <div className="w-20" />
-              )}
-
-              {/* Step dots (mobile) */}
-              <div className="flex-1 flex items-center justify-center gap-1.5 lg:hidden">
-                {journeySteps.map((_, i) => (
-                  <button key={i} onClick={() => setCurrentStep(i)} className={`w-2 h-2 rounded-full transition-all ${
-                    i === clampedStep ? "bg-indigo-500 w-6" : i < clampedStep ? "bg-emerald-400" : "bg-slate-300"
-                  }`} />
-                ))}
-              </div>
-
-              {/* Spacer for desktop */}
-              <div className="flex-1 hidden lg:block" />
-
-              {/* Next / Complete button — slide-style card */}
-              {currentJourneyStep.stepType === "complete" ? (
-                <div className="flex gap-2">
-                  {!completed ? (
-                    <button onClick={handleComplete} disabled={completing}
-                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold text-sm hover:from-emerald-600 hover:to-teal-600 transition-all shadow-lg shadow-emerald-200/50 disabled:opacity-50 active:scale-[0.97]">
-                      {completing ? <><span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Earning...</> : <><Trophy className="w-4 h-4" /> Finish +{xp} XP</>}
-                    </button>
-                  ) : (
-                    <button onClick={() => { setViewing(false); setShowCelebration(false); setCurrentStep(0); }}
-                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold text-sm hover:from-indigo-600 hover:to-purple-600 transition-all shadow-lg shadow-indigo-200/50 active:scale-[0.97]">
-                      <RotateCcw className="w-4 h-4" /> Review
-                    </button>
-                  )}
-                </div>
-              ) : (
-                <button onClick={goNext}
-                  className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all active:scale-[0.97] ${
-                    isLastStep
-                      ? "bg-slate-100 text-slate-500 cursor-default"
-                      : `bg-gradient-to-r ${theme.gradient} text-white shadow-lg hover:brightness-110`
-                  }`}
-                  disabled={isLastStep && !completed}>
-                  <span>{NEXT_BUTTON_LABELS[currentJourneyStep.stepType] || "Next"}</span>
-                  {nextStepLabel && <span className="text-xs opacity-75 hidden sm:inline">— {nextStepLabel}</span>}
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-          </div>
-        )}
       </div>
     );
   }
 
-  /* ─── Landing Page ─── */
-  return (
-    <div className="fade-in max-w-[760px] mx-auto">
-      <div className="relative rounded-3xl p-8 lg:p-10 mb-6 overflow-hidden border border-indigo-200/50 shadow-xl bg-gradient-to-br from-indigo-600 via-violet-600 to-purple-700">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-8 -right-8 w-36 h-36 rounded-full bg-white/10" />
-          <div className="absolute -bottom-8 -left-8 w-28 h-28 rounded-full bg-white/5" />
+  if (!lesson) {
+    return (
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F8FAFC" }}>
+        <div style={{ textAlign: "center", background: "#fff", padding: 32, borderRadius: 16, boxShadow: "0 4px 24px rgba(0,0,0,0.08)" }}>
+          <BookOpen style={{ width: 48, height: 48, color: "#CBD5E1", margin: "0 auto 16px" }} />
+          <h2 style={{ fontSize: 18, fontWeight: 800, color: "#1e293b", marginBottom: 8 }}>Lesson not found</h2>
+          <Link href="/dashboard/student" style={{ color: "#4f46e5", fontWeight: 700, fontSize: 14 }}>← Back to Dashboard</Link>
         </div>
-        <div className="relative z-10">
-          {slugs && (
-            <Link href={`/dashboard/student/lessons/${slugs.themeSlug}/${slugs.questSlug}`} className="inline-flex items-center gap-1.5 text-white/70 hover:text-white text-sm font-semibold mb-4 transition-colors">
-              <ArrowLeft className="w-4 h-4" /> Back to Quest
-            </Link>
-          )}
-          <div className="flex items-center gap-2 mb-3 flex-wrap">
-            {completed && <span className="text-[10px] font-extrabold uppercase tracking-wider bg-white/20 text-white px-2.5 py-1 rounded-full">✓ Completed</span>}
-            {subject && <span className="text-[10px] font-extrabold uppercase tracking-wider bg-white/20 text-white px-2.5 py-1 rounded-full">{subject}{grade ? ` · Grade ${grade}` : ""}</span>}
-            {xp > 0 && <span className="text-[10px] font-extrabold uppercase tracking-wider bg-amber-400/80 text-white px-2.5 py-1 rounded-full flex items-center gap-1"><Zap className="w-3 h-3" /> {xp} XP</span>}
+      </div>
+    );
+  }
+
+  // ── Journey View ─────────────────────────────────────────────────────────
+
+  if (viewing && currentJourneyStep) {
+    return (
+      <LessonErrorBoundary>
+        <div style={{ minHeight: "100vh", background: "#F8FAFC", display: "flex", flexDirection: "column" }}>
+          {/* Top bar */}
+          <div style={{ background: "#fff", borderBottom: "1px solid #E2E8F0", padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 10 }}>
+            <button onClick={() => setViewing(false)} style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "#64748b", fontWeight: 700, fontSize: 13, background: "none", border: "none", cursor: "pointer" }}>
+              <ChevronLeft style={{ width: 16, height: 16 }} /> Exit
+            </button>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              {totalSteps > 0 && (
+                <span style={{ fontSize: 12, fontWeight: 700, color: "#64748b" }}>
+                  {clampedStep + 1}/{totalSteps}
+                </span>
+              )}
+              {xp > 0 && (
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 700, color: "#B45309", background: "#FEF3C7", padding: "3px 8px", borderRadius: 6 }}>
+                  <Zap style={{ width: 10, height: 10 }} /> +{xp} XP
+                </span>
+              )}
+            </div>
           </div>
-          <h1 className="text-3xl lg:text-4xl font-black text-white mb-2 tracking-tight">{cleanTitle(lesson?.title)}</h1>
-          {lesson?.description && <p className="text-white/85 text-lg leading-relaxed">{lesson.description}</p>}
+
+          {/* Progress bar */}
+          {totalSteps > 0 && (
+            <div style={{ padding: "8px 16px", background: "#fff", borderBottom: "1px solid #F1F5F9" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "#64748b" }}>Step {clampedStep + 1} of {totalSteps}</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "#64748b" }}>{Math.round(((clampedStep + 1) / totalSteps) * 100)}%</span>
+              </div>
+              <div style={{ height: 6, background: "#F1F5F9", borderRadius: 3, overflow: "hidden" }}>
+                <div style={{ width: `${((clampedStep + 1) / totalSteps) * 100}%`, height: "100%", background: "linear-gradient(90deg, #6366F1, #8B5CF6)", borderRadius: 3, transition: "width 0.5s ease" }} />
+              </div>
+            </div>
+          )}
+
+          {/* Step content */}
+          <div style={{ flex: 1, overflow: "auto", padding: "16px" }}>
+            <div style={{ maxWidth: 720, margin: "0 auto" }}>
+              {/* Step header */}
+              <div style={{ background: "#fff", borderRadius: 16, padding: "24px", boxShadow: "0 2px 12px rgba(0,0,0,0.04)", marginBottom: 16 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+                  <div style={{ width: 48, height: 48, borderRadius: 12, background: "linear-gradient(135deg, #6366F1, #8B5CF6)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: "1.5rem" }}>
+                    {STEP_TYPE_ICONS[currentJourneyStep.stepType] || "📖"}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <h2 style={{ fontSize: "1.25rem", fontWeight: 800, color: "#1e293b", margin: 0 }}>{currentJourneyStep.title}</h2>
+                    <span style={{ fontSize: "0.75rem", color: "#64748b" }}>Step {clampedStep + 1} of {totalSteps}</span>
+                  </div>
+                </div>
+
+                {/* Owl guidance */}
+                {currentJourneyStep.owlText && (
+                  <div style={{ display: "flex", gap: 12, padding: "16px", borderRadius: 12, background: "linear-gradient(135deg, #F0F9FF, #EDE9FE)", border: "1px solid #C7D2FE", marginBottom: 16 }}>
+                    <OwlTeacher size={40} expression={OWL_EXPRESSIONS[currentJourneyStep.stepType] || 'happy'} />
+                    <p style={{ fontSize: "0.875rem", color: "#334155", lineHeight: 1.6, margin: 0, flex: 1 }}>{currentJourneyStep.owlText}</p>
+                  </div>
+                )}
+
+                {/* Student content */}
+                {currentJourneyStep.studentText && (
+                  <div style={{ marginBottom: 16 }}>
+                    {splitIntoParagraphs(currentJourneyStep.studentText).map((p, i) => (
+                      <p key={i} style={{ fontSize: "1rem", color: "#334155", lineHeight: 1.7, marginBottom: 12 }}>{p}</p>
+                    ))}
+                  </div>
+                )}
+
+                {/* Math display */}
+                {currentJourneyStep.mathDisplay && (
+                  <div style={{ padding: "16px", borderRadius: 12, background: "#F8FAFC", border: "1px solid #E2E8F0", textAlign: "center", marginBottom: 16 }}>
+                    <span style={{ fontSize: "1.5rem", fontFamily: "monospace", fontWeight: 700, color: "#1e293b" }}>{currentJourneyStep.mathDisplay}</span>
+                  </div>
+                )}
+
+                {/* Illustration */}
+                {currentJourneyStep.media?.illustration?.approvedUrl && (
+                  <div style={{ marginBottom: 16, borderRadius: 12, overflow: "hidden", border: "1px solid #E2E8F0" }}>
+                    <img src={currentJourneyStep.media.illustration.approvedUrl} alt={currentJourneyStep.media.illustration.altText || ""} style={{ width: "100%", height: "auto", display: "block" }} />
+                  </div>
+                )}
+
+                {/* Video */}
+                {(() => {
+                  const vUrl = currentJourneyStep.media?.video?.approvedUrl;
+                  if (!vUrl) return null;
+                  const videoId = extractYouTubeId(vUrl);
+                  if (!videoId) return null;
+                  return (
+                    <div style={{ marginBottom: 16, borderRadius: 12, overflow: "hidden", border: "1px solid #E2E8F0" }}>
+                      <div style={{ position: "relative", width: "100%", paddingBottom: "56.25%" }}>
+                        <iframe src={`https://www.youtube.com/embed/${videoId}`} title="Lesson video" allowFullScreen style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: "none" }} />
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {/* Callout for "connect" step */}
+                {currentJourneyStep.stepType === "connect" && (
+                  <div style={{ padding: "14px 16px", borderRadius: 12, background: "#ECFDF5", border: "1px solid #A7F3D0", marginBottom: 16, display: "flex", gap: 10, alignItems: "flex-start" }}>
+                    <Lightbulb style={{ width: 18, height: 18, color: "#059669", flexShrink: 0, marginTop: 2 }} />
+                    <p style={{ fontSize: "0.875rem", color: "#065F46", margin: 0, lineHeight: 1.5 }}>{currentJourneyStep.studentText}</p>
+                  </div>
+                )}
+
+                {/* Practice section */}
+                {currentJourneyStep.stepType === "practice" && !currentJourneyStep.interaction?.options && (
+                  <div style={{ padding: "14px 16px", borderRadius: 12, background: "#F0F9FF", border: "1px solid #BAE6FD", marginBottom: 16 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                      <Pencil style={{ width: 16, height: 16, color: "#0284C7" }} />
+                      <span style={{ fontSize: "0.875rem", fontWeight: 700, color: "#0C4A6E" }}>Your Turn!</span>
+                    </div>
+                    <textarea
+                      value={interaction.practiceEntries[0]}
+                      onChange={e => setInteraction((p: any) => ({ ...p, practiceEntries: [e.target.value, p.practiceEntries[1], p.practiceEntries[2]] }))}
+                      placeholder="Write your answer here..."
+                      rows={4}
+                      style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1.5px solid #BAE6FD`, fontSize: "0.875rem", color: "#1e293b", outline: "none", resize: "vertical", background: "#fff" }}
+                    />
+                  </div>
+                )}
+
+                {/* Multiple choice */}
+                {currentJourneyStep.interaction?.options && currentJourneyStep.interaction.options.length > 0 && (
+                  <div style={{ marginBottom: 16 }}>
+                    <p style={{ fontSize: "1rem", fontWeight: 700, color: "#1e293b", marginBottom: 12 }}>
+                      {currentJourneyStep.interaction.question || currentJourneyStep.interaction.prompt || ""}
+                    </p>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                      {currentJourneyStep.interaction.options.map((opt: string, i: number) => {
+                        const isSelected = interaction.selectedChoice === i;
+                        const showFeedback = interaction.choiceFeedback !== null;
+                        const correctIdx = typeof currentJourneyStep.interaction?.correctAnswer === "number" ? currentJourneyStep.interaction.correctAnswer : null;
+                        const isCorrect = i === correctIdx;
+                        let bg = "#fff", border = "#CBD5E1";
+                        if (showFeedback && isSelected && isCorrect) { bg = "#D1FAE5"; border = "#10B981"; }
+                        else if (showFeedback && isSelected && !isCorrect) { bg = "#FEE2E2"; border = "#DC2626"; }
+                        else if (showFeedback && isCorrect) { bg = "#D1FAE5"; border = "#10B981"; }
+                        else if (isSelected) { bg = "#EEF2FF"; border = "#6366F1"; }
+                        return (
+                          <button key={i} onClick={() => {
+                            if (interaction.choiceFeedback !== null) return;
+                            const correct = correctIdx !== null ? i === correctIdx : true;
+                            setInteraction((p: any) => ({ ...p, selectedChoice: i, choiceFeedback: correct ? "correct" : "incorrect" }));
+                          }} disabled={interaction.choiceFeedback !== null}
+                            style={{ padding: "12px 16px", borderRadius: 10, border: `2px solid ${border}`, background: bg, display: "flex", alignItems: "center", gap: 10, cursor: interaction.choiceFeedback !== null ? "default" : "pointer", textAlign: "left", width: "100%" }}>
+                            <span style={{ width: 24, height: 24, borderRadius: "50%", border: `2px solid ${border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.75rem", fontWeight: 700, color: border, flexShrink: 0 }}>
+                              {String.fromCharCode(65 + i)}
+                            </span>
+                            <span style={{ fontSize: "0.875rem", color: "#334155", flex: 1 }}>{opt}</span>
+                            {showFeedback && isCorrect && <CheckCircle2 style={{ width: 18, height: 18, color: "#059669" }} />}
+                            {showFeedback && isSelected && !isCorrect && <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#DC2626" }}>Try again</span>}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    {interaction.choiceFeedback === "correct" && (
+                      <div style={{ marginTop: 8, padding: "10px 14px", borderRadius: 8, background: "#D1FAE5", border: "1px solid #A7F3D0" }}>
+                        <p style={{ fontSize: "0.875rem", fontWeight: 700, color: "#065F46", margin: 0 }}>✅ Correct! Well done! {currentJourneyStep.interaction?.explanation || ""}</p>
+                      </div>
+                    )}
+                    {interaction.choiceFeedback === "incorrect" && (
+                      <div style={{ marginTop: 8, padding: "10px 14px", borderRadius: 8, background: "#FEF3C7", border: "1px solid #FDE68A" }}>
+                        <p style={{ fontSize: "0.875rem", fontWeight: 700, color: "#92400E", margin: 0 }}>Not quite. Think about it and try again!</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Think first */}
+                {currentJourneyStep.stepType === "think_first" && (
+                  <div style={{ padding: "14px 16px", borderRadius: 12, background: "#FFFBEB", border: "1px solid #FDE68A", marginBottom: 16 }}>
+                    <textarea
+                      value={interaction.predictionText}
+                      onChange={e => setInteraction((p: any) => ({ ...p, predictionText: e.target.value }))}
+                      placeholder="What do you think? Write your ideas here..."
+                      rows={3}
+                      style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1.5px solid #FDE68A`, fontSize: "0.875rem", color: "#1e293b", outline: "none", resize: "vertical", background: "#fff" }}
+                    />
+                    {interaction.predictionText.trim() && (
+                      <p style={{ fontSize: "0.75rem", color: "#92400E", marginTop: 4, fontWeight: 600 }}>✓ Your thinking is saved! Click Next to continue.</p>
+                    )}
+                  </div>
+                )}
+
+                {/* Reflection */}
+                {currentJourneyStep.stepType === "reflect" && (
+                  <div style={{ padding: "14px 16px", borderRadius: 12, background: "#FFF1F2", border: "1px solid #FECDD3", marginBottom: 16 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                      <MessageCircle style={{ width: 16, height: 16, color: "#E11D48" }} />
+                      <span style={{ fontSize: "0.875rem", fontWeight: 700, color: "#9F1239" }}>Reflection Time</span>
+                    </div>
+                    <textarea
+                      value={interaction.reflectionText}
+                      onChange={e => setInteraction((p: any) => ({ ...p, reflectionText: e.target.value }))}
+                      placeholder="What did you learn today? How do you feel?"
+                      rows={3}
+                      style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1.5px solid #FECDD3`, fontSize: "0.875rem", color: "#1e293b", outline: "none", resize: "vertical", background: "#fff", marginBottom: 8 }}
+                    />
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                      {(currentJourneyStep.reflectionOptions || ["I learned something new!", "I need more practice", "This was fun!", "I can teach someone else now"]).map((opt: string, i: number) => (
+                        <button key={i} onClick={() => setInteraction((p: any) => ({ ...p, reflectionChip: p.reflectionChip === i ? null : i }))}
+                          style={{ padding: "6px 12px", borderRadius: 20, border: `2px solid ${interaction.reflectionChip === i ? "#E11D48" : "#FECDD3"}`, background: interaction.reflectionChip === i ? "#E11D48" : "#fff", color: interaction.reflectionChip === i ? "#fff" : "#9F1239", fontSize: "0.75rem", fontWeight: 700, cursor: "pointer" }}>
+                          {opt}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Completion */}
+                {currentJourneyStep.stepType === "complete" && (
+                  <div style={{ textAlign: "center", padding: "24px 0" }}>
+                    <OwlTeacher size={72} expression="celebrating" />
+                    <h3 style={{ fontSize: "1.5rem", fontWeight: 800, color: "#1e293b", margin: "16px 0 8px" }}>You Did It! 🏆</h3>
+                    <p style={{ fontSize: "1rem", color: "#64748b", marginBottom: 16 }}>Amazing work! You've completed this lesson.</p>
+                    {xp > 0 && (
+                      <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 20px", borderRadius: 12, background: "linear-gradient(135deg, #FEF3C7, #FDE68A)", border: "1px solid #F59E0B" }}>
+                        <Zap style={{ width: 20, height: 20, color: "#B45309" }} />
+                        <span style={{ fontSize: "1.125rem", fontWeight: 800, color: "#92400E" }}>+{xp} XP earned!</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom navigation */}
+          {totalSteps > 0 && (
+            <div style={{ background: "#fff", borderTop: "1px solid #E2E8F0", padding: "12px 16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              {clampedStep > 0 ? (
+                <button onClick={() => setCurrentStep(clampedStep - 1)} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "10px 16px", borderRadius: 10, border: "1px solid #CBD5E1", background: "#fff", color: "#334155", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>
+                  <ChevronLeft style={{ width: 16, height: 16 }} /> Back
+                </button>
+              ) : <div />}
+              {isLastStep ? (
+                <button onClick={handleComplete} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 24px", borderRadius: 12, border: "none", background: "linear-gradient(135deg, #059669, #10B981)", color: "#fff", fontWeight: 800, fontSize: 15, cursor: "pointer" }}>
+                  <Trophy style={{ width: 18, height: 18 }} /> Complete Lesson
+                </button>
+              ) : (
+                nextStepLabel && (
+                  <button onClick={() => setCurrentStep(clampedStep + 1)} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "10px 20px", borderRadius: 10, border: "none", background: "linear-gradient(135deg, #6366F1, #8B5CF6)", color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>
+                    {nextStepLabel} <ChevronRight style={{ width: 16, height: 16 }} />
+                  </button>
+                )
+              )}
+            </div>
+          )}
+        </div>
+      </LessonErrorBoundary>
+    );
+  }
+
+  // ── Landing / Start View ─────────────────────────────────────────────────
+
+  const completedSteps = journeySteps.filter((_: any, i: number) => i < currentStep);
+  const progress = totalSteps > 0 ? Math.round((completedSteps.length / totalSteps) * 100) : 0;
+
+  return (
+    <div style={{ minHeight: "100vh", background: "#F0F4FF" }}>
+      {/* Hero */}
+      <div style={{ background: "linear-gradient(135deg, #6366F1 0%, #8B5CF6 50%, #A78BFA 100%)", padding: "32px 16px", color: "#fff" }}>
+        <div style={{ maxWidth: 720, margin: "0 auto" }}>
+          <Link href="/dashboard/student" style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "rgba(255,255,255,0.8)", fontWeight: 600, fontSize: 13, textDecoration: "none", marginBottom: 16 }}>
+            <ArrowLeft style={{ width: 14, height: 14 }} /> Back to Dashboard
+          </Link>
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            <div style={{ fontSize: "3rem" }}>{STEP_TYPE_ICONS[journeySteps[0]?.stepType] || "🦉"}</div>
+            <div>
+              <h1 style={{ fontSize: "1.75rem", fontWeight: 900, margin: 0, color: "#fff" }}>{cleanTitle(lesson.title)}</h1>
+              {subject && <p style={{ fontSize: "0.875rem", color: "rgba(255,255,255,0.8)", margin: "4px 0 0" }}>{subject}{grade ? ` · Grade ${grade}` : ""}</p>}
+            </div>
+          </div>
+          {xp > 0 && (
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, marginTop: 12, padding: "6px 14px", borderRadius: 20, background: "rgba(255,255,255,0.2)", backdropFilter: "blur(8px)" }}>
+              <Zap style={{ width: 14, height: 14 }} />
+              <span style={{ fontSize: "0.8125rem", fontWeight: 700 }}>+{xp} XP</span>
+            </div>
+          )}
         </div>
       </div>
 
-      {completed && (
-        <div className="rounded-2xl border border-blue-200/50 bg-gradient-to-br from-blue-50/80 to-indigo-50/60 text-center p-6 mb-5 shadow-lg">
-          <CheckCircle2 className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-          <p className="font-bold text-blue-800">You've completed this lesson!</p>
-          <p className="text-blue-600 text-sm mt-1">Review the content or move on to the next lesson.</p>
-        </div>
-      )}
-
-      {isJourney && (
-        <div className="rounded-2xl border border-indigo-200/50 bg-indigo-50/60 p-5 mb-5 flex items-center gap-4 shadow-lg">
-          <div className="w-12 h-12 rounded-2xl bg-indigo-100 flex items-center justify-center flex-shrink-0"><Sparkles className="w-6 h-6 text-indigo-600" /></div>
-          <div>
-            <p className="text-base font-bold text-indigo-800">{totalSteps}-step interactive lesson</p>
-            <p className="text-sm text-indigo-600/80 font-medium">Work through each step to complete the lesson</p>
+      <div style={{ maxWidth: 720, margin: "0 auto", padding: "24px 16px" }}>
+        {/* Journey overview */}
+        {journeySteps.length > 0 && (
+          <div style={{ background: "#fff", borderRadius: 16, padding: "20px", boxShadow: "0 2px 12px rgba(0,0,0,0.04)", marginBottom: 16 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+              <h3 style={{ fontSize: "1rem", fontWeight: 800, color: "#1e293b", margin: 0 }}>Lesson Journey</h3>
+              <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#6366F1", background: "#EEF2FF", padding: "3px 8px", borderRadius: 6 }}>{progress}% Complete</span>
+            </div>
+            {/* Progress bar */}
+            <div style={{ height: 8, background: "#F1F5F9", borderRadius: 4, overflow: "hidden", marginBottom: 16 }}>
+              <div style={{ width: `${progress}%`, height: "100%", background: "linear-gradient(90deg, #6366F1, #8B5CF6)", borderRadius: 4, transition: "width 0.5s ease" }} />
+            </div>
+            {/* Step indicators */}
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+              {journeySteps.map((step: any, i: number) => {
+                const isCompleted = i < currentStep;
+                const isCurrent = i === currentStep;
+                return (
+                  <button key={step.id} onClick={() => setCurrentStep(i)} style={{
+                    width: 36, height: 36, borderRadius: 10, border: "none",
+                    background: isCurrent ? "#6366F1" : isCompleted ? "#10B981" : "#F1F5F9",
+                    color: isCurrent || isCompleted ? "#fff" : "#94A3B8",
+                    fontSize: "0.875rem", fontWeight: 700, cursor: "pointer",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    position: "relative",
+                    boxShadow: isCurrent ? "0 4px 12px rgba(99,102,241,0.3)" : "none",
+                  }}>
+                    {isCompleted ? <CheckCircle2 style={{ width: 16, height: 16 }} /> : (STEP_TYPE_ICONS[step.stepType] || (i + 1))}
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      <GradientButton variant={completed ? "secondary" : "primary"} size="lg"
-        icon={completed ? <Eye className="w-5 h-5" /> : <Sparkles className="w-5 h-5" />}
-        onClick={async () => {
-          if (lesson?.id) {
-            try { await fetch("/api/learner/progress", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ lessonId: lesson.id, action: "start" }) }); } catch { /* non-blocking */ }
-          }
-          setCurrentStep(0); setViewing(true);
-        }} className="w-full">
-        {completed ? "Review Lesson" : isJourney ? `Begin ${totalSteps}-Step Journey` : "Start Lesson"}
-      </GradientButton>
+        {/* Start / Continue button */}
+        {!completed && (
+          <GradientButton variant="primary" size="lg" icon={<Play style={{ width: 18, height: 18 }} />} onClick={() => { setCurrentStep(0); setViewing(true); }} style={{ width: "100%", marginBottom: 16 }}>
+            {completedSteps.length > 0 ? "Continue Lesson" : "Start Lesson"}
+          </GradientButton>
+        )}
+
+        {/* Last step info */}
+        {currentJourneyStep && !viewing && (
+          <div style={{ background: "#fff", borderRadius: 16, padding: "20px", boxShadow: "0 2px 12px rgba(0,0,0,0.04)" }}>
+            <p style={{ fontSize: "0.75rem", fontWeight: 700, color: "#6366F1", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 8 }}>Current Step</p>
+            <h3 style={{ fontSize: "1.125rem", fontWeight: 800, color: "#1e293b", marginBottom: 8 }}>{currentJourneyStep.title}</h3>
+            {currentJourneyStep.owlText && (
+              <div style={{ display: "flex", gap: 10, padding: "12px", borderRadius: 10, background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                <OwlTeacher size={32} expression={OWL_EXPRESSIONS[currentJourneyStep.stepType] || 'happy'} />
+                <p style={{ fontSize: "0.8125rem", color: "#475569", margin: 0, lineHeight: 1.5 }}>{currentJourneyStep.owlText.slice(0, 150)}{currentJourneyStep.owlText.length > 150 ? "..." : ""}</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {completed && (
+          <div style={{ textAlign: "center", padding: "32px 0" }}>
+            <Trophy style={{ width: 48, height: 48, color: "#F59E0B", margin: "0 auto 12px" }} />
+            <h3 style={{ fontSize: "1.25rem", fontWeight: 800, color: "#1e293b" }}>Lesson Complete! 🎉</h3>
+            <p style={{ fontSize: "0.875rem", color: "#64748b" }}>You've finished this lesson. Great work!</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
-/* ─── build lesson journey ─── */
-
-function buildLessonJourney(lesson: any): { steps: JourneyStep[]; source: string } | null {
-  if (!lesson?.id) return null;
-  const subject = lesson.quest?.theme?.themeSubjects?.[0]?.subject || "";
-  const grade = lesson.quest?.theme?.grade || 0;
-  return buildUniversalJourney(lesson.id, lesson.title || "Lesson", lesson.contentBlocks, {
-    subject, grade, xpReward: getRewardValue(lesson?.xpReward), coinReward: lesson?.coinReward,
-  });
+function buildLessonJourney(lesson: any) {
+  if (!lesson) return null;
+  try {
+    const cb = typeof lesson.contentBlocks === "string" ? JSON.parse(lesson.contentBlocks) : lesson.contentBlocks;
+    if (!cb) return null;
+    const steps = Array.isArray(cb.studentJourney) && cb.studentJourney.length > 0
+      ? cb.studentJourney
+      : Array.isArray(cb.studentJourneyDraft) && cb.studentJourneyDraft.length > 0
+        ? cb.studentJourneyDraft
+        : [];
+    return { steps, source: Array.isArray(cb.studentJourney) && cb.studentJourney.length > 0 ? "live" : "draft" };
+  } catch { return null; }
 }
