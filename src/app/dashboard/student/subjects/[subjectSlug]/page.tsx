@@ -113,11 +113,20 @@ export default function SubjectDetailPage({ params }: { params: Promise<{ subjec
       // Filter lessons for this subject
       const allLessons: LessonData[] = lessonsData.lessons || [];
       const subjectLessons = allLessons.filter((l: any) => {
-        const lessonSubject = l.subject || "";
-        const lessonSubjects = l.subjects || [];
-        return lessonSubject.toLowerCase().includes(targetSubjectName.toLowerCase()) ||
-          lessonSubjects.some((s: string) => s.toLowerCase().includes(targetSubjectName.toLowerCase())) ||
-          targetSubjectName.toLowerCase().includes(lessonSubject.toLowerCase());
+        // Subject can be in l.subject, l.subjects array, or inside contentBlocks
+        const lessonSubject = (l.subject || "").toString();
+        const lessonSubjects = Array.isArray(l.subjects) ? l.subjects : [];
+        // Also check contentBlocks for subject
+        let cbSubject = "";
+        try {
+          const cb = typeof l.contentBlocks === "string" ? JSON.parse(l.contentBlocks) : l.contentBlocks;
+          if (cb && typeof cb === "object") cbSubject = (cb.subject || "").toString();
+        } catch { /* ignore */ }
+        const target = targetSubjectName.toLowerCase();
+        return lessonSubject.toLowerCase().includes(target) ||
+          cbSubject.toLowerCase().includes(target) ||
+          lessonSubjects.some((s: string) => s.toLowerCase().includes(target)) ||
+          (lessonSubject && target.includes(lessonSubject.toLowerCase()));
       });
 
       setLessons(subjectLessons);
