@@ -116,6 +116,7 @@ function buildLessonJourney(lesson: LessonData | null, mode: "live" | "draft" = 
 
 export default function AdminStudentLessonEditor({ params }: { params: Promise<{ id: string }> }) {
   const [lessonId, setLessonId] = useState<string>("");
+  const [lesson, setLesson] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
