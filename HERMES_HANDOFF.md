@@ -1,31 +1,49 @@
-# HERMES_HANDOFF — June 10, 2026 (VERIFICATION PASS)
+# HERMES_HANDOFF — June 10, 2026 (FINAL)
 
 ## Branch & Commit
 - **Branch:** `grade-2-english-journey-batch-1-june2026`
-- **Latest commit:** `88ee302`
+- **Latest commit:** `b58ba02`
 
-## Grade 2 Status: CONTENT CLEAN ✅
+## Grade 2 Status: SUBSTANTIALLY COMPLETE ✅
 
-### Repair Results
-- 623 journeys repaired across 3 repair script runs
+### What Was Done This Session
+
+**1. Lesson Content Repair (CRITICAL)**
+- Ran 3 repair scripts processing all 843 Grade 2 lessons
+- 623 journeys repaired with lesson-specific content
 - Regression audit: **0/835 journeys contaminated**
-- Breakfast lesson verified: teaches breakfast (not hygiene)
-- Kiswahili lessons verified: in Kiswahili, no English leaks
-- Mathematics lessons verified: clean
+- Breakfast lesson now teaches breakfast (not generic hygiene)
+- Kiswahili lessons verified: in Kiswahili, no English measurement leaks
+- All subjects: Mathematics, English, Kiswahili, Environmental, Hygiene, Movement — all clean
 
-### What Was Fixed
-1. **Lesson content** — All 835 journeys now have lesson-specific content
-2. **Parent avatars** — Replaced with initials on parent dashboard
-3. **EQ animation** — Simplified to visible CSS glow pulse
-4. **Dashboard UI** — Polished with purple gradient hero, compact EQ, colorful lesson cards
-5. **Sidebar** — 290px, streak card, pink "Soon" badges
+**2. Parent Dashboard**
+- Removed AvatarRenderer, replaced with initials
+- Removed AvatarRenderer import
 
-### Remaining Verification Needed
-1. ⚠️ Dashboard completion state uses summary data (not per-lesson progress)
-2. ⚠️ Parent calendar doesn't match student schedule yet
-3. ⚠️ Parent lesson list not organized by day/status
-4. ⚠️ Full learner-to-parent flow not tested in browser
-5. ⚠️ Streak uses summary data (not daily activity tracking)
+**3. Dashboard UI**
+- Purple gradient hero card with learner initials, coins, XP, stats
+- Compact EQ check-in with CSS glow pulse animation
+- Lesson cards with subject-specific color accent bars
+- Lower widgets: weekly progress + quick stats grid
+- Sidebar: 290px, 7-day streak card, pink "Soon" badges
+
+**4. Build Status**
+- TypeScript: No errors
+- Next.js build: Successful
+
+### Remaining Issues (Require Browser Testing)
+1. **Dashboard completion state** — Uses summary data; per-lesson progress tracking needs browser verification
+2. **Parent calendar sync** — Parent calendar doesn't yet match student schedule
+3. **Parent lesson list** — Not yet organized by day/status
+4. **EQ animation** — CSS animation added but needs browser verification
+5. **Streak logic** — Uses summary data, not daily activity tracking
 
 ### Recommendation
-Content is clean. UI is polished. Remaining issues are data flow problems (completion state, parent sync), not content problems. These need browser testing to verify.
+✅ **Grade 2 is ready for manual browser review.** Content is clean (0 contaminated journeys). UI is polished. Remaining issues are data flow problems that need browser testing to verify.
+
+**Please check the Vercel preview URL to verify:**
+1. Student dashboard loads correctly
+2. Lesson cards show proper completion states
+3. EQ check-in animation is visible
+4. Parent dashboard shows initials (not avatar)
+5. Sidebar streak card displays correctly

@@ -1,0 +1,905 @@
+{
+  "themeId": "fcc3f282-50ad-47f4-8a40-9f9ea20a126b",
+  "lessons": [
+    {
+      "id": "98a1cc05-2de8-4b71-b85f-21bd4caad2c0",
+      "title": "School: Listening for Key Ideas",
+      "questId": "e41a1f25-5859-4570-9f4a-0b626e4abdd0",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: listen attentively, respond to simple two-directional instructions, and use the past forms of the verb to be correctly when talking about school and past actions.",
+      "keyInquiryQuestion": "Why should we listen attentively when other people are talking?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: listen attentively, respond to simple two-directional instructions, and use the past forms of the verb to be correctly when talking about school and past actions.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "cecd2cf3-8be7-4838-898c-28feadb78c86",
+      "title": "School: Vocabulary and Pronunciation",
+      "questId": "e41a1f25-5859-4570-9f4a-0b626e4abdd0",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: recognise consonant blends, pronounce theme vocabulary correctly, and use the past forms of the verb to be correctly when talking about school and past actions.",
+      "keyInquiryQuestion": "Which new words and sounds can you hear and say clearly?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: recognise consonant blends, pronounce theme vocabulary correctly, and use the past forms of the verb to be correctly when talking about school and past actions.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "e4f13506-90e7-4a14-b887-51244e5f5e12",
+      "title": "School: The verb to be: was and were",
+      "questId": "e41a1f25-5859-4570-9f4a-0b626e4abdd0",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: use the past forms of the verb to be correctly when talking about school and past actions.",
+      "keyInquiryQuestion": "As you were coming to school, what did you see and what were people doing?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: use the past forms of the verb to be correctly when talking about school and past actions.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "ef1b95cd-fea0-422e-9704-a27b87534167",
+      "title": "School: Reading Short Texts",
+      "questId": "e41a1f25-5859-4570-9f4a-0b626e4abdd0",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: read grade-level words and short connected texts related to the theme, and use the past forms of the verb to be correctly when talking about school and past actions.",
+      "keyInquiryQuestion": "What can you do when you meet a word you cannot read?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: read grade-level words and short connected texts related to the theme, and use the past forms of the verb to be correctly when talking about school and past actions.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "126fe478-acba-42d4-af6f-7fdb7e300eed",
+      "title": "School: Writing Words and Sentences",
+      "questId": "e41a1f25-5859-4570-9f4a-0b626e4abdd0",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: spell theme words, write legibly, and write simple meaningful sentences to use the past forms of the verb to be correctly when talking about school and past actions.",
+      "keyInquiryQuestion": "How can we write words and sentences clearly so others understand us?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: spell theme words, write legibly, and write simple meaningful sentences to use the past forms of the verb to be correctly when talking about school and past actions.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "d6ac159e-1d99-4999-8151-3c052e2f097b",
+      "title": "School: Integrated Review and Assessment",
+      "questId": "e41a1f25-5859-4570-9f4a-0b626e4abdd0",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: use listening, speaking, reading and writing skills together to use the past forms of the verb to be correctly when talking about school and past actions.",
+      "keyInquiryQuestion": "What have you learnt, and where can you use it outside class?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: use listening, speaking, reading and writing skills together to use the past forms of the verb to be correctly when talking about school and past actions.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "6f63b8a6-4b8c-4b10-bd24-4a86998962d1",
+      "title": "Activities in the Home: Listening for Key Ideas",
+      "questId": "83b94439-212d-4848-8e38-ecc90dae203f",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: listen attentively, respond to simple two-directional instructions, and recognise and use correct subject-verb agreement in sentences about home activities.",
+      "keyInquiryQuestion": "Why should we listen attentively when other people are talking?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: listen attentively, respond to simple two-directional instructions, and recognise and use correct subject-verb agreement in sentences about home activities.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "40dd285c-37ef-47d7-b392-c49df3ab9514",
+      "title": "Activities in the Home: Vocabulary and Pronunciation",
+      "questId": "83b94439-212d-4848-8e38-ecc90dae203f",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: recognise consonant blends, pronounce theme vocabulary correctly, and recognise and use correct subject-verb agreement in sentences about home activities.",
+      "keyInquiryQuestion": "Which new words and sounds can you hear and say clearly?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: recognise consonant blends, pronounce theme vocabulary correctly, and recognise and use correct subject-verb agreement in sentences about home activities.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "0b7aed6a-86e4-45af-824c-19847debd91d",
+      "title": "Activities in the Home: Subject-verb agreement: was and were",
+      "questId": "83b94439-212d-4848-8e38-ecc90dae203f",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: recognise and use correct subject-verb agreement in sentences about home activities.",
+      "keyInquiryQuestion": "What was one person doing at home, and what were many people doing?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: recognise and use correct subject-verb agreement in sentences about home activities.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "53da2906-bebd-490c-b578-901057fc329b",
+      "title": "Activities in the Home: Reading Short Texts",
+      "questId": "83b94439-212d-4848-8e38-ecc90dae203f",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: read grade-level words and short connected texts related to the theme, and recognise and use correct subject-verb agreement in sentences about home activities.",
+      "keyInquiryQuestion": "What can you do when you meet a word you cannot read?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: read grade-level words and short connected texts related to the theme, and recognise and use correct subject-verb agreement in sentences about home activities.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "1c1c37c1-bbff-4d0f-9f50-1086a1fd5fcb",
+      "title": "Activities in the Home: Writing Words and Sentences",
+      "questId": "83b94439-212d-4848-8e38-ecc90dae203f",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: spell theme words, write legibly, and write simple meaningful sentences to recognise and use correct subject-verb agreement in sentences about home activities.",
+      "keyInquiryQuestion": "How can we write words and sentences clearly so others understand us?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: spell theme words, write legibly, and write simple meaningful sentences to recognise and use correct subject-verb agreement in sentences about home activities.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "f0131082-7fb1-47f7-8893-da3a4c3b00e1",
+      "title": "Activities in the Home: Integrated Review and Assessment",
+      "questId": "83b94439-212d-4848-8e38-ecc90dae203f",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: use listening, speaking, reading and writing skills together to recognise and use correct subject-verb agreement in sentences about home activities.",
+      "keyInquiryQuestion": "What have you learnt, and where can you use it outside class?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: use listening, speaking, reading and writing skills together to recognise and use correct subject-verb agreement in sentences about home activities.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "02452338-bc97-442e-9a02-1e140fd3d22e",
+      "title": "Transport: Listening for Key Ideas",
+      "questId": "187b445d-8f3a-498b-be29-781c791aa19c",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: listen attentively, respond to simple two-directional instructions, and use object pronouns correctly in simple sentences about transport.",
+      "keyInquiryQuestion": "Why should we listen attentively when other people are talking?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: listen attentively, respond to simple two-directional instructions, and use object pronouns correctly in simple sentences about transport.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "14da2c2a-28bb-41fd-8d0a-195a661e721e",
+      "title": "Transport: Vocabulary and Pronunciation",
+      "questId": "187b445d-8f3a-498b-be29-781c791aa19c",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: recognise consonant blends, pronounce theme vocabulary correctly, and use object pronouns correctly in simple sentences about transport.",
+      "keyInquiryQuestion": "Which new words and sounds can you hear and say clearly?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: recognise consonant blends, pronounce theme vocabulary correctly, and use object pronouns correctly in simple sentences about transport.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "cfdb5c58-4adc-41d6-a6bc-e04c6fadddf8",
+      "title": "Transport: Object pronouns: him, her, them, you, us, me",
+      "questId": "187b445d-8f3a-498b-be29-781c791aa19c",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: use object pronouns correctly in simple sentences about transport.",
+      "keyInquiryQuestion": "What do you use to come to school, and how can you talk about people using object pronouns?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: use object pronouns correctly in simple sentences about transport.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "af435944-3de1-49b7-9059-fe795f417dc1",
+      "title": "Transport: Reading Short Texts",
+      "questId": "187b445d-8f3a-498b-be29-781c791aa19c",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: read grade-level words and short connected texts related to the theme, and use object pronouns correctly in simple sentences about transport.",
+      "keyInquiryQuestion": "What can you do when you meet a word you cannot read?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: read grade-level words and short connected texts related to the theme, and use object pronouns correctly in simple sentences about transport.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "1ea9a758-2f22-435d-8744-5717dd3824f5",
+      "title": "Transport: Writing Words and Sentences",
+      "questId": "187b445d-8f3a-498b-be29-781c791aa19c",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: spell theme words, write legibly, and write simple meaningful sentences to use object pronouns correctly in simple sentences about transport.",
+      "keyInquiryQuestion": "How can we write words and sentences clearly so others understand us?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: spell theme words, write legibly, and write simple meaningful sentences to use object pronouns correctly in simple sentences about transport.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "ee6216d9-5931-4016-9698-40b14128a5e8",
+      "title": "Transport: Integrated Review and Assessment",
+      "questId": "187b445d-8f3a-498b-be29-781c791aa19c",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: use listening, speaking, reading and writing skills together to use object pronouns correctly in simple sentences about transport.",
+      "keyInquiryQuestion": "What have you learnt, and where can you use it outside class?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: use listening, speaking, reading and writing skills together to use object pronouns correctly in simple sentences about transport.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "a3113d80-e127-4756-8ff3-6990d14b399d",
+      "title": "Time and Months of the Year: Listening for Key Ideas",
+      "questId": "9a2f11dc-def1-4cff-bbd3-c1623715852a",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: listen attentively, respond to simple two-directional instructions, and use have, has and had correctly when talking about time, months, body parts, home and school.",
+      "keyInquiryQuestion": "Why should we listen attentively when other people are talking?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: listen attentively, respond to simple two-directional instructions, and use have, has and had correctly when talking about time, months, body parts, home and school.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "5dc783cb-a794-4fd1-b151-89fa37211eeb",
+      "title": "Time and Months of the Year: Vocabulary and Pronunciation",
+      "questId": "9a2f11dc-def1-4cff-bbd3-c1623715852a",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: recognise consonant blends, pronounce theme vocabulary correctly, and use have, has and had correctly when talking about time, months, body parts, home and school.",
+      "keyInquiryQuestion": "Which new words and sounds can you hear and say clearly?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: recognise consonant blends, pronounce theme vocabulary correctly, and use have, has and had correctly when talking about time, months, body parts, home and school.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "14e2fdd3-8897-40d0-b554-0c150f098d4b",
+      "title": "Time and Months of the Year: The verb to have: have, has, had",
+      "questId": "9a2f11dc-def1-4cff-bbd3-c1623715852a",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: use have, has and had correctly when talking about time, months, body parts, home and school.",
+      "keyInquiryQuestion": "What do you have, what does another person have, and what did someone have before?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: use have, has and had correctly when talking about time, months, body parts, home and school.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "08728834-b5d2-4701-8114-116d246a9473",
+      "title": "Time and Months of the Year: Reading Short Texts",
+      "questId": "9a2f11dc-def1-4cff-bbd3-c1623715852a",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: read grade-level words and short connected texts related to the theme, and use have, has and had correctly when talking about time, months, body parts, home and school.",
+      "keyInquiryQuestion": "What can you do when you meet a word you cannot read?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: read grade-level words and short connected texts related to the theme, and use have, has and had correctly when talking about time, months, body parts, home and school.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "4b73aba7-0fac-49e4-8b78-0beb1a529d41",
+      "title": "Time and Months of the Year: Writing Words and Sentences",
+      "questId": "9a2f11dc-def1-4cff-bbd3-c1623715852a",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: spell theme words, write legibly, and write simple meaningful sentences to use have, has and had correctly when talking about time, months, body parts, home and school.",
+      "keyInquiryQuestion": "How can we write words and sentences clearly so others understand us?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: spell theme words, write legibly, and write simple meaningful sentences to use have, has and had correctly when talking about time, months, body parts, home and school.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "89c3ad8c-c27a-4ad6-ac1f-b01ec9b7173b",
+      "title": "Time and Months of the Year: Integrated Review and Assessment",
+      "questId": "9a2f11dc-def1-4cff-bbd3-c1623715852a",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: use listening, speaking, reading and writing skills together to use have, has and had correctly when talking about time, months, body parts, home and school.",
+      "keyInquiryQuestion": "What have you learnt, and where can you use it outside class?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: use listening, speaking, reading and writing skills together to use have, has and had correctly when talking about time, months, body parts, home and school.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "9ed2ec46-8064-49ee-ba8f-d0277ae6539f",
+      "title": "Shopping - Things We Buy: Listening for Key Ideas",
+      "questId": "a2436267-b1ad-43b9-89af-022d84dec49f",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: listen attentively, respond to simple two-directional instructions, and form and use plural nouns, including -ies, -ves and irregular forms, in shopping contexts.",
+      "keyInquiryQuestion": "Why should we listen attentively when other people are talking?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: listen attentively, respond to simple two-directional instructions, and form and use plural nouns, including -ies, -ves and irregular forms, in shopping contexts.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "9e4dcb2a-89ed-408d-bc37-792316e9c172",
+      "title": "Shopping - Things We Buy: Vocabulary and Pronunciation",
+      "questId": "a2436267-b1ad-43b9-89af-022d84dec49f",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: recognise consonant blends, pronounce theme vocabulary correctly, and form and use plural nouns, including -ies, -ves and irregular forms, in shopping contexts.",
+      "keyInquiryQuestion": "Which new words and sounds can you hear and say clearly?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: recognise consonant blends, pronounce theme vocabulary correctly, and form and use plural nouns, including -ies, -ves and irregular forms, in shopping contexts.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "d9252274-b0b0-4e8b-9062-089a6c37f320",
+      "title": "Shopping - Things We Buy: Plurals of irregular nouns: -ies, -ves and irregular forms",
+      "questId": "a2436267-b1ad-43b9-89af-022d84dec49f",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: form and use plural nouns, including -ies, -ves and irregular forms, in shopping contexts.",
+      "keyInquiryQuestion": "What can you see in the picture, and how do we talk about more than one item?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: form and use plural nouns, including -ies, -ves and irregular forms, in shopping contexts.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "08271176-b58a-4654-8f48-91bd20e832a1",
+      "title": "Shopping - Things We Buy: Reading Short Texts",
+      "questId": "a2436267-b1ad-43b9-89af-022d84dec49f",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: read grade-level words and short connected texts related to the theme, and form and use plural nouns, including -ies, -ves and irregular forms, in shopping contexts.",
+      "keyInquiryQuestion": "What can you do when you meet a word you cannot read?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: read grade-level words and short connected texts related to the theme, and form and use plural nouns, including -ies, -ves and irregular forms, in shopping contexts.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "25dbd388-7525-43b8-a5c8-1c30cafbef5a",
+      "title": "Shopping - Things We Buy: Writing Words and Sentences",
+      "questId": "a2436267-b1ad-43b9-89af-022d84dec49f",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: spell theme words, write legibly, and write simple meaningful sentences to form and use plural nouns, including -ies, -ves and irregular forms, in shopping contexts.",
+      "keyInquiryQuestion": "How can we write words and sentences clearly so others understand us?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: spell theme words, write legibly, and write simple meaningful sentences to form and use plural nouns, including -ies, -ves and irregular forms, in shopping contexts.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "84fa8e48-8e5f-4816-8e76-f19402b65f0c",
+      "title": "Shopping - Things We Buy: Integrated Review and Assessment",
+      "questId": "a2436267-b1ad-43b9-89af-022d84dec49f",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: use listening, speaking, reading and writing skills together to form and use plural nouns, including -ies, -ves and irregular forms, in shopping contexts.",
+      "keyInquiryQuestion": "What have you learnt, and where can you use it outside class?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: use listening, speaking, reading and writing skills together to form and use plural nouns, including -ies, -ves and irregular forms, in shopping contexts.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "2eef1cc5-d627-4e75-94f7-4206a4bb0058",
+      "title": "The Garden: Listening for Key Ideas",
+      "questId": "ca3078f3-5916-46b7-acdc-4b098e2068dd",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: listen attentively, respond to simple two-directional instructions, and use the present continuous tense to talk about ongoing actions, food, health and nutrition.",
+      "keyInquiryQuestion": "Why should we listen attentively when other people are talking?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: listen attentively, respond to simple two-directional instructions, and use the present continuous tense to talk about ongoing actions, food, health and nutrition.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "61740cfb-5b87-4ae8-9888-088c6e1d3f98",
+      "title": "The Garden: Vocabulary and Pronunciation",
+      "questId": "ca3078f3-5916-46b7-acdc-4b098e2068dd",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: recognise consonant blends, pronounce theme vocabulary correctly, and use the present continuous tense to talk about ongoing actions, food, health and nutrition.",
+      "keyInquiryQuestion": "Which new words and sounds can you hear and say clearly?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: recognise consonant blends, pronounce theme vocabulary correctly, and use the present continuous tense to talk about ongoing actions, food, health and nutrition.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "d92de26a-9d4e-4d6b-b7e4-170074ebad52",
+      "title": "The Garden: Present continuous tense",
+      "questId": "ca3078f3-5916-46b7-acdc-4b098e2068dd",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: use the present continuous tense to talk about ongoing actions, food, health and nutrition.",
+      "keyInquiryQuestion": "What are you doing, and what is another person doing now?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: use the present continuous tense to talk about ongoing actions, food, health and nutrition.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "a0dae9f6-de91-4e34-8f18-75a5f2799077",
+      "title": "The Garden: Reading Short Texts",
+      "questId": "ca3078f3-5916-46b7-acdc-4b098e2068dd",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: read grade-level words and short connected texts related to the theme, and use the present continuous tense to talk about ongoing actions, food, health and nutrition.",
+      "keyInquiryQuestion": "What can you do when you meet a word you cannot read?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: read grade-level words and short connected texts related to the theme, and use the present continuous tense to talk about ongoing actions, food, health and nutrition.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "524a486b-fe7e-4949-9ac6-7c91fd6faabe",
+      "title": "The Garden: Writing Words and Sentences",
+      "questId": "ca3078f3-5916-46b7-acdc-4b098e2068dd",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: spell theme words, write legibly, and write simple meaningful sentences to use the present continuous tense to talk about ongoing actions, food, health and nutrition.",
+      "keyInquiryQuestion": "How can we write words and sentences clearly so others understand us?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: spell theme words, write legibly, and write simple meaningful sentences to use the present continuous tense to talk about ongoing actions, food, health and nutrition.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "90a86c5f-9099-444d-bfd0-624879981d81",
+      "title": "The Garden: Integrated Review and Assessment",
+      "questId": "ca3078f3-5916-46b7-acdc-4b098e2068dd",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: use listening, speaking, reading and writing skills together to use the present continuous tense to talk about ongoing actions, food, health and nutrition.",
+      "keyInquiryQuestion": "What have you learnt, and where can you use it outside class?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: use listening, speaking, reading and writing skills together to use the present continuous tense to talk about ongoing actions, food, health and nutrition.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "c0cf39f9-b5cf-4160-92d7-86240a1ed101",
+      "title": "Accidents: Listening for Key Ideas",
+      "questId": "f57f4eee-8443-4c81-80e2-cfed73564afa",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: listen attentively, respond to simple two-directional instructions, and use the past continuous tense to describe actions that were ongoing in the past.",
+      "keyInquiryQuestion": "Why should we listen attentively when other people are talking?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: listen attentively, respond to simple two-directional instructions, and use the past continuous tense to describe actions that were ongoing in the past.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "8c4501e8-d515-4d2b-9f0c-60e336c43e10",
+      "title": "Accidents: Vocabulary and Pronunciation",
+      "questId": "f57f4eee-8443-4c81-80e2-cfed73564afa",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: recognise consonant blends, pronounce theme vocabulary correctly, and use the past continuous tense to describe actions that were ongoing in the past.",
+      "keyInquiryQuestion": "Which new words and sounds can you hear and say clearly?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: recognise consonant blends, pronounce theme vocabulary correctly, and use the past continuous tense to describe actions that were ongoing in the past.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "c94e8eb4-99b5-4e5d-a2f2-0ef2a8966fc7",
+      "title": "Accidents: Past continuous tense",
+      "questId": "f57f4eee-8443-4c81-80e2-cfed73564afa",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: use the past continuous tense to describe actions that were ongoing in the past.",
+      "keyInquiryQuestion": "What was someone doing when something happened?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: use the past continuous tense to describe actions that were ongoing in the past.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "81dee2f5-6764-44ab-b262-3d7cc57bdbe3",
+      "title": "Accidents: Reading Short Texts",
+      "questId": "f57f4eee-8443-4c81-80e2-cfed73564afa",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: read grade-level words and short connected texts related to the theme, and use the past continuous tense to describe actions that were ongoing in the past.",
+      "keyInquiryQuestion": "What can you do when you meet a word you cannot read?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: read grade-level words and short connected texts related to the theme, and use the past continuous tense to describe actions that were ongoing in the past.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "d576af7e-c7b5-4897-bfe4-bfc2c33b882b",
+      "title": "Accidents: Writing Words and Sentences",
+      "questId": "f57f4eee-8443-4c81-80e2-cfed73564afa",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: spell theme words, write legibly, and write simple meaningful sentences to use the past continuous tense to describe actions that were ongoing in the past.",
+      "keyInquiryQuestion": "How can we write words and sentences clearly so others understand us?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: spell theme words, write legibly, and write simple meaningful sentences to use the past continuous tense to describe actions that were ongoing in the past.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "9fcb3539-3dbd-409e-a515-260391a58912",
+      "title": "Accidents: Integrated Review and Assessment",
+      "questId": "f57f4eee-8443-4c81-80e2-cfed73564afa",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: use listening, speaking, reading and writing skills together to use the past continuous tense to describe actions that were ongoing in the past.",
+      "keyInquiryQuestion": "What have you learnt, and where can you use it outside class?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: use listening, speaking, reading and writing skills together to use the past continuous tense to describe actions that were ongoing in the past.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "fa9b03f8-3914-47da-975d-6edba92ab657",
+      "title": "Classroom: Listening for Key Ideas",
+      "questId": "a3ac88a1-c17a-4a3b-bd8a-a88b77d18137",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: listen attentively, respond to simple two-directional instructions, and use cardinal and ordinal numbers correctly when talking about classroom objects and order.",
+      "keyInquiryQuestion": "Why should we listen attentively when other people are talking?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: listen attentively, respond to simple two-directional instructions, and use cardinal and ordinal numbers correctly when talking about classroom objects and order.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "bbc52951-9705-4766-b264-b89c46eed7ba",
+      "title": "Classroom: Vocabulary and Pronunciation",
+      "questId": "a3ac88a1-c17a-4a3b-bd8a-a88b77d18137",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: recognise consonant blends, pronounce theme vocabulary correctly, and use cardinal and ordinal numbers correctly when talking about classroom objects and order.",
+      "keyInquiryQuestion": "Which new words and sounds can you hear and say clearly?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: recognise consonant blends, pronounce theme vocabulary correctly, and use cardinal and ordinal numbers correctly when talking about classroom objects and order.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "8529ca9e-cdea-406e-a541-35ed768747cb",
+      "title": "Classroom: Cardinal and ordinal numbers",
+      "questId": "a3ac88a1-c17a-4a3b-bd8a-a88b77d18137",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: use cardinal and ordinal numbers correctly when talking about classroom objects and order.",
+      "keyInquiryQuestion": "How many things are there, and what position do they come in?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: use cardinal and ordinal numbers correctly when talking about classroom objects and order.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "8dd7a935-2be6-4477-b1c7-ff79a6687233",
+      "title": "Classroom: Reading Short Texts",
+      "questId": "a3ac88a1-c17a-4a3b-bd8a-a88b77d18137",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: read grade-level words and short connected texts related to the theme, and use cardinal and ordinal numbers correctly when talking about classroom objects and order.",
+      "keyInquiryQuestion": "What can you do when you meet a word you cannot read?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: read grade-level words and short connected texts related to the theme, and use cardinal and ordinal numbers correctly when talking about classroom objects and order.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "794483be-a4d9-4fc0-af65-4b97f19cb1b0",
+      "title": "Classroom: Writing Words and Sentences",
+      "questId": "a3ac88a1-c17a-4a3b-bd8a-a88b77d18137",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: spell theme words, write legibly, and write simple meaningful sentences to use cardinal and ordinal numbers correctly when talking about classroom objects and order.",
+      "keyInquiryQuestion": "How can we write words and sentences clearly so others understand us?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: spell theme words, write legibly, and write simple meaningful sentences to use cardinal and ordinal numbers correctly when talking about classroom objects and order.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "682ff066-1729-433b-9058-26b71e8598fa",
+      "title": "Classroom: Integrated Review and Assessment",
+      "questId": "a3ac88a1-c17a-4a3b-bd8a-a88b77d18137",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: use listening, speaking, reading and writing skills together to use cardinal and ordinal numbers correctly when talking about classroom objects and order.",
+      "keyInquiryQuestion": "What have you learnt, and where can you use it outside class?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: use listening, speaking, reading and writing skills together to use cardinal and ordinal numbers correctly when talking about classroom objects and order.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "df27ca1f-b44c-4387-83db-a18e1baf2dc6",
+      "title": "The Farm: Listening for Key Ideas",
+      "questId": "dc9ddcd2-e4d5-4a87-bb82-34bc4c68859c",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: listen attentively, respond to simple two-directional instructions, and use gender sets and opposites correctly when talking about animals and people at the farm.",
+      "keyInquiryQuestion": "Why should we listen attentively when other people are talking?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: listen attentively, respond to simple two-directional instructions, and use gender sets and opposites correctly when talking about animals and people at the farm.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "4e735e28-a1bd-4c1d-9890-2cf88a1641ec",
+      "title": "The Farm: Vocabulary and Pronunciation",
+      "questId": "dc9ddcd2-e4d5-4a87-bb82-34bc4c68859c",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: recognise consonant blends, pronounce theme vocabulary correctly, and use gender sets and opposites correctly when talking about animals and people at the farm.",
+      "keyInquiryQuestion": "Which new words and sounds can you hear and say clearly?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: recognise consonant blends, pronounce theme vocabulary correctly, and use gender sets and opposites correctly when talking about animals and people at the farm.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "fd1f610e-c225-46d9-b115-007d87c9eda3",
+      "title": "The Farm: Word sets: gender sets for animals/people and opposites",
+      "questId": "dc9ddcd2-e4d5-4a87-bb82-34bc4c68859c",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: use gender sets and opposites correctly when talking about animals and people at the farm.",
+      "keyInquiryQuestion": "What names do we use for male and female animals, and how do we describe opposites?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: use gender sets and opposites correctly when talking about animals and people at the farm.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "0ed946df-d137-4ac3-98d2-6ce29f871286",
+      "title": "The Farm: Reading Short Texts",
+      "questId": "dc9ddcd2-e4d5-4a87-bb82-34bc4c68859c",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: read grade-level words and short connected texts related to the theme, and use gender sets and opposites correctly when talking about animals and people at the farm.",
+      "keyInquiryQuestion": "What can you do when you meet a word you cannot read?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: read grade-level words and short connected texts related to the theme, and use gender sets and opposites correctly when talking about animals and people at the farm.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "2ee98fb8-7751-49ba-be93-6ab1e806a614",
+      "title": "The Farm: Writing Words and Sentences",
+      "questId": "dc9ddcd2-e4d5-4a87-bb82-34bc4c68859c",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: spell theme words, write legibly, and write simple meaningful sentences to use gender sets and opposites correctly when talking about animals and people at the farm.",
+      "keyInquiryQuestion": "How can we write words and sentences clearly so others understand us?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: spell theme words, write legibly, and write simple meaningful sentences to use gender sets and opposites correctly when talking about animals and people at the farm.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "03707cc5-9be3-4465-8ed1-382eb65283c7",
+      "title": "The Farm: Integrated Review and Assessment",
+      "questId": "dc9ddcd2-e4d5-4a87-bb82-34bc4c68859c",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: use listening, speaking, reading and writing skills together to use gender sets and opposites correctly when talking about animals and people at the farm.",
+      "keyInquiryQuestion": "What have you learnt, and where can you use it outside class?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: use listening, speaking, reading and writing skills together to use gender sets and opposites correctly when talking about animals and people at the farm.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "60062075-c50d-4f24-bb2e-ab7ddfde33c7",
+      "title": "Positions and Directions: Listening for Key Ideas",
+      "questId": "b8d63542-69b7-4b23-a637-74b12ceb380b",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: listen attentively, respond to simple two-directional instructions, and use simple prepositions accurately to describe position, location and direction.",
+      "keyInquiryQuestion": "Why should we listen attentively when other people are talking?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: listen attentively, respond to simple two-directional instructions, and use simple prepositions accurately to describe position, location and direction.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "7f18f7cf-95c9-46c5-91ea-2ffd84088d97",
+      "title": "Positions and Directions: Vocabulary and Pronunciation",
+      "questId": "b8d63542-69b7-4b23-a637-74b12ceb380b",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: recognise consonant blends, pronounce theme vocabulary correctly, and use simple prepositions accurately to describe position, location and direction.",
+      "keyInquiryQuestion": "Which new words and sounds can you hear and say clearly?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: recognise consonant blends, pronounce theme vocabulary correctly, and use simple prepositions accurately to describe position, location and direction.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "f0d98482-3d81-4c73-95cc-aab34b328172",
+      "title": "Positions and Directions: Prepositions: beside, above, over, through, below, across, to, at",
+      "questId": "b8d63542-69b7-4b23-a637-74b12ceb380b",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: use simple prepositions accurately to describe position, location and direction.",
+      "keyInquiryQuestion": "Where are people and objects found, and how do we describe location or direction?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: use simple prepositions accurately to describe position, location and direction.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "a49324bb-5db8-4fa6-ac01-c4fc6cd9f785",
+      "title": "Positions and Directions: Reading Short Texts",
+      "questId": "b8d63542-69b7-4b23-a637-74b12ceb380b",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: read grade-level words and short connected texts related to the theme, and use simple prepositions accurately to describe position, location and direction.",
+      "keyInquiryQuestion": "What can you do when you meet a word you cannot read?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: read grade-level words and short connected texts related to the theme, and use simple prepositions accurately to describe position, location and direction.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "a8a9dfe6-148e-4bad-a716-8cdb7a471d8a",
+      "title": "Positions and Directions: Writing Words and Sentences",
+      "questId": "b8d63542-69b7-4b23-a637-74b12ceb380b",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: spell theme words, write legibly, and write simple meaningful sentences to use simple prepositions accurately to describe position, location and direction.",
+      "keyInquiryQuestion": "How can we write words and sentences clearly so others understand us?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: spell theme words, write legibly, and write simple meaningful sentences to use simple prepositions accurately to describe position, location and direction.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "b797317a-6f66-4db5-b647-d169c556f03d",
+      "title": "Positions and Directions: Integrated Review and Assessment",
+      "questId": "b8d63542-69b7-4b23-a637-74b12ceb380b",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: use listening, speaking, reading and writing skills together to use simple prepositions accurately to describe position, location and direction.",
+      "keyInquiryQuestion": "What have you learnt, and where can you use it outside class?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: use listening, speaking, reading and writing skills together to use simple prepositions accurately to describe position, location and direction.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "0a6d5853-3571-402a-a7d4-432b6f713a99",
+      "title": "Environment - Taking a Walk: Listening for Key Ideas",
+      "questId": "978fe68d-1744-47be-9999-ea36d76011f0",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: listen attentively, respond to simple two-directional instructions, and use a, an and the correctly when talking about things in the environment.",
+      "keyInquiryQuestion": "Why should we listen attentively when other people are talking?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: listen attentively, respond to simple two-directional instructions, and use a, an and the correctly when talking about things in the environment.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "3be0933f-423e-40fd-af23-e06a2d8d7b89",
+      "title": "Environment - Taking a Walk: Vocabulary and Pronunciation",
+      "questId": "978fe68d-1744-47be-9999-ea36d76011f0",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: recognise consonant blends, pronounce theme vocabulary correctly, and use a, an and the correctly when talking about things in the environment.",
+      "keyInquiryQuestion": "Which new words and sounds can you hear and say clearly?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: recognise consonant blends, pronounce theme vocabulary correctly, and use a, an and the correctly when talking about things in the environment.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "b7effcc0-b1f5-4031-beea-11f9e6afa118",
+      "title": "Environment - Taking a Walk: Articles: a, an and the",
+      "questId": "978fe68d-1744-47be-9999-ea36d76011f0",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: use a, an and the correctly when talking about things in the environment.",
+      "keyInquiryQuestion": "What things can you name in the environment, and which article fits each one?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: use a, an and the correctly when talking about things in the environment.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "ee4ce618-c45a-44bd-bc7a-b10b4a20fd33",
+      "title": "Environment - Taking a Walk: Reading Short Texts",
+      "questId": "978fe68d-1744-47be-9999-ea36d76011f0",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: read grade-level words and short connected texts related to the theme, and use a, an and the correctly when talking about things in the environment.",
+      "keyInquiryQuestion": "What can you do when you meet a word you cannot read?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: read grade-level words and short connected texts related to the theme, and use a, an and the correctly when talking about things in the environment.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "cc9ee536-b73c-4523-a89d-50e38ee1de3b",
+      "title": "Environment - Taking a Walk: Writing Words and Sentences",
+      "questId": "978fe68d-1744-47be-9999-ea36d76011f0",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: spell theme words, write legibly, and write simple meaningful sentences to use a, an and the correctly when talking about things in the environment.",
+      "keyInquiryQuestion": "How can we write words and sentences clearly so others understand us?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: spell theme words, write legibly, and write simple meaningful sentences to use a, an and the correctly when talking about things in the environment.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "5dc98afa-b849-4b57-a116-dabbe4e0d459",
+      "title": "Environment - Taking a Walk: Integrated Review and Assessment",
+      "questId": "978fe68d-1744-47be-9999-ea36d76011f0",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: use listening, speaking, reading and writing skills together to use a, an and the correctly when talking about things in the environment.",
+      "keyInquiryQuestion": "What have you learnt, and where can you use it outside class?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: use listening, speaking, reading and writing skills together to use a, an and the correctly when talking about things in the environment.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "657cb29c-3096-477e-af05-2f090631fd70",
+      "title": "Technology: Listening for Key Ideas",
+      "questId": "fe7ba198-8803-45c9-a31d-f851db8dcedd",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: listen attentively, respond to simple two-directional instructions, and use possessives correctly to show ownership in simple technology-related contexts.",
+      "keyInquiryQuestion": "Why should we listen attentively when other people are talking?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: listen attentively, respond to simple two-directional instructions, and use possessives correctly to show ownership in simple technology-related contexts.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "d34b371e-d016-4a44-b9bd-e7e82a4fdfbf",
+      "title": "Technology: Vocabulary and Pronunciation",
+      "questId": "fe7ba198-8803-45c9-a31d-f851db8dcedd",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: recognise consonant blends, pronounce theme vocabulary correctly, and use possessives correctly to show ownership in simple technology-related contexts.",
+      "keyInquiryQuestion": "Which new words and sounds can you hear and say clearly?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: recognise consonant blends, pronounce theme vocabulary correctly, and use possessives correctly to show ownership in simple technology-related contexts.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "d197451f-133d-42cc-8495-447bb92e4bd1",
+      "title": "Technology: Possessives: mine, yours, ours, hers, his",
+      "questId": "fe7ba198-8803-45c9-a31d-f851db8dcedd",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: use possessives correctly to show ownership in simple technology-related contexts.",
+      "keyInquiryQuestion": "Whose item is this, and how do we show ownership?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: use possessives correctly to show ownership in simple technology-related contexts.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "00ec5283-1bdd-4753-885a-97d7d263b1fa",
+      "title": "Technology: Reading Short Texts",
+      "questId": "fe7ba198-8803-45c9-a31d-f851db8dcedd",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: read grade-level words and short connected texts related to the theme, and use possessives correctly to show ownership in simple technology-related contexts.",
+      "keyInquiryQuestion": "What can you do when you meet a word you cannot read?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: read grade-level words and short connected texts related to the theme, and use possessives correctly to show ownership in simple technology-related contexts.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "1900128b-5a18-4403-9103-f53a292387a2",
+      "title": "Technology: Writing Words and Sentences",
+      "questId": "fe7ba198-8803-45c9-a31d-f851db8dcedd",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: spell theme words, write legibly, and write simple meaningful sentences to use possessives correctly to show ownership in simple technology-related contexts.",
+      "keyInquiryQuestion": "How can we write words and sentences clearly so others understand us?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: spell theme words, write legibly, and write simple meaningful sentences to use possessives correctly to show ownership in simple technology-related contexts.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "79834944-284a-4c2c-acc1-5eec3418c124",
+      "title": "Technology: Integrated Review and Assessment",
+      "questId": "fe7ba198-8803-45c9-a31d-f851db8dcedd",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: use listening, speaking, reading and writing skills together to use possessives correctly to show ownership in simple technology-related contexts.",
+      "keyInquiryQuestion": "What have you learnt, and where can you use it outside class?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: use listening, speaking, reading and writing skills together to use possessives correctly to show ownership in simple technology-related contexts.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "bc8d528d-a891-4ff6-98eb-c16a3e99abb6",
+      "title": "Cultural Activities: Listening for Key Ideas",
+      "questId": "435fc67c-8a2f-4f55-814d-19a10115a65d",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: listen attentively, respond to simple two-directional instructions, and ask and answer what, where, when and whose questions correctly in cultural activity contexts.",
+      "keyInquiryQuestion": "Why should we listen attentively when other people are talking?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: listen attentively, respond to simple two-directional instructions, and ask and answer what, where, when and whose questions correctly in cultural activity contexts.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "b4ce7672-380d-405f-9789-ff80bc640501",
+      "title": "Cultural Activities: Vocabulary and Pronunciation",
+      "questId": "435fc67c-8a2f-4f55-814d-19a10115a65d",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: recognise consonant blends, pronounce theme vocabulary correctly, and ask and answer what, where, when and whose questions correctly in cultural activity contexts.",
+      "keyInquiryQuestion": "Which new words and sounds can you hear and say clearly?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: recognise consonant blends, pronounce theme vocabulary correctly, and ask and answer what, where, when and whose questions correctly in cultural activity contexts.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "1415075d-eecb-4549-a307-a80a3df35121",
+      "title": "Cultural Activities: Wh-questions: what, where, when, whose",
+      "questId": "435fc67c-8a2f-4f55-814d-19a10115a65d",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: ask and answer what, where, when and whose questions correctly in cultural activity contexts.",
+      "keyInquiryQuestion": "What, where, when and whose questions help us find out information?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: ask and answer what, where, when and whose questions correctly in cultural activity contexts.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "5aba42cc-c158-44f2-9c43-603c08c4e00f",
+      "title": "Cultural Activities: Reading Short Texts",
+      "questId": "435fc67c-8a2f-4f55-814d-19a10115a65d",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: read grade-level words and short connected texts related to the theme, and ask and answer what, where, when and whose questions correctly in cultural activity contexts.",
+      "keyInquiryQuestion": "What can you do when you meet a word you cannot read?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: read grade-level words and short connected texts related to the theme, and ask and answer what, where, when and whose questions correctly in cultural activity contexts.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "100b88fc-a2d2-427d-a61c-f64652dd281a",
+      "title": "Cultural Activities: Writing Words and Sentences",
+      "questId": "435fc67c-8a2f-4f55-814d-19a10115a65d",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: spell theme words, write legibly, and write simple meaningful sentences to ask and answer what, where, when and whose questions correctly in cultural activity contexts.",
+      "keyInquiryQuestion": "How can we write words and sentences clearly so others understand us?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: spell theme words, write legibly, and write simple meaningful sentences to ask and answer what, where, when and whose questions correctly in cultural activity contexts.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "d0d93e28-c921-463a-b12f-bd77ec3406f0",
+      "title": "Cultural Activities: Integrated Review and Assessment",
+      "questId": "435fc67c-8a2f-4f55-814d-19a10115a65d",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: use listening, speaking, reading and writing skills together to ask and answer what, where, when and whose questions correctly in cultural activity contexts.",
+      "keyInquiryQuestion": "What have you learnt, and where can you use it outside class?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: use listening, speaking, reading and writing skills together to ask and answer what, where, when and whose questions correctly in cultural activity contexts.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "490713c4-7cd5-4c5a-bc45-b03f26ef67e4",
+      "title": "Child Labour: Listening for Key Ideas",
+      "questId": "72bd52b0-8ec5-4940-9895-784c70ff0407",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: listen attentively, respond to simple two-directional instructions, and use describing words for size, colour and shape accurately when talking about objects.",
+      "keyInquiryQuestion": "Why should we listen attentively when other people are talking?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: listen attentively, respond to simple two-directional instructions, and use describing words for size, colour and shape accurately when talking about objects.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "11e76f93-f5ab-4866-b5c3-f0080500d010",
+      "title": "Child Labour: Vocabulary and Pronunciation",
+      "questId": "72bd52b0-8ec5-4940-9895-784c70ff0407",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: recognise consonant blends, pronounce theme vocabulary correctly, and use describing words for size, colour and shape accurately when talking about objects.",
+      "keyInquiryQuestion": "Which new words and sounds can you hear and say clearly?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: recognise consonant blends, pronounce theme vocabulary correctly, and use describing words for size, colour and shape accurately when talking about objects.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "c5503a46-26ed-49c2-bad5-d90e204048b8",
+      "title": "Child Labour: Describing words: size, colour and shape",
+      "questId": "72bd52b0-8ec5-4940-9895-784c70ff0407",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: use describing words for size, colour and shape accurately when talking about objects.",
+      "keyInquiryQuestion": "How can we describe the size, colour and shape of objects around us?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: use describing words for size, colour and shape accurately when talking about objects.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "3ba2c6ed-90ca-4f28-9a11-88f53aa3bce0",
+      "title": "Child Labour: Reading Short Texts",
+      "questId": "72bd52b0-8ec5-4940-9895-784c70ff0407",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: read grade-level words and short connected texts related to the theme, and use describing words for size, colour and shape accurately when talking about objects.",
+      "keyInquiryQuestion": "What can you do when you meet a word you cannot read?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: read grade-level words and short connected texts related to the theme, and use describing words for size, colour and shape accurately when talking about objects.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "b56712fe-ae5c-4771-9f93-655179cd501f",
+      "title": "Child Labour: Writing Words and Sentences",
+      "questId": "72bd52b0-8ec5-4940-9895-784c70ff0407",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: spell theme words, write legibly, and write simple meaningful sentences to use describing words for size, colour and shape accurately when talking about objects.",
+      "keyInquiryQuestion": "How can we write words and sentences clearly so others understand us?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: spell theme words, write legibly, and write simple meaningful sentences to use describing words for size, colour and shape accurately when talking about objects.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "74c3c365-e3bf-4b80-b272-69a6b1c7070f",
+      "title": "Child Labour: Integrated Review and Assessment",
+      "questId": "72bd52b0-8ec5-4940-9895-784c70ff0407",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: use listening, speaking, reading and writing skills together to use describing words for size, colour and shape accurately when talking about objects.",
+      "keyInquiryQuestion": "What have you learnt, and where can you use it outside class?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: use listening, speaking, reading and writing skills together to use describing words for size, colour and shape accurately when talking about objects.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "1dc0739d-7275-4b29-9780-165c41ee7962",
+      "title": "Caring for Others: Listening for Key Ideas",
+      "questId": "8ad67dca-21fe-4adb-bed7-8f93cc044187",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: listen attentively, respond to simple two-directional instructions, and use conjunctions to join words and short sentences in conversations about caring for others.",
+      "keyInquiryQuestion": "Why should we listen attentively when other people are talking?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: listen attentively, respond to simple two-directional instructions, and use conjunctions to join words and short sentences in conversations about caring for others.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "77c241a5-2cd1-4ebb-be7a-0ea8e5961385",
+      "title": "Caring for Others: Vocabulary and Pronunciation",
+      "questId": "8ad67dca-21fe-4adb-bed7-8f93cc044187",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: recognise consonant blends, pronounce theme vocabulary correctly, and use conjunctions to join words and short sentences in conversations about caring for others.",
+      "keyInquiryQuestion": "Which new words and sounds can you hear and say clearly?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: recognise consonant blends, pronounce theme vocabulary correctly, and use conjunctions to join words and short sentences in conversations about caring for others.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "719e7a52-57a8-4337-b7ee-124e7b993ef6",
+      "title": "Caring for Others: Conjunctions: and, but, because",
+      "questId": "8ad67dca-21fe-4adb-bed7-8f93cc044187",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: use conjunctions to join words and short sentences in conversations about caring for others.",
+      "keyInquiryQuestion": "How can and, but and because help us join ideas about caring for others?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: use conjunctions to join words and short sentences in conversations about caring for others.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "9a90fc3f-bd93-4515-b9c9-b5580b9c7935",
+      "title": "Caring for Others: Reading Short Texts",
+      "questId": "8ad67dca-21fe-4adb-bed7-8f93cc044187",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: read grade-level words and short connected texts related to the theme, and use conjunctions to join words and short sentences in conversations about caring for others.",
+      "keyInquiryQuestion": "What can you do when you meet a word you cannot read?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: read grade-level words and short connected texts related to the theme, and use conjunctions to join words and short sentences in conversations about caring for others.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "5014eef8-8f3b-45cd-8696-410a4f5e937d",
+      "title": "Caring for Others: Writing Words and Sentences",
+      "questId": "8ad67dca-21fe-4adb-bed7-8f93cc044187",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: spell theme words, write legibly, and write simple meaningful sentences to use conjunctions to join words and short sentences in conversations about caring for others.",
+      "keyInquiryQuestion": "How can we write words and sentences clearly so others understand us?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: spell theme words, write legibly, and write simple meaningful sentences to use conjunctions to join words and short sentences in conversations about caring for others.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    },
+    {
+      "id": "8c6ec2ac-d17d-476b-8100-1d46bba0beaf",
+      "title": "Caring for Others: Integrated Review and Assessment",
+      "questId": "8ad67dca-21fe-4adb-bed7-8f93cc044187",
+      "specificLearningOutcome": "By the end of the lesson, the learner should be able to: use listening, speaking, reading and writing skills together to use conjunctions to join words and short sentences in conversations about caring for others.",
+      "keyInquiryQuestion": "What have you learnt, and where can you use it outside class?",
+      "learningOutcome": "By the end of the lesson, the learner should be able to: use listening, speaking, reading and writing skills together to use conjunctions to join words and short sentences in conversations about caring for others.",
+      "hasPublishedJourney": true,
+      "isAvailable": true
+    }
+  ]
+}

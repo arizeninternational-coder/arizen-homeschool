@@ -11,7 +11,6 @@ import {
   Image, Video, Trash2, Upload, MoreVertical, ExternalLink,
   RefreshCw, MessageCircle, Send
 } from "lucide-react";
-import confetti from "canvas-confetti";
 import { convertLegacyBlocksToJourney } from "@/lib/curriculum/lesson-journey";
 
 /* ─────────────────────────────────────────────────────────────────────────────

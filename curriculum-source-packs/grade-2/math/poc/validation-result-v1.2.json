@@ -1,0 +1,200 @@
+{
+  "validationVersion": "1.2",
+  "validatedAt": "2026-06-17T08:39:39.528Z",
+  "lessonId": "0767b9f0-4a75-4a27-b2a2-fa9833c8dae8",
+  "lessonTitle": "Introduction to Halves Using Rectangular Cut-outs",
+  "checks": [
+    {
+      "id": "S1",
+      "name": "10 steps present",
+      "result": "PASS",
+      "detail": "10 steps found"
+    },
+    {
+      "id": "S2",
+      "name": "Correct step order",
+      "result": "PASS",
+      "detail": "welcome→mission→think_first→learn→real_life→example→practice→quick_check→reflect→complete"
+    },
+    {
+      "id": "S3",
+      "name": "No duplicate step types",
+      "result": "PASS",
+      "detail": "10 unique types"
+    },
+    {
+      "id": "T1",
+      "name": "No title-copying",
+      "result": "PASS",
+      "detail": "Clean"
+    },
+    {
+      "id": "T2",
+      "name": "No generic greetings",
+      "result": "PASS",
+      "detail": "Hello friend! Today we are going to learn something exciting"
+    },
+    {
+      "id": "T3",
+      "name": "No raw curriculum text",
+      "result": "PASS",
+      "detail": "All text child-friendly"
+    },
+    {
+      "id": "T4",
+      "name": "No placeholder text",
+      "result": "PASS",
+      "detail": "No placeholders"
+    },
+    {
+      "id": "F1",
+      "name": "Fractions scope: halves only",
+      "result": "PASS",
+      "detail": "No unsupported fractions"
+    },
+    {
+      "id": "F2",
+      "name": "No fraction arithmetic",
+      "result": "PASS",
+      "detail": "No arithmetic"
+    },
+    {
+      "id": "F3",
+      "name": "No abstract fraction comparison",
+      "result": "PASS",
+      "detail": "No comparison"
+    },
+    {
+      "id": "F4",
+      "name": "QC answer mathematically correct",
+      "result": "PASS",
+      "detail": "one half (1/2)"
+    },
+    {
+      "id": "F5",
+      "name": "QC distractors are Grade 2 safe",
+      "result": "PASS",
+      "detail": "Options: one half (1/2), one quarter (1/4), one whole, two halves (2/2)"
+    },
+    {
+      "id": "F6",
+      "name": "No answer leaks before QC",
+      "result": "FAIL",
+      "detail": "Potential leak found"
+    },
+    {
+      "id": "M1",
+      "name": "Video not required",
+      "result": "PASS",
+      "detail": "SVG-first"
+    },
+    {
+      "id": "M2",
+      "name": "Video not in Practice or QC",
+      "result": "PASS",
+      "detail": "No video in P/QC"
+    },
+    {
+      "id": "M3",
+      "name": "All media has alt text",
+      "result": "PASS",
+      "detail": "8 SVG items"
+    },
+    {
+      "id": "M4",
+      "name": "All media has approval status",
+      "result": "PASS",
+      "detail": "All set"
+    },
+    {
+      "id": "M5",
+      "name": "Fallback exists for all media",
+      "result": "PASS",
+      "detail": "All have fallback"
+    },
+    {
+      "id": "M6",
+      "name": "No broken media or placeholders",
+      "result": "PASS",
+      "detail": "Clean"
+    },
+    {
+      "id": "I1",
+      "name": "Practice requires learner action",
+      "result": "PASS",
+      "detail": "multiple_choice"
+    },
+    {
+      "id": "I2",
+      "name": "Practice is different from Quick Check",
+      "result": "PASS",
+      "detail": "P: \"Which shape shows halves?\" QC: \"What fraction is shaded?\""
+    },
+    {
+      "id": "I3",
+      "name": "Quick Check is valid",
+      "result": "PASS",
+      "detail": "All QC fields present"
+    },
+    {
+      "id": "I4",
+      "name": "QC tests lesson concept",
+      "result": "FAIL",
+      "detail": "What fraction is shaded?"
+    },
+    {
+      "id": "I5",
+      "name": "No video dependency in Learn",
+      "result": "PASS",
+      "detail": "Learn has text + SVG fallback"
+    },
+    {
+      "id": "W1",
+      "name": "Step 2 Mission has owlText",
+      "result": "PASS",
+      "detail": "Today we are going to learn about halves. A half means one o"
+    },
+    {
+      "id": "W2",
+      "name": "Step 3 Think First has interaction.question",
+      "result": "PASS",
+      "detail": "How would you share one chapati fairly with a friend? Draw o"
+    },
+    {
+      "id": "W3",
+      "name": "Step 5 studentText is complete sentences",
+      "result": "PASS",
+      "detail": "We see halves every day! When you cut a chapati into two equ"
+    },
+    {
+      "id": "W4",
+      "name": "Step 6 studentText is detailed for Grade 2",
+      "result": "PASS",
+      "detail": "Length: 206"
+    },
+    {
+      "id": "W5",
+      "name": "Step 8 feedbackIncorrect is one-shot",
+      "result": "PASS",
+      "detail": "Good effort. A half means one of two equal parts. The circle"
+    }
+  ],
+  "summary": {
+    "total": 29,
+    "passed": 27,
+    "failed": 2,
+    "warnings": 0
+  },
+  "issues": [
+    {
+      "id": "F6",
+      "name": "No answer leaks before QC",
+      "detail": "Potential leak found"
+    },
+    {
+      "id": "I4",
+      "name": "QC tests lesson concept",
+      "detail": "What fraction is shaded?"
+    }
+  ]
+}
