@@ -1182,6 +1182,7 @@ function parseContentBlocks(contentBlocks: any): any {
 /** Helper: Get the student journey from contentBlocks, with fallback */
 export function getStudentJourney(contentBlocks: any): JourneyStep[] | null {
   const blocks = parseContentBlocks(contentBlocks);
+  if (!blocks || typeof blocks !== "object" || Array.isArray(blocks)) return null;
   const approved = blocks.studentJourney;
   if (Array.isArray(approved) && approved.length > 0) return approved;
   return null;

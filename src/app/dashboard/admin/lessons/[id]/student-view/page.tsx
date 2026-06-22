@@ -430,9 +430,10 @@ export default function AdminStudentLessonEditor({ params }: { params: Promise<{
 
   // ── Contamination detection ──
   const contaminationInfo = (() => {
-    if (!lesson?.contentBlocks) return null;
     try {
+      if (!lesson?.contentBlocks) return null;
       const cb = typeof lesson.contentBlocks === "string" ? JSON.parse(lesson.contentBlocks) : lesson.contentBlocks;
+      if (!cb || typeof cb !== "object" || Array.isArray(cb)) return null;
       const CONTAMINATION_PHRASES = [
         "reading comprehension", "main idea", "read a short passage",
         "good readers", "reading passage", "passage about",
@@ -443,8 +444,8 @@ export default function AdminStudentLessonEditor({ params }: { params: Promise<{
         const text = JSON.stringify(steps).toLowerCase();
         return CONTAMINATION_PHRASES.filter(p => text.includes(p));
       }
-      const liveContamination = check(cb?.studentJourney || []);
-      const draftContamination = check(cb?.studentJourneyDraft || []);
+      const liveContamination = check(Array.isArray(cb?.studentJourney) ? cb.studentJourney : []);
+      const draftContamination = check(Array.isArray(cb?.studentJourneyDraft) ? cb.studentJourneyDraft : []);
       const hasDraft = Array.isArray(cb?.studentJourneyDraft) && cb.studentJourneyDraft.length > 0;
       return { liveContamination, draftContamination, hasDraft };
     } catch { return null; }
@@ -459,11 +460,23 @@ export default function AdminStudentLessonEditor({ params }: { params: Promise<{
             <BookOpen className="w-12 h-12 text-slate-300 mx-auto mb-4" />
             <h3 className="text-lg font-bold text-slate-800 mb-2">No {viewMode} journey steps</h3>
             <p className="text-sm text-slate-500 mb-4">Generate a journey draft from the lesson editor to preview it here.</p>
-            <Link href={`/dashboard/admin/lessons/${lessonId}`}>
+            <Link href={`/dashboard/admin/lessons/${lessId}`}>
               <GradientButton variant="primary" size="sm" icon={<Sparkles className="w-4 h-4" />}>
                 Go to Lesson Editor
               </GradientButton>
             </Link>
+          </div>
+        </div>
+      );
+    }
+
+    if (!currentJourneyStep) {
+      return (
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center bg-white rounded-2xl p-10 shadow-lg border border-slate-100 max-w-md">
+            <AlertTriangle className="w-12 h-12 text-amber-400 mx-auto mb-4" />
+            <h3 className="text-lg font-bold text-slate-800 mb-2">Journey data unavailable</h3>
+            <p className="text-sm text-slate-500">This lesson journey could not be loaded. It may need to be regenerated.</p>
           </div>
         </div>
       );
@@ -808,6 +821,7 @@ function AdminVideo({ step, stepIndex, videoUrl, videoTitle, adding, onUrlChange
 }
 
 function AdminInteraction({ step, interaction, setInteraction }: any) {
+  if (!step) return null;
   const ix = step.interaction;
   const ixType = ix?.type || "none";
   const question = ix?.question || ix?.prompt;

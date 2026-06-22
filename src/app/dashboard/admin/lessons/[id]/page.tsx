@@ -805,8 +805,9 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
 
             return (
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                {journeyToShow.map((step: any, i: number) => {
+                {journeyToShow.filter((step: any) => step && typeof step === "object").map((step: any, i: number) => {
                   const isExpanded = expandedStep === i;
+                  const stepType = step.stepType || "welcome";
                   return (
                     <div key={i} style={{
                       border: `1px solid ${colors.border}`,
@@ -821,12 +822,12 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
                           border: "none", cursor: "pointer", textAlign: "left",
                         }}
                       >
-                        <span style={{ fontSize: "1rem" }}>{stepIcons[step.stepType] || "📌"}</span>
+                        <span style={{ fontSize: "1rem" }}>{stepIcons[stepType] || "📌"}</span>
                         <span style={{ fontSize: "0.75rem", fontWeight: 700, color: colors.text, flex: 1 }}>
-                          {i + 1}. {step.title || step.stepType}
+                          {i + 1}. {step.title || stepType}
                         </span>
                         <span style={{ fontSize: "0.625rem", color: colors.textMuted, textTransform: "uppercase" }}>
-                          {step.stepType}
+                          {stepType}
                         </span>
                         {isExpanded ? <ChevronUp size={14} style={{ color: colors.textMuted }} /> : <ChevronDown size={14} style={{ color: colors.textMuted }} />}
                       </button>
