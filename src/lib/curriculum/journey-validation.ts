@@ -253,7 +253,7 @@ export function validateJourney(journey: any[]): ValidationResult {
     }
   }
 
-  // ── 2. Per-Step Content Validation ───────────────────────────────────────
+  // ── 2. Per-Step Content Validation (STRICT) ─────────────────────────────
 
   for (let i = 0; i < journey.length; i++) {
     const step = journey[i];
@@ -267,7 +267,7 @@ export function validateJourney(journey: any[]): ValidationResult {
     const owlText = (step?.owlText || "").trim();
     const interaction = step?.interaction || {};
 
-    // 2a. Placeholder detection
+    // 2a. Placeholder detection (STRICT)
     const allStepText = `${studentText} ${owlText} ${JSON.stringify(interaction)}`;
     const placeholders = detectPlaceholders(allStepText);
     if (placeholders.length > 0) {
@@ -280,7 +280,7 @@ export function validateJourney(journey: any[]): ValidationResult {
       });
     }
 
-    // 2b. Minimum student text length
+    // 2b. Minimum student text length (STRICT)
     if (requirements.minStudentTextLength > 0 && studentText.length < requirements.minStudentTextLength) {
       errors.push({
         code: "STUDENT_TEXT_TOO_SHORT",
@@ -313,7 +313,84 @@ export function validateJourney(journey: any[]): ValidationResult {
       });
     }
 
-    // 2e. Quick Check specific validation
+    // ────────────────────────────────────────────────────────────────────────
+    // STEP-SPECIFIC STRICT VALIDATION
+    // ────────────────────────────────────────────────────────────────────────
+
+    // LEARN STEP: Must have 2+ meaningful lines and real teaching content
+    if (stepType === "learn") {
+      const meaningfulLines = studentText.split("\n").filter((l) => l.trim().length > 10);
+      if (meaningfulLines.length < 2) {
+        errors.push({
+          code: "LEARN_TOO_THIN",
+          message: `Learn step has only ${meaningfulLines.length} meaningful line(s), minimum is 2`,
+          step: stepNum,
+          stepType,
+          severity: "error",
+        });
+      }
+      // Must contain actual teaching content (not just a definition)
+      const hasTeachingContent = studentText.includes("**") || studentText.includes("##") ||
+        studentText.includes("1.") || studentText.includes("•") ||
+        meaningfulLines.length >= 3;
+      if (!hasTeachingContent && studentText.length < 150) {
+        warnings.push({
+          code: "LEAK_LACKS_STRUCTURE",
+          message: `Learn step may lack teaching structure (no formatting, bullets, or numbered points)`,
+          step: stepNum,
+          stepType,
+          severity: "warning",
+        });
+      }
+    }
+
+    // EXAMPLE STEP: Must have step-by-step structure
+    if (stepType === "example") {
+      const hasStepByStep = /step\s*\d/i.test(studentText) ||
+        /→/.test(studentText) || /->/.test(studentText) ||
+        /^\d+[\.\)]/m.test(studentText) ||
+        /first|then|next|finally|lastly/i.test(studentText);
+      if (!hasStepByStep) {
+        errors.push({
+          code: "EXAMPLE_NO_STEPS",
+          message: `Example step lacks step-by-step structure (no "Step 1", "→", "First/Then/Next" pattern)`,
+          step: stepNum,
+          stepType,
+          severity: "error",
+        });
+      }
+      const exampleMeaningfulLines = studentText.split("\n").filter((l) => l.trim().length > 10);
+      if (exampleMeaningfulLines.length < 2) {
+        errors.push({
+          code: "EXAMPLE_TOO_THIN",
+          message: `Example step has only ${exampleMeaningfulLines.length} meaningful line(s)`,
+          step: stepNum,
+          stepType,
+          severity: "error",
+        });
+      }
+    }
+
+    // PRACTICE STEP: Must have 2+ identifiable tasks
+    if (stepType === "practice") {
+      const numberedTasks = (studentText.match(/\d+[\.\)]/g) || []).length;
+      const questionMarks = (studentText.match(/\?/g) || []).length;
+      const bulletPoints = (studentText.match(/[•\-*]/g) || []).length;
+      const imperativeVerbs = (studentText.match(/\b(draw|write|count|solve|find|circle|shade|match|complete|fill|tell|show|make|choose|pick|color|cut|paste|measure|record|list|name|identify|compare|order|arrange|build|create|design|explain|describe|answer|calculate|add|subtract|multiply|divide)\b/gi) || []).length;
+      const taskCount = Math.max(numberedTasks, questionMarks, bulletPoints > 2 ? bulletPoints : 0);
+      
+      if (taskCount < 2 && imperativeVerbs < 2) {
+        errors.push({
+          code: "PRACTICE_TOO_FEW_TASKS",
+          message: `Practice step has ~${taskCount} identifiable tasks, minimum is 2`,
+          step: stepNum,
+          stepType,
+          severity: "error",
+        });
+      }
+    }
+
+    // QUICK CHECK: Must have valid multiple choice with correct answer
     if (stepType === "quick_check") {
       if (requirements.requiresOptions) {
         const options = interaction?.options || [];
@@ -341,10 +418,11 @@ export function validateJourney(journey: any[]): ValidationResult {
 
       if (requirements.requiresCorrectAnswer) {
         const correctIdx = interaction?.correctIndex;
-        if (typeof correctIdx !== "number" || correctIdx < 0) {
+        // Must be a valid number (not null, undefined, or non-integer)
+        if (typeof correctIdx !== "number" || !Number.isInteger(correctIdx) || correctIdx < 0) {
           errors.push({
             code: "QC_NO_CORRECT_ANSWER",
-            message: `Quick Check has no valid correctIndex`,
+            message: `Quick Check has no valid correctIndex (got: ${correctIdx})`,
             step: stepNum,
             stepType,
             severity: "error",
@@ -373,31 +451,14 @@ export function validateJourney(journey: any[]): ValidationResult {
       }
     }
 
-    // 2f. Practice task count
-    if (requirements.minPracticeTasks > 0 && studentText.length > 0) {
-      // Count practice tasks by looking for numbered items, bullet points, or question marks
-      const taskPatterns = studentText.match(/\d+[\.\)]/g) || [];
-      const questionMarks = (studentText.match(/\?/g) || []).length;
-      const taskCount = Math.max(taskPatterns.length, questionMarks);
-      if (taskCount < requirements.minPracticeTasks) {
-        warnings.push({
-          code: "PRACTICE_TOO_FEW_TASKS",
-          message: `Practice step has ~${taskCount} tasks, recommended minimum is ${requirements.minPracticeTasks}`,
-          step: stepNum,
-          stepType,
-          severity: "warning",
-        });
-      }
-    }
-
-    // 2g. Reflection prompt quality
-    if (requirements.minReflectionPrompts > 0) {
+    // REFLECT STEP: Must have meaningful prompt or options
+    if (stepType === "reflect") {
       const reflectionOptions = step?.reflectionOptions || [];
-      const hasPrompt = studentText.length > 10 || owlText.length > 10;
+      const hasPrompt = owlText.length > 10 || studentText.length > 10;
       if (!hasPrompt && reflectionOptions.length === 0) {
         errors.push({
           code: "REFLECT_TOO_WEAK",
-          message: `Reflect step has no meaningful prompt or options`,
+          message: `Reflect step has no meaningful prompt or reflection options`,
           step: stepNum,
           stepType,
           severity: "error",
