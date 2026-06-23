@@ -1,0 +1,1851 @@
+{
+  "summary": {
+    "total_lessons": 91,
+    "with_live": 55,
+    "with_draft": 36,
+    "placeholder_journeys": 19,
+    "duplicate_journeys": 128,
+    "missing_journeys": 7,
+    "empty_learn": 2,
+    "empty_example": 4,
+    "weak_practice": 46,
+    "invalid_qc": 47,
+    "total_issues": 253
+  },
+  "placeholder_journeys": [
+    {
+      "id": "981b27eb-9d0d-4450-9bed-e76f1ba54c96",
+      "title": "Adding Two 2-Digit Numbers Without Regrouping",
+      "field": "live",
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "981b27eb-9d0d-4450-9bed-e76f1ba54c96",
+      "title": "Adding Two 2-Digit Numbers Without Regrouping",
+      "field": "draft",
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "14e2fdd3-8897-40d0-b554-0c150f098d4b",
+      "title": "Time and Months of the Year: The verb to have: have, has, had",
+      "field": "live",
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "14e2fdd3-8897-40d0-b554-0c150f098d4b",
+      "title": "Time and Months of the Year: The verb to have: have, has, had",
+      "field": "live (contamination)",
+      "status": "PUBLISHED",
+      "contamination": [
+        "main idea",
+        "read a short passage",
+        "passage about"
+      ]
+    },
+    {
+      "id": "14e2fdd3-8897-40d0-b554-0c150f098d4b",
+      "title": "Time and Months of the Year: The verb to have: have, has, had",
+      "field": "draft",
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "f9dd1dbb-250d-4591-af46-ad35e335d40c",
+      "title": "Comparing Numbers",
+      "field": "live",
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "ed0039bc-67b7-4c7f-ba0b-76cc80030328",
+      "title": "Counting Numbers to 100",
+      "field": "live",
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "ed0039bc-67b7-4c7f-ba0b-76cc80030328",
+      "title": "Counting Numbers to 100",
+      "field": "draft",
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "a3113d80-e127-4756-8ff3-6990d14b399d",
+      "title": "Time and Months of the Year: Listening for Key Ideas",
+      "field": "live",
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "a3113d80-e127-4756-8ff3-6990d14b399d",
+      "title": "Time and Months of the Year: Listening for Key Ideas",
+      "field": "live (contamination)",
+      "status": "PUBLISHED",
+      "contamination": [
+        "main idea",
+        "read a short passage",
+        "passage about",
+        "tell the main idea"
+      ]
+    },
+    {
+      "id": "a3113d80-e127-4756-8ff3-6990d14b399d",
+      "title": "Time and Months of the Year: Listening for Key Ideas",
+      "field": "draft",
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "5dc783cb-a794-4fd1-b151-89fa37211eeb",
+      "title": "Time and Months of the Year: Vocabulary and Pronunciation",
+      "field": "live",
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "5dc783cb-a794-4fd1-b151-89fa37211eeb",
+      "title": "Time and Months of the Year: Vocabulary and Pronunciation",
+      "field": "live (contamination)",
+      "status": "PUBLISHED",
+      "contamination": [
+        "main idea",
+        "read a short passage",
+        "passage about",
+        "tell the main idea"
+      ]
+    },
+    {
+      "id": "5dc783cb-a794-4fd1-b151-89fa37211eeb",
+      "title": "Time and Months of the Year: Vocabulary and Pronunciation",
+      "field": "draft",
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "839653eb-cd5e-405b-a483-b6d307fee352",
+      "title": "Comparing Fractions: 1/2 and 1/4",
+      "field": "live",
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "c71a49c8-e9c6-41e5-b6ef-ad0aa386a59f",
+      "title": "Fractions: Practice and Application",
+      "field": "live",
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "2e1869d6-f5df-46a1-9d02-b4b53a1062fe",
+      "title": "Fractions: Assessment and Reflection",
+      "field": "live",
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "17d7857a-a622-4b09-8524-db7be78977f8",
+      "title": "Subtracting 2-Digit Numbers Without Regrouping (Vertical)",
+      "field": "live",
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "17d7857a-a622-4b09-8524-db7be78977f8",
+      "title": "Subtracting 2-Digit Numbers Without Regrouping (Vertical)",
+      "field": "draft",
+      "status": "PUBLISHED"
+    }
+  ],
+  "duplicate_pairs": [
+    {
+      "id": "981b27eb-9d0d-4450-9bed-e76f1ba54c96",
+      "title": "Adding Two 2-Digit Numbers Without Regrouping",
+      "similarity": 1.0,
+      "type": "live\u2248draft"
+    },
+    {
+      "id": "14e2fdd3-8897-40d0-b554-0c150f098d4b",
+      "title": "Time and Months of the Year: The verb to have: have, has, had",
+      "similarity": 1.0,
+      "type": "live\u2248draft"
+    },
+    {
+      "id": "ed0039bc-67b7-4c7f-ba0b-76cc80030328",
+      "title": "Counting Numbers to 100",
+      "similarity": 1.0,
+      "type": "live\u2248draft"
+    },
+    {
+      "id": "95b7d152-18ab-4e3e-8114-19742f6839a0",
+      "title": "Measuring Length in Metres/m",
+      "similarity": 1.0,
+      "type": "live\u2248draft"
+    },
+    {
+      "id": "a3113d80-e127-4756-8ff3-6990d14b399d",
+      "title": "Time and Months of the Year: Listening for Key Ideas",
+      "similarity": 1.0,
+      "type": "live\u2248draft"
+    },
+    {
+      "id": "5dc783cb-a794-4fd1-b151-89fa37211eeb",
+      "title": "Time and Months of the Year: Vocabulary and Pronunciation",
+      "similarity": 1.0,
+      "type": "live\u2248draft"
+    },
+    {
+      "id": "17d7857a-a622-4b09-8524-db7be78977f8",
+      "title": "Subtracting 2-Digit Numbers Without Regrouping (Vertical)",
+      "similarity": 1.0,
+      "type": "live\u2248draft"
+    },
+    {
+      "id_1": "7fe4e4f8-25d2-4aab-b06f-34120a06d946",
+      "title_1": "Word Problems: Single Digit Addition",
+      "id_2": "7993c880-07eb-4b67-b0de-71af2f600fef",
+      "title_2": "Word Problems: 2-Digit and 1-Digit Addition",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "981b27eb-9d0d-4450-9bed-e76f1ba54c96",
+      "title_1": "Adding Two 2-Digit Numbers Without Regrouping",
+      "id_2": "17d7857a-a622-4b09-8524-db7be78977f8",
+      "title_2": "Subtracting 2-Digit Numbers Without Regrouping (Vertical)",
+      "similarity": 0.82,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "a3113d80-e127-4756-8ff3-6990d14b399d",
+      "title_1": "Time and Months of the Year: Listening for Key Ideas",
+      "id_2": "5dc783cb-a794-4fd1-b151-89fa37211eeb",
+      "title_2": "Time and Months of the Year: Vocabulary and Pronunciation",
+      "similarity": 0.79,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "a9cb3164-32c1-4b8e-a0bd-a52b03fe4c94",
+      "title_1": "Place Value: Ones and Tens",
+      "id_2": "93a6b8a3-a810-4774-b24b-117c9d4ec841",
+      "title_2": "Place Value: Hundreds",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "a9cb3164-32c1-4b8e-a0bd-a52b03fe4c94",
+      "title_1": "Place Value: Ones and Tens",
+      "id_2": "db4c0d2d-671b-4a12-975c-c76a3da956c9",
+      "title_2": "Number Patterns: Completing Patterns up to 50",
+      "similarity": 0.95,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "a9cb3164-32c1-4b8e-a0bd-a52b03fe4c94",
+      "title_1": "Place Value: Ones and Tens",
+      "id_2": "4cac57af-ad3f-4dc4-b6dc-a9c1bb57d59d",
+      "title_2": "Number Patterns: Skip Counting by 2s",
+      "similarity": 0.8,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "a9cb3164-32c1-4b8e-a0bd-a52b03fe4c94",
+      "title_1": "Place Value: Ones and Tens",
+      "id_2": "60572597-f1c3-42d8-aede-0f1198f8f484",
+      "title_2": "Number Patterns: Skip Counting by 5s",
+      "similarity": 0.79,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "a9cb3164-32c1-4b8e-a0bd-a52b03fe4c94",
+      "title_1": "Place Value: Ones and Tens",
+      "id_2": "edefbd62-e357-46fa-8311-cf1a17959cd9",
+      "title_2": "Number Patterns: Skip Counting by 10s",
+      "similarity": 0.79,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "a9cb3164-32c1-4b8e-a0bd-a52b03fe4c94",
+      "title_1": "Place Value: Ones and Tens",
+      "id_2": "326924a2-ea0e-4f05-833a-6f77a629d954",
+      "title_2": "Number Line: Counting Forward",
+      "similarity": 0.95,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "a9cb3164-32c1-4b8e-a0bd-a52b03fe4c94",
+      "title_1": "Place Value: Ones and Tens",
+      "id_2": "b607eeb5-45e9-4fda-9c60-1e85435fc1aa",
+      "title_2": "Number Line: Counting Backward",
+      "similarity": 0.95,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "a9cb3164-32c1-4b8e-a0bd-a52b03fe4c94",
+      "title_1": "Place Value: Ones and Tens",
+      "id_2": "9f5bfa58-7077-453a-afb8-736d7376c8a9",
+      "title_2": "Number Line: Skip Counting",
+      "similarity": 0.95,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "a9cb3164-32c1-4b8e-a0bd-a52b03fe4c94",
+      "title_1": "Place Value: Ones and Tens",
+      "id_2": "fb0c5c4f-519a-47d6-a021-2526d6d5a665",
+      "title_2": "Number Patterns: Extending Patterns",
+      "similarity": 0.95,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "93a6b8a3-a810-4774-b24b-117c9d4ec841",
+      "title_1": "Place Value: Hundreds",
+      "id_2": "db4c0d2d-671b-4a12-975c-c76a3da956c9",
+      "title_2": "Number Patterns: Completing Patterns up to 50",
+      "similarity": 0.95,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "93a6b8a3-a810-4774-b24b-117c9d4ec841",
+      "title_1": "Place Value: Hundreds",
+      "id_2": "4cac57af-ad3f-4dc4-b6dc-a9c1bb57d59d",
+      "title_2": "Number Patterns: Skip Counting by 2s",
+      "similarity": 0.8,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "93a6b8a3-a810-4774-b24b-117c9d4ec841",
+      "title_1": "Place Value: Hundreds",
+      "id_2": "60572597-f1c3-42d8-aede-0f1198f8f484",
+      "title_2": "Number Patterns: Skip Counting by 5s",
+      "similarity": 0.79,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "93a6b8a3-a810-4774-b24b-117c9d4ec841",
+      "title_1": "Place Value: Hundreds",
+      "id_2": "edefbd62-e357-46fa-8311-cf1a17959cd9",
+      "title_2": "Number Patterns: Skip Counting by 10s",
+      "similarity": 0.79,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "93a6b8a3-a810-4774-b24b-117c9d4ec841",
+      "title_1": "Place Value: Hundreds",
+      "id_2": "326924a2-ea0e-4f05-833a-6f77a629d954",
+      "title_2": "Number Line: Counting Forward",
+      "similarity": 0.95,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "93a6b8a3-a810-4774-b24b-117c9d4ec841",
+      "title_1": "Place Value: Hundreds",
+      "id_2": "b607eeb5-45e9-4fda-9c60-1e85435fc1aa",
+      "title_2": "Number Line: Counting Backward",
+      "similarity": 0.95,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "93a6b8a3-a810-4774-b24b-117c9d4ec841",
+      "title_1": "Place Value: Hundreds",
+      "id_2": "9f5bfa58-7077-453a-afb8-736d7376c8a9",
+      "title_2": "Number Line: Skip Counting",
+      "similarity": 0.95,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "93a6b8a3-a810-4774-b24b-117c9d4ec841",
+      "title_1": "Place Value: Hundreds",
+      "id_2": "fb0c5c4f-519a-47d6-a021-2526d6d5a665",
+      "title_2": "Number Patterns: Extending Patterns",
+      "similarity": 0.95,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "db4c0d2d-671b-4a12-975c-c76a3da956c9",
+      "title_1": "Number Patterns: Completing Patterns up to 50",
+      "id_2": "4cac57af-ad3f-4dc4-b6dc-a9c1bb57d59d",
+      "title_2": "Number Patterns: Skip Counting by 2s",
+      "similarity": 0.79,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "db4c0d2d-671b-4a12-975c-c76a3da956c9",
+      "title_1": "Number Patterns: Completing Patterns up to 50",
+      "id_2": "60572597-f1c3-42d8-aede-0f1198f8f484",
+      "title_2": "Number Patterns: Skip Counting by 5s",
+      "similarity": 0.8,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "db4c0d2d-671b-4a12-975c-c76a3da956c9",
+      "title_1": "Number Patterns: Completing Patterns up to 50",
+      "id_2": "edefbd62-e357-46fa-8311-cf1a17959cd9",
+      "title_2": "Number Patterns: Skip Counting by 10s",
+      "similarity": 0.77,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "db4c0d2d-671b-4a12-975c-c76a3da956c9",
+      "title_1": "Number Patterns: Completing Patterns up to 50",
+      "id_2": "326924a2-ea0e-4f05-833a-6f77a629d954",
+      "title_2": "Number Line: Counting Forward",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "db4c0d2d-671b-4a12-975c-c76a3da956c9",
+      "title_1": "Number Patterns: Completing Patterns up to 50",
+      "id_2": "b607eeb5-45e9-4fda-9c60-1e85435fc1aa",
+      "title_2": "Number Line: Counting Backward",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "db4c0d2d-671b-4a12-975c-c76a3da956c9",
+      "title_1": "Number Patterns: Completing Patterns up to 50",
+      "id_2": "9f5bfa58-7077-453a-afb8-736d7376c8a9",
+      "title_2": "Number Line: Skip Counting",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "db4c0d2d-671b-4a12-975c-c76a3da956c9",
+      "title_1": "Number Patterns: Completing Patterns up to 50",
+      "id_2": "fb0c5c4f-519a-47d6-a021-2526d6d5a665",
+      "title_2": "Number Patterns: Extending Patterns",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "4cac57af-ad3f-4dc4-b6dc-a9c1bb57d59d",
+      "title_1": "Number Patterns: Skip Counting by 2s",
+      "id_2": "60572597-f1c3-42d8-aede-0f1198f8f484",
+      "title_2": "Number Patterns: Skip Counting by 5s",
+      "similarity": 0.76,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "4cac57af-ad3f-4dc4-b6dc-a9c1bb57d59d",
+      "title_1": "Number Patterns: Skip Counting by 2s",
+      "id_2": "edefbd62-e357-46fa-8311-cf1a17959cd9",
+      "title_2": "Number Patterns: Skip Counting by 10s",
+      "similarity": 0.76,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "4cac57af-ad3f-4dc4-b6dc-a9c1bb57d59d",
+      "title_1": "Number Patterns: Skip Counting by 2s",
+      "id_2": "326924a2-ea0e-4f05-833a-6f77a629d954",
+      "title_2": "Number Line: Counting Forward",
+      "similarity": 0.79,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "4cac57af-ad3f-4dc4-b6dc-a9c1bb57d59d",
+      "title_1": "Number Patterns: Skip Counting by 2s",
+      "id_2": "b607eeb5-45e9-4fda-9c60-1e85435fc1aa",
+      "title_2": "Number Line: Counting Backward",
+      "similarity": 0.79,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "4cac57af-ad3f-4dc4-b6dc-a9c1bb57d59d",
+      "title_1": "Number Patterns: Skip Counting by 2s",
+      "id_2": "9f5bfa58-7077-453a-afb8-736d7376c8a9",
+      "title_2": "Number Line: Skip Counting",
+      "similarity": 0.79,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "4cac57af-ad3f-4dc4-b6dc-a9c1bb57d59d",
+      "title_1": "Number Patterns: Skip Counting by 2s",
+      "id_2": "fb0c5c4f-519a-47d6-a021-2526d6d5a665",
+      "title_2": "Number Patterns: Extending Patterns",
+      "similarity": 0.79,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "60572597-f1c3-42d8-aede-0f1198f8f484",
+      "title_1": "Number Patterns: Skip Counting by 5s",
+      "id_2": "edefbd62-e357-46fa-8311-cf1a17959cd9",
+      "title_2": "Number Patterns: Skip Counting by 10s",
+      "similarity": 0.8,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "60572597-f1c3-42d8-aede-0f1198f8f484",
+      "title_1": "Number Patterns: Skip Counting by 5s",
+      "id_2": "326924a2-ea0e-4f05-833a-6f77a629d954",
+      "title_2": "Number Line: Counting Forward",
+      "similarity": 0.8,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "60572597-f1c3-42d8-aede-0f1198f8f484",
+      "title_1": "Number Patterns: Skip Counting by 5s",
+      "id_2": "b607eeb5-45e9-4fda-9c60-1e85435fc1aa",
+      "title_2": "Number Line: Counting Backward",
+      "similarity": 0.8,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "60572597-f1c3-42d8-aede-0f1198f8f484",
+      "title_1": "Number Patterns: Skip Counting by 5s",
+      "id_2": "9f5bfa58-7077-453a-afb8-736d7376c8a9",
+      "title_2": "Number Line: Skip Counting",
+      "similarity": 0.8,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "60572597-f1c3-42d8-aede-0f1198f8f484",
+      "title_1": "Number Patterns: Skip Counting by 5s",
+      "id_2": "fb0c5c4f-519a-47d6-a021-2526d6d5a665",
+      "title_2": "Number Patterns: Extending Patterns",
+      "similarity": 0.8,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "edefbd62-e357-46fa-8311-cf1a17959cd9",
+      "title_1": "Number Patterns: Skip Counting by 10s",
+      "id_2": "326924a2-ea0e-4f05-833a-6f77a629d954",
+      "title_2": "Number Line: Counting Forward",
+      "similarity": 0.77,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "edefbd62-e357-46fa-8311-cf1a17959cd9",
+      "title_1": "Number Patterns: Skip Counting by 10s",
+      "id_2": "b607eeb5-45e9-4fda-9c60-1e85435fc1aa",
+      "title_2": "Number Line: Counting Backward",
+      "similarity": 0.77,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "edefbd62-e357-46fa-8311-cf1a17959cd9",
+      "title_1": "Number Patterns: Skip Counting by 10s",
+      "id_2": "9f5bfa58-7077-453a-afb8-736d7376c8a9",
+      "title_2": "Number Line: Skip Counting",
+      "similarity": 0.77,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "edefbd62-e357-46fa-8311-cf1a17959cd9",
+      "title_1": "Number Patterns: Skip Counting by 10s",
+      "id_2": "fb0c5c4f-519a-47d6-a021-2526d6d5a665",
+      "title_2": "Number Patterns: Extending Patterns",
+      "similarity": 0.77,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "326924a2-ea0e-4f05-833a-6f77a629d954",
+      "title_1": "Number Line: Counting Forward",
+      "id_2": "b607eeb5-45e9-4fda-9c60-1e85435fc1aa",
+      "title_2": "Number Line: Counting Backward",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "326924a2-ea0e-4f05-833a-6f77a629d954",
+      "title_1": "Number Line: Counting Forward",
+      "id_2": "9f5bfa58-7077-453a-afb8-736d7376c8a9",
+      "title_2": "Number Line: Skip Counting",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "326924a2-ea0e-4f05-833a-6f77a629d954",
+      "title_1": "Number Line: Counting Forward",
+      "id_2": "fb0c5c4f-519a-47d6-a021-2526d6d5a665",
+      "title_2": "Number Patterns: Extending Patterns",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "b607eeb5-45e9-4fda-9c60-1e85435fc1aa",
+      "title_1": "Number Line: Counting Backward",
+      "id_2": "9f5bfa58-7077-453a-afb8-736d7376c8a9",
+      "title_2": "Number Line: Skip Counting",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "b607eeb5-45e9-4fda-9c60-1e85435fc1aa",
+      "title_1": "Number Line: Counting Backward",
+      "id_2": "fb0c5c4f-519a-47d6-a021-2526d6d5a665",
+      "title_2": "Number Patterns: Extending Patterns",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "9f5bfa58-7077-453a-afb8-736d7376c8a9",
+      "title_1": "Number Line: Skip Counting",
+      "id_2": "fb0c5c4f-519a-47d6-a021-2526d6d5a665",
+      "title_2": "Number Patterns: Extending Patterns",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "839653eb-cd5e-405b-a483-b6d307fee352",
+      "title_1": "Comparing Fractions: 1/2 and 1/4",
+      "id_2": "c71a49c8-e9c6-41e5-b6ef-ad0aa386a59f",
+      "title_2": "Fractions: Practice and Application",
+      "similarity": 0.77,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "839653eb-cd5e-405b-a483-b6d307fee352",
+      "title_1": "Comparing Fractions: 1/2 and 1/4",
+      "id_2": "2e1869d6-f5df-46a1-9d02-b4b53a1062fe",
+      "title_2": "Fractions: Assessment and Reflection",
+      "similarity": 0.77,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "c71a49c8-e9c6-41e5-b6ef-ad0aa386a59f",
+      "title_1": "Fractions: Practice and Application",
+      "id_2": "2e1869d6-f5df-46a1-9d02-b4b53a1062fe",
+      "title_2": "Fractions: Assessment and Reflection",
+      "similarity": 0.84,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "93e1418a-7f84-4a4c-864a-be2e6b12cdfb",
+      "title_1": "Word Problems: Subtraction Within 100",
+      "id_2": "a2c19258-4fce-4d87-bb6b-c92e5d79e3b2",
+      "title_2": "Subtraction: Practice and Application",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "93e1418a-7f84-4a4c-864a-be2e6b12cdfb",
+      "title_1": "Word Problems: Subtraction Within 100",
+      "id_2": "a295ff53-4930-4a82-b76d-38b0f6acd3ec",
+      "title_2": "Subtraction: Digital Games",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "93e1418a-7f84-4a4c-864a-be2e6b12cdfb",
+      "title_1": "Word Problems: Subtraction Within 100",
+      "id_2": "c6bb3650-4995-47df-98ac-e3e34411aff4",
+      "title_2": "Subtraction: Word Problems",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "93e1418a-7f84-4a4c-864a-be2e6b12cdfb",
+      "title_1": "Word Problems: Subtraction Within 100",
+      "id_2": "7a0a98dd-9540-47fc-9fc5-7d8af38527df",
+      "title_2": "Subtraction: Missing Numbers in Patterns",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "93e1418a-7f84-4a4c-864a-be2e6b12cdfb",
+      "title_1": "Word Problems: Subtraction Within 100",
+      "id_2": "23d35317-4c2b-4118-ae0e-11c80e8c85ea",
+      "title_2": "Subtraction: Creating Patterns",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "93e1418a-7f84-4a4c-864a-be2e6b12cdfb",
+      "title_1": "Word Problems: Subtraction Within 100",
+      "id_2": "85f7ad4c-a8d7-4aea-b5fc-b8d372d37a3f",
+      "title_2": "Subtraction: Comparing Groups",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "93e1418a-7f84-4a4c-864a-be2e6b12cdfb",
+      "title_1": "Word Problems: Subtraction Within 100",
+      "id_2": "54d40989-42ac-4220-9204-2a90fe73aa35",
+      "title_2": "Subtraction: Community Service",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "93e1418a-7f84-4a4c-864a-be2e6b12cdfb",
+      "title_1": "Word Problems: Subtraction Within 100",
+      "id_2": "01f283c3-2b7c-44ea-9d2a-8d7782a8cb1a",
+      "title_2": "Subtraction: Review and Reflection",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "93e1418a-7f84-4a4c-864a-be2e6b12cdfb",
+      "title_1": "Word Problems: Subtraction Within 100",
+      "id_2": "f4dfc669-06e9-4bea-a6db-a8f601437f76",
+      "title_2": "Subtraction: Final Assessment",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "a2c19258-4fce-4d87-bb6b-c92e5d79e3b2",
+      "title_1": "Subtraction: Practice and Application",
+      "id_2": "a295ff53-4930-4a82-b76d-38b0f6acd3ec",
+      "title_2": "Subtraction: Digital Games",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "a2c19258-4fce-4d87-bb6b-c92e5d79e3b2",
+      "title_1": "Subtraction: Practice and Application",
+      "id_2": "c6bb3650-4995-47df-98ac-e3e34411aff4",
+      "title_2": "Subtraction: Word Problems",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "a2c19258-4fce-4d87-bb6b-c92e5d79e3b2",
+      "title_1": "Subtraction: Practice and Application",
+      "id_2": "7a0a98dd-9540-47fc-9fc5-7d8af38527df",
+      "title_2": "Subtraction: Missing Numbers in Patterns",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "a2c19258-4fce-4d87-bb6b-c92e5d79e3b2",
+      "title_1": "Subtraction: Practice and Application",
+      "id_2": "23d35317-4c2b-4118-ae0e-11c80e8c85ea",
+      "title_2": "Subtraction: Creating Patterns",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "a2c19258-4fce-4d87-bb6b-c92e5d79e3b2",
+      "title_1": "Subtraction: Practice and Application",
+      "id_2": "85f7ad4c-a8d7-4aea-b5fc-b8d372d37a3f",
+      "title_2": "Subtraction: Comparing Groups",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "a2c19258-4fce-4d87-bb6b-c92e5d79e3b2",
+      "title_1": "Subtraction: Practice and Application",
+      "id_2": "54d40989-42ac-4220-9204-2a90fe73aa35",
+      "title_2": "Subtraction: Community Service",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "a2c19258-4fce-4d87-bb6b-c92e5d79e3b2",
+      "title_1": "Subtraction: Practice and Application",
+      "id_2": "01f283c3-2b7c-44ea-9d2a-8d7782a8cb1a",
+      "title_2": "Subtraction: Review and Reflection",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "a2c19258-4fce-4d87-bb6b-c92e5d79e3b2",
+      "title_1": "Subtraction: Practice and Application",
+      "id_2": "f4dfc669-06e9-4bea-a6db-a8f601437f76",
+      "title_2": "Subtraction: Final Assessment",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "a295ff53-4930-4a82-b76d-38b0f6acd3ec",
+      "title_1": "Subtraction: Digital Games",
+      "id_2": "c6bb3650-4995-47df-98ac-e3e34411aff4",
+      "title_2": "Subtraction: Word Problems",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "a295ff53-4930-4a82-b76d-38b0f6acd3ec",
+      "title_1": "Subtraction: Digital Games",
+      "id_2": "7a0a98dd-9540-47fc-9fc5-7d8af38527df",
+      "title_2": "Subtraction: Missing Numbers in Patterns",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "a295ff53-4930-4a82-b76d-38b0f6acd3ec",
+      "title_1": "Subtraction: Digital Games",
+      "id_2": "23d35317-4c2b-4118-ae0e-11c80e8c85ea",
+      "title_2": "Subtraction: Creating Patterns",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "a295ff53-4930-4a82-b76d-38b0f6acd3ec",
+      "title_1": "Subtraction: Digital Games",
+      "id_2": "85f7ad4c-a8d7-4aea-b5fc-b8d372d37a3f",
+      "title_2": "Subtraction: Comparing Groups",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "a295ff53-4930-4a82-b76d-38b0f6acd3ec",
+      "title_1": "Subtraction: Digital Games",
+      "id_2": "54d40989-42ac-4220-9204-2a90fe73aa35",
+      "title_2": "Subtraction: Community Service",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "a295ff53-4930-4a82-b76d-38b0f6acd3ec",
+      "title_1": "Subtraction: Digital Games",
+      "id_2": "01f283c3-2b7c-44ea-9d2a-8d7782a8cb1a",
+      "title_2": "Subtraction: Review and Reflection",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "a295ff53-4930-4a82-b76d-38b0f6acd3ec",
+      "title_1": "Subtraction: Digital Games",
+      "id_2": "f4dfc669-06e9-4bea-a6db-a8f601437f76",
+      "title_2": "Subtraction: Final Assessment",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "c6bb3650-4995-47df-98ac-e3e34411aff4",
+      "title_1": "Subtraction: Word Problems",
+      "id_2": "7a0a98dd-9540-47fc-9fc5-7d8af38527df",
+      "title_2": "Subtraction: Missing Numbers in Patterns",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "c6bb3650-4995-47df-98ac-e3e34411aff4",
+      "title_1": "Subtraction: Word Problems",
+      "id_2": "23d35317-4c2b-4118-ae0e-11c80e8c85ea",
+      "title_2": "Subtraction: Creating Patterns",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "c6bb3650-4995-47df-98ac-e3e34411aff4",
+      "title_1": "Subtraction: Word Problems",
+      "id_2": "85f7ad4c-a8d7-4aea-b5fc-b8d372d37a3f",
+      "title_2": "Subtraction: Comparing Groups",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "c6bb3650-4995-47df-98ac-e3e34411aff4",
+      "title_1": "Subtraction: Word Problems",
+      "id_2": "54d40989-42ac-4220-9204-2a90fe73aa35",
+      "title_2": "Subtraction: Community Service",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "c6bb3650-4995-47df-98ac-e3e34411aff4",
+      "title_1": "Subtraction: Word Problems",
+      "id_2": "01f283c3-2b7c-44ea-9d2a-8d7782a8cb1a",
+      "title_2": "Subtraction: Review and Reflection",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "c6bb3650-4995-47df-98ac-e3e34411aff4",
+      "title_1": "Subtraction: Word Problems",
+      "id_2": "f4dfc669-06e9-4bea-a6db-a8f601437f76",
+      "title_2": "Subtraction: Final Assessment",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "7a0a98dd-9540-47fc-9fc5-7d8af38527df",
+      "title_1": "Subtraction: Missing Numbers in Patterns",
+      "id_2": "23d35317-4c2b-4118-ae0e-11c80e8c85ea",
+      "title_2": "Subtraction: Creating Patterns",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "7a0a98dd-9540-47fc-9fc5-7d8af38527df",
+      "title_1": "Subtraction: Missing Numbers in Patterns",
+      "id_2": "85f7ad4c-a8d7-4aea-b5fc-b8d372d37a3f",
+      "title_2": "Subtraction: Comparing Groups",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "7a0a98dd-9540-47fc-9fc5-7d8af38527df",
+      "title_1": "Subtraction: Missing Numbers in Patterns",
+      "id_2": "54d40989-42ac-4220-9204-2a90fe73aa35",
+      "title_2": "Subtraction: Community Service",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "7a0a98dd-9540-47fc-9fc5-7d8af38527df",
+      "title_1": "Subtraction: Missing Numbers in Patterns",
+      "id_2": "01f283c3-2b7c-44ea-9d2a-8d7782a8cb1a",
+      "title_2": "Subtraction: Review and Reflection",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "7a0a98dd-9540-47fc-9fc5-7d8af38527df",
+      "title_1": "Subtraction: Missing Numbers in Patterns",
+      "id_2": "f4dfc669-06e9-4bea-a6db-a8f601437f76",
+      "title_2": "Subtraction: Final Assessment",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "23d35317-4c2b-4118-ae0e-11c80e8c85ea",
+      "title_1": "Subtraction: Creating Patterns",
+      "id_2": "85f7ad4c-a8d7-4aea-b5fc-b8d372d37a3f",
+      "title_2": "Subtraction: Comparing Groups",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "23d35317-4c2b-4118-ae0e-11c80e8c85ea",
+      "title_1": "Subtraction: Creating Patterns",
+      "id_2": "54d40989-42ac-4220-9204-2a90fe73aa35",
+      "title_2": "Subtraction: Community Service",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "23d35317-4c2b-4118-ae0e-11c80e8c85ea",
+      "title_1": "Subtraction: Creating Patterns",
+      "id_2": "01f283c3-2b7c-44ea-9d2a-8d7782a8cb1a",
+      "title_2": "Subtraction: Review and Reflection",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "23d35317-4c2b-4118-ae0e-11c80e8c85ea",
+      "title_1": "Subtraction: Creating Patterns",
+      "id_2": "f4dfc669-06e9-4bea-a6db-a8f601437f76",
+      "title_2": "Subtraction: Final Assessment",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "85f7ad4c-a8d7-4aea-b5fc-b8d372d37a3f",
+      "title_1": "Subtraction: Comparing Groups",
+      "id_2": "54d40989-42ac-4220-9204-2a90fe73aa35",
+      "title_2": "Subtraction: Community Service",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "85f7ad4c-a8d7-4aea-b5fc-b8d372d37a3f",
+      "title_1": "Subtraction: Comparing Groups",
+      "id_2": "01f283c3-2b7c-44ea-9d2a-8d7782a8cb1a",
+      "title_2": "Subtraction: Review and Reflection",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "85f7ad4c-a8d7-4aea-b5fc-b8d372d37a3f",
+      "title_1": "Subtraction: Comparing Groups",
+      "id_2": "f4dfc669-06e9-4bea-a6db-a8f601437f76",
+      "title_2": "Subtraction: Final Assessment",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "54d40989-42ac-4220-9204-2a90fe73aa35",
+      "title_1": "Subtraction: Community Service",
+      "id_2": "01f283c3-2b7c-44ea-9d2a-8d7782a8cb1a",
+      "title_2": "Subtraction: Review and Reflection",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "54d40989-42ac-4220-9204-2a90fe73aa35",
+      "title_1": "Subtraction: Community Service",
+      "id_2": "f4dfc669-06e9-4bea-a6db-a8f601437f76",
+      "title_2": "Subtraction: Final Assessment",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "01f283c3-2b7c-44ea-9d2a-8d7782a8cb1a",
+      "title_1": "Subtraction: Review and Reflection",
+      "id_2": "f4dfc669-06e9-4bea-a6db-a8f601437f76",
+      "title_2": "Subtraction: Final Assessment",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "0637d6e8-8325-403a-b44a-93f100d48c52",
+      "title_1": "Multiplication: Practice and Application",
+      "id_2": "6f189a13-23b4-49da-8acf-a103df240d45",
+      "title_2": "Multiplication: Digital Games",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "0637d6e8-8325-403a-b44a-93f100d48c52",
+      "title_1": "Multiplication: Practice and Application",
+      "id_2": "22374453-e203-461f-bfab-d87b2fae59f0",
+      "title_2": "Multiplication: Patterns and Arrays",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "0637d6e8-8325-403a-b44a-93f100d48c52",
+      "title_1": "Multiplication: Practice and Application",
+      "id_2": "aacd260b-3a71-4a37-8724-61a214487641",
+      "title_2": "Multiplication: Assessment and Review",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "6f189a13-23b4-49da-8acf-a103df240d45",
+      "title_1": "Multiplication: Digital Games",
+      "id_2": "22374453-e203-461f-bfab-d87b2fae59f0",
+      "title_2": "Multiplication: Patterns and Arrays",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "6f189a13-23b4-49da-8acf-a103df240d45",
+      "title_1": "Multiplication: Digital Games",
+      "id_2": "aacd260b-3a71-4a37-8724-61a214487641",
+      "title_2": "Multiplication: Assessment and Review",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "22374453-e203-461f-bfab-d87b2fae59f0",
+      "title_1": "Multiplication: Patterns and Arrays",
+      "id_2": "aacd260b-3a71-4a37-8724-61a214487641",
+      "title_2": "Multiplication: Assessment and Review",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "09d734a3-a5bc-4402-9d25-a842c5ccc1ea",
+      "title_1": "Division as Equal Grouping",
+      "id_2": "40dc0390-2570-45b8-8a37-72c3d49e0e68",
+      "title_2": "Writing Division Sentences Using the \u00f7 Sign",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "09d734a3-a5bc-4402-9d25-a842c5ccc1ea",
+      "title_1": "Division as Equal Grouping",
+      "id_2": "e82fbc22-3f1b-458d-b4f4-0ab50064e6f6",
+      "title_2": "Dividing Numbers up to 25 by 2 and 3",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "09d734a3-a5bc-4402-9d25-a842c5ccc1ea",
+      "title_1": "Division as Equal Grouping",
+      "id_2": "e740ce84-ae87-4282-bd10-d9335dd117c4",
+      "title_2": "Division: Word Problems",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "09d734a3-a5bc-4402-9d25-a842c5ccc1ea",
+      "title_1": "Division as Equal Grouping",
+      "id_2": "85020d62-81c3-4efe-aef5-2abf8c37a5f3",
+      "title_2": "Division: Digital Games",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "09d734a3-a5bc-4402-9d25-a842c5ccc1ea",
+      "title_1": "Division as Equal Grouping",
+      "id_2": "f18192e7-33d6-4b2b-9115-b882a36c9015",
+      "title_2": "Division: Practice and Assessment",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "40dc0390-2570-45b8-8a37-72c3d49e0e68",
+      "title_1": "Writing Division Sentences Using the \u00f7 Sign",
+      "id_2": "e82fbc22-3f1b-458d-b4f4-0ab50064e6f6",
+      "title_2": "Dividing Numbers up to 25 by 2 and 3",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "40dc0390-2570-45b8-8a37-72c3d49e0e68",
+      "title_1": "Writing Division Sentences Using the \u00f7 Sign",
+      "id_2": "e740ce84-ae87-4282-bd10-d9335dd117c4",
+      "title_2": "Division: Word Problems",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "40dc0390-2570-45b8-8a37-72c3d49e0e68",
+      "title_1": "Writing Division Sentences Using the \u00f7 Sign",
+      "id_2": "85020d62-81c3-4efe-aef5-2abf8c37a5f3",
+      "title_2": "Division: Digital Games",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "40dc0390-2570-45b8-8a37-72c3d49e0e68",
+      "title_1": "Writing Division Sentences Using the \u00f7 Sign",
+      "id_2": "f18192e7-33d6-4b2b-9115-b882a36c9015",
+      "title_2": "Division: Practice and Assessment",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "e82fbc22-3f1b-458d-b4f4-0ab50064e6f6",
+      "title_1": "Dividing Numbers up to 25 by 2 and 3",
+      "id_2": "e740ce84-ae87-4282-bd10-d9335dd117c4",
+      "title_2": "Division: Word Problems",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "e82fbc22-3f1b-458d-b4f4-0ab50064e6f6",
+      "title_1": "Dividing Numbers up to 25 by 2 and 3",
+      "id_2": "85020d62-81c3-4efe-aef5-2abf8c37a5f3",
+      "title_2": "Division: Digital Games",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "e82fbc22-3f1b-458d-b4f4-0ab50064e6f6",
+      "title_1": "Dividing Numbers up to 25 by 2 and 3",
+      "id_2": "f18192e7-33d6-4b2b-9115-b882a36c9015",
+      "title_2": "Division: Practice and Assessment",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "e740ce84-ae87-4282-bd10-d9335dd117c4",
+      "title_1": "Division: Word Problems",
+      "id_2": "85020d62-81c3-4efe-aef5-2abf8c37a5f3",
+      "title_2": "Division: Digital Games",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "e740ce84-ae87-4282-bd10-d9335dd117c4",
+      "title_1": "Division: Word Problems",
+      "id_2": "f18192e7-33d6-4b2b-9115-b882a36c9015",
+      "title_2": "Division: Practice and Assessment",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "85020d62-81c3-4efe-aef5-2abf8c37a5f3",
+      "title_1": "Division: Digital Games",
+      "id_2": "f18192e7-33d6-4b2b-9115-b882a36c9015",
+      "title_2": "Division: Practice and Assessment",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "42331b00-d61d-4541-b7ed-8a7dca664484",
+      "title_1": "Comparing Measurements Using Different Units",
+      "id_2": "a0832964-1e92-4712-b621-0293fe0d1180",
+      "title_2": "Introducing the Metre as a Standard Unit",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "42331b00-d61d-4541-b7ed-8a7dca664484",
+      "title_1": "Comparing Measurements Using Different Units",
+      "id_2": "871b6ab6-d91f-4590-ba55-c895971d4302",
+      "title_2": "Making and Using 1-Metre Sticks",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "a0832964-1e92-4712-b621-0293fe0d1180",
+      "title_1": "Introducing the Metre as a Standard Unit",
+      "id_2": "871b6ab6-d91f-4590-ba55-c895971d4302",
+      "title_2": "Making and Using 1-Metre Sticks",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    },
+    {
+      "id_1": "9512b162-b896-4329-8bdc-16f0d5b370df",
+      "title_1": "Measuring Mass Using Fixed Units",
+      "id_2": "e749a723-2f32-49fe-83f7-262f0b873aeb",
+      "title_2": "Identifying the Kilogram as a Unit of Mass",
+      "similarity": 1.0,
+      "type": "cross-lesson"
+    }
+  ],
+  "missing_journeys": [
+    {
+      "id": "2c3fa3ab-1474-4f56-88db-0725ccde0fd7",
+      "title": "Comparing Parts of Different Plants",
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "0767b9f0-4a75-4a27-b2a2-fa9833c8dae8",
+      "title": "Introduction to Halves Using Rectangular Cut-outs",
+      "status": "DRAFT"
+    },
+    {
+      "id": "159f92b9-69c7-45ea-8376-2b15af491360",
+      "title": "Identifying 1/2 in Everyday Objects",
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "9b887eb8-0a48-4f37-9689-b53113904728",
+      "title": "Introduction to Quarters Using Rectangular Cut-outs",
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "60441bd5-774f-4135-9871-666fc481b13b",
+      "title": "Identifying 1/4 in Everyday Objects",
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "b163de06-c0e5-4a42-8bce-ba7dcab330a9",
+      "title": "Making Patterns with Fractions",
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "dbadac3a-b59b-4f76-bebf-efda6fb3e261",
+      "title": "Digital Games with Fractions",
+      "status": "PUBLISHED"
+    }
+  ],
+  "empty_learn": [
+    {
+      "id": "981b27eb-9d0d-4450-9bed-e76f1ba54c96",
+      "title": "Adding Two 2-Digit Numbers Without Regrouping",
+      "learn_length": 202,
+      "has_placeholder": true
+    },
+    {
+      "id": "17d7857a-a622-4b09-8524-db7be78977f8",
+      "title": "Subtracting 2-Digit Numbers Without Regrouping (Vertical)",
+      "learn_length": 226,
+      "has_placeholder": true
+    }
+  ],
+  "empty_example": [
+    {
+      "id": "981b27eb-9d0d-4450-9bed-e76f1ba54c96",
+      "title": "Adding Two 2-Digit Numbers Without Regrouping",
+      "example_length": 141,
+      "has_placeholder": true
+    },
+    {
+      "id": "4db719cc-28b2-4a24-82f3-71509f643d54",
+      "title": "Addition: Assessment and Review",
+      "example_length": 36,
+      "has_placeholder": false
+    },
+    {
+      "id": "4da16052-0c43-48f6-8413-b802526461f0",
+      "title": "Addition: Missing Numbers in Patterns",
+      "example_length": 48,
+      "has_placeholder": false
+    },
+    {
+      "id": "17d7857a-a622-4b09-8524-db7be78977f8",
+      "title": "Subtracting 2-Digit Numbers Without Regrouping (Vertical)",
+      "example_length": 153,
+      "has_placeholder": true
+    }
+  ],
+  "weak_practice": [
+    {
+      "id": "7fe4e4f8-25d2-4aab-b06f-34120a06d946",
+      "title": "Word Problems: Single Digit Addition",
+      "practice_length": 29,
+      "task_count": 2
+    },
+    {
+      "id": "7993c880-07eb-4b67-b0de-71af2f600fef",
+      "title": "Word Problems: 2-Digit and 1-Digit Addition",
+      "practice_length": 29,
+      "task_count": 2
+    },
+    {
+      "id": "14e2fdd3-8897-40d0-b554-0c150f098d4b",
+      "title": "Time and Months of the Year: The verb to have: have, has, had",
+      "practice_length": 109,
+      "task_count": 0
+    },
+    {
+      "id": "ed0039bc-67b7-4c7f-ba0b-76cc80030328",
+      "title": "Counting Numbers to 100",
+      "practice_length": 372,
+      "task_count": 1
+    },
+    {
+      "id": "95b7d152-18ab-4e3e-8114-19742f6839a0",
+      "title": "Measuring Length in Metres/m",
+      "practice_length": 157,
+      "task_count": 0
+    },
+    {
+      "id": "a3113d80-e127-4756-8ff3-6990d14b399d",
+      "title": "Time and Months of the Year: Listening for Key Ideas",
+      "practice_length": 109,
+      "task_count": 0
+    },
+    {
+      "id": "5dc783cb-a794-4fd1-b151-89fa37211eeb",
+      "title": "Time and Months of the Year: Vocabulary and Pronunciation",
+      "practice_length": 109,
+      "task_count": 0
+    },
+    {
+      "id": "a9cb3164-32c1-4b8e-a0bd-a52b03fe4c94",
+      "title": "Place Value: Ones and Tens",
+      "practice_length": 70,
+      "task_count": 0
+    },
+    {
+      "id": "93a6b8a3-a810-4774-b24b-117c9d4ec841",
+      "title": "Place Value: Hundreds",
+      "practice_length": 70,
+      "task_count": 0
+    },
+    {
+      "id": "db4c0d2d-671b-4a12-975c-c76a3da956c9",
+      "title": "Number Patterns: Completing Patterns up to 50",
+      "practice_length": 66,
+      "task_count": 0
+    },
+    {
+      "id": "4cac57af-ad3f-4dc4-b6dc-a9c1bb57d59d",
+      "title": "Number Patterns: Skip Counting by 2s",
+      "practice_length": 61,
+      "task_count": 0
+    },
+    {
+      "id": "60572597-f1c3-42d8-aede-0f1198f8f484",
+      "title": "Number Patterns: Skip Counting by 5s",
+      "practice_length": 61,
+      "task_count": 0
+    },
+    {
+      "id": "edefbd62-e357-46fa-8311-cf1a17959cd9",
+      "title": "Number Patterns: Skip Counting by 10s",
+      "practice_length": 63,
+      "task_count": 0
+    },
+    {
+      "id": "326924a2-ea0e-4f05-833a-6f77a629d954",
+      "title": "Number Line: Counting Forward",
+      "practice_length": 66,
+      "task_count": 0
+    },
+    {
+      "id": "b607eeb5-45e9-4fda-9c60-1e85435fc1aa",
+      "title": "Number Line: Counting Backward",
+      "practice_length": 66,
+      "task_count": 0
+    },
+    {
+      "id": "9f5bfa58-7077-453a-afb8-736d7376c8a9",
+      "title": "Number Line: Skip Counting",
+      "practice_length": 66,
+      "task_count": 0
+    },
+    {
+      "id": "fb0c5c4f-519a-47d6-a021-2526d6d5a665",
+      "title": "Number Patterns: Extending Patterns",
+      "practice_length": 66,
+      "task_count": 0
+    },
+    {
+      "id": "839653eb-cd5e-405b-a483-b6d307fee352",
+      "title": "Comparing Fractions: 1/2 and 1/4",
+      "practice_length": 77,
+      "task_count": 0
+    },
+    {
+      "id": "c71a49c8-e9c6-41e5-b6ef-ad0aa386a59f",
+      "title": "Fractions: Practice and Application",
+      "practice_length": 77,
+      "task_count": 0
+    },
+    {
+      "id": "2e1869d6-f5df-46a1-9d02-b4b53a1062fe",
+      "title": "Fractions: Assessment and Reflection",
+      "practice_length": 77,
+      "task_count": 0
+    },
+    {
+      "id": "3b7a611d-0908-42c8-a0f2-394fdac48db3",
+      "title": "Addition: Digital Games",
+      "practice_length": 18,
+      "task_count": 0
+    },
+    {
+      "id": "4db719cc-28b2-4a24-82f3-71509f643d54",
+      "title": "Addition: Assessment and Review",
+      "practice_length": 26,
+      "task_count": 0
+    },
+    {
+      "id": "4da16052-0c43-48f6-8413-b802526461f0",
+      "title": "Addition: Missing Numbers in Patterns",
+      "practice_length": 28,
+      "task_count": 0
+    },
+    {
+      "id": "fe6f4998-52b5-40eb-8e39-2e8e3432b8ab",
+      "title": "Addition: Creating Number Patterns",
+      "practice_length": 63,
+      "task_count": 0
+    },
+    {
+      "id": "a669d5eb-9e51-4270-a439-7cd2568c5daf",
+      "title": "Addition: Practice and Application",
+      "practice_length": 28,
+      "task_count": 0
+    },
+    {
+      "id": "93e1418a-7f84-4a4c-864a-be2e6b12cdfb",
+      "title": "Word Problems: Subtraction Within 100",
+      "practice_length": 24,
+      "task_count": 0
+    },
+    {
+      "id": "a2c19258-4fce-4d87-bb6b-c92e5d79e3b2",
+      "title": "Subtraction: Practice and Application",
+      "practice_length": 24,
+      "task_count": 0
+    },
+    {
+      "id": "a295ff53-4930-4a82-b76d-38b0f6acd3ec",
+      "title": "Subtraction: Digital Games",
+      "practice_length": 24,
+      "task_count": 0
+    },
+    {
+      "id": "c6bb3650-4995-47df-98ac-e3e34411aff4",
+      "title": "Subtraction: Word Problems",
+      "practice_length": 24,
+      "task_count": 0
+    },
+    {
+      "id": "7a0a98dd-9540-47fc-9fc5-7d8af38527df",
+      "title": "Subtraction: Missing Numbers in Patterns",
+      "practice_length": 24,
+      "task_count": 0
+    },
+    {
+      "id": "23d35317-4c2b-4118-ae0e-11c80e8c85ea",
+      "title": "Subtraction: Creating Patterns",
+      "practice_length": 24,
+      "task_count": 0
+    },
+    {
+      "id": "85f7ad4c-a8d7-4aea-b5fc-b8d372d37a3f",
+      "title": "Subtraction: Comparing Groups",
+      "practice_length": 24,
+      "task_count": 0
+    },
+    {
+      "id": "54d40989-42ac-4220-9204-2a90fe73aa35",
+      "title": "Subtraction: Community Service",
+      "practice_length": 24,
+      "task_count": 0
+    },
+    {
+      "id": "01f283c3-2b7c-44ea-9d2a-8d7782a8cb1a",
+      "title": "Subtraction: Review and Reflection",
+      "practice_length": 24,
+      "task_count": 0
+    },
+    {
+      "id": "f4dfc669-06e9-4bea-a6db-a8f601437f76",
+      "title": "Subtraction: Final Assessment",
+      "practice_length": 24,
+      "task_count": 0
+    },
+    {
+      "id": "09d734a3-a5bc-4402-9d25-a842c5ccc1ea",
+      "title": "Division as Equal Grouping",
+      "practice_length": 26,
+      "task_count": 2
+    },
+    {
+      "id": "40dc0390-2570-45b8-8a37-72c3d49e0e68",
+      "title": "Writing Division Sentences Using the \u00f7 Sign",
+      "practice_length": 26,
+      "task_count": 2
+    },
+    {
+      "id": "e82fbc22-3f1b-458d-b4f4-0ab50064e6f6",
+      "title": "Dividing Numbers up to 25 by 2 and 3",
+      "practice_length": 26,
+      "task_count": 2
+    },
+    {
+      "id": "e740ce84-ae87-4282-bd10-d9335dd117c4",
+      "title": "Division: Word Problems",
+      "practice_length": 26,
+      "task_count": 2
+    },
+    {
+      "id": "85020d62-81c3-4efe-aef5-2abf8c37a5f3",
+      "title": "Division: Digital Games",
+      "practice_length": 26,
+      "task_count": 2
+    },
+    {
+      "id": "f18192e7-33d6-4b2b-9115-b882a36c9015",
+      "title": "Division: Practice and Assessment",
+      "practice_length": 26,
+      "task_count": 2
+    },
+    {
+      "id": "42331b00-d61d-4541-b7ed-8a7dca664484",
+      "title": "Comparing Measurements Using Different Units",
+      "practice_length": 61,
+      "task_count": 0
+    },
+    {
+      "id": "a0832964-1e92-4712-b621-0293fe0d1180",
+      "title": "Introducing the Metre as a Standard Unit",
+      "practice_length": 61,
+      "task_count": 0
+    },
+    {
+      "id": "871b6ab6-d91f-4590-ba55-c895971d4302",
+      "title": "Making and Using 1-Metre Sticks",
+      "practice_length": 61,
+      "task_count": 0
+    },
+    {
+      "id": "9512b162-b896-4329-8bdc-16f0d5b370df",
+      "title": "Measuring Mass Using Fixed Units",
+      "practice_length": 61,
+      "task_count": 0
+    },
+    {
+      "id": "e749a723-2f32-49fe-83f7-262f0b873aeb",
+      "title": "Identifying the Kilogram as a Unit of Mass",
+      "practice_length": 61,
+      "task_count": 0
+    }
+  ],
+  "invalid_qc": [
+    {
+      "id": "7fe4e4f8-25d2-4aab-b06f-34120a06d946",
+      "title": "Word Problems: Single Digit Addition",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "7993c880-07eb-4b67-b0de-71af2f600fef",
+      "title": "Word Problems: 2-Digit and 1-Digit Addition",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "f9dd1dbb-250d-4591-af46-ad35e335d40c",
+      "title": "Comparing Numbers",
+      "errors": [
+        "type=open_response",
+        "options=0",
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "ed0039bc-67b7-4c7f-ba0b-76cc80030328",
+      "title": "Counting Numbers to 100",
+      "errors": [
+        "type=text",
+        "options=0",
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "95b7d152-18ab-4e3e-8114-19742f6839a0",
+      "title": "Measuring Length in Metres/m",
+      "errors": [
+        "type=choice",
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "a9cb3164-32c1-4b8e-a0bd-a52b03fe4c94",
+      "title": "Place Value: Ones and Tens",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "93a6b8a3-a810-4774-b24b-117c9d4ec841",
+      "title": "Place Value: Hundreds",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "db4c0d2d-671b-4a12-975c-c76a3da956c9",
+      "title": "Number Patterns: Completing Patterns up to 50",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "4cac57af-ad3f-4dc4-b6dc-a9c1bb57d59d",
+      "title": "Number Patterns: Skip Counting by 2s",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "60572597-f1c3-42d8-aede-0f1198f8f484",
+      "title": "Number Patterns: Skip Counting by 5s",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "edefbd62-e357-46fa-8311-cf1a17959cd9",
+      "title": "Number Patterns: Skip Counting by 10s",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "326924a2-ea0e-4f05-833a-6f77a629d954",
+      "title": "Number Line: Counting Forward",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "b607eeb5-45e9-4fda-9c60-1e85435fc1aa",
+      "title": "Number Line: Counting Backward",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "9f5bfa58-7077-453a-afb8-736d7376c8a9",
+      "title": "Number Line: Skip Counting",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "fb0c5c4f-519a-47d6-a021-2526d6d5a665",
+      "title": "Number Patterns: Extending Patterns",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "3b7a611d-0908-42c8-a0f2-394fdac48db3",
+      "title": "Addition: Digital Games",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "0f23169f-b325-40a9-9145-488f5115142b",
+      "title": "Addition: Word Problems with 2-Digit Numbers",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "4db719cc-28b2-4a24-82f3-71509f643d54",
+      "title": "Addition: Assessment and Review",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "4da16052-0c43-48f6-8413-b802526461f0",
+      "title": "Addition: Missing Numbers in Patterns",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "fe6f4998-52b5-40eb-8e39-2e8e3432b8ab",
+      "title": "Addition: Creating Number Patterns",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "627e0732-926b-4f12-9f0c-a13f170e747a",
+      "title": "Addition: Community Application",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "a669d5eb-9e51-4270-a439-7cd2568c5daf",
+      "title": "Addition: Practice and Application",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "93e1418a-7f84-4a4c-864a-be2e6b12cdfb",
+      "title": "Word Problems: Subtraction Within 100",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "a2c19258-4fce-4d87-bb6b-c92e5d79e3b2",
+      "title": "Subtraction: Practice and Application",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "a295ff53-4930-4a82-b76d-38b0f6acd3ec",
+      "title": "Subtraction: Digital Games",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "c6bb3650-4995-47df-98ac-e3e34411aff4",
+      "title": "Subtraction: Word Problems",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "7a0a98dd-9540-47fc-9fc5-7d8af38527df",
+      "title": "Subtraction: Missing Numbers in Patterns",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "23d35317-4c2b-4118-ae0e-11c80e8c85ea",
+      "title": "Subtraction: Creating Patterns",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "85f7ad4c-a8d7-4aea-b5fc-b8d372d37a3f",
+      "title": "Subtraction: Comparing Groups",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "54d40989-42ac-4220-9204-2a90fe73aa35",
+      "title": "Subtraction: Community Service",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "01f283c3-2b7c-44ea-9d2a-8d7782a8cb1a",
+      "title": "Subtraction: Review and Reflection",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "f4dfc669-06e9-4bea-a6db-a8f601437f76",
+      "title": "Subtraction: Final Assessment",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "0637d6e8-8325-403a-b44a-93f100d48c52",
+      "title": "Multiplication: Practice and Application",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "6f189a13-23b4-49da-8acf-a103df240d45",
+      "title": "Multiplication: Digital Games",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "22374453-e203-461f-bfab-d87b2fae59f0",
+      "title": "Multiplication: Patterns and Arrays",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "aacd260b-3a71-4a37-8724-61a214487641",
+      "title": "Multiplication: Assessment and Review",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "09d734a3-a5bc-4402-9d25-a842c5ccc1ea",
+      "title": "Division as Equal Grouping",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "40dc0390-2570-45b8-8a37-72c3d49e0e68",
+      "title": "Writing Division Sentences Using the \u00f7 Sign",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "e82fbc22-3f1b-458d-b4f4-0ab50064e6f6",
+      "title": "Dividing Numbers up to 25 by 2 and 3",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "e740ce84-ae87-4282-bd10-d9335dd117c4",
+      "title": "Division: Word Problems",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "85020d62-81c3-4efe-aef5-2abf8c37a5f3",
+      "title": "Division: Digital Games",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "f18192e7-33d6-4b2b-9115-b882a36c9015",
+      "title": "Division: Practice and Assessment",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "42331b00-d61d-4541-b7ed-8a7dca664484",
+      "title": "Comparing Measurements Using Different Units",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "a0832964-1e92-4712-b621-0293fe0d1180",
+      "title": "Introducing the Metre as a Standard Unit",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "871b6ab6-d91f-4590-ba55-c895971d4302",
+      "title": "Making and Using 1-Metre Sticks",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "9512b162-b896-4329-8bdc-16f0d5b370df",
+      "title": "Measuring Mass Using Fixed Units",
+      "errors": [
+        "correctIndex=None"
+      ]
+    },
+    {
+      "id": "e749a723-2f32-49fe-83f7-262f0b873aeb",
+      "title": "Identifying the Kilogram as a Unit of Mass",
+      "errors": [
+        "correctIndex=None"
+      ]
+    }
+  ]
+}
