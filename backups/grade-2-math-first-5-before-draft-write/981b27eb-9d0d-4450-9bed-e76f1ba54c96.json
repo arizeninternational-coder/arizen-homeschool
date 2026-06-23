@@ -1,0 +1,250 @@
+{
+  "id": "981b27eb-9d0d-4450-9bed-e76f1ba54c96",
+  "title": "Adding Two 2-Digit Numbers Without Regrouping",
+  "status": "PUBLISHED",
+  "isAvailable": true,
+  "updatedAt": "2026-06-10T08:15:23.53+00:00",
+  "original_studentJourney_steps": 0,
+  "original_studentJourneyDraft_steps": 10,
+  "original_contentBlocks": {
+    "importSource": "csv",
+    "curriculum": {
+      "version": "",
+      "country": "Kenya",
+      "system": "CBC",
+      "grade": "2",
+      "term": "Term 1",
+      "week": "Week 11",
+      "subject": "Mathematics",
+      "strand": "Numbers",
+      "subStrand": "1.4 Addition",
+      "specificLearningOutcome": "",
+      "keyInquiryQuestion": "How can we align a 2-digit number and a 1-digit number vertically in order to add? When do we regroup?",
+      "suggestedLearningExperience": "Learners in pairs to write addition sentences given in horizontal form vertically according to place value. Learners to add a 2-digit number to a 1-digit number without and with regrouping. Learners to practice addition by skipping on the number line. Learners in pairs/groups to collect different safe objects and use them in addition of 3-single digit numbers. Learners in pairs/groups to practice breaking numbers apart to make a 10. Learners in pairs to come up with different ways of adding two 2-digit numbers without and with regrouping. Learners to play digital games involving addition. Learners in groups to make patterns using numbers up to 100.",
+      "coreCompetencies": [
+        "Communication and Collaboration",
+        "Critical Thinking and Problem Solving",
+        "Digital Literacy"
+      ],
+      "values": [
+        "Respect",
+        "Responsibility",
+        "Unity"
+      ],
+      "pertinentAndContemporaryIssues": [
+        "ESD: DRR; safety - as learners collect objects; Citizenship: social cohesion - when working in groups"
+      ],
+      "learningResources": [],
+      "parentalEngagement": ""
+    },
+    "lessonShell": {
+      "activityTitle": "Activity: Adding Two 2-Digit Numbers Without Regrouping",
+      "activityInstructions": "Learners in pairs to write addition sentences given in horizontal form vertically according to place value. Learners to add a 2-digit number to a 1-digit number without and with regrouping. Learners to practice addition by skipping on the number line. Learners in pairs/groups to collect different safe objects and use them in addition of 3-single digit numbers. Learners in pairs/groups to practice breaking numbers apart to make a 10. Learners in pairs to come up with different ways of adding two",
+      "assessmentMethod": "",
+      "assessmentCriteria": "",
+      "questTitle": "1.4 Addition Quest",
+      "questInstructions": "Explore 1.4 addition through interactive activities, hands-on practice, and real-life application.",
+      "reflectionPrompt": "What did you learn about adding two 2-digit numbers without regrouping today? How can you use this in your daily life?",
+      "offlineActivity": ""
+    },
+    "rewards": {
+      "xp": 0,
+      "coins": 10
+    },
+    "video": {
+      "searchKeywords": "",
+      "required": false
+    },
+    "source": {
+      "reference": "",
+      "reviewStatus": "DRAFT"
+    },
+    "lessonOrder": "",
+    "illustrationNotes": "",
+    "grade": "2",
+    "subject": "Mathematics",
+    "strand": "Numbers",
+    "subStrand": "1.4 Addition",
+    "term": "Term 1",
+    "week": "Week 11",
+    "learningOutcome": "By the end of the lesson, the learner should be able to: work out missing numbers in patterns involving addition of whole numbers up to 100",
+    "specificLearningOutcome": "",
+    "keyInquiryQuestion": "How can we align a 2-digit number and a 1-digit number vertically in order to add? When do we regroup?",
+    "suggestedLearningExperience": "Learners in pairs to write addition sentences given in horizontal form vertically according to place value. Learners to add a 2-digit number to a 1-digit number without and with regrouping. Learners to practice addition by skipping on the number line. Learners in pairs/groups to collect different safe objects and use them in addition of 3-single digit numbers. Learners in pairs/groups to practice breaking numbers apart to make a 10. Learners in pairs to come up with different ways of adding two 2-digit numbers without and with regrouping. Learners to play digital games involving addition. Learners in groups to make patterns using numbers up to 100.",
+    "assessmentMethod": "",
+    "assessmentCriteria": "",
+    "learningResources": "",
+    "coreCompetencies": "Communication and Collaboration, Critical Thinking and Problem Solving, Digital Literacy",
+    "values": "Respect, Responsibility, Unity",
+    "parentalEngagement": "",
+    "activityTitle": "Activity: Adding Two 2-Digit Numbers Without Regrouping",
+    "activityInstructions": "Learners in pairs to write addition sentences given in horizontal form vertically according to place value. Learners to add a 2-digit number to a 1-digit number without and with regrouping. Learners to practice addition by skipping on the number line. Learners in pairs/groups to collect different safe objects and use them in addition of 3-single digit numbers. Learners in pairs/groups to practice breaking numbers apart to make a 10. Learners in pairs to come up with different ways of adding two",
+    "questTitle": "1.4 Addition Quest",
+    "questInstructions": "Explore 1.4 addition through interactive activities, hands-on practice, and real-life application.",
+    "reflectionPrompt": "What did you learn about adding two 2-digit numbers without regrouping today? How can you use this in your daily life?",
+    "rewardCoins": "10",
+    "rewardStars": "1",
+    "rewardXp": "0",
+    "estimatedDuration": "30",
+    "difficulty": "medium",
+    "videoSearchKeywords": "",
+    "sourceReference": "",
+    "completenessScore": 70,
+    "aiMetadata": {
+      "model": "structured-template-v2",
+      "promptVersion": "batch-2-standard",
+      "generatedAt": "2026-06-13T03:52:26.551Z",
+      "reviewStatus": "APPROVED",
+      "batchId": "g2-math-hq-1781322732668",
+      "approvedAt": "2026-06-10T08:15:23.530Z",
+      "publishedAt": "2026-06-11T09:53:34.682Z",
+      "publishedBy": "batch-publish-math-v1",
+      "engineVersion": "v3-fix",
+      "validated": true,
+      "cleared": false,
+      "clearedAt": "2026-06-12T22:24:48.233Z",
+      "note": "Cleared incorrect English content. Needs subject-specific regeneration.",
+      "topic": "addition",
+      "videoId": "pAtrNu8y6FQ",
+      "generator": "math-journey-generator-v1"
+    },
+    "studentJourney": [],
+    "isAvailable": false,
+    "studentJourneyDraft": [
+      {
+        "id": "step-01",
+        "stepType": "welcome",
+        "title": "Welcome!",
+        "studentText": "",
+        "owlText": "Today we learn addition! Adding means putting groups together to find the total.",
+        "interaction": {
+          "type": "none"
+        },
+        "media": {
+          "illustration": {
+            "approvedUrl": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20200%22%3E%3Crect%20width%3D%22400%22%20height%3D%22200%22%20fill%3D%22%23f0fdf4%22%20rx%3D%2212%22%2F%3E%3Ctext%20x%3D%22200%22%20y%3D%2230%22%20text-anchor%3D%22middle%22%20font-size%3D%2214%22%20font-weight%3D%22bold%22%20fill%3D%22%23166534%22%3EAddition%20%3D%20Putting%20Together%3C%2Ftext%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2290%22%20r%3D%2218%22%20fill%3D%22%234ade80%22%2F%3E%3Ccircle%20cx%3D%22100%22%20cy%3D%2290%22%20r%3D%2218%22%20fill%3D%22%234ade80%22%2F%3E%3Ccircle%20cx%3D%2280%22%20cy%3D%22120%22%20r%3D%2218%22%20fill%3D%22%234ade80%22%2F%3E%3Ctext%20x%3D%22145%22%20y%3D%2295%22%20text-anchor%3D%22middle%22%20font-size%3D%2228%22%20font-weight%3D%22bold%22%20fill%3D%22%23166534%22%3E%2B%3C%2Ftext%3E%3Ccircle%20cx%3D%22190%22%20cy%3D%2290%22%20r%3D%2218%22%20fill%3D%22%23fbbf24%22%2F%3E%3Ccircle%20cx%3D%22230%22%20cy%3D%2290%22%20r%3D%2218%22%20fill%3D%22%23fbbf24%22%2F%3E%3Ctext%20x%3D%22270%22%20y%3D%2295%22%20text-anchor%3D%22middle%22%20font-size%3D%2228%22%20font-weight%3D%22bold%22%20fill%3D%22%23166534%22%3E%3D%3C%2Ftext%3E%3Ctext%20x%3D%22330%22%20y%3D%2295%22%20text-anchor%3D%22middle%22%20font-size%3D%2232%22%20font-weight%3D%22bold%22%20fill%3D%22%2315803d%22%3E5%3C%2Ftext%3E%3Ctext%20x%3D%22200%22%20y%3D%22165%22%20text-anchor%3D%22middle%22%20font-size%3D%2216%22%20font-weight%3D%22bold%22%20fill%3D%22%2315803d%22%3E3%20%2B%202%20%3D%205%3C%2Ftext%3E%3Ctext%20x%3D%22200%22%20y%3D%22185%22%20text-anchor%3D%22middle%22%20font-size%3D%2211%22%20fill%3D%22%23166534%22%3EWe%20put%203%20and%202%20together%20to%20make%205!%3C%2Ftext%3E%3C%2Fsvg%3E",
+            "approvedByAdmin": true
+          }
+        }
+      },
+      {
+        "id": "step-02",
+        "stepType": "mission",
+        "title": "Our Mission",
+        "studentText": "",
+        "owlText": "work out missing numbers in patterns involving addition of whole numbers up to 100",
+        "interaction": {
+          "type": "none"
+        }
+      },
+      {
+        "id": "step-03",
+        "stepType": "think_first",
+        "title": "Think First!",
+        "studentText": "",
+        "owlText": "If you have 2 bananas and mama gives you 8 more, how many bananas do you have altogether?",
+        "interaction": {
+          "type": "open_response",
+          "prompt": "If you have 2 bananas and mama gives you 8 more, how many bananas do you have altogether?",
+          "hint": "Start at 2 and count forward 8 more!"
+        }
+      },
+      {
+        "id": "step-04",
+        "stepType": "learn",
+        "title": "Learn It",
+        "studentText": "Addition uses the + sign. We add two numbers to get a sum (the total).\n\n**Example:** 2 + 8 = ?\n\nStart at 2. Count forward 8.\n\n**2 + 8 = 10**\n\n**Tip:** Always start with the bigger number and count forward!",
+        "owlText": "",
+        "interaction": {
+          "type": "none"
+        },
+        "media": {
+          "illustration": {
+            "approvedUrl": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20200%22%3E%3Crect%20width%3D%22400%22%20height%3D%22200%22%20fill%3D%22%23f0fdf4%22%20rx%3D%2212%22%2F%3E%3Ctext%20x%3D%22200%22%20y%3D%2230%22%20text-anchor%3D%22middle%22%20font-size%3D%2214%22%20font-weight%3D%22bold%22%20fill%3D%22%23166534%22%3EAddition%20%3D%20Putting%20Together%3C%2Ftext%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2290%22%20r%3D%2218%22%20fill%3D%22%234ade80%22%2F%3E%3Ccircle%20cx%3D%22100%22%20cy%3D%2290%22%20r%3D%2218%22%20fill%3D%22%234ade80%22%2F%3E%3Ccircle%20cx%3D%2280%22%20cy%3D%22120%22%20r%3D%2218%22%20fill%3D%22%234ade80%22%2F%3E%3Ctext%20x%3D%22145%22%20y%3D%2295%22%20text-anchor%3D%22middle%22%20font-size%3D%2228%22%20font-weight%3D%22bold%22%20fill%3D%22%23166534%22%3E%2B%3C%2Ftext%3E%3Ccircle%20cx%3D%22190%22%20cy%3D%2290%22%20r%3D%2218%22%20fill%3D%22%23fbbf24%22%2F%3E%3Ccircle%20cx%3D%22230%22%20cy%3D%2290%22%20r%3D%2218%22%20fill%3D%22%23fbbf24%22%2F%3E%3Ctext%20x%3D%22270%22%20y%3D%2295%22%20text-anchor%3D%22middle%22%20font-size%3D%2228%22%20font-weight%3D%22bold%22%20fill%3D%22%23166534%22%3E%3D%3C%2Ftext%3E%3Ctext%20x%3D%22330%22%20y%3D%2295%22%20text-anchor%3D%22middle%22%20font-size%3D%2232%22%20font-weight%3D%22bold%22%20fill%3D%22%2315803d%22%3E5%3C%2Ftext%3E%3Ctext%20x%3D%22200%22%20y%3D%22165%22%20text-anchor%3D%22middle%22%20font-size%3D%2216%22%20font-weight%3D%22bold%22%20fill%3D%22%2315803d%22%3E3%20%2B%202%20%3D%205%3C%2Ftext%3E%3Ctext%20x%3D%22200%22%20y%3D%22185%22%20text-anchor%3D%22middle%22%20font-size%3D%2211%22%20fill%3D%22%23166534%22%3EWe%20put%203%20and%202%20together%20to%20make%205!%3C%2Ftext%3E%3C%2Fsvg%3E",
+            "approvedByAdmin": true
+          }
+        }
+      },
+      {
+        "id": "step-05",
+        "stepType": "connect",
+        "title": "Real Life Connection",
+        "studentText": "You use addition every day:\n• Counting all your books together\n• Adding prices at the market\n• Finding how many people are in a group\n• Counting your savings!",
+        "owlText": "When do you see this in your daily life? Think about your home, school, and market!",
+        "interaction": {
+          "type": "open_response",
+          "prompt": "Where do you see this in real life? Give an example."
+        }
+      },
+      {
+        "id": "step-06",
+        "stepType": "example",
+        "title": "Watch and Learn",
+        "studentText": "**Worked Example:** 25 + 17 = ?\n\nStep 1: Add the ones: 5 + 7 = 12. Write 2, carry 1.\nStep 2: Add the tens: 2 + 1 + 1 (carried) = 4.\n\nAnswer: **25 + 17 = 42**\n\nYou can also count on: start at 25, count forward 17!",
+        "owlText": "",
+        "interaction": {
+          "type": "none"
+        },
+        "media": {
+          "video": {
+            "approvedUrl": "https://www.youtube.com/watch?v=pAtrNu8y6FQ",
+            "approvedByAdmin": true,
+            "approvedTitle": "Addition for Kids - Basic Math"
+          }
+        }
+      },
+      {
+        "id": "step-07",
+        "stepType": "practice",
+        "title": "Your Turn!",
+        "studentText": "**Solve these:**\n1) 14 + 9 = ?\n2) 23 + 18 = ?\n3) 35 + 27 = ?\n4) A shop has 28 oranges and 15 mangoes. How many fruits altogether?\n\n*Show your working!*",
+        "owlText": "Start with the bigger number. Count forward. For harder ones, add ones first then tens.",
+        "interaction": {
+          "type": "open_response",
+          "prompt": "Write your answers here. Show all your work!",
+          "hint": "Start with the bigger number. Count forward. For harder ones, add ones first then tens."
+        }
+      },
+      {
+        "id": "step-08",
+        "stepType": "quick_check",
+        "title": "Quick Check!",
+        "studentText": "",
+        "owlText": "",
+        "interaction": {
+          "type": "multiple_choice",
+          "question": "What is 12 + 8?",
+          "options": [
+            "20",
+            "15",
+            "25",
+            "30"
+          ],
+          "correctIndex": 0,
+          "correctAnswer": 0
+        }
+      },
+      {
+        "id": "step-09",
+        "stepType": "reflect",
+        "title": "Think About Your Learning",
+        "studentText": "",
+        "owlText": "How do you add two numbers together? What helps you get the right answer?",
+        "interaction": {
+          "type": "open_response",
+          "prompt": "How do you add two numbers together? What helps you get the right answer?"
+        }
+      },
+      {
+        "id": "step-10",
+        "stepType": "complete",
+        "title": "You Did It! 🏆",
+        "studentText": "",
+        "owlText": "Amazing work! You learned about \"Adding Two 2-Digit Numbers Without Regrouping\". Keep practising and you will become a math champion! 🌟",
+        "interaction": {
+          "type": "none"
+        }
+      }
+    ]
+  }
+}
