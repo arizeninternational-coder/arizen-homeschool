@@ -14,6 +14,7 @@ import OwlTeacher from "@/components/ui/OwlTeacher";
 import type { JourneyStep, JourneyStepType } from "@/lib/curriculum/lesson-journey";
 import { STEP_TYPE_ICONS } from "@/lib/curriculum/lesson-journey";
 import { InteractiveStepRenderer } from "@/components/interactive";
+import { isLessonStudentVisible } from "@/lib/curriculum/student-visibility";
 
 function getStepType(step: any): JourneyStepType {
   return (step?.stepType || "welcome") as JourneyStepType;
@@ -191,6 +192,10 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
     }
   }
 
+  // ── Student visibility gate ───────────────────────────────────────────────
+  const visibility = lesson ? isLessonStudentVisible(lesson) : { visible: false, reasons: ["No lesson loaded"] };
+  const isHiddenFromStudent = !visibility.visible;
+
   const nextStepLabel = !isLastStep && journeySteps[clampedStep + 1]
     ? STEP_TYPE_ICONS[journeySteps[clampedStep + 1].stepType as JourneyStepType] + " " + (journeySteps[clampedStep + 1].title || "Next")
     : null;
@@ -273,6 +278,34 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
           <BookOpen style={{ width: 48, height: 48, color: "#CBD5E1", margin: "0 auto 16px" }} />
           <h2 style={{ fontSize: 18, fontWeight: 800, color: "#1e293b", marginBottom: 8 }}>Lesson not found</h2>
           <Link href="/dashboard/student" style={{ color: "#4f46e5", fontWeight: 700, fontSize: 14 }}>← Back to Dashboard</Link>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Hidden lesson gate ────────────────────────────────────────────────────
+  if (isHiddenFromStudent) {
+    return (
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F8FAFC" }}>
+        <div style={{ textAlign: "center", background: "#fff", padding: 40, borderRadius: 20, boxShadow: "0 4px 24px rgba(0,0,0,0.08)", maxWidth: 480 }}>
+          <span style={{ fontSize: 48 }}>🔒</span>
+          <h2 style={{ fontSize: 20, fontWeight: 800, color: "#1e293b", margin: "16px 0 8px" }}>Lesson Not Ready Yet</h2>
+          <p style={{ fontSize: 14, color: "#64748b", marginBottom: 20, lineHeight: 1.6 }}>
+            This lesson is being improved and is not ready yet. Please check back later or try another lesson.
+          </p>
+          {process.env.NODE_ENV === "development" && (
+            <details style={{ textAlign: "left", marginBottom: 16, padding: 12, background: "#FEF3C7", borderRadius: 8, fontSize: 12 }}>
+              <summary style={{ fontWeight: 700, color: "#92400E", cursor: "pointer" }}>Dev: Visibility Reasons</summary>
+              <ul style={{ marginTop: 8, paddingLeft: 16, color: "#78350F" }}>
+                {visibility.reasons.map((r: string, i: number) => (
+                  <li key={i} style={{ marginBottom: 4 }}>{r}</li>
+                ))}
+              </ul>
+            </details>
+          )}
+          <Link href="/dashboard/student" style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "#4f46e5", fontWeight: 700, fontSize: 14 }}>
+            ← Back to Dashboard
+          </Link>
         </div>
       </div>
     );
