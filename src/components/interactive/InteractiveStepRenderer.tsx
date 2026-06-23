@@ -176,7 +176,7 @@ function renderVisualElement(visual: any): React.ReactNode {
         parts={visual.parts || 1}
         shadedParts={visual.shadedParts || 0}
         equalParts={visual.equalParts !== false}
-        orientation={visual.orientation || "vertical"}
+        orientation={(visual.orientation as "horizontal" | "vertical") || "vertical"}
         showLabels={visual.showLabels !== false}
         labels={visual.labels}
         width={140}
