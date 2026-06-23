@@ -24,12 +24,39 @@ interface LessonRecord {
   };
 }
 
+import { getLessonStatusLabel } from "@/lib/curriculum/student-visibility";
+
 const STATUS_LABELS: Record<string, string> = {
   DRAFT: "Draft",
   REVIEW: "In Review",
   PUBLISHED: "Published",
   ARCHIVED: "Archived",
 };
+
+// ── Compute rich status label for a lesson ──────────────────────────────────
+
+function getRichStatusLabel(lesson: any): { label: string; color: string } {
+  const baseStatus = getLessonStatusLabel(lesson);
+
+  // Map to color classes
+  const colorMap: Record<string, string> = {
+    "Gold Standard": "text-amber-700 bg-amber-50 border-amber-200",
+    "Student Visible": "text-emerald-700 bg-emerald-50 border-emerald-200",
+    "Interactive Ready": "text-indigo-700 bg-indigo-50 border-indigo-200",
+    "Needs Revision": "text-orange-700 bg-orange-50 border-orange-200",
+    "Contaminated": "text-red-700 bg-red-50 border-red-200",
+    "Shell Only": "text-slate-600 bg-slate-100 border-slate-200",
+    "Draft Only": "text-blue-700 bg-blue-50 border-blue-200",
+    "Missing Journey": "text-amber-700 bg-amber-50 border-amber-200",
+    "Draft": "text-amber-700 bg-amber-50 border-amber-200",
+    "Published": "text-emerald-700 bg-emerald-50 border-emerald-200",
+  };
+
+  return {
+    label: baseStatus,
+    color: colorMap[baseStatus] || "text-slate-600 bg-slate-100 border-slate-200",
+  };
+}
 
 export default function AdminLessonsPage() {
   const [lessons, setLessons] = useState<LessonRecord[]>([]);
@@ -275,13 +302,8 @@ export default function AdminLessonsPage() {
                       )}
                     </div>
                   </div>
-                  <span className={`text-[0.6875rem] font-bold px-2 py-1 rounded-lg flex-shrink-0 ${
-                    isPublished ? "text-emerald-700 bg-emerald-50" :
-                    isReview ? "text-blue-700 bg-blue-50" :
-                    lesson.status === "ARCHIVED" ? "text-slate-600 bg-slate-100" :
-                    "text-amber-700 bg-amber-50"
-                  }`}>
-                    {STATUS_LABELS[lesson.status] || lesson.status}
+                  <span className={`text-[0.6875rem] font-bold px-2 py-1 rounded-lg flex-shrink-0 border ${getRichStatusLabel(lesson).color}`}>
+                    {getRichStatusLabel(lesson).label}
                   </span>
                   <div className="flex gap-1.5 flex-shrink-0 flex-wrap">
                     {hasJourney(lesson) && (
