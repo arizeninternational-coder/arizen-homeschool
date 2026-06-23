@@ -1,8 +1,33 @@
-// GET /api/learner/lessons — List published lessons for the current learner
-// Returns lessons with normalized reward values, subject info, and progress
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { getAuthUser } from "@/lib/api-guard";
+
+// ── Student visibility check ────────────────────────────────────────────────
+// Only returns lessons that pass the student visibility gate
+
+const STUDENT_VISIBLE_QUALITY_STATUSES = ["STUDENT_READY", "GOLD_STANDARD_APPLIED"];
+
+function isLessonStudentVisible(lesson: any): boolean {
+  if (!lesson) return false;
+  let cb = lesson.contentBlocks;
+  if (typeof cb === "string") { try { cb = JSON.parse(cb); } catch { return false; } }
+  if (!cb || typeof cb !== "object") return false;
+
+  const aiMeta = cb.aiMetadata || {};
+  if (aiMeta.studentVisible !== true) return false;
+  if (!STUDENT_VISIBLE_QUALITY_STATUSES.includes(aiMeta.qualityStatus)) return false;
+
+  const journey = cb.studentJourney || [];
+  if (!Array.isArray(journey) || journey.length !== 10) return false;
+
+  // Check no reading comprehension contamination for non-English lessons
+  const isEnglish = lesson.slug?.startsWith("g2-english") || cb.subject === "English";
+  const allText = journey.map((s: any) => `${s.studentText || ""} ${s.owlText || ""}`).join(" ").toLowerCase();
+  if (!isEnglish && allText.includes("reading comprehension")) return false;
+
+  return true;
+}
+
 export const dynamic = "force-dynamic";
 
 function normalizeReward(reward: any): number {
@@ -131,6 +156,9 @@ export async function GET(req: NextRequest) {
         };
       });
     }
+
+    // Filter to only student-visible lessons
+    filtered = filtered.filter(isLessonStudentVisible);
 
     return NextResponse.json({ lessons: filtered });
   } catch (err: any) {
