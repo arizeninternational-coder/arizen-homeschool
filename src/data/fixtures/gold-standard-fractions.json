@@ -1,0 +1,698 @@
+{
+  "id": "gold-standard-fractions-halves",
+  "title": "Introduction to Halves Using Circular Cut-outs",
+  "slug": "fractions-halves-circular-cutouts",
+  "description": "Gold standard interactive lesson: Introduction to Halves Using Circular Cut-outs",
+  "status": "DRAFT",
+  "xpReward": {
+    "base": 50
+  },
+  "subject": "Mathematics",
+  "grade": 2,
+  "contentBlocks": {
+    "studentJourney": [
+      {
+        "stepKey": "welcome",
+        "activityType": "intro",
+        "studentInstruction": "Get ready to look at a whole circle and discover one half.",
+        "content": "Today's lesson is about halves. A half is one part of a whole that has been divided into two equal parts.",
+        "mediaSpec": {
+          "type": "image",
+          "source": "generated_or_library",
+          "altText": "A friendly owl beside a whole circle and a half-shaded circle.",
+          "purpose": "Introduce the learner to halves visually.",
+          "reviewStatus": "approved"
+        },
+        "visualSpec": {
+          "type": "fraction_circle",
+          "parts": 1,
+          "shadedParts": 0,
+          "equalParts": true,
+          "showLabels": false
+        },
+        "interactionSpec": {
+          "type": "tap_continue",
+          "prompt": "Tap continue when you are ready to begin."
+        },
+        "feedbackSpec": {
+          "correct": "Great. Let us explore halves together.",
+          "incorrect": "",
+          "hint": ""
+        },
+        "successCriteria": "Learner is ready to explore a whole circle and divide it into equal parts.",
+        "rewardText": "",
+        "id": "welcome",
+        "stepType": "welcome",
+        "title": "Welcome to Fractions",
+        "studentText": "Today's lesson is about halves. A half is one part of a whole that has been divided into two equal parts.",
+        "owlText": "Hello mathematician! Today we are going to explore fractions using a circle.",
+        "interaction": {
+          "type": "tap_continue",
+          "question": "Tap continue when you are ready to begin.",
+          "prompt": "Tap continue when you are ready to begin.",
+          "options": null,
+          "correctAnswer": null,
+          "hint": ""
+        },
+        "media": {
+          "illustration": {
+            "prompt": "A friendly owl beside a whole circle and a half-shaded circle.",
+            "approvedUrl": null,
+            "approvedByAdmin": true,
+            "status": "APPROVED"
+          }
+        }
+      },
+      {
+        "stepKey": "mission",
+        "activityType": "mission",
+        "studentInstruction": "By the end of this lesson, you should be able to show one half of a circle.",
+        "content": "In this lesson, you will look at one whole circle, divide it into two equal parts, shade one part, and name the shaded part as one half.",
+        "mediaSpec": null,
+        "visualSpec": {
+          "type": "checklist",
+          "items": [
+            "Start with one whole circle",
+            "Divide it into two equal parts",
+            "Shade one part",
+            "Call it one half"
+          ]
+        },
+        "interactionSpec": {
+          "type": "tap_continue",
+          "prompt": "Tap continue to accept your mission."
+        },
+        "feedbackSpec": {
+          "correct": "Mission accepted. Let us begin.",
+          "incorrect": "",
+          "hint": ""
+        },
+        "successCriteria": "Learner understands the goal of the lesson.",
+        "rewardText": "",
+        "id": "mission",
+        "stepType": "mission",
+        "title": "Your Mission",
+        "studentText": "In this lesson, you will look at one whole circle, divide it into two equal parts, shade one part, and name the shaded part as one half.",
+        "owlText": "Your mission is to discover what one half means.",
+        "interaction": {
+          "type": "tap_continue",
+          "question": "Tap continue to accept your mission.",
+          "prompt": "Tap continue to accept your mission.",
+          "options": null,
+          "correctAnswer": null,
+          "hint": ""
+        },
+        "media": {
+          "illustration": null
+        }
+      },
+      {
+        "stepKey": "think_first",
+        "activityType": "tap_choice",
+        "studentInstruction": "Choose the fairest way to share one chapati between two people.",
+        "content": "Fair sharing means both people get the same amount.",
+        "mediaSpec": null,
+        "visualSpec": {
+          "type": "choice_grid",
+          "choices": [
+            {
+              "id": "A",
+              "label": "One big piece and one small piece",
+              "visual": {
+                "type": "fraction_circle",
+                "parts": 2,
+                "shadedParts": 1,
+                "equalParts": false,
+                "showLabels": false
+              }
+            },
+            {
+              "id": "B",
+              "label": "Two equal pieces",
+              "visual": {
+                "type": "fraction_circle",
+                "parts": 2,
+                "shadedParts": 1,
+                "equalParts": true,
+                "showLabels": false
+              }
+            },
+            {
+              "id": "C",
+              "label": "Give the whole chapati to one person",
+              "visual": {
+                "type": "fraction_circle",
+                "parts": 1,
+                "shadedParts": 1,
+                "equalParts": true,
+                "showLabels": false
+              }
+            }
+          ]
+        },
+        "interactionSpec": {
+          "type": "tap_choice",
+          "prompt": "Tap the fairest sharing picture.",
+          "choices": [
+            "A",
+            "B",
+            "C"
+          ],
+          "correctChoiceId": "B"
+        },
+        "feedbackSpec": {
+          "correct": "Yes. Fair sharing means the two pieces are equal.",
+          "incorrect": "Try again. Look for the picture where both people get the same amount.",
+          "hint": "Fair means same size."
+        },
+        "successCriteria": "Learner connects halves to fair sharing between two people.",
+        "rewardText": "",
+        "id": "think_first",
+        "stepType": "think_first",
+        "title": "Think First",
+        "studentText": "Fair sharing means both people get the same amount.",
+        "owlText": "Imagine you have one chapati and you want to share it fairly with one friend.",
+        "interaction": {
+          "type": "tap_choice",
+          "question": "Tap the fairest sharing picture.",
+          "prompt": "Tap the fairest sharing picture.",
+          "options": [
+            "A",
+            "B",
+            "C"
+          ],
+          "correctAnswer": "B",
+          "hint": "Fair means same size."
+        },
+        "media": {
+          "illustration": null
+        }
+      },
+      {
+        "stepKey": "learn",
+        "activityType": "teaching",
+        "studentInstruction": "Look at the circle and see how it becomes two equal parts.",
+        "content": "A whole is one complete object. A circle is one whole shape. When we divide one whole circle into two equal parts, each part is called one half. We write one half as 1/2. The parts must be equal. If one part is bigger and the other part is smaller, the parts are not halves.",
+        "mediaSpec": {
+          "type": "video",
+          "provider": "youtube",
+          "url": "",
+          "title": "",
+          "purpose": "Show how to fold or divide a circle into two equal parts.",
+          "placement": "learn",
+          "startTime": 0,
+          "endTime": 120,
+          "reviewStatus": "needs_review",
+          "suggestedVideoSearch": "Grade 2 fractions halves equal parts circle"
+        },
+        "visualSpec": {
+          "type": "step_reveal",
+          "steps": [
+            {
+              "title": "Start with one whole circle",
+              "visual": {
+                "type": "fraction_circle",
+                "parts": 1,
+                "shadedParts": 0,
+                "equalParts": true,
+                "showLabels": false
+              }
+            },
+            {
+              "title": "Divide the circle into two equal parts",
+              "visual": {
+                "type": "fraction_circle",
+                "parts": 2,
+                "shadedParts": 0,
+                "equalParts": true,
+                "showLabels": false
+              }
+            },
+            {
+              "title": "Shade one equal part",
+              "visual": {
+                "type": "fraction_circle",
+                "parts": 2,
+                "shadedParts": 1,
+                "equalParts": true,
+                "showLabels": true,
+                "labels": [
+                  "1/2"
+                ]
+              }
+            }
+          ]
+        },
+        "interactionSpec": {
+          "type": "step_reveal",
+          "prompt": "Tap next to see how a whole circle becomes one half."
+        },
+        "feedbackSpec": {
+          "correct": "Good. One half is one of two equal parts.",
+          "incorrect": "Look again. The two parts must be equal.",
+          "hint": "A half needs two equal parts."
+        },
+        "successCriteria": "Learner understands that one half means one of two equal parts of a whole.",
+        "rewardText": "",
+        "id": "learn",
+        "stepType": "learn",
+        "title": "What Is One Half?",
+        "studentText": "A whole is one complete object. A circle is one whole shape. When we divide one whole circle into two equal parts, each part is called one half. We write one half as 1/2. The parts must be equal. If one part is bigger and the other part is smaller, the parts are not halves.",
+        "owlText": "A half means one out of two equal parts.",
+        "interaction": {
+          "type": "step_reveal",
+          "question": "Tap next to see how a whole circle becomes one half.",
+          "prompt": "Tap next to see how a whole circle becomes one half.",
+          "options": null,
+          "correctAnswer": null,
+          "hint": "A half needs two equal parts."
+        },
+        "media": {
+          "illustration": {
+            "prompt": "",
+            "approvedUrl": null,
+            "approvedByAdmin": false,
+            "status": "MISSING"
+          }
+        }
+      },
+      {
+        "stepKey": "connect",
+        "activityType": "real_life_connection",
+        "studentInstruction": "Think of something round that can be shared equally between two people.",
+        "content": "You can see halves when one chapati is shared equally between two children, one orange is cut into two equal pieces, or one circular paper is folded into two equal parts. When the two pieces are the same size, each piece is one half.",
+        "mediaSpec": {
+          "type": "image",
+          "source": "generated_or_library",
+          "altText": "A chapati cut into two equal pieces.",
+          "purpose": "Connect halves to fair sharing in daily life.",
+          "reviewStatus": "approved"
+        },
+        "visualSpec": {
+          "type": "real_life_fraction",
+          "object": "chapati",
+          "parts": 2,
+          "equalParts": true,
+          "highlightPart": 1,
+          "label": "1/2"
+        },
+        "interactionSpec": {
+          "type": "tap_region",
+          "prompt": "Tap one half of the chapati.",
+          "targetVisualId": "chapati_half",
+          "correctRegion": "part_1"
+        },
+        "feedbackSpec": {
+          "correct": "Yes. That is one of the two equal parts.",
+          "incorrect": "Try again. Tap only one of the equal pieces.",
+          "hint": "One half is one piece when the whole is divided into two equal pieces."
+        },
+        "successCriteria": "Learner connects halves to real-life fair sharing.",
+        "rewardText": "",
+        "id": "connect",
+        "stepType": "connect",
+        "title": "Halves Around Us",
+        "studentText": "You can see halves when one chapati is shared equally between two children, one orange is cut into two equal pieces, or one circular paper is folded into two equal parts. When the two pieces are the same size, each piece is one half.",
+        "owlText": "We use halves when we share things fairly in real life.",
+        "interaction": {
+          "type": "tap_region",
+          "question": "Tap one half of the chapati.",
+          "prompt": "Tap one half of the chapati.",
+          "options": null,
+          "correctAnswer": null,
+          "hint": "One half is one piece when the whole is divided into two equal pieces."
+        },
+        "media": {
+          "illustration": {
+            "prompt": "A chapati cut into two equal pieces.",
+            "approvedUrl": null,
+            "approvedByAdmin": true,
+            "status": "APPROVED"
+          }
+        }
+      },
+      {
+        "stepKey": "example",
+        "activityType": "worked_example",
+        "studentInstruction": "Follow each step. Imagine Amina has a circular paper cut-out.",
+        "content": "Amina has one circular paper. She folds it into two equal parts. Then she shades one part. What fraction of the circle has Amina shaded?",
+        "mediaSpec": null,
+        "visualSpec": {
+          "type": "step_reveal",
+          "steps": [
+            {
+              "title": "Amina starts with one whole circular paper",
+              "visual": {
+                "type": "fraction_circle",
+                "parts": 1,
+                "shadedParts": 0,
+                "equalParts": true
+              }
+            },
+            {
+              "title": "She folds it into two equal parts",
+              "visual": {
+                "type": "fraction_circle",
+                "parts": 2,
+                "shadedParts": 0,
+                "equalParts": true
+              }
+            },
+            {
+              "title": "She shades one part",
+              "visual": {
+                "type": "fraction_circle",
+                "parts": 2,
+                "shadedParts": 1,
+                "equalParts": true,
+                "showLabels": true,
+                "labels": [
+                  "1/2"
+                ]
+              }
+            }
+          ],
+          "answerText": "Amina shaded one half, or 1/2."
+        },
+        "interactionSpec": {
+          "type": "step_reveal",
+          "prompt": "Tap next to follow Amina's example."
+        },
+        "feedbackSpec": {
+          "correct": "Great. Amina shaded one out of two equal parts.",
+          "incorrect": "",
+          "hint": "Watch how the circle changes from whole to two equal parts."
+        },
+        "successCriteria": "Learner can follow a worked example and identify one shaded half of a circle.",
+        "rewardText": "",
+        "id": "example",
+        "stepType": "example",
+        "title": "Worked Example",
+        "studentText": "Amina has one circular paper. She folds it into two equal parts. Then she shades one part. What fraction of the circle has Amina shaded?",
+        "owlText": "Let us work through an example together.",
+        "interaction": {
+          "type": "step_reveal",
+          "question": "Tap next to follow Amina's example.",
+          "prompt": "Tap next to follow Amina's example.",
+          "options": null,
+          "correctAnswer": null,
+          "hint": "Watch how the circle changes from whole to two equal parts."
+        },
+        "media": {
+          "illustration": null
+        }
+      },
+      {
+        "stepKey": "practice",
+        "activityType": "guided_practice",
+        "studentInstruction": "Complete each activity. Tap, shade, and explain.",
+        "content": "Practise showing one half of a circle.",
+        "mediaSpec": null,
+        "visualSpec": {
+          "type": "practice_set",
+          "items": [
+            {
+              "id": "practice_1",
+              "type": "shade_shape",
+              "visual": {
+                "type": "fraction_circle",
+                "parts": 2,
+                "shadedParts": 0,
+                "equalParts": true
+              }
+            },
+            {
+              "id": "practice_2",
+              "type": "tap_choice",
+              "visual": {
+                "type": "choice_grid",
+                "choices": [
+                  {
+                    "id": "A",
+                    "label": "Two equal parts",
+                    "visual": {
+                      "type": "fraction_circle",
+                      "parts": 2,
+                      "shadedParts": 1,
+                      "equalParts": true
+                    }
+                  },
+                  {
+                    "id": "B",
+                    "label": "Two unequal parts",
+                    "visual": {
+                      "type": "fraction_circle",
+                      "parts": 2,
+                      "shadedParts": 1,
+                      "equalParts": false
+                    }
+                  },
+                  {
+                    "id": "C",
+                    "label": "Four equal parts",
+                    "visual": {
+                      "type": "fraction_circle",
+                      "parts": 4,
+                      "shadedParts": 1,
+                      "equalParts": true
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "interactionSpec": {
+          "type": "multi_activity",
+          "activities": [
+            {
+              "id": "practice_1",
+              "type": "shade_shape",
+              "prompt": "Shade one half of the circle.",
+              "shape": {
+                "type": "fraction_circle",
+                "parts": 2,
+                "equalParts": true
+              },
+              "requiredShadedParts": 1
+            },
+            {
+              "id": "practice_2",
+              "type": "tap_choice",
+              "prompt": "Tap the picture that shows one half.",
+              "choices": [
+                "A",
+                "B",
+                "C"
+              ],
+              "correctChoiceId": "A"
+            },
+            {
+              "id": "practice_3",
+              "type": "short_response",
+              "prompt": "A circle is cut into one big part and one small part. Are the two parts halves? Explain.",
+              "expectedIdea": "No, because the two parts are not equal.",
+              "keywords": [
+                "no",
+                "not equal",
+                "same size",
+                "equal"
+              ]
+            }
+          ]
+        },
+        "feedbackSpec": {
+          "correct": "Well done. You are showing one half correctly.",
+          "incorrect": "Try again. Remember, halves must be two equal parts.",
+          "hint": "Look for two parts that are the same size."
+        },
+        "successCriteria": "Learner practises shading, identifying, and explaining halves.",
+        "rewardText": "",
+        "id": "practice",
+        "stepType": "practice",
+        "title": "Your Turn",
+        "studentText": "Practise showing one half of a circle.",
+        "owlText": "Now it is your turn to practise finding halves.",
+        "interaction": {
+          "type": "multi_activity",
+          "question": null,
+          "prompt": null,
+          "options": null,
+          "correctAnswer": null,
+          "hint": "Look for two parts that are the same size."
+        },
+        "media": {
+          "illustration": null
+        }
+      },
+      {
+        "stepKey": "quick_check",
+        "activityType": "multiple_choice",
+        "studentInstruction": "Choose the best answer.",
+        "content": "Which sentence correctly explains one half?",
+        "mediaSpec": null,
+        "visualSpec": {
+          "type": "fraction_circle",
+          "parts": 2,
+          "shadedParts": 1,
+          "equalParts": true,
+          "showLabels": true,
+          "labels": [
+            "1/2"
+          ]
+        },
+        "interactionSpec": {
+          "type": "multiple_choice",
+          "question": "Which sentence correctly explains one half?",
+          "options": [
+            "One half is one of two equal parts of a whole.",
+            "One half is any small part of a whole.",
+            "One half is one of four equal parts of a whole.",
+            "One half is the biggest part of a whole."
+          ],
+          "correctIndex": 0
+        },
+        "feedbackSpec": {
+          "correct": "Correct. One half is one of two equal parts of a whole.",
+          "incorrect": "Not quite. A half must be one of two equal parts.",
+          "hint": "Look for the answer that mentions two equal parts."
+        },
+        "successCriteria": "Learner can choose the correct meaning of one half.",
+        "rewardText": "",
+        "id": "quick_check",
+        "stepType": "quick_check",
+        "title": "Quick Check",
+        "studentText": "Which sentence correctly explains one half?",
+        "owlText": "Let us check your understanding.",
+        "interaction": {
+          "type": "multiple_choice",
+          "question": "Which sentence correctly explains one half?",
+          "prompt": null,
+          "options": [
+            "One half is one of two equal parts of a whole.",
+            "One half is any small part of a whole.",
+            "One half is one of four equal parts of a whole.",
+            "One half is the biggest part of a whole."
+          ],
+          "correctAnswer": null,
+          "hint": "Look for the answer that mentions two equal parts."
+        },
+        "media": {
+          "illustration": null
+        }
+      },
+      {
+        "stepKey": "reflect",
+        "activityType": "reflection",
+        "studentInstruction": "Use the chips to help explain your answer.",
+        "content": "How can you tell if two parts of a circle are halves?",
+        "mediaSpec": null,
+        "visualSpec": {
+          "type": "reflection_card",
+          "icon": "circle-halves",
+          "sentenceStarter": "I know the parts are halves when..."
+        },
+        "interactionSpec": {
+          "type": "reflection_chips",
+          "prompt": "How can you tell if two parts of a circle are halves?",
+          "chips": [
+            "equal parts",
+            "two parts",
+            "same size",
+            "fair sharing"
+          ],
+          "sentenceStarter": "I know the parts are halves when..."
+        },
+        "feedbackSpec": {
+          "correct": "Good reflection. Halves must be two equal parts.",
+          "incorrect": "Think about the important rule: the parts must be equal.",
+          "hint": "Use the words equal parts or same size."
+        },
+        "successCriteria": "Learner can explain the key rule for halves using words.",
+        "rewardText": "",
+        "id": "reflect",
+        "stepType": "reflect",
+        "title": "Think About It",
+        "studentText": "How can you tell if two parts of a circle are halves?",
+        "owlText": "You have learned something important about fair parts.",
+        "interaction": {
+          "type": "reflection_chips",
+          "question": "How can you tell if two parts of a circle are halves?",
+          "prompt": "How can you tell if two parts of a circle are halves?",
+          "options": null,
+          "correctAnswer": null,
+          "hint": "Use the words equal parts or same size."
+        },
+        "media": {
+          "illustration": null
+        }
+      },
+      {
+        "stepKey": "complete",
+        "activityType": "completion",
+        "studentInstruction": "You have completed the lesson. Remember: a half is one of two equal parts.",
+        "content": "Today you learned that a circle can be one whole, one whole can be divided into two equal parts, each equal part is one half, one half can be written as 1/2, and unequal parts are not halves.",
+        "mediaSpec": {
+          "type": "reward_animation",
+          "name": "fraction_explorer_badge",
+          "altText": "Fraction Explorer badge with a half-shaded circle.",
+          "purpose": "Celebrate completion of the first fractions lesson.",
+          "reviewStatus": "approved"
+        },
+        "visualSpec": {
+          "type": "recap_checklist",
+          "items": [
+            "I can identify one whole circle.",
+            "I can divide a circle into two equal parts.",
+            "I can shade one half.",
+            "I can explain that unequal parts are not halves."
+          ]
+        },
+        "interactionSpec": {
+          "type": "tap_continue",
+          "prompt": "Tap finish to collect your Fraction Explorer badge."
+        },
+        "feedbackSpec": {
+          "correct": "Badge earned. You are now a Fraction Explorer.",
+          "incorrect": "",
+          "hint": ""
+        },
+        "successCriteria": "Learner finishes with a clear understanding of one half as one of two equal parts.",
+        "rewardText": "You earned your Fraction Explorer badge for learning about halves.",
+        "id": "complete",
+        "stepType": "complete",
+        "title": "Lesson Complete",
+        "studentText": "Today you learned that a circle can be one whole, one whole can be divided into two equal parts, each equal part is one half, one half can be written as 1/2, and unequal parts are not halves.",
+        "owlText": "Great work! You can now show one half of a circle and explain that halves must be equal.",
+        "interaction": {
+          "type": "tap_continue",
+          "question": "Tap finish to collect your Fraction Explorer badge.",
+          "prompt": "Tap finish to collect your Fraction Explorer badge.",
+          "options": null,
+          "correctAnswer": null,
+          "hint": ""
+        },
+        "media": {
+          "illustration": {
+            "prompt": "Fraction Explorer badge with a half-shaded circle.",
+            "approvedUrl": null,
+            "approvedByAdmin": true,
+            "status": "APPROVED"
+          }
+        }
+      }
+    ],
+    "strand": "Numbers",
+    "subStrand": "Fractions",
+    "learningOutcome": "Learner can identify one half of a circle"
+  },
+  "quest": {
+    "id": "quest-fractions",
+    "title": "Fractions",
+    "theme": {
+      "id": "theme-numbers",
+      "title": "Numbers Everyday",
+      "grade": 2
+    }
+  }
+}
