@@ -112,6 +112,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
   const [lesson, setLesson] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [completed, setCompleted] = useState(false);
+  const [subjectMismatch, setSubjectMismatch] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [viewing, setViewing] = useState(false);
   const [xpEarned, setXpEarned] = useState(0);
@@ -136,6 +137,59 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
   const xp = getRewardValue(lesson?.xpReward);
   const subject = lesson?.quest?.theme?.themeSubjects?.[0]?.subject || "";
   const grade = lesson?.quest?.theme?.grade || 0;
+
+  // ── Debug logging in development ──────────────────────────────────────────
+  if (process.env.NODE_ENV === "development") {
+    console.log("[StudentPlayer] Loaded lesson:", {
+      id: lesson?.id,
+      title: lesson?.title,
+      slug: lesson?.slug,
+      subject,
+      grade,
+      questId: lesson?.questId,
+      questTitle: lesson?.quest?.title,
+      themeSlug: lesson?.quest?.theme?.slug,
+      journeySource: journey?.source,
+      journeySteps: journeySteps.length,
+    });
+  }
+
+  // ── Subject mismatch guardrail ────────────────────────────────────────────
+  // Detect if a Math lesson contains English reading comprehension content
+  const expectedSubjectFromSlug = lesson?.slug?.startsWith("g2-mathematics") ? "mathematics"
+    : lesson?.slug?.startsWith("g2-english") ? "english"
+    : lesson?.slug?.startsWith("g2-environmental") ? "environmental"
+    : lesson?.slug?.startsWith("g2-movement") ? "movement"
+    : lesson?.slug?.startsWith("g2-kiswahili") ? "kiswahili"
+    : lesson?.slug?.startsWith("g2-hygiene") ? "hygiene_nutrition"
+    : lesson?.slug?.startsWith("g2-science") ? "science_technology"
+    : lesson?.slug?.startsWith("g2-social") ? "social_studies"
+    : lesson?.slug?.startsWith("g2-creative") ? "creative_arts"
+    : lesson?.slug?.startsWith("g2-agriculture") ? "agriculture_nutrition"
+    : "";
+
+  if (expectedSubjectFromSlug && journeySteps.length > 0) {
+    // Check first 3 steps for content mismatch
+    const sampleText = journeySteps.slice(0, 3).map((s: any) =>
+      `${s.studentText || ""} ${s.owlText || ""} ${s.content || ""}`
+    ).join(" ").toLowerCase();
+
+    const hasReadingComprehension = sampleText.includes("reading comprehension");
+    const isMathExpected = expectedSubjectFromSlug === "mathematics";
+
+    if (isMathExpected && hasReadingComprehension) {
+      const msg = `Lesson subject mismatch: expected ${expectedSubjectFromSlug}, but content contains reading comprehension. Lesson: ${lesson?.title} (${lesson?.slug})`;
+      console.error("[StudentPlayer] SUBJECT MISMATCH:", msg, {
+        lessonId: lesson?.id,
+        title: lesson?.title,
+        slug: lesson?.slug,
+        expectedSubject: expectedSubjectFromSlug,
+      });
+      if (process.env.NODE_ENV === "development") {
+        setSubjectMismatch(msg);
+      }
+    }
+  }
 
   const nextStepLabel = !isLastStep && journeySteps[clampedStep + 1]
     ? STEP_TYPE_ICONS[journeySteps[clampedStep + 1].stepType as JourneyStepType] + " " + (journeySteps[clampedStep + 1].title || "Next")
@@ -276,6 +330,21 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                     <span style={{ fontSize: "0.75rem", color: "#64748b" }}>Step {clampedStep + 1} of {totalSteps}</span>
                   </div>
                 </div>
+
+              {/* Subject mismatch warning */}
+              {subjectMismatch && (
+                <div style={{ marginBottom: 16, padding: "12px 16px", borderRadius: 12, background: "#FEF2F2", border: "2px solid #DC2626" }}>
+                  <p style={{ fontSize: "0.8125rem", fontWeight: 700, color: "#DC2626", margin: "0 0 4px" }}>
+                    ⚠️ Lesson Content Error Detected
+                  </p>
+                  <p style={{ fontSize: "0.75rem", color: "#991B1B", margin: 0 }}>
+                    {subjectMismatch}
+                  </p>
+                  <p style={{ fontSize: "0.6875rem", color: "#B91C1C", margin: "4px 0 0" }}>
+                    This is a data issue — the wrong content was stored for this lesson. Please report to the admin.
+                  </p>
+                </div>
+              )}
 
                 {/* Owl guidance */}
                 {currentJourneyStep.owlText && (
