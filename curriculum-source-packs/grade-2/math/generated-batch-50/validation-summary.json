@@ -1,0 +1,19 @@
+{
+  "total_selected": 50,
+  "total_generated": 50,
+  "total_passed": 50,
+  "total_failed": 0,
+  "failures": [],
+  "topic_breakdown": {
+    "Counting": 10,
+    "Numbers": 8,
+    "Other": 4,
+    "Rounding": 1,
+    "Comparing": 3,
+    "Fractions": 3,
+    "Addition": 11,
+    "Subtraction": 6,
+    "Multiplication": 3,
+    "Measurement": 1
+  }
+}

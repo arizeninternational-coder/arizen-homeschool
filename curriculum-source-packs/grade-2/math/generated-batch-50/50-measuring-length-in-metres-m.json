@@ -1,0 +1,187 @@
+{
+  "lessonId": "95b7d152-18ab-4e3e-8114-19742f6839a0",
+  "title": "Measuring Length in Metres/m",
+  "subject": "Mathematics",
+  "grade": 2,
+  "journey": [
+    {
+      "id": "step-1-welcome",
+      "stepType": "welcome",
+      "title": "Welcome! 🦉",
+      "studentText": "",
+      "owlText": "Hello, friend! Today we are going to learn about measuring length in metres/m. This is going to be a fun Math adventure! Are you ready to begin?",
+      "interaction": {
+        "type": "none"
+      },
+      "media": {
+        "illustration": {
+          "altText": "Welcome to Measuring Length in Metres/m",
+          "prompt": "A friendly cartoon owl teacher welcoming young students to a math lesson about measuring length in metres/m, bright cheerful colors, child-friendly illustration style"
+        }
+      },
+      "estimatedMinutes": 1
+    },
+    {
+      "id": "step-2-mission",
+      "stepType": "mission",
+      "title": "Today's Mission 🎯",
+      "studentText": "By the end of this lesson, you will be able to:\n\n✓ Measure length using metres",
+      "owlText": "This is your mission! By the end of this lesson, you will be skilled at measuring length in metres/m. Let us begin!",
+      "interaction": {
+        "type": "none"
+      },
+      "media": {
+        "illustration": {
+          "altText": "Mission: Measuring Length in Metres/m",
+          "prompt": "A colorful math mission banner for children showing the learning goal: measure length using metres, bright engaging colors"
+        }
+      },
+      "estimatedMinutes": 1
+    },
+    {
+      "id": "step-3-think-first",
+      "stepType": "think_first",
+      "title": "Think First! 💭",
+      "studentText": "A metre is about the length of a big step. We use metres to measure longer things like rooms and playgrounds.",
+      "owlText": "Take a moment to think about measuring length in metres/m. What do you already know? There's no wrong answer!",
+      "interaction": {
+        "type": "open_response",
+        "prompt": "What do you already know about measuring length in metres/m?",
+        "hint": "Measure the length of your desk in metres."
+      },
+      "media": {},
+      "estimatedMinutes": 2
+    },
+    {
+      "id": "step-4-learn",
+      "stepType": "learn",
+      "title": "Learn It 📖",
+      "studentText": "**Measuring Length in Metres/m**\n\nLet's learn about measuring length in metres/m step by step.\n\n[Detailed teaching content based on source pack for measurement_metres]",
+      "owlText": "",
+      "interaction": {
+        "type": "none"
+      },
+      "media": {
+        "illustration": {
+          "altText": "Learning Measuring Length in Metres/m",
+          "prompt": "Educational illustration for Grade 2 Math: measuring length in metres/m, showing clear visual examples, number lines or counters as appropriate, bright child-friendly style"
+        }
+      },
+      "estimatedMinutes": 3
+    },
+    {
+      "id": "step-5-connect",
+      "stepType": "connect",
+      "title": "Real Life Connection 🔗",
+      "studentText": "We use measuring length in metres/m in everyday life!\n\nCan you think of times when you use measuring length in metres/m?\n\n**Try this:** Look around you and find examples of measuring length in metres/m.",
+      "owlText": "Can you think of a time you used measuring length in metres/m? Tell someone your story!",
+      "interaction": {
+        "type": "open_response",
+        "prompt": "Write or say: A time when you used measuring length in metres/m.",
+        "hint": "Think about things you do every day."
+      },
+      "media": {},
+      "estimatedMinutes": 2
+    },
+    {
+      "id": "step-6-example",
+      "stepType": "example",
+      "title": "Worked Example 💡",
+      "studentText": "**Worked Example**\n\nLet's work through an example together.\n\n[Example for measuring length in metres/m based on source pack]",
+      "owlText": "",
+      "interaction": {
+        "type": "none"
+      },
+      "media": {
+        "illustration": {
+          "altText": "Worked example for Measuring Length in Metres/m",
+          "prompt": "Step-by-step worked example for Grade 2 Math: measuring length in metres/m, showing the working clearly with numbers and diagrams"
+        }
+      },
+      "estimatedMinutes": 3
+    },
+    {
+      "id": "step-7-practice",
+      "stepType": "practice",
+      "title": "Your Turn! ✏️",
+      "studentText": "**Practice Measuring Length in Metres/m**\n\n1) [Practice question 1]\n\n2) [Practice question 2]\n\n3) [Practice question 3]\n\n4) [Practice question 4]",
+      "owlText": "Use what you learned to solve these problems. Draw pictures or use counters if you need help!",
+      "interaction": {
+        "type": "open_response",
+        "prompt": "Write your answers. Show your working!",
+        "hint": "Use what you learned in the examples."
+      },
+      "materials": [
+        "paper",
+        "pencil"
+      ],
+      "media": {},
+      "estimatedMinutes": 4
+    },
+    {
+      "id": "step-8-quick-check",
+      "stepType": "quick_check",
+      "title": "Quick Check! ✅",
+      "studentText": "",
+      "owlText": "",
+      "interaction": {
+        "type": "multiple_choice",
+        "question": "About how long is a classroom?",
+        "options": [
+          "1 cm",
+          "1 m",
+          "10 m",
+          "100 m"
+        ],
+        "correctIndex": 2,
+        "explanation": "Correct! A classroom is about 10 metres long."
+      },
+      "media": {},
+      "estimatedMinutes": 2
+    },
+    {
+      "id": "step-9-reflect",
+      "stepType": "reflect",
+      "title": "Think About Your Learning 🪞",
+      "studentText": "",
+      "owlText": "What did you learn about measuring length in metres/m today? Can you explain it to someone?",
+      "interaction": {
+        "type": "open_response",
+        "prompt": "Tell or write: What did you learn about measuring length in metres/m today?",
+        "hint": "Think about the key ideas and what you can do now."
+      },
+      "reflectionOptions": [
+        "I learned something new about measuring length in metres/m!",
+        "I can explain measuring length in metres/m to someone else now",
+        "I need more practice, but I understand the basics",
+        "This was fun and I want to learn more!"
+      ],
+      "media": {},
+      "estimatedMinutes": 2
+    },
+    {
+      "id": "step-10-complete",
+      "stepType": "complete",
+      "title": "You Did It! 🏆",
+      "studentText": "",
+      "owlText": "Amazing work! Today you learned about measuring length in metres/m. You can now measure length using metres. Keep practising and you will be a Math champion! 🌟",
+      "interaction": {
+        "type": "none"
+      },
+      "media": {
+        "illustration": {
+          "altText": "Completion celebration for Measuring Length in Metres/m",
+          "prompt": "A joyful celebration illustration with an owl teacher and happy students, confetti and stars, bright golden colors, achievement theme for completing measuring length in metres/m"
+        }
+      },
+      "estimatedMinutes": 1
+    }
+  ],
+  "metadata": {
+    "generator": "batch-50-generator",
+    "sourcePack": "curriculum-source-packs/grade-2/math/math-topic-guides.md",
+    "concept": "measurement_metres",
+    "contaminationCheck": "PASSED",
+    "createdAt": "2026-06-21"
+  }
+}

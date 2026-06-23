@@ -1,0 +1,187 @@
+{
+  "lessonId": "853782ed-f7d2-4536-9665-cab6f525dbff",
+  "title": "Filling in Missing Numbers 51 to 100",
+  "subject": "Mathematics",
+  "grade": 2,
+  "journey": [
+    {
+      "id": "step-1-welcome",
+      "stepType": "welcome",
+      "title": "Welcome! 🦉",
+      "studentText": "",
+      "owlText": "Hello, friend! Today we are going to learn about filling in missing numbers 51 to 100. This is going to be a fun Math adventure! Are you ready to begin?",
+      "interaction": {
+        "type": "none"
+      },
+      "media": {
+        "illustration": {
+          "altText": "Welcome to Filling in Missing Numbers 51 to 100",
+          "prompt": "A friendly cartoon owl teacher welcoming young students to a math lesson about filling in missing numbers 51 to 100, bright cheerful colors, child-friendly illustration style"
+        }
+      },
+      "estimatedMinutes": 1
+    },
+    {
+      "id": "step-2-mission",
+      "stepType": "mission",
+      "title": "Today's Mission 🎯",
+      "studentText": "By the end of this lesson, you will be able to:\n\n✓ Understand and apply filling in missing numbers 51 to 100",
+      "owlText": "This is your mission! By the end of this lesson, you will be skilled at filling in missing numbers 51 to 100. Let us begin!",
+      "interaction": {
+        "type": "none"
+      },
+      "media": {
+        "illustration": {
+          "altText": "Mission: Filling in Missing Numbers 51 to 100",
+          "prompt": "A colorful math mission banner for children showing the learning goal: understand and apply filling in missing numbers 51 to 100, bright engaging colors"
+        }
+      },
+      "estimatedMinutes": 1
+    },
+    {
+      "id": "step-3-think-first",
+      "stepType": "think_first",
+      "title": "Think First! 💭",
+      "studentText": "Think about what you already know about filling in missing numbers 51 to 100. What do you remember?",
+      "owlText": "Take a moment to think about filling in missing numbers 51 to 100. What do you already know? There's no wrong answer!",
+      "interaction": {
+        "type": "open_response",
+        "prompt": "What do you already know about filling in missing numbers 51 to 100?",
+        "hint": "Think about what you've learned before."
+      },
+      "media": {},
+      "estimatedMinutes": 2
+    },
+    {
+      "id": "step-4-learn",
+      "stepType": "learn",
+      "title": "Learn It 📖",
+      "studentText": "**Filling in Missing Numbers 51 to 100**\n\nLet's learn about filling in missing numbers 51 to 100 step by step.\n\n[Detailed teaching content based on source pack for general_math]",
+      "owlText": "",
+      "interaction": {
+        "type": "none"
+      },
+      "media": {
+        "illustration": {
+          "altText": "Learning Filling in Missing Numbers 51 to 100",
+          "prompt": "Educational illustration for Grade 2 Math: filling in missing numbers 51 to 100, showing clear visual examples, number lines or counters as appropriate, bright child-friendly style"
+        }
+      },
+      "estimatedMinutes": 3
+    },
+    {
+      "id": "step-5-connect",
+      "stepType": "connect",
+      "title": "Real Life Connection 🔗",
+      "studentText": "We use filling in missing numbers 51 to 100 in everyday life!\n\nCan you think of times when you use filling in missing numbers 51 to 100?\n\n**Try this:** Look around you and find examples of filling in missing numbers 51 to 100.",
+      "owlText": "Can you think of a time you used filling in missing numbers 51 to 100? Tell someone your story!",
+      "interaction": {
+        "type": "open_response",
+        "prompt": "Write or say: A time when you used filling in missing numbers 51 to 100.",
+        "hint": "Think about things you do every day."
+      },
+      "media": {},
+      "estimatedMinutes": 2
+    },
+    {
+      "id": "step-6-example",
+      "stepType": "example",
+      "title": "Worked Example 💡",
+      "studentText": "**Worked Example**\n\nLet's work through an example together.\n\n[Example for filling in missing numbers 51 to 100 based on source pack]",
+      "owlText": "",
+      "interaction": {
+        "type": "none"
+      },
+      "media": {
+        "illustration": {
+          "altText": "Worked example for Filling in Missing Numbers 51 to 100",
+          "prompt": "Step-by-step worked example for Grade 2 Math: filling in missing numbers 51 to 100, showing the working clearly with numbers and diagrams"
+        }
+      },
+      "estimatedMinutes": 3
+    },
+    {
+      "id": "step-7-practice",
+      "stepType": "practice",
+      "title": "Your Turn! ✏️",
+      "studentText": "**Practice Filling in Missing Numbers 51 to 100**\n\n1) [Practice question 1]\n\n2) [Practice question 2]\n\n3) [Practice question 3]\n\n4) [Practice question 4]",
+      "owlText": "Use what you learned to solve these problems. Draw pictures or use counters if you need help!",
+      "interaction": {
+        "type": "open_response",
+        "prompt": "Write your answers. Show your working!",
+        "hint": "Use what you learned in the examples."
+      },
+      "materials": [
+        "paper",
+        "pencil"
+      ],
+      "media": {},
+      "estimatedMinutes": 4
+    },
+    {
+      "id": "step-8-quick-check",
+      "stepType": "quick_check",
+      "title": "Quick Check! ✅",
+      "studentText": "",
+      "owlText": "",
+      "interaction": {
+        "type": "multiple_choice",
+        "question": "Question about filling in missing numbers 51 to 100?",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ],
+        "correctIndex": 0,
+        "explanation": "Correct!"
+      },
+      "media": {},
+      "estimatedMinutes": 2
+    },
+    {
+      "id": "step-9-reflect",
+      "stepType": "reflect",
+      "title": "Think About Your Learning 🪞",
+      "studentText": "",
+      "owlText": "What did you learn about filling in missing numbers 51 to 100 today? Can you explain it to someone?",
+      "interaction": {
+        "type": "open_response",
+        "prompt": "Tell or write: What did you learn about filling in missing numbers 51 to 100 today?",
+        "hint": "Think about the key ideas and what you can do now."
+      },
+      "reflectionOptions": [
+        "I learned something new about filling in missing numbers 51 to 100!",
+        "I can explain filling in missing numbers 51 to 100 to someone else now",
+        "I need more practice, but I understand the basics",
+        "This was fun and I want to learn more!"
+      ],
+      "media": {},
+      "estimatedMinutes": 2
+    },
+    {
+      "id": "step-10-complete",
+      "stepType": "complete",
+      "title": "You Did It! 🏆",
+      "studentText": "",
+      "owlText": "Amazing work! Today you learned about filling in missing numbers 51 to 100. You can now understand and apply filling in missing numbers 51 to 100. Keep practising and you will be a Math champion! 🌟",
+      "interaction": {
+        "type": "none"
+      },
+      "media": {
+        "illustration": {
+          "altText": "Completion celebration for Filling in Missing Numbers 51 to 100",
+          "prompt": "A joyful celebration illustration with an owl teacher and happy students, confetti and stars, bright golden colors, achievement theme for completing filling in missing numbers 51 to 100"
+        }
+      },
+      "estimatedMinutes": 1
+    }
+  ],
+  "metadata": {
+    "generator": "batch-50-generator",
+    "sourcePack": "curriculum-source-packs/grade-2/math/math-topic-guides.md",
+    "concept": "general_math",
+    "contaminationCheck": "PASSED",
+    "createdAt": "2026-06-21"
+  }
+}

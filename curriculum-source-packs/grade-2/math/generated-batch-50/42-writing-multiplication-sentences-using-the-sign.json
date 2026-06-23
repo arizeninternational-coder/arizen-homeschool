@@ -1,0 +1,187 @@
+{
+  "lessonId": "cff3b7c1-2468-454d-b2da-fe35d49e2456",
+  "title": "Writing Multiplication Sentences Using the × Sign",
+  "subject": "Mathematics",
+  "grade": 2,
+  "journey": [
+    {
+      "id": "step-1-welcome",
+      "stepType": "welcome",
+      "title": "Welcome! 🦉",
+      "studentText": "",
+      "owlText": "Hello, friend! Today we are going to learn about writing multiplication sentences using the × sign. This is going to be a fun Math adventure! Are you ready to begin?",
+      "interaction": {
+        "type": "none"
+      },
+      "media": {
+        "illustration": {
+          "altText": "Welcome to Writing Multiplication Sentences Using the × Sign",
+          "prompt": "A friendly cartoon owl teacher welcoming young students to a math lesson about writing multiplication sentences using the × sign, bright cheerful colors, child-friendly illustration style"
+        }
+      },
+      "estimatedMinutes": 1
+    },
+    {
+      "id": "step-2-mission",
+      "stepType": "mission",
+      "title": "Today's Mission 🎯",
+      "studentText": "By the end of this lesson, you will be able to:\n\n✓ Write multiplication sentences using the × sign",
+      "owlText": "This is your mission! By the end of this lesson, you will be skilled at writing multiplication sentences using the × sign. Let us begin!",
+      "interaction": {
+        "type": "none"
+      },
+      "media": {
+        "illustration": {
+          "altText": "Mission: Writing Multiplication Sentences Using the × Sign",
+          "prompt": "A colorful math mission banner for children showing the learning goal: write multiplication sentences using the × sign, bright engaging colors"
+        }
+      },
+      "estimatedMinutes": 1
+    },
+    {
+      "id": "step-3-think-first",
+      "stepType": "think_first",
+      "title": "Think First! 💭",
+      "studentText": "If there are 4 groups of 3 counters, we write: 4 × 3 = 12. The × sign means 'groups of'.",
+      "owlText": "Take a moment to think about writing multiplication sentences using the × sign. What do you already know? There's no wrong answer!",
+      "interaction": {
+        "type": "open_response",
+        "prompt": "What do you already know about writing multiplication sentences using the × sign?",
+        "hint": "Write the multiplication sentence for 5 groups of 2."
+      },
+      "media": {},
+      "estimatedMinutes": 2
+    },
+    {
+      "id": "step-4-learn",
+      "stepType": "learn",
+      "title": "Learn It 📖",
+      "studentText": "**Writing Multiplication Sentences Using the × Sign**\n\nLet's learn about writing multiplication sentences using the × sign step by step.\n\n[Detailed teaching content based on source pack for multiplication_sentences]",
+      "owlText": "",
+      "interaction": {
+        "type": "none"
+      },
+      "media": {
+        "illustration": {
+          "altText": "Learning Writing Multiplication Sentences Using the × Sign",
+          "prompt": "Educational illustration for Grade 2 Math: writing multiplication sentences using the × sign, showing clear visual examples, number lines or counters as appropriate, bright child-friendly style"
+        }
+      },
+      "estimatedMinutes": 3
+    },
+    {
+      "id": "step-5-connect",
+      "stepType": "connect",
+      "title": "Real Life Connection 🔗",
+      "studentText": "We use writing multiplication sentences using the × sign in everyday life!\n\nCan you think of times when you use writing multiplication sentences using the × sign?\n\n**Try this:** Look around you and find examples of writing multiplication sentences using the × sign.",
+      "owlText": "Can you think of a time you used writing multiplication sentences using the × sign? Tell someone your story!",
+      "interaction": {
+        "type": "open_response",
+        "prompt": "Write or say: A time when you used writing multiplication sentences using the × sign.",
+        "hint": "Think about things you do every day."
+      },
+      "media": {},
+      "estimatedMinutes": 2
+    },
+    {
+      "id": "step-6-example",
+      "stepType": "example",
+      "title": "Worked Example 💡",
+      "studentText": "**Worked Example**\n\nLet's work through an example together.\n\n[Example for writing multiplication sentences using the × sign based on source pack]",
+      "owlText": "",
+      "interaction": {
+        "type": "none"
+      },
+      "media": {
+        "illustration": {
+          "altText": "Worked example for Writing Multiplication Sentences Using the × Sign",
+          "prompt": "Step-by-step worked example for Grade 2 Math: writing multiplication sentences using the × sign, showing the working clearly with numbers and diagrams"
+        }
+      },
+      "estimatedMinutes": 3
+    },
+    {
+      "id": "step-7-practice",
+      "stepType": "practice",
+      "title": "Your Turn! ✏️",
+      "studentText": "**Practice Writing Multiplication Sentences Using the × Sign**\n\n1) [Practice question 1]\n\n2) [Practice question 2]\n\n3) [Practice question 3]\n\n4) [Practice question 4]",
+      "owlText": "Use what you learned to solve these problems. Draw pictures or use counters if you need help!",
+      "interaction": {
+        "type": "open_response",
+        "prompt": "Write your answers. Show your working!",
+        "hint": "Use what you learned in the examples."
+      },
+      "materials": [
+        "paper",
+        "pencil"
+      ],
+      "media": {},
+      "estimatedMinutes": 4
+    },
+    {
+      "id": "step-8-quick-check",
+      "stepType": "quick_check",
+      "title": "Quick Check! ✅",
+      "studentText": "",
+      "owlText": "",
+      "interaction": {
+        "type": "multiple_choice",
+        "question": "4 groups of 3 is the same as:",
+        "options": [
+          "4 + 3",
+          "4 × 3",
+          "3 × 3",
+          "4 - 3"
+        ],
+        "correctIndex": 1,
+        "explanation": "Correct! 4 groups of 3 = 4 × 3."
+      },
+      "media": {},
+      "estimatedMinutes": 2
+    },
+    {
+      "id": "step-9-reflect",
+      "stepType": "reflect",
+      "title": "Think About Your Learning 🪞",
+      "studentText": "",
+      "owlText": "What did you learn about writing multiplication sentences using the × sign today? Can you explain it to someone?",
+      "interaction": {
+        "type": "open_response",
+        "prompt": "Tell or write: What did you learn about writing multiplication sentences using the × sign today?",
+        "hint": "Think about the key ideas and what you can do now."
+      },
+      "reflectionOptions": [
+        "I learned something new about writing multiplication sentences using the × sign!",
+        "I can explain writing multiplication sentences using the × sign to someone else now",
+        "I need more practice, but I understand the basics",
+        "This was fun and I want to learn more!"
+      ],
+      "media": {},
+      "estimatedMinutes": 2
+    },
+    {
+      "id": "step-10-complete",
+      "stepType": "complete",
+      "title": "You Did It! 🏆",
+      "studentText": "",
+      "owlText": "Amazing work! Today you learned about writing multiplication sentences using the × sign. You can now write multiplication sentences using the × sign. Keep practising and you will be a Math champion! 🌟",
+      "interaction": {
+        "type": "none"
+      },
+      "media": {
+        "illustration": {
+          "altText": "Completion celebration for Writing Multiplication Sentences Using the × Sign",
+          "prompt": "A joyful celebration illustration with an owl teacher and happy students, confetti and stars, bright golden colors, achievement theme for completing writing multiplication sentences using the × sign"
+        }
+      },
+      "estimatedMinutes": 1
+    }
+  ],
+  "metadata": {
+    "generator": "batch-50-generator",
+    "sourcePack": "curriculum-source-packs/grade-2/math/math-topic-guides.md",
+    "concept": "multiplication_sentences",
+    "contaminationCheck": "PASSED",
+    "createdAt": "2026-06-21"
+  }
+}

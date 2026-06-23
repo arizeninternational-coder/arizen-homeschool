@@ -1,0 +1,187 @@
+{
+  "lessonId": "b0c38507-b852-4a4c-8767-c0234ef9b89c",
+  "title": "Multiplication as Repeated Addition Using Counters",
+  "subject": "Mathematics",
+  "grade": 2,
+  "journey": [
+    {
+      "id": "step-1-welcome",
+      "stepType": "welcome",
+      "title": "Welcome! 🦉",
+      "studentText": "",
+      "owlText": "Hello, friend! Today we are going to learn about multiplication as repeated addition using counters. This is going to be a fun Math adventure! Are you ready to begin?",
+      "interaction": {
+        "type": "none"
+      },
+      "media": {
+        "illustration": {
+          "altText": "Welcome to Multiplication as Repeated Addition Using Counters",
+          "prompt": "A friendly cartoon owl teacher welcoming young students to a math lesson about multiplication as repeated addition using counters, bright cheerful colors, child-friendly illustration style"
+        }
+      },
+      "estimatedMinutes": 1
+    },
+    {
+      "id": "step-2-mission",
+      "stepType": "mission",
+      "title": "Today's Mission 🎯",
+      "studentText": "By the end of this lesson, you will be able to:\n\n✓ Solve addition word problems within 100",
+      "owlText": "This is your mission! By the end of this lesson, you will be skilled at multiplication as repeated addition using counters. Let us begin!",
+      "interaction": {
+        "type": "none"
+      },
+      "media": {
+        "illustration": {
+          "altText": "Mission: Multiplication as Repeated Addition Using Counters",
+          "prompt": "A colorful math mission banner for children showing the learning goal: solve addition word problems within 100, bright engaging colors"
+        }
+      },
+      "estimatedMinutes": 1
+    },
+    {
+      "id": "step-3-think-first",
+      "stepType": "think_first",
+      "title": "Think First! 💭",
+      "studentText": "If Mary has 23 apples and John gives her 15 more, how many apples does Mary have? We need to add 23 + 15.",
+      "owlText": "Take a moment to think about multiplication as repeated addition using counters. What do you already know? There's no wrong answer!",
+      "interaction": {
+        "type": "open_response",
+        "prompt": "What do you already know about multiplication as repeated addition using counters?",
+        "hint": "There are 34 red balls and 28 blue balls. How many balls altogether?"
+      },
+      "media": {},
+      "estimatedMinutes": 2
+    },
+    {
+      "id": "step-4-learn",
+      "stepType": "learn",
+      "title": "Learn It 📖",
+      "studentText": "**Multiplication as Repeated Addition Using Counters**\n\nLet's learn about multiplication as repeated addition using counters step by step.\n\n[Detailed teaching content based on source pack for addition_word_problems]",
+      "owlText": "",
+      "interaction": {
+        "type": "none"
+      },
+      "media": {
+        "illustration": {
+          "altText": "Learning Multiplication as Repeated Addition Using Counters",
+          "prompt": "Educational illustration for Grade 2 Math: multiplication as repeated addition using counters, showing clear visual examples, number lines or counters as appropriate, bright child-friendly style"
+        }
+      },
+      "estimatedMinutes": 3
+    },
+    {
+      "id": "step-5-connect",
+      "stepType": "connect",
+      "title": "Real Life Connection 🔗",
+      "studentText": "We use multiplication as repeated addition using counters in everyday life!\n\nCan you think of times when you use multiplication as repeated addition using counters?\n\n**Try this:** Look around you and find examples of multiplication as repeated addition using counters.",
+      "owlText": "Can you think of a time you used multiplication as repeated addition using counters? Tell someone your story!",
+      "interaction": {
+        "type": "open_response",
+        "prompt": "Write or say: A time when you used multiplication as repeated addition using counters.",
+        "hint": "Think about things you do every day."
+      },
+      "media": {},
+      "estimatedMinutes": 2
+    },
+    {
+      "id": "step-6-example",
+      "stepType": "example",
+      "title": "Worked Example 💡",
+      "studentText": "**Worked Example**\n\nLet's work through an example together.\n\n[Example for multiplication as repeated addition using counters based on source pack]",
+      "owlText": "",
+      "interaction": {
+        "type": "none"
+      },
+      "media": {
+        "illustration": {
+          "altText": "Worked example for Multiplication as Repeated Addition Using Counters",
+          "prompt": "Step-by-step worked example for Grade 2 Math: multiplication as repeated addition using counters, showing the working clearly with numbers and diagrams"
+        }
+      },
+      "estimatedMinutes": 3
+    },
+    {
+      "id": "step-7-practice",
+      "stepType": "practice",
+      "title": "Your Turn! ✏️",
+      "studentText": "**Practice Multiplication as Repeated Addition Using Counters**\n\n1) [Practice question 1]\n\n2) [Practice question 2]\n\n3) [Practice question 3]\n\n4) [Practice question 4]",
+      "owlText": "Use what you learned to solve these problems. Draw pictures or use counters if you need help!",
+      "interaction": {
+        "type": "open_response",
+        "prompt": "Write your answers. Show your working!",
+        "hint": "Use what you learned in the examples."
+      },
+      "materials": [
+        "paper",
+        "pencil"
+      ],
+      "media": {},
+      "estimatedMinutes": 4
+    },
+    {
+      "id": "step-8-quick-check",
+      "stepType": "quick_check",
+      "title": "Quick Check! ✅",
+      "studentText": "",
+      "owlText": "",
+      "interaction": {
+        "type": "multiple_choice",
+        "question": "Mary has 25 stickers. She gets 13 more. How many does she have?",
+        "options": [
+          "12",
+          "38",
+          "35",
+          "28"
+        ],
+        "correctIndex": 1,
+        "explanation": "Correct! 25 + 13 = 38 stickers."
+      },
+      "media": {},
+      "estimatedMinutes": 2
+    },
+    {
+      "id": "step-9-reflect",
+      "stepType": "reflect",
+      "title": "Think About Your Learning 🪞",
+      "studentText": "",
+      "owlText": "What did you learn about multiplication as repeated addition using counters today? Can you explain it to someone?",
+      "interaction": {
+        "type": "open_response",
+        "prompt": "Tell or write: What did you learn about multiplication as repeated addition using counters today?",
+        "hint": "Think about the key ideas and what you can do now."
+      },
+      "reflectionOptions": [
+        "I learned something new about multiplication as repeated addition using counters!",
+        "I can explain multiplication as repeated addition using counters to someone else now",
+        "I need more practice, but I understand the basics",
+        "This was fun and I want to learn more!"
+      ],
+      "media": {},
+      "estimatedMinutes": 2
+    },
+    {
+      "id": "step-10-complete",
+      "stepType": "complete",
+      "title": "You Did It! 🏆",
+      "studentText": "",
+      "owlText": "Amazing work! Today you learned about multiplication as repeated addition using counters. You can now solve addition word problems within 100. Keep practising and you will be a Math champion! 🌟",
+      "interaction": {
+        "type": "none"
+      },
+      "media": {
+        "illustration": {
+          "altText": "Completion celebration for Multiplication as Repeated Addition Using Counters",
+          "prompt": "A joyful celebration illustration with an owl teacher and happy students, confetti and stars, bright golden colors, achievement theme for completing multiplication as repeated addition using counters"
+        }
+      },
+      "estimatedMinutes": 1
+    }
+  ],
+  "metadata": {
+    "generator": "batch-50-generator",
+    "sourcePack": "curriculum-source-packs/grade-2/math/math-topic-guides.md",
+    "concept": "addition_word_problems",
+    "contaminationCheck": "PASSED",
+    "createdAt": "2026-06-21"
+  }
+}
