@@ -55,8 +55,12 @@ interface TapContinueProps {
   feedback?: FeedbackSpec;
 }
 
-export function TapContinue({ prompt, onContinue, feedback }: TapContinueProps) {
+export function TapContinue({ prompt, onContinue, feedback, buttonLabel }: TapContinueProps) {
   const [tapped, setTapped] = useState(false);
+
+  // Use provided buttonLabel or sensible defaults
+  const defaultLabel = buttonLabel || "Continue";
+  const tappedLabel = buttonLabel ? `✓ ${buttonLabel}` : "✓ Let's go!";
 
   return (
     <div className="mt-4 space-y-3">
@@ -70,7 +74,7 @@ export function TapContinue({ prompt, onContinue, feedback }: TapContinueProps) 
         }}
         className="w-full px-5 py-3 rounded-xl bg-indigo-500 text-white font-bold text-sm hover:bg-indigo-600 transition-colors shadow-md shadow-indigo-100"
       >
-        {tapped ? "✓ Let's go!" : "Tap to continue →"}
+        {tapped ? tappedLabel : defaultLabel}
       </button>
       {tapped && feedback?.correct && (
         <FeedbackDisplay feedback={feedback} state="correct" />

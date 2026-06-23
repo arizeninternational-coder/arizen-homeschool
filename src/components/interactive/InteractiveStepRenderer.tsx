@@ -322,6 +322,7 @@ export function InteractiveStepRenderer({
           prompt={spec.prompt}
           onContinue={onNext}
           feedback={feedback}
+          buttonLabel={spec.buttonLabel}
         />
       );
     }
@@ -485,18 +486,20 @@ export function InteractiveStepRenderer({
   if (hasNewSpec) {
     return (
       <div className={`space-y-4 ${className}`}>
-        {(step.studentInstruction || step.content) && (
-          <div className="prose prose-sm max-w-none">
-            {(step.studentInstruction || step.content || "")
-              .split("\n")
-              .filter((line) => line.trim())
-              .map((line, i) => (
-                <p key={i} className="text-slate-700 leading-relaxed mb-2 last:mb-0">
-                  {line}
-                </p>
+        {/* Render studentInstruction/content only if it differs from interactionSpec.prompt */}
+        {(() => {
+          const instruction = step.studentInstruction || step.content || '';
+          const prompt = step.interactionSpec?.prompt || '';
+          // Don't duplicate: if instruction and prompt are the same, skip instruction
+          const showInstruction = instruction.trim() && instruction.trim() !== prompt.trim();
+          return showInstruction ? (
+            <div className="prose prose-sm max-w-none">
+              {instruction.split('\n').filter(l => l.trim()).map((line, i) => (
+                <p key={i} className="text-slate-700 leading-relaxed mb-2 last:mb-0">{line}</p>
               ))}
-          </div>
-        )}
+            </div>
+          ) : null;
+        })()}
 
         {renderVisualSpec()}
         {renderMediaSpecVideo()}
