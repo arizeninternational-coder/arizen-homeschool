@@ -9,6 +9,7 @@ const publicPaths = [
   "/",
   "/auth/login",
   "/auth/register",
+  "/preview",
 ];
 
 // Role-based path prefixes
