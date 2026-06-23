@@ -9,5 +9,13 @@ export {
   FeedbackDisplay,
 } from "./InteractionRenderers";
 export { MediaSpecVideo } from "./MediaSpecVideo";
+export {
+  TapRegion,
+  ShadeShape,
+  MultiActivity,
+  RealLifeFraction,
+  RecapChecklist,
+  RewardAnimation,
+} from "./AdvancedRenderers";
 export { InteractiveStepRenderer } from "./InteractiveStepRenderer";
 export type { ExtendedJourneyStep } from "./InteractiveStepRenderer";

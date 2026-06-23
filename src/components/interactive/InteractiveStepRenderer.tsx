@@ -11,6 +11,14 @@ import {
   ReflectionChips,
 } from "./InteractionRenderers";
 import { MediaSpecVideo } from "./MediaSpecVideo";
+import {
+  TapRegion,
+  ShadeShape,
+  MultiActivity,
+  RealLifeFraction,
+  RecapChecklist,
+  RewardAnimation,
+} from "./AdvancedRenderers";
 
 // -- Extended Journey Step Type -----------------------------------------------
 
@@ -56,6 +64,7 @@ export interface ExtendedJourneyStep {
     reviewStatus?: string;
     suggestedVideoSearch?: string;
     source?: string;
+    name?: string;
   };
   visualSpec?: {
     type?: string;
@@ -65,6 +74,10 @@ export interface ExtendedJourneyStep {
     showLabels?: boolean;
     labels?: string[];
     orientation?: string;
+    object?: string;
+    highlightPart?: number;
+    label?: string;
+    items?: string[];
     steps?: Array<{
       title: string;
       description?: string;
@@ -76,6 +89,8 @@ export interface ExtendedJourneyStep {
       description?: string;
       visual?: any;
     }>;
+    icon?: string;
+    sentenceStarter?: string;
   };
   interactionSpec?: {
     type?: string;
@@ -99,6 +114,22 @@ export interface ExtendedJourneyStep {
     correctPlacements?: any[];
     shape?: any;
     requiredShadedParts?: number;
+    activities?: Array<{
+      id: string;
+      type: string;
+      prompt?: string;
+      question?: string;
+      choices?: string[];
+      options?: string[];
+      correctChoiceId?: string;
+      correctIndex?: number;
+      correctAnswer?: number | string;
+      hint?: string;
+      shape?: any;
+      requiredShadedParts?: number;
+      expectedIdea?: string;
+      keywords?: string[];
+    }>;
   };
   feedbackSpec?: {
     correct?: string;
@@ -119,6 +150,42 @@ interface InteractiveStepRendererProps {
   setInteraction: (v: any) => void;
   onNext: () => void;
   className?: string;
+}
+
+// -- Visual Spec Interpreter (renders data objects as React components) -------
+
+function renderVisualElement(visual: any): React.ReactNode {
+  if (!visual || typeof visual !== "object") return null;
+
+  if (visual.type === "fraction_circle") {
+    return (
+      <FractionCircle
+        parts={visual.parts || 1}
+        shadedParts={visual.shadedParts || 0}
+        equalParts={visual.equalParts !== false}
+        showLabels={visual.showLabels !== false}
+        labels={visual.labels}
+        size={120}
+      />
+    );
+  }
+
+  if (visual.type === "fraction_rectangle") {
+    return (
+      <FractionRectangle
+        parts={visual.parts || 1}
+        shadedParts={visual.shadedParts || 0}
+        equalParts={visual.equalParts !== false}
+        orientation={visual.orientation || "vertical"}
+        showLabels={visual.showLabels !== false}
+        labels={visual.labels}
+        width={140}
+        height={90}
+      />
+    );
+  }
+
+  return null;
 }
 
 // -- Main Renderer ------------------------------------------------------------
@@ -176,7 +243,7 @@ export function InteractiveStepRenderer({
       const revealSteps = (vs.steps || []).map((s) => ({
         title: s.title,
         description: s.description,
-        visual: s.visual,
+        visual: renderVisualElement(s.visual),
       }));
       return (
         <StepReveal
@@ -191,7 +258,7 @@ export function InteractiveStepRenderer({
         id: c.id,
         label: c.label,
         description: c.description,
-        visual: c.visual,
+        visual: renderVisualElement(c.visual),
       }));
       return (
         <ChoiceGrid
@@ -203,6 +270,40 @@ export function InteractiveStepRenderer({
           columns={Math.min(choices.length, 3)}
         />
       );
+    }
+
+    if (vs.type === "real_life_fraction") {
+      return (
+        <RealLifeFraction
+          object={vs.object || "shape"}
+          parts={vs.parts || 2}
+          equalParts={vs.equalParts !== false}
+          highlightPart={vs.highlightPart || 1}
+          label={vs.label}
+        />
+      );
+    }
+
+    if (vs.type === "checklist" || vs.type === "recap_checklist") {
+      return <RecapChecklist items={vs.items || []} />;
+    }
+
+    if (vs.type === "reflection_card") {
+      return (
+        <div className="flex flex-col items-center gap-2 my-4">
+          {vs.sentenceStarter && (
+            <p className="text-sm text-slate-500 italic">{vs.sentenceStarter}</p>
+          )}
+        </div>
+      );
+    }
+
+    if (vs.type === "reward_animation") {
+      return null; // Rendered separately after interactionSpec
+    }
+
+    if (vs.type === "practice_set") {
+      return null; // Handled by multi_activity interaction
     }
 
     return null;
@@ -234,7 +335,7 @@ export function InteractiveStepRenderer({
             id: typeof c === "string" ? String(i) : c.id || String(i),
             label: typeof c === "string" ? String.fromCharCode(65 + i) : c.label || String.fromCharCode(65 + i),
             description: typeof c === "string" ? c : c.description,
-            visual: typeof c === "object" ? c.visual : undefined,
+            visual: typeof c === "object" ? renderVisualElement(c.visual) : undefined,
           }))}
           correctChoiceId={spec.correctChoiceId}
           onSelect={(choiceId) => {
@@ -288,6 +389,82 @@ export function InteractiveStepRenderer({
       );
     }
 
+    if (spec.type === "tap_region") {
+      return (
+        <TapRegion
+          visualSpec={step.visualSpec || { type: "fraction_circle", parts: 2, equalParts: true }}
+          correctRegion={spec.correctRegion || "part_1"}
+          prompt={spec.prompt}
+          feedback={feedback}
+          onAnswer={(correct) => {
+            setInteraction((p: any) => ({
+              ...p,
+              tapRegionSubmitted: true,
+              tapRegionCorrect: correct,
+            }));
+          }}
+        />
+      );
+    }
+
+    if (spec.type === "shade_shape") {
+      return (
+        <ShadeShape
+          shape={spec.shape || { type: "fraction_circle", parts: 2, equalParts: true }}
+          requiredShadedParts={spec.requiredShadedParts || 1}
+          prompt={spec.prompt}
+          feedback={feedback}
+          onAnswer={(correct) => {
+            setInteraction((p: any) => ({
+              ...p,
+              shadeSubmitted: true,
+              shadeCorrect: correct,
+            }));
+          }}
+        />
+      );
+    }
+
+    if (spec.type === "multi_activity") {
+      return (
+        <MultiActivity
+          activities={spec.activities || []}
+          feedback={feedback}
+          onComplete={() => {
+            setInteraction((p: any) => ({ ...p, multiActivityComplete: true }));
+          }}
+        />
+      );
+    }
+
+    if (spec.type === "step_reveal") {
+      // step_reveal interaction is handled by the visual spec renderer
+      // but we show feedback at the end
+      return (
+        <div className="mt-3">
+          {feedback.hint && (
+            <p className="text-xs text-amber-600 font-semibold text-center">
+              💡 {feedback.hint}
+            </p>
+          )}
+        </div>
+      );
+    }
+
+    return null;
+  };
+
+  // -- Render reward (after interaction) -------------------------------------
+
+  const renderReward = () => {
+    if (step.visualSpec?.type === "reward_animation" || step.rewardText) {
+      return (
+        <RewardAnimation
+          rewardText={step.rewardText}
+          badgeName={step.mediaSpec?.name}
+        />
+      );
+    }
     return null;
   };
 
@@ -324,6 +501,7 @@ export function InteractiveStepRenderer({
         {renderVisualSpec()}
         {renderMediaSpecVideo()}
         {renderInteractionSpec()}
+        {renderReward()}
 
         {!step.interactionSpec && step.interaction && (
           <LegacyInteractionRenderer
@@ -405,7 +583,6 @@ function LegacyInteractionRenderer({
 }) {
   if (!step.interaction && step.stepType !== "reflect") return null;
 
-  // Think first
   if (step.stepType === "think_first" && step.interaction?.question) {
     return (
       <div className="mt-4 px-5 py-4 rounded-xl bg-amber-50/80 border border-amber-200/60">
@@ -430,7 +607,6 @@ function LegacyInteractionRenderer({
     );
   }
 
-  // Practice
   if (step.stepType === "practice") {
     return (
       <div className="mt-4 px-5 py-4 rounded-xl bg-sky-50/80 border border-sky-200/60">
@@ -448,7 +624,6 @@ function LegacyInteractionRenderer({
     );
   }
 
-  // Quick check — multiple choice
   if (
     step.stepType === "quick_check" &&
     step.interaction?.type === "multiple_choice" &&
@@ -509,7 +684,6 @@ function LegacyInteractionRenderer({
     );
   }
 
-  // Self check
   if (
     step.stepType === "quick_check" &&
     step.interaction?.type === "self_check" &&
@@ -547,7 +721,6 @@ function LegacyInteractionRenderer({
     );
   }
 
-  // Reflection
   if (step.stepType === "reflect") {
     return (
       <div className="mt-4 px-5 py-4 rounded-xl bg-rose-50/80 border border-rose-200/60">
