@@ -1,0 +1,292 @@
+{
+  "id": "17d7857a-a622-4b09-8524-db7be78977f8",
+  "title": "Subtracting 2-Digit Numbers Without Regrouping (Vertical)",
+  "status": "PUBLISHED",
+  "isAvailable": true,
+  "updatedAt": "2026-06-10T08:15:42.494+00:00",
+  "live_steps_before": 0,
+  "draft_steps_before": 10,
+  "contentBlocks": {
+    "importSource": "csv",
+    "curriculum": {
+      "version": "",
+      "country": "Kenya",
+      "system": "CBC",
+      "grade": "2",
+      "term": "Term 2",
+      "week": "Week 1",
+      "subject": "Mathematics",
+      "strand": "Numbers",
+      "subStrand": "1.5 Subtraction",
+      "specificLearningOutcome": "",
+      "keyInquiryQuestion": "How do you work out missing numbers in patterns involving subtraction?",
+      "suggestedLearningExperience": "Learners in pairs/groups to subtract single digit numbers by comparing groups of objects. Learners to subtract up to 2-digit numbers without regrouping in horizontal and vertical forms. Learners to discuss the relationship between addition and subtraction using number families. Learners to work out missing numbers in subtraction of up to 2-digit numbers. Learners to play digital games involving subtraction. Learners to work out missing numbers in patterns involving subtraction.",
+      "coreCompetencies": [
+        "Communication and Collaboration",
+        "Critical Thinking and Problem Solving",
+        "Self-efficacy",
+        "Imagination and Creativity",
+        "Digital Literacy"
+      ],
+      "values": [
+        "Respect",
+        "Unity",
+        "Responsibility"
+      ],
+      "pertinentAndContemporaryIssues": [
+        "Life skills: interpersonal relationship",
+        "effective communication",
+        "friendship formation; Citizenship: social cohesion"
+      ],
+      "learningResources": [],
+      "parentalEngagement": ""
+    },
+    "lessonShell": {
+      "activityTitle": "Activity: Subtracting 2-Digit Numbers Without Regrouping (Vertical)",
+      "activityInstructions": "Learners in pairs/groups to subtract single digit numbers by comparing groups of objects. Learners to subtract up to 2-digit numbers without regrouping in horizontal and vertical forms. Learners to discuss the relationship between addition and subtraction using number families. Learners to work out missing numbers in subtraction of up to 2-digit numbers. Learners to play digital games involving subtraction. Learners to work out missing numbers in patterns involving subtraction.",
+      "assessmentMethod": "",
+      "assessmentCriteria": "",
+      "questTitle": "1.5 Subtraction Quest",
+      "questInstructions": "Explore 1.5 subtraction through interactive activities, hands-on practice, and real-life application.",
+      "reflectionPrompt": "What did you learn about subtracting 2-digit numbers without regrouping (vertical) today? How can you use this in your daily life?",
+      "offlineActivity": ""
+    },
+    "rewards": {
+      "xp": 0,
+      "coins": 10
+    },
+    "video": {
+      "searchKeywords": "",
+      "required": false
+    },
+    "source": {
+      "reference": "",
+      "reviewStatus": "DRAFT"
+    },
+    "lessonOrder": "",
+    "illustrationNotes": "",
+    "grade": "2",
+    "subject": "Mathematics",
+    "strand": "Numbers",
+    "subStrand": "1.5 Subtraction",
+    "term": "Term 2",
+    "week": "Week 1",
+    "learningOutcome": "By the end of the lesson, the learner should be able to: work out missing numbers in patterns involving subtraction up to 100",
+    "specificLearningOutcome": "",
+    "keyInquiryQuestion": "How do you work out missing numbers in patterns involving subtraction?",
+    "suggestedLearningExperience": "Learners in pairs/groups to subtract single digit numbers by comparing groups of objects. Learners to subtract up to 2-digit numbers without regrouping in horizontal and vertical forms. Learners to discuss the relationship between addition and subtraction using number families. Learners to work out missing numbers in subtraction of up to 2-digit numbers. Learners to play digital games involving subtraction. Learners to work out missing numbers in patterns involving subtraction.",
+    "assessmentMethod": "",
+    "assessmentCriteria": "",
+    "learningResources": "",
+    "coreCompetencies": "Communication and Collaboration, Critical Thinking and Problem Solving, Self-efficacy, Imagination and Creativity, Digital Literacy",
+    "values": "Respect, Unity, Responsibility",
+    "parentalEngagement": "",
+    "activityTitle": "Activity: Subtracting 2-Digit Numbers Without Regrouping (Vertical)",
+    "activityInstructions": "Learners in pairs/groups to subtract single digit numbers by comparing groups of objects. Learners to subtract up to 2-digit numbers without regrouping in horizontal and vertical forms. Learners to discuss the relationship between addition and subtraction using number families. Learners to work out missing numbers in subtraction of up to 2-digit numbers. Learners to play digital games involving subtraction. Learners to work out missing numbers in patterns involving subtraction.",
+    "questTitle": "1.5 Subtraction Quest",
+    "questInstructions": "Explore 1.5 subtraction through interactive activities, hands-on practice, and real-life application.",
+    "reflectionPrompt": "What did you learn about subtracting 2-digit numbers without regrouping (vertical) today? How can you use this in your daily life?",
+    "rewardCoins": "10",
+    "rewardStars": "1",
+    "rewardXp": "0",
+    "estimatedDuration": "30",
+    "difficulty": "medium",
+    "videoSearchKeywords": "",
+    "sourceReference": "",
+    "completenessScore": 70,
+    "aiMetadata": {
+      "model": "structured-template-v3",
+      "promptVersion": "batch-3-comprehensive",
+      "generatedAt": "2026-06-13T03:52:28.941Z",
+      "reviewStatus": "APPROVED",
+      "batchId": "g2-math-hq-1781322732668",
+      "approvedAt": "2026-06-10T08:15:42.492Z",
+      "publishedAt": "2026-06-11T09:53:53.563Z",
+      "publishedBy": "batch-publish-math-v1",
+      "engineVersion": "v3-fix",
+      "validated": true,
+      "cleared": false,
+      "clearedAt": "2026-06-12T22:25:10.043Z",
+      "note": "Cleared incorrect English content. Needs subject-specific regeneration.",
+      "topic": "subtraction",
+      "videoId": "gBXbs6lVRuo",
+      "generator": "math-journey-generator-v1"
+    },
+    "studentJourney": [],
+    "isAvailable": false,
+    "studentJourneyDraft": [
+      {
+        "id": "step-1-welcome",
+        "stepType": "welcome",
+        "title": "Welcome! 🦉",
+        "studentText": "",
+        "owlText": "Hello, friend! Today we are going to learn about subtracting 2-digit numbers without regrouping (vertical). This is going to be a fun Math adventure! Are you ready to begin?",
+        "interaction": {
+          "type": "none"
+        },
+        "media": {
+          "illustration": {
+            "altText": "Welcome to Subtracting 2-Digit Numbers Without Regrouping (Vertical)",
+            "prompt": "A friendly cartoon owl teacher welcoming young students to a math lesson about subtracting 2-digit numbers without regrouping (vertical), bright cheerful colors, child-friendly illustration style"
+          }
+        },
+        "estimatedMinutes": 1
+      },
+      {
+        "id": "step-2-mission",
+        "stepType": "mission",
+        "title": "Today's Mission 🎯",
+        "studentText": "By the end of this lesson, you will be able to:\n\n✓ Add two 2-digit numbers with and without regrouping",
+        "owlText": "This is your mission! By the end of this lesson, you will be skilled at subtracting 2-digit numbers without regrouping (vertical). Let us begin!",
+        "interaction": {
+          "type": "none"
+        },
+        "media": {
+          "illustration": {
+            "altText": "Mission: Subtracting 2-Digit Numbers Without Regrouping (Vertical)",
+            "prompt": "A colorful math mission banner for children showing the learning goal: add two 2-digit numbers with and without regrouping, bright engaging colors"
+          }
+        },
+        "estimatedMinutes": 1
+      },
+      {
+        "id": "step-3-think-first",
+        "stepType": "think_first",
+        "title": "Think First! 💭",
+        "studentText": "When we add 38 + 25, we first add the ones: 8 + 5 = 13. That's 1 ten and 3 ones. We carry the 1 ten!",
+        "owlText": "Take a moment to think about subtracting 2-digit numbers without regrouping (vertical). What do you already know? There's no wrong answer!",
+        "interaction": {
+          "type": "open_response",
+          "prompt": "What do you already know about subtracting 2-digit numbers without regrouping (vertical)?",
+          "hint": "What is 47 + 36?"
+        },
+        "media": {},
+        "estimatedMinutes": 2
+      },
+      {
+        "id": "step-4-learn",
+        "stepType": "learn",
+        "title": "Learn It 📖",
+        "studentText": "**Subtracting 2-Digit Numbers Without Regrouping (Vertical)**\n\nLet's learn about subtracting 2-digit numbers without regrouping (vertical) step by step.\n\n[Detailed teaching content based on source pack for addition_regrouping]",
+        "owlText": "",
+        "interaction": {
+          "type": "none"
+        },
+        "media": {
+          "illustration": {
+            "altText": "Learning Subtracting 2-Digit Numbers Without Regrouping (Vertical)",
+            "prompt": "Educational illustration for Grade 2 Math: subtracting 2-digit numbers without regrouping (vertical), showing clear visual examples, number lines or counters as appropriate, bright child-friendly style"
+          }
+        },
+        "estimatedMinutes": 3
+      },
+      {
+        "id": "step-5-connect",
+        "stepType": "connect",
+        "title": "Real Life Connection 🔗",
+        "studentText": "We use subtracting 2-digit numbers without regrouping (vertical) in everyday life!\n\nCan you think of times when you use subtracting 2-digit numbers without regrouping (vertical)?\n\n**Try this:** Look around you and find examples of subtracting 2-digit numbers without regrouping (vertical).",
+        "owlText": "Can you think of a time you used subtracting 2-digit numbers without regrouping (vertical)? Tell someone your story!",
+        "interaction": {
+          "type": "open_response",
+          "prompt": "Write or say: A time when you used subtracting 2-digit numbers without regrouping (vertical).",
+          "hint": "Think about things you do every day."
+        },
+        "media": {},
+        "estimatedMinutes": 2
+      },
+      {
+        "id": "step-6-example",
+        "stepType": "example",
+        "title": "Worked Example 💡",
+        "studentText": "**Worked Example**\n\nLet's work through an example together.\n\n[Example for subtracting 2-digit numbers without regrouping (vertical) based on source pack]",
+        "owlText": "",
+        "interaction": {
+          "type": "none"
+        },
+        "media": {
+          "illustration": {
+            "altText": "Worked example for Subtracting 2-Digit Numbers Without Regrouping (Vertical)",
+            "prompt": "Step-by-step worked example for Grade 2 Math: subtracting 2-digit numbers without regrouping (vertical), showing the working clearly with numbers and diagrams"
+          }
+        },
+        "estimatedMinutes": 3
+      },
+      {
+        "id": "step-7-practice",
+        "stepType": "practice",
+        "title": "Your Turn! ✏️",
+        "studentText": "**Practice Subtracting 2-Digit Numbers Without Regrouping (Vertical)**\n\n1) [Practice question 1]\n\n2) [Practice question 2]\n\n3) [Practice question 3]\n\n4) [Practice question 4]",
+        "owlText": "Use what you learned to solve these problems. Draw pictures or use counters if you need help!",
+        "interaction": {
+          "type": "open_response",
+          "prompt": "Write your answers. Show your working!",
+          "hint": "Use what you learned in the examples."
+        },
+        "materials": [
+          "paper",
+          "pencil"
+        ],
+        "media": {},
+        "estimatedMinutes": 4
+      },
+      {
+        "id": "step-8-quick-check",
+        "stepType": "quick_check",
+        "title": "Quick Check! ✅",
+        "studentText": "",
+        "owlText": "",
+        "interaction": {
+          "type": "multiple_choice",
+          "question": "What is 47 + 28?",
+          "options": [
+            "65",
+            "75",
+            "73",
+            "615"
+          ],
+          "correctIndex": 1,
+          "explanation": "Correct! 47 + 28 = 75."
+        },
+        "media": {},
+        "estimatedMinutes": 2
+      },
+      {
+        "id": "step-9-reflect",
+        "stepType": "reflect",
+        "title": "Think About Your Learning 🪞",
+        "studentText": "",
+        "owlText": "What did you learn about subtracting 2-digit numbers without regrouping (vertical) today? Can you explain it to someone?",
+        "interaction": {
+          "type": "open_response",
+          "prompt": "Tell or write: What did you learn about subtracting 2-digit numbers without regrouping (vertical) today?",
+          "hint": "Think about the key ideas and what you can do now."
+        },
+        "reflectionOptions": [
+          "I learned something new about subtracting 2-digit numbers without regrouping (vertical)!",
+          "I can explain subtracting 2-digit numbers without regrouping (vertical) to someone else now",
+          "I need more practice, but I understand the basics",
+          "This was fun and I want to learn more!"
+        ],
+        "media": {},
+        "estimatedMinutes": 2
+      },
+      {
+        "id": "step-10-complete",
+        "stepType": "complete",
+        "title": "You Did It! 🏆",
+        "studentText": "",
+        "owlText": "Amazing work! Today you learned about subtracting 2-digit numbers without regrouping (vertical). You can now add two 2-digit numbers with and without regrouping. Keep practising and you will be a Math champion! 🌟",
+        "interaction": {
+          "type": "none"
+        },
+        "media": {
+          "illustration": {
+            "altText": "Completion celebration for Subtracting 2-Digit Numbers Without Regrouping (Vertical)",
+            "prompt": "A joyful celebration illustration with an owl teacher and happy students, confetti and stars, bright golden colors, achievement theme for completing subtracting 2-digit numbers without regrouping (vertical)"
+          }
+        },
+        "estimatedMinutes": 1
+      }
+    ]
+  }
+}

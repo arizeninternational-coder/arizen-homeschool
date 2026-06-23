@@ -1,0 +1,288 @@
+{
+  "id": "981b27eb-9d0d-4450-9bed-e76f1ba54c96",
+  "title": "Adding Two 2-Digit Numbers Without Regrouping",
+  "status": "PUBLISHED",
+  "isAvailable": true,
+  "updatedAt": "2026-06-10T08:15:23.53+00:00",
+  "live_steps_before": 0,
+  "draft_steps_before": 10,
+  "contentBlocks": {
+    "importSource": "csv",
+    "curriculum": {
+      "version": "",
+      "country": "Kenya",
+      "system": "CBC",
+      "grade": "2",
+      "term": "Term 1",
+      "week": "Week 11",
+      "subject": "Mathematics",
+      "strand": "Numbers",
+      "subStrand": "1.4 Addition",
+      "specificLearningOutcome": "",
+      "keyInquiryQuestion": "How can we align a 2-digit number and a 1-digit number vertically in order to add? When do we regroup?",
+      "suggestedLearningExperience": "Learners in pairs to write addition sentences given in horizontal form vertically according to place value. Learners to add a 2-digit number to a 1-digit number without and with regrouping. Learners to practice addition by skipping on the number line. Learners in pairs/groups to collect different safe objects and use them in addition of 3-single digit numbers. Learners in pairs/groups to practice breaking numbers apart to make a 10. Learners in pairs to come up with different ways of adding two 2-digit numbers without and with regrouping. Learners to play digital games involving addition. Learners in groups to make patterns using numbers up to 100.",
+      "coreCompetencies": [
+        "Communication and Collaboration",
+        "Critical Thinking and Problem Solving",
+        "Digital Literacy"
+      ],
+      "values": [
+        "Respect",
+        "Responsibility",
+        "Unity"
+      ],
+      "pertinentAndContemporaryIssues": [
+        "ESD: DRR; safety - as learners collect objects; Citizenship: social cohesion - when working in groups"
+      ],
+      "learningResources": [],
+      "parentalEngagement": ""
+    },
+    "lessonShell": {
+      "activityTitle": "Activity: Adding Two 2-Digit Numbers Without Regrouping",
+      "activityInstructions": "Learners in pairs to write addition sentences given in horizontal form vertically according to place value. Learners to add a 2-digit number to a 1-digit number without and with regrouping. Learners to practice addition by skipping on the number line. Learners in pairs/groups to collect different safe objects and use them in addition of 3-single digit numbers. Learners in pairs/groups to practice breaking numbers apart to make a 10. Learners in pairs to come up with different ways of adding two",
+      "assessmentMethod": "",
+      "assessmentCriteria": "",
+      "questTitle": "1.4 Addition Quest",
+      "questInstructions": "Explore 1.4 addition through interactive activities, hands-on practice, and real-life application.",
+      "reflectionPrompt": "What did you learn about adding two 2-digit numbers without regrouping today? How can you use this in your daily life?",
+      "offlineActivity": ""
+    },
+    "rewards": {
+      "xp": 0,
+      "coins": 10
+    },
+    "video": {
+      "searchKeywords": "",
+      "required": false
+    },
+    "source": {
+      "reference": "",
+      "reviewStatus": "DRAFT"
+    },
+    "lessonOrder": "",
+    "illustrationNotes": "",
+    "grade": "2",
+    "subject": "Mathematics",
+    "strand": "Numbers",
+    "subStrand": "1.4 Addition",
+    "term": "Term 1",
+    "week": "Week 11",
+    "learningOutcome": "By the end of the lesson, the learner should be able to: work out missing numbers in patterns involving addition of whole numbers up to 100",
+    "specificLearningOutcome": "",
+    "keyInquiryQuestion": "How can we align a 2-digit number and a 1-digit number vertically in order to add? When do we regroup?",
+    "suggestedLearningExperience": "Learners in pairs to write addition sentences given in horizontal form vertically according to place value. Learners to add a 2-digit number to a 1-digit number without and with regrouping. Learners to practice addition by skipping on the number line. Learners in pairs/groups to collect different safe objects and use them in addition of 3-single digit numbers. Learners in pairs/groups to practice breaking numbers apart to make a 10. Learners in pairs to come up with different ways of adding two 2-digit numbers without and with regrouping. Learners to play digital games involving addition. Learners in groups to make patterns using numbers up to 100.",
+    "assessmentMethod": "",
+    "assessmentCriteria": "",
+    "learningResources": "",
+    "coreCompetencies": "Communication and Collaboration, Critical Thinking and Problem Solving, Digital Literacy",
+    "values": "Respect, Responsibility, Unity",
+    "parentalEngagement": "",
+    "activityTitle": "Activity: Adding Two 2-Digit Numbers Without Regrouping",
+    "activityInstructions": "Learners in pairs to write addition sentences given in horizontal form vertically according to place value. Learners to add a 2-digit number to a 1-digit number without and with regrouping. Learners to practice addition by skipping on the number line. Learners in pairs/groups to collect different safe objects and use them in addition of 3-single digit numbers. Learners in pairs/groups to practice breaking numbers apart to make a 10. Learners in pairs to come up with different ways of adding two",
+    "questTitle": "1.4 Addition Quest",
+    "questInstructions": "Explore 1.4 addition through interactive activities, hands-on practice, and real-life application.",
+    "reflectionPrompt": "What did you learn about adding two 2-digit numbers without regrouping today? How can you use this in your daily life?",
+    "rewardCoins": "10",
+    "rewardStars": "1",
+    "rewardXp": "0",
+    "estimatedDuration": "30",
+    "difficulty": "medium",
+    "videoSearchKeywords": "",
+    "sourceReference": "",
+    "completenessScore": 70,
+    "aiMetadata": {
+      "model": "structured-template-v2",
+      "promptVersion": "batch-2-standard",
+      "generatedAt": "2026-06-13T03:52:26.551Z",
+      "reviewStatus": "APPROVED",
+      "batchId": "g2-math-hq-1781322732668",
+      "approvedAt": "2026-06-10T08:15:23.530Z",
+      "publishedAt": "2026-06-11T09:53:34.682Z",
+      "publishedBy": "batch-publish-math-v1",
+      "engineVersion": "v3-fix",
+      "validated": true,
+      "cleared": false,
+      "clearedAt": "2026-06-12T22:24:48.233Z",
+      "note": "Cleared incorrect English content. Needs subject-specific regeneration.",
+      "topic": "addition",
+      "videoId": "pAtrNu8y6FQ",
+      "generator": "math-journey-generator-v1"
+    },
+    "studentJourney": [],
+    "isAvailable": false,
+    "studentJourneyDraft": [
+      {
+        "id": "step-1-welcome",
+        "stepType": "welcome",
+        "title": "Welcome! 🦉",
+        "studentText": "",
+        "owlText": "Hello, friend! Today we are going to learn about adding two 2-digit numbers without regrouping. This is going to be a fun Math adventure! Are you ready to begin?",
+        "interaction": {
+          "type": "none"
+        },
+        "media": {
+          "illustration": {
+            "altText": "Welcome to Adding Two 2-Digit Numbers Without Regrouping",
+            "prompt": "A friendly cartoon owl teacher welcoming young students to a math lesson about adding two 2-digit numbers without regrouping, bright cheerful colors, child-friendly illustration style"
+          }
+        },
+        "estimatedMinutes": 1
+      },
+      {
+        "id": "step-2-mission",
+        "stepType": "mission",
+        "title": "Today's Mission 🎯",
+        "studentText": "By the end of this lesson, you will be able to:\n\n✓ Add two 2-digit numbers with and without regrouping",
+        "owlText": "This is your mission! By the end of this lesson, you will be skilled at adding two 2-digit numbers without regrouping. Let us begin!",
+        "interaction": {
+          "type": "none"
+        },
+        "media": {
+          "illustration": {
+            "altText": "Mission: Adding Two 2-Digit Numbers Without Regrouping",
+            "prompt": "A colorful math mission banner for children showing the learning goal: add two 2-digit numbers with and without regrouping, bright engaging colors"
+          }
+        },
+        "estimatedMinutes": 1
+      },
+      {
+        "id": "step-3-think-first",
+        "stepType": "think_first",
+        "title": "Think First! 💭",
+        "studentText": "When we add 38 + 25, we first add the ones: 8 + 5 = 13. That's 1 ten and 3 ones. We carry the 1 ten!",
+        "owlText": "Take a moment to think about adding two 2-digit numbers without regrouping. What do you already know? There's no wrong answer!",
+        "interaction": {
+          "type": "open_response",
+          "prompt": "What do you already know about adding two 2-digit numbers without regrouping?",
+          "hint": "What is 47 + 36?"
+        },
+        "media": {},
+        "estimatedMinutes": 2
+      },
+      {
+        "id": "step-4-learn",
+        "stepType": "learn",
+        "title": "Learn It 📖",
+        "studentText": "**Adding Two 2-Digit Numbers Without Regrouping**\n\nLet's learn about adding two 2-digit numbers without regrouping step by step.\n\n[Detailed teaching content based on source pack for addition_regrouping]",
+        "owlText": "",
+        "interaction": {
+          "type": "none"
+        },
+        "media": {
+          "illustration": {
+            "altText": "Learning Adding Two 2-Digit Numbers Without Regrouping",
+            "prompt": "Educational illustration for Grade 2 Math: adding two 2-digit numbers without regrouping, showing clear visual examples, number lines or counters as appropriate, bright child-friendly style"
+          }
+        },
+        "estimatedMinutes": 3
+      },
+      {
+        "id": "step-5-connect",
+        "stepType": "connect",
+        "title": "Real Life Connection 🔗",
+        "studentText": "We use adding two 2-digit numbers without regrouping in everyday life!\n\nCan you think of times when you use adding two 2-digit numbers without regrouping?\n\n**Try this:** Look around you and find examples of adding two 2-digit numbers without regrouping.",
+        "owlText": "Can you think of a time you used adding two 2-digit numbers without regrouping? Tell someone your story!",
+        "interaction": {
+          "type": "open_response",
+          "prompt": "Write or say: A time when you used adding two 2-digit numbers without regrouping.",
+          "hint": "Think about things you do every day."
+        },
+        "media": {},
+        "estimatedMinutes": 2
+      },
+      {
+        "id": "step-6-example",
+        "stepType": "example",
+        "title": "Worked Example 💡",
+        "studentText": "**Worked Example**\n\nLet's work through an example together.\n\n[Example for adding two 2-digit numbers without regrouping based on source pack]",
+        "owlText": "",
+        "interaction": {
+          "type": "none"
+        },
+        "media": {
+          "illustration": {
+            "altText": "Worked example for Adding Two 2-Digit Numbers Without Regrouping",
+            "prompt": "Step-by-step worked example for Grade 2 Math: adding two 2-digit numbers without regrouping, showing the working clearly with numbers and diagrams"
+          }
+        },
+        "estimatedMinutes": 3
+      },
+      {
+        "id": "step-7-practice",
+        "stepType": "practice",
+        "title": "Your Turn! ✏️",
+        "studentText": "**Practice Adding Two 2-Digit Numbers Without Regrouping**\n\n1) [Practice question 1]\n\n2) [Practice question 2]\n\n3) [Practice question 3]\n\n4) [Practice question 4]",
+        "owlText": "Use what you learned to solve these problems. Draw pictures or use counters if you need help!",
+        "interaction": {
+          "type": "open_response",
+          "prompt": "Write your answers. Show your working!",
+          "hint": "Use what you learned in the examples."
+        },
+        "materials": [
+          "paper",
+          "pencil"
+        ],
+        "media": {},
+        "estimatedMinutes": 4
+      },
+      {
+        "id": "step-8-quick-check",
+        "stepType": "quick_check",
+        "title": "Quick Check! ✅",
+        "studentText": "",
+        "owlText": "",
+        "interaction": {
+          "type": "multiple_choice",
+          "question": "What is 47 + 28?",
+          "options": [
+            "65",
+            "75",
+            "73",
+            "615"
+          ],
+          "correctIndex": 1,
+          "explanation": "Correct! 47 + 28 = 75."
+        },
+        "media": {},
+        "estimatedMinutes": 2
+      },
+      {
+        "id": "step-9-reflect",
+        "stepType": "reflect",
+        "title": "Think About Your Learning 🪞",
+        "studentText": "",
+        "owlText": "What did you learn about adding two 2-digit numbers without regrouping today? Can you explain it to someone?",
+        "interaction": {
+          "type": "open_response",
+          "prompt": "Tell or write: What did you learn about adding two 2-digit numbers without regrouping today?",
+          "hint": "Think about the key ideas and what you can do now."
+        },
+        "reflectionOptions": [
+          "I learned something new about adding two 2-digit numbers without regrouping!",
+          "I can explain adding two 2-digit numbers without regrouping to someone else now",
+          "I need more practice, but I understand the basics",
+          "This was fun and I want to learn more!"
+        ],
+        "media": {},
+        "estimatedMinutes": 2
+      },
+      {
+        "id": "step-10-complete",
+        "stepType": "complete",
+        "title": "You Did It! 🏆",
+        "studentText": "",
+        "owlText": "Amazing work! Today you learned about adding two 2-digit numbers without regrouping. You can now add two 2-digit numbers with and without regrouping. Keep practising and you will be a Math champion! 🌟",
+        "interaction": {
+          "type": "none"
+        },
+        "media": {
+          "illustration": {
+            "altText": "Completion celebration for Adding Two 2-Digit Numbers Without Regrouping",
+            "prompt": "A joyful celebration illustration with an owl teacher and happy students, confetti and stars, bright golden colors, achievement theme for completing adding two 2-digit numbers without regrouping"
+          }
+        },
+        "estimatedMinutes": 1
+      }
+    ]
+  }
+}
