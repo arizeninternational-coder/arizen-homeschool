@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   ArrowLeft, ChevronRight, ChevronLeft, Trophy, Zap,
-  AlertTriangle, CheckCircle2
+  AlertTriangle, CheckCircle2, MessageCircle, Target, Brain, BookOpen,
+  Link2, Lightbulb, Pencil, CheckSquare, MessageSquare, PartyPopper,
+  ImagePlus, Sparkles, Upload, Trash2, Check
 } from "lucide-react";
 import { InteractiveStepRenderer, ExtendedJourneyStep } from "@/components/interactive";
 
@@ -14,17 +16,17 @@ import goldStandardFixture from "@/data/fixtures/gold-standard-fractions.json";
 const LESSON = goldStandardFixture;
 const JOURNEY: ExtendedJourneyStep[] = (LESSON.contentBlocks?.studentJourney || []) as unknown as ExtendedJourneyStep[];
 
-const STEP_META: Record<string, { icon: string; label: string; color: string; gradient: string; border: string; accent: string }> = {
-  welcome:     { icon: "🦉", label: "Welcome", color: "text-indigo-700", gradient: "from-indigo-500 to-purple-500", border: "border-indigo-200/60", accent: "text-indigo-700" },
-  mission:     { icon: "🎯", label: "Mission", color: "text-violet-700", gradient: "from-violet-500 to-purple-500", border: "border-violet-200/60", accent: "text-violet-700" },
-  think_first: { icon: "💭", label: "Predict", color: "text-amber-700", gradient: "from-amber-500 to-orange-500", border: "border-amber-200/60", accent: "text-amber-700" },
-  learn:       { icon: "📖", label: "Learn", color: "text-emerald-700", gradient: "from-emerald-500 to-teal-500", border: "border-emerald-200/60", accent: "text-emerald-700" },
-  connect:     { icon: "🔗", label: "Connect", color: "text-teal-700", gradient: "from-teal-500 to-cyan-500", border: "border-teal-200/60", accent: "text-teal-700" },
-  example:     { icon: "💡", label: "Example", color: "text-cyan-700", gradient: "from-cyan-500 to-blue-500", border: "border-cyan-200/60", accent: "text-cyan-700" },
-  practice:    { icon: "✏️", label: "Practice", color: "text-sky-700", gradient: "from-sky-500 to-blue-500", border: "border-sky-200/60", accent: "text-sky-700" },
-  quick_check: { icon: "✅", label: "Check", color: "text-lime-700", gradient: "from-lime-500 to-green-500", border: "border-lime-200/60", accent: "text-lime-700" },
-  reflect:     { icon: "🪞", label: "Reflect", color: "text-rose-700", gradient: "from-rose-500 to-pink-500", border: "border-rose-200/60", accent: "text-rose-700" },
-  complete:    { icon: "🏆", label: "Done", color: "text-yellow-700", gradient: "from-yellow-500 to-amber-500", border: "border-yellow-200/60", accent: "text-yellow-700" },
+const STEP_META: Record<string, { icon: React.ElementType; label: string; color: string; gradient: string; border: string; accent: string }> = {
+  welcome:     { icon: MessageCircle, label: "Welcome", color: "text-indigo-700", gradient: "from-indigo-500 to-purple-500", border: "border-indigo-200/60", accent: "text-indigo-700" },
+  mission:     { icon: Target, label: "Mission", color: "text-violet-700", gradient: "from-violet-500 to-purple-500", border: "border-violet-200/60", accent: "text-violet-700" },
+  think_first: { icon: Brain, label: "Predict", color: "text-amber-700", gradient: "from-amber-500 to-orange-500", border: "border-amber-200/60", accent: "text-amber-700" },
+  learn:       { icon: BookOpen, label: "Learn", color: "text-emerald-700", gradient: "from-emerald-500 to-teal-500", border: "border-emerald-200/60", accent: "text-emerald-700" },
+  connect:     { icon: Link2, label: "Connect", color: "text-teal-700", gradient: "from-teal-500 to-cyan-500", border: "border-teal-200/60", accent: "text-teal-700" },
+  example:     { icon: Lightbulb, label: "Example", color: "text-cyan-700", gradient: "from-cyan-500 to-blue-500", border: "border-cyan-200/60", accent: "text-cyan-700" },
+  practice:    { icon: Pencil, label: "Practice", color: "text-sky-700", gradient: "from-sky-500 to-blue-500", border: "border-sky-200/60", accent: "text-sky-700" },
+  quick_check: { icon: CheckSquare, label: "Check", color: "text-lime-700", gradient: "from-lime-500 to-green-500", border: "border-lime-200/60", accent: "text-lime-700" },
+  reflect:     { icon: MessageSquare, label: "Reflect", color: "text-rose-700", gradient: "from-rose-500 to-pink-500", border: "border-rose-200/60", accent: "text-rose-700" },
+  complete:    { icon: PartyPopper, label: "Done", color: "text-yellow-700", gradient: "from-yellow-500 to-amber-500", border: "border-yellow-200/60", accent: "text-yellow-700" },
 };
 
 function getMeta(type: string) { return STEP_META[type] || STEP_META.welcome; }
@@ -184,6 +186,28 @@ export default function InteractivePreviewPage({ params }: { params: Promise<{ i
                   <p className="text-slate-700 text-sm leading-relaxed font-medium">{step.owlText}</p>
                 </div>
               )}
+
+              {/* Admin Image Controls */}
+              <div className="mb-4 px-3 py-2 rounded-xl bg-slate-50 border border-slate-200/60">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Illustration:</span>
+                  <button className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white border border-slate-200 text-[10px] font-semibold text-slate-600 hover:border-indigo-300 hover:text-indigo-600 transition-colors">
+                    <Upload className="w-3 h-3" /> Upload
+                  </button>
+                  <button className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white border border-slate-200 text-[10px] font-semibold text-slate-600 hover:border-indigo-300 hover:text-indigo-600 transition-colors">
+                    <Sparkles className="w-3 h-3" /> Generate
+                  </button>
+                  <button className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white border border-slate-200 text-[10px] font-semibold text-slate-600 hover:border-indigo-300 hover:text-indigo-600 transition-colors">
+                    <ImagePlus className="w-3 h-3" /> Regenerate
+                  </button>
+                  <button className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-[10px] font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors">
+                    <Check className="w-3 h-3" /> Approve
+                  </button>
+                  <button className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-red-50 border border-red-200 text-[10px] font-semibold text-red-600 hover:bg-red-100 transition-colors">
+                    <Trash2 className="w-3 h-3" /> Remove
+                  </button>
+                </div>
+              </div>
 
               {/* Interactive step renderer */}
               <InteractiveStepRenderer

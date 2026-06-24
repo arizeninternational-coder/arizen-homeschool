@@ -13,14 +13,21 @@
       {
         "stepKey": "welcome",
         "activityType": "intro",
-        "studentInstruction": "Look at the chapati. In this lesson, you will split it into two equal parts.",
+        "studentInstruction": "In this lesson, you will learn how to split a chapati into two equal parts. Each part is called one half!",
         "content": "Look at the whole circle. In this lesson, you will split it into two equal parts.",
         "mediaSpec": {
           "type": "image",
           "source": "generated_or_library",
           "altText": "Friendly owl mascot beside a whole circle, warm Kenyan classroom, clean modern childrens educational illustration, no text in image",
           "purpose": "Introduce halves visually",
-          "reviewStatus": "approved"
+          "reviewStatus": "approved",
+          "illustration": {
+            "mode": "generated",
+            "prompt": "Warm child-friendly illustration of a young girl named Amina holding a chapati and smiling, simple clean educational style, Kenyan context, no text in image",
+            "reviewStatus": "pending",
+            "alt": "Amina holding a chapati",
+            "caption": "Amina has a round chapati to share!"
+          }
         },
         "visualSpec": {
           "type": "fraction_circle",
@@ -46,17 +53,22 @@
         "stepType": "welcome",
         "title": "Welcome to Halves",
         "studentText": "Look at the whole circle. In this lesson, you will split it into two equal parts.",
-        "owlText": "Hi explorer! Today we are going to help Amina share a round chapati fairly. Ready?",
+        "owlText": "Hi explorer! Today we are going to help Amina share a round chapati fairly. Are you ready?",
         "interaction": {
           "type": "tap_continue",
           "prompt": "Start lesson",
           "buttonLabel": "Start lesson"
+        },
+        "childImageGen": {
+          "enabled": true,
+          "maxTries": 3,
+          "prompt": "Young girl holding a chapati, warm educational illustration"
         }
       },
       {
         "stepKey": "mission",
         "activityType": "mission",
-        "studentInstruction": "Accept your mission.",
+        "studentInstruction": "Your challenge today is to learn what one half means and how to find it.",
         "content": "Your challenge today is to learn what one half means and how to find it.",
         "visualSpec": {
           "type": "checklist",
@@ -69,7 +81,8 @@
         },
         "interactionSpec": {
           "type": "tap_continue",
-          "buttonLabel": "Accept mission"
+          "buttonLabel": "Accept mission",
+          "prompt": null
         },
         "feedbackSpec": {
           "correct": "Mission accepted! Let us begin.",
@@ -180,7 +193,14 @@
           "provider": "youtube",
           "url": "",
           "reviewStatus": "needs_review",
-          "suggestedVideoSearch": "Grade 2 fractions halves equal parts circle"
+          "suggestedVideoSearch": "Grade 2 fractions halves equal parts circle",
+          "illustration": {
+            "mode": "generated",
+            "prompt": "Child-friendly illustration showing a whole circle, then folded/split into two equal parts, then one half shaded, simple educational style",
+            "reviewStatus": "pending",
+            "alt": "Circle being folded into halves",
+            "caption": "Watch how a whole circle becomes two equal parts."
+          }
         },
         "visualSpec": {
           "type": "step_reveal",
@@ -260,7 +280,14 @@
           "source": "generated_or_library",
           "altText": "A chapati cut into two equal pieces on a plate, warm Kenyan home context, clean childrens educational illustration, no text in image",
           "purpose": "Connect halves to fair sharing in daily life.",
-          "reviewStatus": "approved"
+          "reviewStatus": "approved",
+          "illustration": {
+            "mode": "generated",
+            "prompt": "Cute child-friendly illustration of two kittens sharing one round biscuit equally, clean composition, warm colors, educational style, no text",
+            "reviewStatus": "pending",
+            "alt": "Two kittens sharing a biscuit",
+            "caption": "Two kittens share a biscuit fairly."
+          }
         },
         "visualSpec": {
           "type": "real_life_fraction",
@@ -296,6 +323,11 @@
           "prompt": "Tap one half of the chapati.",
           "correctRegion": "part_1",
           "hint": "One half is one piece when the whole is divided into two equal pieces."
+        },
+        "childImageGen": {
+          "enabled": true,
+          "maxTries": 2,
+          "prompt": "Two cute kittens sharing a round biscuit equally"
         }
       },
       {
@@ -368,6 +400,20 @@
           "prompt": "Next step",
           "buttonLabel": "Next step",
           "hint": "Watch how the circle changes from whole to two equal parts."
+        },
+        "mediaSpec": {
+          "type": "image",
+          "source": "generated_or_library",
+          "altText": "Amina folding a circular paper into two equal parts",
+          "purpose": "Show worked example visually",
+          "reviewStatus": "approved",
+          "illustration": {
+            "mode": "generated",
+            "prompt": "Child-friendly illustration of a girl folding a circular paper cutout into two equal parts, simple educational style, clean background",
+            "reviewStatus": "pending",
+            "alt": "Folding a paper cutout",
+            "caption": "Amina folds the paper into two equal parts."
+          }
         }
       },
       {
@@ -588,7 +634,7 @@
       {
         "stepKey": "complete",
         "activityType": "completion",
-        "studentInstruction": "You have completed the lesson.",
+        "studentInstruction": "You completed the lesson!",
         "content": "Today you learned about halves.",
         "mediaSpec": {
           "type": "reward_animation",
@@ -607,7 +653,6 @@
         },
         "interactionSpec": {
           "type": "tap_continue",
-          "prompt": "Tap Finish lesson to collect your badge.",
           "buttonLabel": "Finish lesson"
         },
         "feedbackSpec": {
@@ -616,7 +661,7 @@
           "hint": ""
         },
         "successCriteria": "Finishes with a clear understanding of one half.",
-        "rewardText": "You earned your Fraction Explorer badge for learning about halves.",
+        "rewardText": "You earned your Fraction Explorer Badge for learning about halves.",
         "id": "complete",
         "stepType": "complete",
         "title": "Lesson Complete",
