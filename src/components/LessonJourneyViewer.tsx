@@ -1,13 +1,15 @@
 "use client";
 
-import { useState, useCallback, createContext, useContext } from "react";
+import React, { useState, useCallback, createContext, useContext } from "react";
 import {
   ChevronRight, ChevronLeft, Play, Pause, Settings, Eye, Edit3,
   Sparkles, Upload, Video, Trash2, Archive, ArchiveRestore,
   Send, CheckCircle, AlertTriangle, Clock, BookOpen, Target,
   Star, Flame, Map, X, Loader2, MessageCircle, Zap, Award,
   HelpCircle, Pencil, RotateCcw, Image, Link2, ExternalLink,
-  FileText, Users, MoreVertical, ChevronDown, Search, Filter, Trophy
+  FileText, Users, MoreVertical, ChevronDown, Search, Filter, Trophy,
+  Lightbulb, GraduationCap, Brain, Eye as EyeIcon, UtensilsCrossed, ClipboardList,
+  CheckSquare, MessageSquare, PartyPopper
 } from "lucide-react";
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -126,17 +128,17 @@ export const useViewer = () => useContext(ViewerContext)!;
 
 // ── Shared sub-components ────────────────────────────────────────────────────
 
-const STEP_TYPE_META: Record<string, { icon: string; label: string; color: string; bg: string; border: string; gradient: string; accent?: string; softBg?: string; iconBg?: string }> = {
-  welcome:    { icon: "🦉", label: "Welcome", color: "text-indigo-700", bg: "bg-indigo-50/60", border: "border-indigo-200/60", gradient: "from-indigo-500 to-purple-500", accent: "text-indigo-700", softBg: "from-indigo-50/80 to-purple-50/50", iconBg: "bg-indigo-100" },
-  mission:    { icon: "🎯", label: "Mission", color: "text-violet-700", bg: "bg-violet-50/60", border: "border-violet-200/60", gradient: "from-violet-500 to-purple-500", accent: "text-violet-700", softBg: "from-violet-50/80 to-purple-50/50", iconBg: "bg-violet-100" },
-  think_first:{ icon: "💭", label: "Predict", color: "text-amber-700", bg: "bg-amber-50/60", border: "border-amber-200/60", gradient: "from-amber-500 to-orange-500", accent: "text-amber-700", softBg: "from-amber-50/80 to-orange-50/50", iconBg: "bg-amber-100" },
-  learn:      { icon: "📖", label: "Learn", color: "text-emerald-700", bg: "bg-emerald-50/60", border: "border-emerald-200/60", gradient: "from-emerald-500 to-teal-500", accent: "text-emerald-700", softBg: "from-emerald-50/80 to-teal-50/50", iconBg: "bg-emerald-100" },
-  connect:    { icon: "🔗", label: "Connect", color: "text-teal-700", bg: "bg-teal-50/60", border: "border-teal-200/60", gradient: "from-teal-500 to-cyan-500", accent: "text-teal-700", softBg: "from-teal-50/80 to-cyan-50/50", iconBg: "bg-teal-100" },
-  example:    { icon: "💡", label: "Example", color: "text-cyan-700", bg: "bg-cyan-50/60", border: "border-cyan-200/60", gradient: "from-cyan-500 to-blue-500", accent: "text-cyan-700", softBg: "from-cyan-50/80 to-blue-50/50", iconBg: "bg-cyan-100" },
-  practice:   { icon: "✏️", label: "Practice", color: "text-sky-700", bg: "bg-sky-50/60", border: "border-sky-200/60", gradient: "from-sky-500 to-blue-500", accent: "text-sky-700", softBg: "from-sky-50/80 to-blue-50/50", iconBg: "bg-sky-100" },
-  quick_check:{ icon: "✅", label: "Check", color: "text-lime-700", bg: "bg-lime-50/60", border: "border-lime-200/60", gradient: "from-lime-500 to-green-500", accent: "text-lime-700", softBg: "from-lime-50/80 to-green-50/50", iconBg: "bg-lime-100" },
-  reflect:    { icon: "🪞", label: "Reflect", color: "text-rose-700", bg: "bg-rose-50/60", border: "border-rose-200/60", gradient: "from-rose-500 to-pink-500", accent: "text-rose-700", softBg: "from-rose-50/80 to-pink-50/50", iconBg: "bg-rose-100" },
-  complete:   { icon: "🏆", label: "Done", color: "text-yellow-700", bg: "bg-yellow-50/60", border: "border-yellow-200/60", gradient: "from-yellow-500 to-amber-500", accent: "text-yellow-700", softBg: "from-yellow-50/80 to-amber-50/50", iconBg: "bg-yellow-100" },
+const STEP_TYPE_META: Record<string, { icon: React.ElementType; label: string; color: string; bg: string; border: string; gradient: string; accent?: string; softBg?: string; iconBg?: string }> = {
+  welcome:    { icon: MessageCircle, label: "Welcome", color: "text-indigo-700", bg: "bg-indigo-50/60", border: "border-indigo-200/60", gradient: "from-indigo-500 to-purple-500", accent: "text-indigo-700", softBg: "from-indigo-50/80 to-purple-50/50", iconBg: "bg-indigo-100" },
+  mission:    { icon: Target, label: "Mission", color: "text-violet-700", bg: "bg-violet-50/60", border: "border-violet-200/60", gradient: "from-violet-500 to-purple-500", accent: "text-violet-700", softBg: "from-violet-50/80 to-purple-50/50", iconBg: "bg-violet-100" },
+  think_first:{ icon: Brain, label: "Predict", color: "text-amber-700", bg: "bg-amber-50/60", border: "border-amber-200/60", gradient: "from-amber-500 to-orange-500", accent: "text-amber-700", softBg: "from-amber-50/80 to-orange-50/50", iconBg: "bg-amber-100" },
+  learn:      { icon: BookOpen, label: "Learn", color: "text-emerald-700", bg: "bg-emerald-50/60", border: "border-emerald-200/60", gradient: "from-emerald-500 to-teal-500", accent: "text-emerald-700", softBg: "from-emerald-50/80 to-teal-50/50", iconBg: "bg-emerald-100" },
+  connect:    { icon: Link2, label: "Connect", color: "text-teal-700", bg: "bg-teal-50/60", border: "border-teal-200/60", gradient: "from-teal-500 to-cyan-500", accent: "text-teal-700", softBg: "from-teal-50/80 to-cyan-50/50", iconBg: "bg-teal-100" },
+  example:    { icon: Lightbulb, label: "Example", color: "text-cyan-700", bg: "bg-cyan-50/60", border: "border-cyan-200/60", gradient: "from-cyan-500 to-blue-500", accent: "text-cyan-700", softBg: "from-cyan-50/80 to-blue-50/50", iconBg: "bg-cyan-100" },
+  practice:   { icon: Pencil, label: "Practice", color: "text-sky-700", bg: "bg-sky-50/60", border: "border-sky-200/60", gradient: "from-sky-500 to-blue-500", accent: "text-sky-700", softBg: "from-sky-50/80 to-blue-50/50", iconBg: "bg-sky-100" },
+  quick_check:{ icon: CheckSquare, label: "Check", color: "text-lime-700", bg: "bg-lime-50/60", border: "border-lime-200/60", gradient: "from-lime-500 to-green-500", accent: "text-lime-700", softBg: "from-lime-50/80 to-green-50/50", iconBg: "bg-lime-100" },
+  reflect:    { icon: MessageSquare, label: "Reflect", color: "text-rose-700", bg: "bg-rose-50/60", border: "border-rose-200/60", gradient: "from-rose-500 to-pink-500", accent: "text-rose-700", softBg: "from-rose-50/80 to-pink-50/50", iconBg: "bg-rose-100" },
+  complete:   { icon: PartyPopper, label: "Done", color: "text-yellow-700", bg: "bg-yellow-50/60", border: "border-yellow-200/60", gradient: "from-yellow-500 to-amber-500", accent: "text-yellow-700", softBg: "from-yellow-50/80 to-amber-50/50", iconBg: "bg-yellow-100" },
 };
 
 export function getStepMeta(stepType: string) {
@@ -267,8 +269,8 @@ export function ViewerIllustrationArea({ step, adminMode, onGenerate, onUpload, 
   return (
     <div className={`rounded-2xl border-2 border-dashed ${meta.border} overflow-hidden mt-4`}>
       <div className={`bg-gradient-to-br ${meta.softBg || ""} p-5 flex flex-col items-center gap-2.5`}>
-        <div className={`w-12 h-12 rounded-xl ${meta.iconBg || "bg-slate-100"} flex items-center justify-center`}>
-          <span className="text-xl">{icon}</span>
+        <div className={`w-12 h-12 rounded-xl ${meta.iconBg || "bg-slate-100"} flex items-center justify-center text-slate-600`}>
+          {icon ? React.createElement(icon, { size: 24 }) : <span className="text-xl">?</span>}
         </div>
         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Illustration</p>
         {prompt && (
@@ -572,7 +574,7 @@ export function ViewerSupportPanel({ lesson, journey, currentStep, onStepClick, 
                 <span className={`w-5 h-5 rounded-md flex items-center justify-center text-[10px] flex-shrink-0 ${
                   i === currentStep ? `bg-gradient-to-br ${meta.gradient} text-white` : i < currentStep ? "bg-emerald-200 text-emerald-700" : "bg-slate-100 text-slate-400"
                 }`}>
-                  {i < currentStep ? "✓" : meta.icon}
+                  {i < currentStep ? "✓" : (meta.icon ? React.createElement(meta.icon, { size: 14}) : meta.label)}
                 </span>
                 <span className="truncate">{meta.label}</span>
               </button>

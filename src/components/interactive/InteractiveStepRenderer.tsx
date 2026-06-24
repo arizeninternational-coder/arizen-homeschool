@@ -4,12 +4,8 @@ import React from "react";
 import { FractionCircle, FractionRectangle } from "./FractionVisuals";
 import { StepReveal } from "./StepReveal";
 import { ChoiceGrid } from "./ChoiceGrid";
-import {
-  TapContinue,
-  TapChoice,
-  MultipleChoice,
-  ReflectionChips,
-} from "./InteractionRenderers";
+import { HorizontalTeachingStrip } from "./HorizontalTeachingStrip";
+import { TapContinue, TapChoice, MultipleChoice, ReflectionChips } from "./InteractionRenderers";
 import { MediaSpecVideo } from "./MediaSpecVideo";
 import {
   TapRegion,
@@ -19,6 +15,7 @@ import {
   RecapChecklist,
   RewardAnimation,
 } from "./AdvancedRenderers";
+import type { CircleTheme } from "./FractionVisuals";
 
 // -- Extended Journey Step Type -----------------------------------------------
 
@@ -91,6 +88,7 @@ export interface ExtendedJourneyStep {
     }>;
     icon?: string;
     sentenceStarter?: string;
+    theme?: CircleTheme;
   };
   interactionSpec?: {
     type?: string;
@@ -131,6 +129,7 @@ export interface ExtendedJourneyStep {
       expectedIdea?: string;
       keywords?: string[];
     }>;
+    theme?: CircleTheme;
   };
   feedbackSpec?: {
     correct?: string;
@@ -155,7 +154,7 @@ interface InteractiveStepRendererProps {
 
 // -- Visual Spec Interpreter (renders data objects as React components) -------
 
-function renderVisualElement(visual: any): React.ReactNode {
+function renderVisualElement(visual: any, theme?: CircleTheme): React.ReactNode {
   if (!visual || typeof visual !== "object") return null;
 
   if (visual.type === "fraction_circle") {
@@ -167,6 +166,7 @@ function renderVisualElement(visual: any): React.ReactNode {
         showLabels={visual.showLabels !== false}
         labels={visual.labels}
         size={120}
+        theme={theme}
       />
     );
   }
@@ -201,6 +201,11 @@ export function InteractiveStepRenderer({
   className = "",
 }: InteractiveStepRendererProps) {
   const hasNewSpec = !!(step.visualSpec || step.interactionSpec || step.feedbackSpec || step.mediaSpec);
+  const theme = (step.visualSpec?.theme || step.interactionSpec?.theme || "plain") as CircleTheme;
+
+  // -- Pre-action states for post-tap feedback -------------------------------
+
+  const [missionAccepted, setMissionAccepted] = React.useState(false);
 
   // -- Render visual spec ----------------------------------------------------
 
@@ -218,6 +223,7 @@ export function InteractiveStepRenderer({
             showLabels={vs.showLabels !== false}
             labels={vs.labels}
             size={180}
+            theme={theme}
           />
         </div>
       );
@@ -244,15 +250,17 @@ export function InteractiveStepRenderer({
       const revealSteps = (vs.steps || []).map((s) => ({
         title: s.title,
         description: s.description,
-        visual: renderVisualElement(s.visual),
+        visual: renderVisualElement(s.visual, theme),
       }));
-      // For teaching steps (learn, example), show all steps without carousel
-      const stepMode = (step.stepKey === "learn" || step.stepKey === "example") ? "all" : "carousel";
+      // Teaching steps use horizontal layout instead of carousel
+      if (step.stepKey === "learn" || step.stepKey === "example") {
+        return <HorizontalTeachingStrip steps={revealSteps} theme={theme} />;
+      }
       return (
         <StepReveal
           steps={revealSteps}
           onComplete={onNext}
-          mode={stepMode}
+          mode="carousel"
         />
       );
     }
@@ -262,7 +270,7 @@ export function InteractiveStepRenderer({
         id: c.id,
         label: c.label,
         description: c.description,
-        visual: renderVisualElement(c.visual),
+        visual: renderVisualElement(c.visual, theme),
       }));
       return (
         <ChoiceGrid
@@ -277,7 +285,7 @@ export function InteractiveStepRenderer({
     }
 
     if (vs.type === "real_life_fraction") {
-      // If there's a tap_region interaction, the visual is rendered by TapRegion
+      // TapRegion renders its own interactive visual
       if (step.interactionSpec?.type === "tap_region") return null;
       return (
         <RealLifeFraction
@@ -286,16 +294,31 @@ export function InteractiveStepRenderer({
           equalParts={vs.equalParts !== false}
           highlightPart={vs.highlightPart || 1}
           label={vs.label}
+          theme={theme}
         />
       );
     }
 
     if (vs.type === "checklist") {
+      if (step.stepKey === "mission" && !missionAccepted) {
+        return (
+          <div className="mt-4 rounded-2xl border border-slate-200/60 bg-gradient-to-br from-slate-50 to-white p-5 space-y-3">
+            <div className="space-y-2">
+              {(vs.items || []).map((item, i) => (
+                <div key={i} className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white/60 border border-slate-100">
+                  <span className="w-5 h-5 rounded-full border-2 border-slate-300 flex-shrink-0" />
+                  <span className="text-sm font-medium text-slate-700">{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
       return <RecapChecklist items={vs.items || []} heading={step.title} variant="bullet" />;
     }
 
     if (vs.type === "recap_checklist") {
-      return <RecapChecklist items={vs.items || []} heading={step.title || "You can now:"} variant="check" />;
+      return <RecapChecklist items={vs.items || []} heading="You can now:" variant="check" />;
     }
 
     if (vs.type === "reflection_card") {
@@ -320,43 +343,31 @@ export function InteractiveStepRenderer({
     const spec = step.interactionSpec;
     const feedback = step.feedbackSpec || {};
 
-    // When choice_grid visual is present, tap_choice interaction is handled by ChoiceGrid
+    // When choice_grid visual is present, tap_choice is handled by ChoiceGrid
     if (spec.type === "tap_choice" && step.visualSpec?.type === "choice_grid") {
-      return null;
-    }
-
-    if (spec.type === "tap_continue") {
       return (
-        <TapContinue
-          prompt={spec.prompt}
-          onContinue={onNext}
-          feedback={feedback}
-          buttonLabel={spec.buttonLabel}
-        />
+        <div className="mt-3">
+          {feedback.correct && interaction.choiceSubmitted && (
+            <p className="text-sm font-semibold text-emerald-600 text-center">{feedback.correct}</p>
+          )}
+          {feedback.incorrect && interaction.choiceSubmitted && !interaction.choiceCorrect && (
+            <p className="text-sm font-semibold text-orange-600 text-center">{feedback.incorrect}</p>
+          )}
+        </div>
       );
     }
 
-    if (spec.type === "tap_choice") {
-      const choices = spec.choices || spec.options || [];
+    if (spec.type === "tap_continue") {
+      const isMission = step.stepKey === "mission";
       return (
-        <TapChoice
-          prompt={spec.prompt || spec.question}
-          options={choices.map((c: any, i: number) => ({
-            id: typeof c === "string" ? String(i) : c.id || String(i),
-            label: typeof c === "string" ? String.fromCharCode(65 + i) : c.label || String.fromCharCode(65 + i),
-            description: typeof c === "string" ? c : c.description,
-            visual: typeof c === "object" ? renderVisualElement(c.visual) : undefined,
-          }))}
-          correctChoiceId={spec.correctChoiceId}
-          onSelect={(choiceId) => {
-            setInteraction((p: any) => ({
-              ...p,
-              selectedChoiceId: choiceId,
-              choiceSubmitted: true,
-            }));
+        <TapContinue
+          prompt={isMission ? undefined : spec.prompt}
+          onContinue={() => {
+            if (isMission) setMissionAccepted(true);
+            onNext();
           }}
           feedback={feedback}
-          disabled={interaction.choiceSubmitted}
+          buttonLabel={spec.buttonLabel}
         />
       );
     }
@@ -370,7 +381,7 @@ export function InteractiveStepRenderer({
           options={options}
           correctIndex={correctIdx}
           feedback={feedback}
-          onAnswer={(correct, selectedIdx) => {
+          onAnswer={(correct: boolean, selectedIdx: number) => {
             setInteraction((p: any) => ({
               ...p,
               selectedChoice: selectedIdx,
@@ -387,7 +398,7 @@ export function InteractiveStepRenderer({
           prompt={spec.prompt}
           chips={spec.chips || step.reflectionOptions || []}
           sentenceStarter={spec.sentenceStarter}
-          onSave={(selectedChips, text) => {
+          onSave={(selectedChips: string[], text: string) => {
             setInteraction((p: any) => ({
               ...p,
               reflectionChips: selectedChips,
@@ -402,7 +413,7 @@ export function InteractiveStepRenderer({
     if (spec.type === "tap_region") {
       return (
         <TapRegion
-          visualSpec={step.visualSpec || { type: "fraction_circle", parts: 2, equalParts: true }}
+          visualSpec={step.visualSpec || { type: "fraction_circle", parts: 2, equalParts: true, theme }}
           correctRegion={spec.correctRegion || "part_1"}
           prompt={spec.prompt}
           feedback={feedback}
@@ -420,7 +431,7 @@ export function InteractiveStepRenderer({
     if (spec.type === "shade_shape") {
       return (
         <ShadeShape
-          shape={spec.shape || { type: "fraction_circle", parts: 2, equalParts: true }}
+          shape={spec.shape || { type: "fraction_circle", parts: 2, equalParts: true, theme }}
           requiredShadedParts={spec.requiredShadedParts || 1}
           prompt={spec.prompt}
           feedback={feedback}
@@ -436,25 +447,18 @@ export function InteractiveStepRenderer({
     }
 
     if (spec.type === "multi_activity") {
-      // For the practice step, render a simplified single-panel shade interaction
+      // Practice step: simplified single-panel shade interaction
       if (step.stepKey === "practice") {
-        const shadeActivity = (spec.activities || []).find(a => a.type === "shade_shape");
+        const shadeActivity = (spec.activities || []).find((a: any) => a.type === "shade_shape");
         if (shadeActivity) {
           return (
-            <div className="space-y-4">
-              <p className="text-base font-bold text-slate-800 text-center">
-                Shade one half of the circle
-              </p>
-              <ShadeShape
-                shape={shadeActivity.shape || { type: "fraction_circle", parts: 2, equalParts: true }}
-                requiredShadedParts={shadeActivity.requiredShadedParts || 1}
-                prompt={shadeActivity.prompt}
-                feedback={feedback}
-                onAnswer={(correct: boolean) => {
-                  setInteraction((p: any) => ({ ...p, shadeSubmitted: true, shadeCorrect: correct }));
-                }}
-              />
-            </div>
+            <PracticeShadePanel
+              activity={shadeActivity}
+              feedback={feedback}
+              onAnswer={(correct: boolean) => {
+                setInteraction((p: any) => ({ ...p, shadeSubmitted: true, shadeCorrect: correct }));
+              }}
+            />
           );
         }
       }
@@ -470,17 +474,8 @@ export function InteractiveStepRenderer({
     }
 
     if (spec.type === "step_reveal") {
-      // step_reveal interaction is handled by the visual spec renderer
-      // but we show feedback at the end
-      return (
-        <div className="mt-3">
-          {feedback.hint && (
-            <p className="text-xs text-amber-600 font-semibold text-center">
-              💡 {feedback.hint}
-            </p>
-          )}
-        </div>
-      );
+      // Teaching steps have no interaction; show a "Got it" at end of visual
+      return null;
     }
 
     return null;
@@ -504,7 +499,6 @@ export function InteractiveStepRenderer({
 
   const renderMediaSpecVideo = () => {
     if (!step.mediaSpec || step.mediaSpec.type !== "video") return null;
-    // Hide unapproved videos from student view
     if (step.mediaSpec.reviewStatus === "needs_review") return null;
     return (
       <MediaSpecVideo
@@ -514,20 +508,32 @@ export function InteractiveStepRenderer({
     );
   };
 
+  // -- Mission accepted confirmation -----------------------------------------
+
+  const renderMissionConfirmation = () => {
+    if (step.stepKey === "mission" && missionAccepted && step.feedbackSpec?.correct) {
+      return (
+        <p className="text-sm font-semibold text-emerald-600 text-center mt-2 animate-fade-in">
+          {step.feedbackSpec.correct}
+        </p>
+      );
+    }
+    return null;
+  };
+
   // -- Main render ------------------------------------------------------------
 
   if (hasNewSpec) {
     return (
       <div className={`space-y-4 ${className}`}>
-        {/* Render studentInstruction/content only if it differs from interactionSpec.prompt */}
+        {/* Instruction text — shown before action buttons */}
         {(() => {
-          const instruction = step.studentInstruction || step.content || '';
-          const prompt = step.interactionSpec?.prompt || '';
-          // Don't duplicate: if instruction and prompt are the same, skip instruction
+          const instruction = step.studentInstruction || step.content || "";
+          const prompt = step.interactionSpec?.prompt || "";
           const showInstruction = instruction.trim() && instruction.trim() !== prompt.trim();
           return showInstruction ? (
             <div className="prose prose-sm max-w-none">
-              {instruction.split('\n').filter(l => l.trim()).map((line, i) => (
+              {instruction.split("\n").filter((l) => l.trim()).map((line, i) => (
                 <p key={i} className="text-slate-700 leading-relaxed mb-2 last:mb-0">{line}</p>
               ))}
             </div>
@@ -537,6 +543,7 @@ export function InteractiveStepRenderer({
         {renderVisualSpec()}
         {renderMediaSpecVideo()}
         {renderInteractionSpec()}
+        {renderMissionConfirmation()}
         {renderReward()}
 
         {!step.interactionSpec && step.interaction && (
@@ -580,31 +587,107 @@ export function InteractiveStepRenderer({
         </div>
       )}
 
-      {step.media?.illustration?.approvedUrl && (
-        <div className="rounded-2xl overflow-hidden border border-slate-200/50 shadow-sm">
-          <img
-            src={step.media.illustration.approvedUrl}
-            alt={step.media.illustration.altText || "Lesson illustration"}
-            className="w-full h-auto max-h-[220px] object-cover"
-          />
-        </div>
+      {renderMediaSpecVideo()}
+
+      {step.interaction && (
+        <LegacyInteractionRenderer
+          step={step}
+          interaction={interaction}
+          setInteraction={setInteraction}
+          onNext={onNext}
+        />
       )}
 
-      {step.media?.video?.approvedUrl && (
-        <MediaSpecVideo fallbackVideo={step.media.video} />
+      {step.reflectionOptions && step.interaction?.type === "reflection" && (
+        <ReflectionChips
+          prompt={step.reflectionOptions.join(" • ")}
+          chips={step.reflectionOptions}
+        />
       )}
 
-      <LegacyInteractionRenderer
-        step={step}
-        interaction={interaction}
-        setInteraction={setInteraction}
-        onNext={onNext}
-      />
+      {renderReward()}
+
+      {step.successCriteria && process.env.NODE_ENV === "development" && (
+        <details className="text-[10px] text-slate-400 mt-2">
+          <summary>Success criteria</summary>
+          <p className="mt-1">{step.successCriteria}</p>
+        </details>
+      )}
     </div>
   );
 }
 
-// -- Legacy Interaction Renderer ----------------------------------------------
+// -- Practice Shade Panel (improved shading interaction) ---------------------
+
+interface PracticeShadePanelProps {
+  activity: any;
+  feedback?: { correct?: string; incorrect?: string; hint?: string };
+  onAnswer?: (correct: boolean) => void;
+  theme?: CircleTheme;
+}
+
+function PracticeShadePanel({ activity, feedback, onAnswer, theme }: PracticeShadePanelProps) {
+  const [shadedParts, setShadedParts] = React.useState(0);
+  const [submitted, setSubmitted] = React.useState(false);
+  const required = activity.requiredShadedParts || 1;
+  const isCorrect = shadedParts === required && shadedParts > 0;
+
+  const handlePartClick = (partIndex: number) => {
+    if (submitted) return;
+    setShadedParts(partIndex + 1 === shadedParts ? 0 : partIndex + 1);
+  };
+
+  const handleSubmit = () => {
+    setSubmitted(true);
+    onAnswer?.(isCorrect);
+  };
+
+  return (
+    <div className="space-y-4">
+      <p className="text-base font-bold text-slate-800 text-center">
+        {activity.prompt || "Shade one half of the circle"}
+      </p>
+      <div className="flex justify-center">
+        <FractionCircle
+          parts={2}
+          shadedParts={shadedParts}
+          equalParts={true}
+          showLabels={false}
+          size={170}
+          interactive
+          onClickPart={handlePartClick}
+          theme={theme === "plain" ? "paper_cutout" : theme}
+        />
+      </div>
+      <p className="text-xs text-slate-500 text-center">
+        Tap inside one half to shade it, tap again to erase.
+      </p>
+      {!submitted && shadedParts > 0 && (
+        <div className="flex justify-center">
+          <button
+            onClick={handleSubmit}
+            className="px-5 py-2.5 rounded-xl bg-indigo-500 text-white text-sm font-bold hover:bg-indigo-600 transition-colors"
+          >
+            Check my shading
+          </button>
+        </div>
+      )}
+      {submitted && feedback && (
+        <div className="text-center">
+          {isCorrect ? (
+            <p className="text-sm font-bold text-emerald-600">{feedback.correct || "Well done! You shaded one half."}</p>
+          ) : (
+            <p className="text-sm font-bold text-orange-600">
+              {feedback.incorrect || "Try again. Remember: shade exactly one of the two equal parts."}
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// -- Legacy interaction renderer (fallback) ---------------------------------
 
 function LegacyInteractionRenderer({
   step,
@@ -617,163 +700,47 @@ function LegacyInteractionRenderer({
   setInteraction: (v: any) => void;
   onNext: () => void;
 }) {
-  if (!step.interaction && step.stepType !== "reflect") return null;
+  const type = step.interaction?.type;
 
-  if (step.stepType === "think_first" && step.interaction?.question) {
+  if (type === "tap_continue") {
     return (
-      <div className="mt-4 px-5 py-4 rounded-xl bg-amber-50/80 border border-amber-200/60">
-        <p className="text-base font-bold text-amber-900 mb-2">
-          💭 {step.interaction.question}
-        </p>
-        <textarea
-          value={interaction.predictionText || ""}
-          onChange={(e) =>
-            setInteraction((p: any) => ({ ...p, predictionText: e.target.value }))
-          }
-          placeholder="Type your guess here..."
-          className="w-full px-4 py-3 rounded-xl border border-amber-200 bg-white text-base text-slate-800 placeholder:text-slate-400 resize-none focus:outline-none focus:ring-2 focus:ring-amber-300"
-          rows={3}
-        />
-        {interaction.predictionText?.trim() && (
-          <p className="text-xs text-amber-600 mt-1.5 font-semibold">
-            ✓ Your guess is saved!
-          </p>
-        )}
-      </div>
+      <TapContinue
+        prompt={step.interaction?.prompt}
+        onContinue={onNext}
+        buttonLabel={(step.interaction as any)?.buttonLabel || step.interaction?.prompt}
+      />
     );
   }
 
-  if (step.stepType === "practice") {
+  if (type === "choice") {
+    const options = step.interaction?.options || [];
+    const correctIdx = typeof step.interaction?.correctAnswer === "number" ? step.interaction.correctAnswer : 0;
     return (
-      <div className="mt-4 px-5 py-4 rounded-xl bg-sky-50/80 border border-sky-200/60">
-        {step.studentText && step.studentText !== "Practice" ? (
-          <div
-            className="prose prose-sm max-w-none text-sky-900 mb-3"
-            dangerouslySetInnerHTML={{
-              __html: step.studentText.replace(/\n/g, "<br/>"),
-            }}
-          />
-        ) : (
-          <p className="text-base font-bold text-sky-900 mb-1.5">✏️ Your Turn</p>
-        )}
-      </div>
+      <ChoiceGrid
+        options={options.map((opt: string, i: number) => ({
+          id: String(i),
+          label: String.fromCharCode(65 + i),
+          description: opt,
+        }))}
+        onSelect={(id) => setInteraction((p: any) => ({ ...p, selectedChoice: parseInt(id) }))}
+        selectedId={interaction.selectedChoice != null ? String(interaction.selectedChoice) : undefined}
+        columns={Math.min(options.length, 3)}
+      />
     );
   }
 
-  if (
-    step.stepType === "quick_check" &&
-    step.interaction?.type === "multiple_choice" &&
-    step.interaction.question
-  ) {
-    const correctAnswer = step.interaction.correctAnswer;
+  if (type === "multiple_choice") {
+    const options = step.interaction?.options || [];
+    const correctIdx = step.interaction?.correctIndex != null ? step.interaction.correctIndex : (typeof step.interaction?.correctAnswer === "number" ? step.interaction.correctAnswer : 0);
     return (
-      <div className="mt-4 px-5 py-4 rounded-xl bg-lime-50/80 border border-lime-200/60">
-        <p className="text-base font-bold text-lime-900 mb-0.5">✅ Quick Check</p>
-        <p className="text-lg font-bold text-lime-800 mb-3">
-          {step.interaction.question}
-        </p>
-        {step.interaction.options?.map((opt: string, i: number) => {
-          const isSelected = interaction.selectedChoice === i;
-          const isCorrect = i === correctAnswer;
-          const showFeedback = interaction.choiceFeedback !== null;
-          let btnClass =
-            "bg-white border-lime-200 text-lime-800 hover:bg-lime-50 hover:shadow-md";
-          if (isSelected && !showFeedback)
-            btnClass = "bg-lime-600 text-white border-lime-600 shadow-lg shadow-lime-200";
-          if (showFeedback && isSelected && isCorrect)
-            btnClass = "bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-200";
-          if (showFeedback && isSelected && !isCorrect)
-            btnClass = "bg-orange-500 text-white border-orange-500 shadow-lg shadow-orange-200";
-          if (showFeedback && !isSelected && isCorrect)
-            btnClass = "bg-emerald-100 border-emerald-400 text-emerald-800";
-          return (
-            <button
-              key={i}
-              onClick={() => {
-                if (interaction.choiceFeedback !== null) return;
-                setInteraction((p: any) => ({
-                  ...p,
-                  selectedChoice: i,
-                  choiceFeedback: i === correctAnswer ? "correct" : "incorrect",
-                }));
-              }}
-              disabled={interaction.choiceFeedback !== null}
-              className={`text-left px-4 py-3 rounded-xl text-sm font-semibold transition-all border-2 ${btnClass} disabled:cursor-default mb-2 w-full`}
-            >
-              <span className="mr-2 text-base">{String.fromCharCode(65 + i)}.</span> {opt}
-            </button>
-          );
-        })}
-        {interaction.choiceFeedback === "correct" && (
-          <div className="mt-3 px-4 py-2.5 rounded-xl bg-emerald-100 border border-emerald-300">
-            <p className="text-sm font-bold text-emerald-800">✅ Correct! Well done!</p>
-          </div>
-        )}
-        {interaction.choiceFeedback === "incorrect" && (
-          <div className="mt-3 px-4 py-2.5 rounded-xl bg-orange-100 border border-orange-300">
-            <p className="text-sm font-bold text-orange-800">
-              Not quite. {step.interaction.hint || "Think about it again!"}
-            </p>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  if (
-    step.stepType === "quick_check" &&
-    step.interaction?.type === "self_check" &&
-    step.interaction.question
-  ) {
-    return (
-      <div className="mt-4 px-5 py-4 rounded-xl bg-lime-50/80 border border-lime-200/60">
-        <p className="text-base font-bold text-lime-900 mb-0.5">✅ Check yourself:</p>
-        <p className="text-lg font-bold text-lime-800 mb-3">
-          {step.interaction.question}
-        </p>
-        <div className="flex gap-2">
-          <button
-            onClick={() => setInteraction((p: any) => ({ ...p, selfChecked: true }))}
-            className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all border-2 ${
-              interaction.selfChecked === true
-                ? "bg-emerald-600 text-white border-emerald-600 shadow-lg"
-                : "bg-white border-lime-200 text-lime-700 hover:bg-lime-50"
-            }`}
-          >
-            ✓ Yes, I got it!
-          </button>
-          <button
-            onClick={() => setInteraction((p: any) => ({ ...p, selfChecked: false }))}
-            className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all border-2 ${
-              interaction.selfChecked === false
-                ? "bg-orange-500 text-white border-orange-500 shadow-lg"
-                : "bg-white border-orange-200 text-orange-600 hover:bg-orange-50"
-            }`}
-          >
-            ↺ I need more practice
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (step.stepType === "reflect") {
-    return (
-      <div className="mt-4 px-5 py-4 rounded-xl bg-rose-50/80 border border-rose-200/60">
-        <p className="text-base font-bold text-rose-900 mb-0.5">🪞 Reflection Time</p>
-        <p className="text-lg font-bold text-rose-800 mb-3">
-          {step.interaction?.question || "What did you learn today?"}
-        </p>
-        <textarea
-          value={interaction.reflectionText || ""}
-          onChange={(e) =>
-            setInteraction((p: any) => ({ ...p, reflectionText: e.target.value }))
-          }
-          placeholder="Write your reflection..."
-          rows={4}
-          className="w-full px-4 py-3 rounded-xl border border-rose-200 bg-white text-sm text-slate-800 placeholder:text-slate-400 resize-none focus:outline-none focus:ring-2 focus:ring-rose-200"
-        />
-      </div>
+      <MultipleChoice
+        question={step.interaction?.question || ""}
+        options={options}
+        correctIndex={correctIdx}
+        onAnswer={(correct: boolean, idx: number) => {
+          setInteraction((p: any) => ({ ...p, selectedChoice: idx, choiceFeedback: correct ? "correct" : "incorrect" }));
+        }}
+      />
     );
   }
 

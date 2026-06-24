@@ -13,7 +13,7 @@
       {
         "stepKey": "welcome",
         "activityType": "intro",
-        "studentInstruction": "Look at the whole circle. In this lesson, you will split it into two equal parts.",
+        "studentInstruction": "Look at the chapati. In this lesson, you will split it into two equal parts.",
         "content": "Look at the whole circle. In this lesson, you will split it into two equal parts.",
         "mediaSpec": {
           "type": "image",
@@ -27,7 +27,8 @@
           "parts": 1,
           "shadedParts": 0,
           "equalParts": true,
-          "showLabels": false
+          "showLabels": false,
+          "theme": "chapati"
         },
         "interactionSpec": {
           "type": "tap_continue",
@@ -68,7 +69,6 @@
         },
         "interactionSpec": {
           "type": "tap_continue",
-          "prompt": "Tap Accept mission.",
           "buttonLabel": "Accept mission"
         },
         "feedbackSpec": {
@@ -173,7 +173,7 @@
       {
         "stepKey": "learn",
         "activityType": "teaching",
-        "studentInstruction": "Tap Show me to see how a whole circle becomes one half.",
+        "studentInstruction": "Watch how a whole circle becomes one half.",
         "content": "A whole is one complete object. When we divide one whole circle into two equal parts, each part is called one half. We write one half as 1/2.",
         "mediaSpec": {
           "type": "video",
@@ -223,12 +223,11 @@
                 ]
               }
             }
-          ]
+          ],
+          "theme": "paper_cutout"
         },
         "interactionSpec": {
-          "type": "step_reveal",
-          "prompt": "Tap Show me.",
-          "buttonLabel": "Show me"
+          "type": "step_reveal"
         },
         "feedbackSpec": {
           "correct": "Good. One half is one of two equal parts.",
@@ -248,7 +247,8 @@
           "prompt": "Show me",
           "buttonLabel": "Show me",
           "hint": "A half needs two equal parts."
-        }
+        },
+        "contentBlocks": {}
       },
       {
         "stepKey": "connect",
@@ -268,13 +268,15 @@
           "parts": 2,
           "equalParts": true,
           "highlightPart": 1,
-          "label": "1/2"
+          "label": "1/2",
+          "theme": "chapati"
         },
         "interactionSpec": {
           "type": "tap_region",
           "prompt": "Tap one half of the chapati.",
           "correctRegion": "part_1",
-          "buttonLabel": "Check"
+          "buttonLabel": "Check",
+          "theme": "chapati"
         },
         "feedbackSpec": {
           "correct": "Yes. That is one of two equal pieces.",
@@ -342,12 +344,11 @@
                 ]
               }
             }
-          ]
+          ],
+          "theme": "paper_cutout"
         },
         "interactionSpec": {
-          "type": "step_reveal",
-          "prompt": "Tap Next step.",
-          "buttonLabel": "Next step"
+          "type": "step_reveal"
         },
         "feedbackSpec": {
           "correct": "Great. Amina shaded one half, or 1/2.",
@@ -438,7 +439,8 @@
               "shape": {
                 "type": "fraction_circle",
                 "parts": 2,
-                "equalParts": true
+                "equalParts": true,
+                "theme": "paper_cutout"
               },
               "requiredShadedParts": 1
             },
@@ -495,10 +497,11 @@
           "parts": 2,
           "shadedParts": 1,
           "equalParts": true,
-          "showLabels": true,
+          "showLabels": false,
           "labels": [
             "1/2"
-          ]
+          ],
+          "theme": "plain"
         },
         "interactionSpec": {
           "type": "multiple_choice",

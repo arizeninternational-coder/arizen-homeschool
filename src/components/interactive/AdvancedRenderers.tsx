@@ -18,6 +18,7 @@ interface TapRegionProps {
     highlightPart?: number;
     label?: string;
     orientation?: string;
+    theme?: string;
   };
   correctRegion: string;
   prompt?: string;
@@ -49,8 +50,8 @@ export function TapRegion({
 
   // Render a fraction shape with tappable parts
   const renderTappableShape = () => {
+    const theme = (visualSpec.theme as any) || "plain";
     if (visualSpec.type === "real_life_fraction" || visualSpec.object) {
-      // For real-life objects, render as fraction circle with object label
       const objName = visualSpec.object || "shape";
       return (
         <div className="flex flex-col items-center gap-2">
@@ -64,12 +65,12 @@ export function TapRegion({
             size={160}
             interactive
             onClickPart={(i) => handlePartClick(i)}
+            theme={theme}
           />
         </div>
       );
     }
 
-    // Default: fraction circle
     return (
       <FractionCircle
         parts={parts}
@@ -80,6 +81,7 @@ export function TapRegion({
         size={160}
         interactive
         onClickPart={(i) => handlePartClick(i)}
+        theme={theme}
       />
     );
   };
@@ -430,6 +432,7 @@ interface RealLifeFractionProps {
   equalParts?: boolean;
   highlightPart?: number;
   label?: string;
+  theme?: string;
 }
 
 export function RealLifeFraction({
@@ -438,6 +441,7 @@ export function RealLifeFraction({
   equalParts = true,
   highlightPart = 1,
   label,
+  theme = "plain",
 }: RealLifeFractionProps) {
   // Map object names to visual types
   const isCircular = ["chapati", "mandazi", "orange", "plate", "clock", "wheel"].some(
@@ -459,6 +463,7 @@ export function RealLifeFraction({
           showLabels={!!label}
           labels={label ? [label] : undefined}
           size={160}
+          theme={theme as any}
         />
       ) : (
         <FractionRectangle
