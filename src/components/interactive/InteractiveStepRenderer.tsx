@@ -157,38 +157,33 @@ export function InteractiveStepRenderer({
 
     if (illo.approvedUrl) {
       return (
-        <div className="my-4 rounded-2xl overflow-hidden border border-slate-200/50 shadow-sm">
-          <img src={illo.approvedUrl} alt={illo.alt || step.title} className="w-full h-auto max-h-[240px] object-cover" />
+        <div className="rounded-2xl overflow-hidden border border-slate-200/50 shadow-sm">
+          <img src={illo.approvedUrl} alt={illo.alt || step.title} className="w-full h-auto max-h-[220px] object-cover" />
           {illo.caption && <p className="text-xs text-slate-500 text-center py-2 bg-slate-50">{illo.caption}</p>}
         </div>
       );
     }
 
-    // Placeholder / generation UI
-    if (illo.mode === "generated" || illo.prompt) {
-      return (
-        <div className="my-4 rounded-2xl border-2 border-dashed border-slate-200/60 bg-slate-50/50 p-4 flex flex-col items-center gap-2">
-          <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-slate-400">
-              <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.5"/>
-              <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/>
-              <path d="M21 15l-5-5L5 21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </div>
-          {illo.caption && <p className="text-xs text-slate-500 text-center">{illo.caption}</p>}
-          {canGenerateImage && (
-            <button
-              onClick={() => setGenTries((t: number) => t + 1)}
-              className="mt-1 px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-600 text-xs font-semibold hover:bg-indigo-100 transition-colors"
-            >
-              ✨ Generate another picture ({genTries}/{genConfig?.maxTries})
-            </button>
-          )}
-        </div>
-      );
-    }
-
-    return null;
+    // Compact themed placeholder
+    const themedBg = theme === "chapati" ? "from-amber-50 to-orange-50" : "from-indigo-50 to-purple-50";
+    return (
+      <div className={`rounded-2xl border border-slate-200/60 bg-gradient-to-br ${themedBg} p-3 flex flex-col items-center gap-2 min-h-[120px] justify-center`}>
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" className="text-slate-400">
+          <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.5"/>
+          <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/>
+          <path d="M21 15l-5-5L5 21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+        {illo.caption && <p className="text-[10px] text-slate-500 text-center leading-snug">{illo.caption}</p>}
+        {canGenerateImage && (
+          <button
+            onClick={() => setGenTries((t: number) => t + 1)}
+            className="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-600 text-[10px] font-semibold hover:bg-indigo-100 transition-colors"
+          >
+            Generate Image (preview)
+          </button>
+        )}
+      </div>
+    );
   };
 
   // -- Visual spec ------------------------------------------------------------
@@ -423,16 +418,21 @@ export function InteractiveStepRenderer({
         <CelebrationBurst active={showBurst} />
         <ConfettiCelebration active={showConfetti} />
 
-        {/* Step title */}
+        {/* Step title + step number */}
         {step.title && (
-          <h3 className="text-lg font-extrabold text-slate-800 text-center">{step.title}</h3>
+          <div className="flex items-center gap-3">
+            <div className="flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-500 text-white text-sm font-black shadow-sm">
+              {stepNumber}
+            </div>
+            <h3 className="text-lg font-extrabold text-slate-800">{step.title}</h3>
+            <span className="text-xs text-slate-400 font-semibold">Step {stepNumber} of {totalSteps}</span>
+          </div>
         )}
 
-        {/* Owl / story introduction */}
+        {/* Owl / story introduction — clean callout, no emoji */}
         {step.owlText && (
-          <div className="flex items-start gap-2 px-3 py-2 rounded-xl bg-indigo-50/50 border border-indigo-100">
-            <span className="text-lg flex-shrink-0">🦉</span>
-            <p className="text-sm text-indigo-800 leading-relaxed">{step.owlText}</p>
+          <div className="flex items-start gap-2 px-4 py-3 rounded-xl bg-gradient-to-br from-indigo-50/80 to-purple-50/50 border border-indigo-200/60">
+            <p className="text-sm text-indigo-800 leading-relaxed font-medium">{step.owlText}</p>
           </div>
         )}
 
@@ -450,11 +450,40 @@ export function InteractiveStepRenderer({
           ) : null;
         })()}
 
-        {/* Illustration layer */}
-        {renderIllustration()}
+        {/* Two-column layout: illustration + visual */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Left: Illustration */}
+          {renderIllustration()}
 
-        {/* Teaching visual */}
-        {renderVisualSpec()}
+          {/* Right: Teaching visual */}
+          <div className="flex flex-col justify-center">
+            {renderVisualSpec()}
+          </div>
+        </div>
+
+        {/* Admin Image Controls (admin only) */}
+        {process.env.NODE_ENV !== "production" && step.mediaSpec?.illustration && (
+          <div className="px-3 py-2 rounded-xl bg-slate-50 border border-slate-200/60">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Illustration:</span>
+              <button className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white border border-slate-200 text-[10px] font-semibold text-slate-600 hover:border-indigo-300 hover:text-indigo-600 transition-colors">
+                Upload
+              </button>
+              <button className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white border border-slate-200 text-[10px] font-semibold text-slate-600 hover:border-indigo-300 hover:text-indigo-600 transition-colors">
+                Generate
+              </button>
+              <button className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white border border-slate-200 text-[10px] font-semibold text-slate-600 hover:border-indigo-300 hover:text-indigo-600 transition-colors">
+                Regenerate
+              </button>
+              <button className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-[10px] font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors">
+                Approve
+              </button>
+              <button className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-red-50 border border-red-200 text-[10px] font-semibold text-red-600 hover:bg-red-100 transition-colors">
+                Remove
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Video */}
         <MediaSpecVideoRenderer step={step} />
@@ -484,21 +513,40 @@ export function InteractiveStepRenderer({
   // -- Legacy fallback --------------------------------------------------------
   return (
     <div className={`space-y-4 ${className}`}>
-      {step.title && <h3 className="text-lg font-extrabold text-slate-800 text-center">{step.title}</h3>}
-      {step.owlText && (
-        <div className="flex items-start gap-2 px-3 py-2 rounded-xl bg-indigo-50/50 border border-indigo-100">
-          <span className="text-lg flex-shrink-0">🦉</span>
-          <p className="text-sm text-indigo-800 leading-relaxed">{step.owlText}</p>
+      {/* Step title */}
+      {step.title && (
+        <div className="flex items-center gap-3">
+          <div className="flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-500 text-white text-sm font-black shadow-sm">
+            {stepNumber}
+          </div>
+          <h3 className="text-lg font-extrabold text-slate-800">{step.title}</h3>
         </div>
       )}
+
+      {/* Owl text */}
+      {step.owlText && (
+        <div className="flex items-start gap-2 px-4 py-3 rounded-xl bg-gradient-to-br from-indigo-50/80 to-purple-50/50 border border-indigo-200/60">
+          <p className="text-sm text-indigo-800 leading-relaxed font-medium">{step.owlText}</p>
+        </div>
+      )}
+
+      {/* Student text */}
       {step.studentText && (
         <div className="prose prose-sm max-w-none">
-          {step.studentText.split("\n").filter((l) => l.trim()).map((line, i) => (
+          {step.studentText.split("\n").filter((f: string) => f.trim()).map((line: string, i: number) => (
             <p key={i} className="text-slate-700 leading-relaxed mb-2 last:mb-0">{line}</p>
           ))}
         </div>
       )}
+
+      {step.mathDisplay && (
+        <div className="px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-center">
+          <span className="text-lg font-mono font-bold text-slate-800">{step.mathDisplay}</span>
+        </div>
+      )}
+
       <MediaSpecVideoRenderer step={step} />
+
       {step.interaction && <LegacyInteractionRenderer step={step} interaction={interaction} setInteraction={setInteraction} onNext={onNext} />}
       {renderMissionConfirmation()}
       {step.rewardText && <RewardAnimation rewardText={step.rewardText} badgeName={step.mediaSpec?.name} />}

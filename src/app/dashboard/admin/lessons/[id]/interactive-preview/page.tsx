@@ -163,62 +163,14 @@ export default function InteractivePreviewPage({ params }: { params: Promise<{ i
               </button>
             </div>
           ) : (
-            <div className={"rounded-2xl border-2 " + meta.border + " bg-white p-6 lg:p-8 shadow-lg"}>
-              {/* Step header */}
-              <div className="flex items-center gap-3 mb-5">
-                <div className={"flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center bg-gradient-to-br " + meta.gradient + " text-white shadow-md"}>
-                  <span className="text-lg font-black">{clampedStep + 1}</span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h2 className={"font-black text-xl lg:text-2xl " + meta.accent + " tracking-tight leading-tight"}>
-                    {step.title}
-                  </h2>
-                  <span className="text-[11px] font-semibold text-slate-400">
-                    Step {clampedStep + 1} of {totalSteps}
-                  </span>
-                </div>
-              </div>
-
-              {/* Owl guidance */}
-              {step.owlText && (
-                <div className="flex items-start gap-3 px-4 py-3 rounded-2xl bg-gradient-to-br from-sky-50/90 via-indigo-50/60 to-purple-50/40 border border-sky-200/50 shadow-sm mb-5">
-                  <span className="text-2xl flex-shrink-0">🦉</span>
-                  <p className="text-slate-700 text-sm leading-relaxed font-medium">{step.owlText}</p>
-                </div>
-              )}
-
-              {/* Admin Image Controls */}
-              <div className="mb-4 px-3 py-2 rounded-xl bg-slate-50 border border-slate-200/60">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Illustration:</span>
-                  <button className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white border border-slate-200 text-[10px] font-semibold text-slate-600 hover:border-indigo-300 hover:text-indigo-600 transition-colors">
-                    <Upload className="w-3 h-3" /> Upload
-                  </button>
-                  <button className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white border border-slate-200 text-[10px] font-semibold text-slate-600 hover:border-indigo-300 hover:text-indigo-600 transition-colors">
-                    <Sparkles className="w-3 h-3" /> Generate
-                  </button>
-                  <button className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white border border-slate-200 text-[10px] font-semibold text-slate-600 hover:border-indigo-300 hover:text-indigo-600 transition-colors">
-                    <ImagePlus className="w-3 h-3" /> Regenerate
-                  </button>
-                  <button className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-[10px] font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors">
-                    <Check className="w-3 h-3" /> Approve
-                  </button>
-                  <button className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-red-50 border border-red-200 text-[10px] font-semibold text-red-600 hover:bg-red-100 transition-colors">
-                    <Trash2 className="w-3 h-3" /> Remove
-                  </button>
-                </div>
-              </div>
-
-              {/* Interactive step renderer */}
-              <InteractiveStepRenderer
-                step={step}
-                stepNumber={clampedStep + 1}
-                totalSteps={totalSteps}
-                interaction={interaction}
-                setInteraction={setInteraction}
-                onNext={handleNext}
-              />
-            </div>
+            <InteractiveStepRenderer
+              step={step}
+              stepNumber={clampedStep + 1}
+              totalSteps={totalSteps}
+              interaction={interaction}
+              setInteraction={setInteraction}
+              onNext={handleNext}
+            />
           )}
         </div>
       </div>
