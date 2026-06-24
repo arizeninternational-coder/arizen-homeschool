@@ -53,6 +53,7 @@ interface TapContinueProps {
   prompt?: string;
   onContinue: () => void;
   feedback?: FeedbackSpec;
+  buttonLabel?: string;
 }
 
 export function TapContinue({ prompt, onContinue, feedback, buttonLabel }: TapContinueProps) {

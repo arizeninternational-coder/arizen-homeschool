@@ -78,6 +78,7 @@ export async function GET(req: NextRequest) {
         xpReward,
         estimatedDurationMinutes,
         createdAt,
+        contentBlocks,
         quest:Quest(
           id,
           title,

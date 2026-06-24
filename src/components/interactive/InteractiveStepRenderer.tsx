@@ -102,6 +102,7 @@ export interface ExtendedJourneyStep {
     choices?: string[];
     correctAnswer?: number | string;
     hint?: string;
+    buttonLabel?: string;
     chips?: string[];
     sentenceStarter?: string;
     targetVisualId?: string;
@@ -397,7 +398,7 @@ export function InteractiveStepRenderer({
           correctRegion={spec.correctRegion || "part_1"}
           prompt={spec.prompt}
           feedback={feedback}
-          onAnswer={(correct) => {
+          onAnswer={(correct: boolean) => {
             setInteraction((p: any) => ({
               ...p,
               tapRegionSubmitted: true,
@@ -415,7 +416,7 @@ export function InteractiveStepRenderer({
           requiredShadedParts={spec.requiredShadedParts || 1}
           prompt={spec.prompt}
           feedback={feedback}
-          onAnswer={(correct) => {
+          onAnswer={(correct: boolean) => {
             setInteraction((p: any) => ({
               ...p,
               shadeSubmitted: true,
