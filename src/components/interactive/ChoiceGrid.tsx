@@ -36,14 +36,15 @@ export function ChoiceGrid({
             key={opt.id}
             onClick={() => !disabled && onSelect(opt.id)}
             disabled={disabled}
-            className={`relative rounded-2xl border-2 p-4 text-center transition-all ${
+            className={`relative rounded-2xl border-2 p-4 pt-6 text-center transition-all ${
               isSelected
                 ? "border-indigo-500 bg-indigo-50 shadow-lg shadow-indigo-100"
                 : "border-slate-200 bg-white hover:border-indigo-300 hover:shadow-md"
             } ${disabled ? "cursor-default" : "cursor-pointer"}`}
           >
+            {/* Letter badge */}
             <div
-              className={`absolute -top-2.5 -left-2.5 w-7 h-7 rounded-full flex items-center justify-center text-xs font-black text-white ${
+              className={`absolute top-2 left-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-black text-white ${
                 isSelected ? "bg-indigo-500" : "bg-slate-400"
               }`}
             >
@@ -51,11 +52,11 @@ export function ChoiceGrid({
             </div>
 
             {opt.visual && (
-              <div className="flex justify-center mb-2">{opt.visual}</div>
+              <div className="flex justify-center mb-3 mt-2">{opt.visual}</div>
             )}
 
             {opt.description && (
-              <p className="text-xs text-slate-600 font-medium mt-1 leading-snug">
+              <p className="text-sm text-slate-600 font-medium leading-snug">
                 {opt.description}
               </p>
             )}

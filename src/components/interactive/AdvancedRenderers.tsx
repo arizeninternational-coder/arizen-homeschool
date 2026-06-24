@@ -480,24 +480,30 @@ export function RealLifeFraction({
 
 interface RecapChecklistProps {
   items: string[];
+  heading?: string;
+  variant?: "check" | "bullet";
 }
 
-export function RecapChecklist({ items }: RecapChecklistProps) {
+export function RecapChecklist({ items, heading, variant = "bullet" }: RecapChecklistProps) {
   return (
     <div className="mt-4 rounded-2xl border border-slate-200/60 bg-gradient-to-br from-slate-50 to-white p-5 space-y-3">
-      <p className="text-sm font-bold text-slate-700 text-center">What you learned today</p>
+      {heading && <p className="text-sm font-bold text-slate-700 text-center">{heading}</p>}
       <div className="space-y-2">
         {items.map((item, i) => (
           <div
             key={i}
-            className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-emerald-50 border border-emerald-200/60"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white/60 border border-slate-100"
           >
-            <span className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-              <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                <path d="M2 5L4 7L8 3" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </span>
-            <span className="text-sm font-medium text-emerald-800">{item}</span>
+            {variant === "check" ? (
+              <span className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                  <path d="M2 5L4 7L8 3" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </span>
+            ) : (
+              <span className="w-5 h-5 rounded-full border-2 border-slate-300 flex-shrink-0" />
+            )}
+            <span className="text-sm font-medium text-slate-700">{item}</span>
           </div>
         ))}
       </div>

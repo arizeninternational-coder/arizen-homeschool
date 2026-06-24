@@ -80,7 +80,7 @@ export function FractionCircle({
           <line x1={cx} y1={cy - radius} x2={cx} y2={cy + radius} stroke="#fff" strokeWidth="2" />
         )}
         {sectors.map((s) => {
-          const label = showLabels && labels && labels[s.i] ? labels[s.i] : showLabels ? `${s.i + 1}/${parts}` : null;
+          const label = showLabels && labels && labels[s.i] ? labels[s.i] : showLabels ? (parts === 2 && equalParts ? "1/2" : `${s.i + 1}/${parts}`) : null;
           if (!label) return null;
           return (
             <text

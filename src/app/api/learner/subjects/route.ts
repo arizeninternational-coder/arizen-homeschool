@@ -23,6 +23,7 @@ export async function GET(req: NextRequest) {
     const learnerGrade = profile?.grade || null;
 
     // Fetch themes for this grade (any status — so subjects show even without published content)
+    // Also fetch themes that have studentVisible lessons regardless of grade
     let themeQuery = supabase
       .from("Theme")
       .select("id, title, slug, grade, status")

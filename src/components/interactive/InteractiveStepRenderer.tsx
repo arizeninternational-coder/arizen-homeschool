@@ -246,10 +246,13 @@ export function InteractiveStepRenderer({
         description: s.description,
         visual: renderVisualElement(s.visual),
       }));
+      // For teaching steps (learn, example), show all steps without carousel
+      const stepMode = (step.stepKey === "learn" || step.stepKey === "example") ? "all" : "carousel";
       return (
         <StepReveal
           steps={revealSteps}
           onComplete={onNext}
+          mode={stepMode}
         />
       );
     }
@@ -274,6 +277,8 @@ export function InteractiveStepRenderer({
     }
 
     if (vs.type === "real_life_fraction") {
+      // If there's a tap_region interaction, the visual is rendered by TapRegion
+      if (step.interactionSpec?.type === "tap_region") return null;
       return (
         <RealLifeFraction
           object={vs.object || "shape"}
@@ -285,18 +290,16 @@ export function InteractiveStepRenderer({
       );
     }
 
-    if (vs.type === "checklist" || vs.type === "recap_checklist") {
-      return <RecapChecklist items={vs.items || []} />;
+    if (vs.type === "checklist") {
+      return <RecapChecklist items={vs.items || []} heading={step.title} variant="bullet" />;
+    }
+
+    if (vs.type === "recap_checklist") {
+      return <RecapChecklist items={vs.items || []} heading={step.title || "You can now:"} variant="check" />;
     }
 
     if (vs.type === "reflection_card") {
-      return (
-        <div className="flex flex-col items-center gap-2 my-4">
-          {vs.sentenceStarter && (
-            <p className="text-sm text-slate-500 italic">{vs.sentenceStarter}</p>
-          )}
-        </div>
-      );
+      return null; // Rendered by reflection_chips interactionSpec
     }
 
     if (vs.type === "reward_animation") {
@@ -316,6 +319,11 @@ export function InteractiveStepRenderer({
     if (!step.interactionSpec) return null;
     const spec = step.interactionSpec;
     const feedback = step.feedbackSpec || {};
+
+    // When choice_grid visual is present, tap_choice interaction is handled by ChoiceGrid
+    if (spec.type === "tap_choice" && step.visualSpec?.type === "choice_grid") {
+      return null;
+    }
 
     if (spec.type === "tap_continue") {
       return (
@@ -428,6 +436,28 @@ export function InteractiveStepRenderer({
     }
 
     if (spec.type === "multi_activity") {
+      // For the practice step, render a simplified single-panel shade interaction
+      if (step.stepKey === "practice") {
+        const shadeActivity = (spec.activities || []).find(a => a.type === "shade_shape");
+        if (shadeActivity) {
+          return (
+            <div className="space-y-4">
+              <p className="text-base font-bold text-slate-800 text-center">
+                Shade one half of the circle
+              </p>
+              <ShadeShape
+                shape={shadeActivity.shape || { type: "fraction_circle", parts: 2, equalParts: true }}
+                requiredShadedParts={shadeActivity.requiredShadedParts || 1}
+                prompt={shadeActivity.prompt}
+                feedback={feedback}
+                onAnswer={(correct: boolean) => {
+                  setInteraction((p: any) => ({ ...p, shadeSubmitted: true, shadeCorrect: correct }));
+                }}
+              />
+            </div>
+          );
+        }
+      }
       return (
         <MultiActivity
           activities={spec.activities || []}
@@ -474,6 +504,8 @@ export function InteractiveStepRenderer({
 
   const renderMediaSpecVideo = () => {
     if (!step.mediaSpec || step.mediaSpec.type !== "video") return null;
+    // Hide unapproved videos from student view
+    if (step.mediaSpec.reviewStatus === "needs_review") return null;
     return (
       <MediaSpecVideo
         mediaSpec={step.mediaSpec}

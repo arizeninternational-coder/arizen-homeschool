@@ -11,12 +11,51 @@ interface RevealStep {
 interface StepRevealProps {
   steps: RevealStep[];
   onComplete?: () => void;
+  mode?: "carousel" | "all";
 }
 
-export function StepReveal({ steps, onComplete }: StepRevealProps) {
+export function StepReveal({ steps, onComplete, mode = "carousel" }: StepRevealProps) {
   const [current, setCurrent] = useState(0);
   const isLast = current >= steps.length - 1;
   const step = steps[current];
+
+  // "all" mode: show all steps without carousel navigation
+  if (mode === "all") {
+    if (!steps || steps.length === 0) return null;
+    return (
+      <div className="rounded-2xl border border-slate-200/60 bg-gradient-to-br from-slate-50 to-white p-5 space-y-5">
+        {steps.map((s, i) => (
+          <div key={i} className="text-center space-y-2">
+            <div className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-indigo-100 text-indigo-600 text-xs font-bold">
+              {i + 1}
+            </div>
+            <h4 className="font-bold text-slate-800 text-base">{s.title}</h4>
+            {s.description && (
+              <p className="text-sm text-slate-600 leading-relaxed max-w-md mx-auto">{s.description}</p>
+            )}
+            {s.visual && (
+              <div className="flex justify-center py-2">{s.visual}</div>
+            )}
+            {i < steps.length - 1 && (
+              <div className="flex justify-center">
+                <div className="w-0.5 h-4 bg-indigo-200" />
+              </div>
+            )}
+          </div>
+        ))}
+        {onComplete && (
+          <div className="flex justify-center pt-3">
+            <button
+              onClick={onComplete}
+              className="px-5 py-2 rounded-xl bg-emerald-500 text-white text-sm font-bold hover:bg-emerald-600 transition-colors"
+            >
+              Got it! ✓
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   if (!step) return null;
 

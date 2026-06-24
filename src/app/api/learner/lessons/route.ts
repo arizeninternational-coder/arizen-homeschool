@@ -102,9 +102,17 @@ export async function GET(req: NextRequest) {
 
     let filtered = lessons || [];
 
-    // Filter by grade if available
+    // Filter by grade if available — but always include studentVisible lessons
     if (grade) {
-      filtered = filtered.filter((l: any) => !l.quest?.theme?.grade || l.quest.theme.grade === grade);
+      filtered = filtered.filter((l: any) => {
+        // Always show student-visible lessons regardless of grade
+        let cb = l.contentBlocks;
+        if (typeof cb === "string") { try { cb = JSON.parse(cb); } catch { /* ignore */ } }
+        const aiMeta = cb?.aiMetadata || {};
+        if (aiMeta.studentVisible === true) return true;
+        // Otherwise filter by grade
+        return !l.quest?.theme?.grade || l.quest.theme.grade === grade;
+      });
     }
 
     // Get theme IDs for subject lookup
