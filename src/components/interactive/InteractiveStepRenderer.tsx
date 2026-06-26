@@ -492,26 +492,49 @@ export function InteractiveStepRenderer({
 
             {/* Owl guidance removed per instruction */}
 
-            {/* Student instruction / topic intro — skip for Welcome (visual already conveys the message) */}
-            {(() => {
-              if (step.stepKey === "welcome" || step.stepType === "welcome") return null;
-              const instruction = step.studentInstruction || step.content || "";
-              const prompt = step.interactionSpec?.prompt || "";
-              const showInstruction = instruction.trim() && instruction.trim() !== prompt.trim();
-              return showInstruction ? (
-                <div className="prose prose-sm max-w-none">
-                  {instruction.split("\n").filter((l) => l.trim()).map((line, i) => (
-                    <p key={i} className="text-slate-700 leading-relaxed mb-2 last:mb-0">{line}</p>
-                  ))}
-                </div>
-              ) : null;
-            })()}
+            {/* For Welcome: show teacher message + intro paragraph once */}
+            {(step.stepKey === "welcome" || step.stepType === "welcome") ? (
+              <div className="space-y-4">
+                {(step.owlText || step.studentInstruction || step.content) && (
+                  <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-gradient-to-br from-indigo-50/80 to-purple-50/50 border border-indigo-200/60">
+                    <p className="text-sm text-indigo-800 leading-relaxed font-medium">
+                      {step.owlText || step.studentInstruction || step.content}
+                    </p>
+                  </div>
+                )}
+                {step.interactionSpec?.prompt && step.interactionSpec.prompt !== step.studentInstruction && step.interactionSpec.prompt !== step.content && (
+                  <p className="text-sm text-slate-600 leading-relaxed text-center">
+                    Today, you will learn how to split one whole into two equal parts. Each equal part is called one half.
+                  </p>
+                )}
+              </div>
+            ) : (
+              /* Student instruction / topic intro for non-Welcome steps */
+              (() => {
+                const instruction = step.studentInstruction || step.content || "";
+                const prompt = step.interactionSpec?.prompt || "";
+                const showInstruction = instruction.trim() && instruction.trim() !== prompt.trim();
+                return showInstruction ? (
+                  <div className="prose prose-sm max-w-none">
+                    {instruction.split("\n").filter((l) => l.trim()).map((line, i) => (
+                      <p key={i} className="text-slate-700 leading-relaxed mb-2 last:mb-0">{line}</p>
+                    ))}
+                  </div>
+                ) : null;
+              })()
+            )}
           </>
         )}
 
-        {/* Illustration + visual — single column for full-width, no clipping */}
-        {renderIllustration()}
-        {renderVisualSpec()}
+        {/* For Welcome step, render only the welcome_story visual (not both illustration + visualSpec) */}
+        {step.stepKey === "welcome" || step.stepType === "welcome" ? (
+          <WelcomeStepVisual step={step} />
+        ) : (
+          <>
+            {renderIllustration()}
+            {renderVisualSpec()}
+          </>
+        )}
 
 
         {/* Admin Image Controls (admin only) */}
@@ -676,4 +699,49 @@ function LegacyInteractionRenderer({ step, interaction, setInteraction, onNext }
     return <MultipleChoice question={step.interaction.question || ""} options={options} correctIndex={correctIdx} onAnswer={(correct: boolean, idx: number) => setInteraction((p: any) => ({ ...p, selectedChoice: idx, choiceFeedback: correct ? "correct" : "incorrect" }))} />;
   }
   return null;
+}
+
+// -- Welcome Step Visual ---------------------------------------------------
+// Single polished visual for the Welcome step: shows the illustration or a clean placeholder.
+// This prevents double-rendering (illustration + visualSpec) for Welcome steps.
+
+function WelcomeStepVisual({ step }: { step: ExtendedJourneyStep }) {
+  const illo = step.mediaSpec?.illustration;
+  const caption = illo?.caption || "Amina holding a round chapati";
+  const theme = (step.visualSpec?.theme || "plain") as CircleTheme;
+
+  // Case 1: Real approved image exists — show it as the single main visual
+  if (illo?.approvedUrl) {
+    return (
+      <div className="flex justify-center my-4">
+        <div className="rounded-2xl overflow-hidden border border-slate-200/60 shadow-sm max-w-md w-full">
+          <img src={illo.approvedUrl} alt={illo.alt || "Lesson illustration"} className="w-full h-auto max-h-[280px] object-cover" />
+          {illo.caption && <p className="text-xs text-slate-500 text-center py-2 bg-slate-50">{illo.caption}</p>}
+        </div>
+      </div>
+    );
+  }
+
+  // Case 2: No image — show a single polished student-friendly placeholder
+  const themeAccent = theme === "chapati" ? "text-amber-500" : theme === "orange" ? "text-orange-500" : "text-indigo-500";
+  const themeBg = theme === "chapati" ? "from-amber-50 to-orange-50" : theme === "orange" ? "from-orange-50 to-amber-50" : "from-indigo-50 to-purple-50";
+  return (
+    <div className="flex justify-center my-4">
+      <div className={`rounded-2xl border border-slate-200/60 bg-gradient-to-br ${themeBg} p-8 flex flex-col items-center gap-4 max-w-md w-full`}>
+        <div className={`w-24 h-24 rounded-full bg-white/80 flex items-center justify-center shadow-sm ${themeAccent}`}>
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+            <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="2" strokeDasharray="4 3" />
+            <circle cx="24" cy="24" r="12" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity="0.1" />
+            <circle cx="24" cy="24" r="6" fill="currentColor" fillOpacity="0.2" />
+          </svg>
+        </div>
+        <p className="text-sm text-slate-600 text-center font-medium leading-relaxed max-w-xs">
+          Illustration: {caption}
+        </p>
+        <p className="text-[10px] text-slate-400 text-center uppercase tracking-wider font-semibold">
+          {step.title}
+        </p>
+      </div>
+    </div>
+  );
 }

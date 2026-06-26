@@ -339,8 +339,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
           {/* Progress bar */}
           {totalSteps > 0 && (
             <div style={{ padding: "8px 16px", background: "#fff", borderBottom: "1px solid #F1F5F9" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: "#64748b" }}>Step {clampedStep + 1} of {totalSteps}</span>
+              <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 4 }}>
                 <span style={{ fontSize: 11, fontWeight: 700, color: "#64748b" }}>{Math.round(((clampedStep + 1) / totalSteps) * 100)}%</span>
               </div>
               <div style={{ height: 6, background: "#F1F5F9", borderRadius: 3, overflow: "hidden" }}>
@@ -360,6 +359,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <h2 style={{ fontSize: "1.15rem", fontWeight: 800, color: "#1e293b", margin: 0, lineHeight: 1.2 }}>{currentJourneyStep.title}</h2>
+                    <span style={{ fontSize: "0.75rem", color: "#64748b", fontWeight: 600 }}>Step {clampedStep + 1} of {totalSteps}</span>
                   </div>
                 </div>
                 {/* Owl guidance removed per instruction */}
