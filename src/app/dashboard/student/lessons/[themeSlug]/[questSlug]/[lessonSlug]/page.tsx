@@ -21,7 +21,12 @@ function getStepType(step: any): JourneyStepType {
 }
 
 function hasInteractiveSpec(step: any): boolean {
-  return !!(step?.visualSpec || step?.interactionSpec || step?.feedbackSpec || step?.mediaSpec);
+  if (!step) return false;
+  // Primary: new spec fields (used by InteractiveStepRenderer)
+  if (step.visualSpec || step.interactionSpec || step.feedbackSpec || step.mediaSpec) return true;
+  // Fallback: legacy interaction with options or question indicates interactive body
+  if (step.interaction && (step.interaction.options || step.interaction.question || step.interaction.type)) return true;
+  return false;
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -352,9 +357,28 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
           {/* Step content */}
           <div style={{ flex: 1, overflow: "auto", padding: "16px" }}>
             <div style={{ maxWidth: 720, margin: "0 auto" }}>
+              {/* Step chrome — page owns title/badge/step count/owl for ALL steps */}
+              <div style={{ background: "#fff", borderRadius: 16, padding: "20px", boxShadow: "0 2px 12px rgba(0,0,0,0.04)", marginBottom: 12 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{ width: 44, height: 44, borderRadius: 12, background: "linear-gradient(135deg, #6366F1, #8B5CF6)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: "1.3rem", fontWeight: 800, flexShrink: 0 }}>
+                    {STEP_TYPE_ICONS[getStepType(currentJourneyStep)] || "📖"}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <h2 style={{ fontSize: "1.15rem", fontWeight: 800, color: "#1e293b", margin: 0, lineHeight: 1.2 }}>{currentJourneyStep.title}</h2>
+                    <span style={{ fontSize: "0.75rem", color: "#64748b", fontWeight: 600 }}>Step {clampedStep + 1} of {totalSteps}</span>
+                  </div>
+                </div>
+                {currentJourneyStep.owlText && (
+                  <div style={{ display: "flex", gap: 10, padding: "12px", borderRadius: 10, background: "linear-gradient(135deg, #F0F9FF, #EDE9FE)", border: "1px solid #C7D2FE", marginTop: 12 }}>
+                    <OwlTeacher size={36} expression={OWL_EXPRESSIONS[getStepType(currentJourneyStep)] || 'happy'} />
+                    <p style={{ fontSize: "0.85rem", color: "#334155", lineHeight: 1.5, margin: 0, flex: 1 }}>{currentJourneyStep.owlText}</p>
+                  </div>
+                )}
+              </div>
+
               {/* Subject mismatch warning */}
               {subjectMismatch && (
-                <div style={{ marginBottom: 16, padding: "12px 16px", borderRadius: 12, background: "#FEF2F2", border: "2px solid #DC2626" }}>
+                <div style={{ marginBottom: 12, padding: "12px 16px", borderRadius: 12, background: "#FEF2F2", border: "2px solid #DC2626" }}>
                   <p style={{ fontSize: "0.8125rem", fontWeight: 700, color: "#DC2626", margin: "0 0 4px" }}>
                     ⚠️ Lesson Content Error Detected
                   </p>
@@ -367,7 +391,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                 </div>
               )}
 
-                {/* Interactive renderer for steps with new spec fields — it owns title/Owl/chrome */}
+                {/* Interactive renderer for steps with new spec fields — body only, NO chrome */}
                 {hasInteractiveSpec(currentJourneyStep) ? (
                   <InteractiveStepRenderer
                     step={currentJourneyStep as any}
@@ -382,7 +406,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                         setCurrentStep((s) => Math.min(totalSteps - 1, s + 1));
                       }
                     }}
-                    showChrome={true}
+                    showChrome={false}
                   />
                 ) : (
                   <LegacyStepContent step={currentJourneyStep} />
