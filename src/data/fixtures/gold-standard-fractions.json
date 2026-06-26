@@ -30,7 +30,7 @@
           }
         },
         "visualSpec": {
-          "type": "welcome_panel",
+          "type": "welcome_story",
           "theme": "chapati"
         },
         "interactionSpec": {

@@ -177,14 +177,6 @@ export function InteractiveStepRenderer({
           <path d="M21 15l-5-5L5 21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
         {illo.caption && <p className="text-[10px] text-slate-500 text-center leading-snug">{illo.caption}</p>}
-        {canGenerateImage && (
-          <button
-            onClick={() => setGenTries((t: number) => t + 1)}
-            className="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-600 text-[10px] font-semibold hover:bg-indigo-100 transition-colors"
-          >
-            Generate Image (preview)
-          </button>
-        )}
       </div>
     );
   };
