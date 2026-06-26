@@ -276,9 +276,13 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
           : lesson?.contentBlocks || {};
       } catch {}
 
+      // Preserve existing studentJourney (live) alongside draft
+      // The student route reads studentJourney; the editor works on draft
       const updatedCb = {
         ...existingCb,
         studentJourneyDraft: journeySteps,
+        // Ensure live journey is preserved if it exists
+        ...(existingCb.studentJourney ? { studentJourney: existingCb.studentJourney } : {}),
       };
 
       const res = await fetch(`/api/admin/lessons/${params.id}`, {

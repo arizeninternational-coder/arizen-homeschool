@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <!-- Background - warm gradient -->
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FEF3C7;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FDE68A;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="chapati" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#D4953A;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#C4852A;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="skin" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#D4A574;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#C4956A;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="shirt" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366F1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#4F46E5;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="boyShirt" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#34D399;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#10B981;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="300" fill="url(#bg)" rx="16" />
+
+  <!-- Floor shadow -->
+  <ellipse cx="200" cy="270" rx="120" ry="15" fill="#00000015" />
+
+  <!-- Amina (girl) - center-left -->
+  <!-- Body -->
+  <ellipse cx="160" cy="220" rx="35" ry="45" fill="url(#shirt)" />
+  <!-- Head -->
+  <circle cx="160" cy="155" r="30" fill="url(#skin)" />
+  <!-- Hair -->
+  <ellipse cx="160" cy="135" rx="28" ry="20" fill="#2D1B0E" />
+  <ellipse cx="145" cy="145" rx="8" ry="12" fill="#2D1B0E" />
+  <ellipse cx="175" cy="145" rx="8" ry="12" fill="#2D1B0E" />
+  <!-- Eyes -->
+  <circle cx="150" cy="155" r="3" fill="#2D1B0E" />
+  <circle cx="170" cy="155" r="3" fill="#2D1B0E" />
+  <!-- Smile -->
+  <path d="M152 165 Q160 172 168 165" stroke="#2D1B0E" stroke-width="2" fill="none" stroke-linecap="round" />
+  <!-- Arms reaching forward with chapati -->
+  <path d="M130 200 Q120 190 110 185" stroke="url(#skin)" stroke-width="12" fill="none" stroke-linecap="round" />
+  <path d="M190 200 Q200 190 210 185" stroke="url(#skin)" stroke-width="12" fill="none" stroke-linecap="round" />
+
+  <!-- The Chapati (round, whole) held in both hands -->
+  <circle cx="160" cy="190" r="38" fill="url(#chapati)" />
+  <circle cx="160" cy="190" r="35" fill="#E8B060" stroke="#C4852A" stroke-width="1.5" />
+  <!-- Chapati texture dots -->
+  <circle cx="148" cy="182" r="2" fill="#C4852A" opacity="0.4" />
+  <circle cx="170" cy="178" r="1.5" fill="#C4852A" opacity="0.3" />
+  <circle cx="155" cy="198" r="2" fill="#C4852A" opacity="0.3" />
+  <circle cx="172" cy="195" r="1.5" fill="#C4852A" opacity="0.4" />
+  <circle cx="145" cy="195" r="1.5" fill="#C4852A" opacity="0.3" />
+
+  <!-- Brother (boy) - right side, slightly behind -->
+  <!-- Body -->
+  <ellipse cx="250" cy="225" rx="30" ry="40" fill="url(#boyShirt)" />
+  <!-- Head -->
+  <circle cx="250" cy="165" r="26" fill="url(#skin)" />
+  <!-- Hair (short) -->
+  <ellipse cx="250" cy="148" rx="24" ry="12" fill="#1a1a1a" />
+  <!-- Eyes (looking at chapati) -->
+  <circle cx="242" cy="165" r="2.5" fill="#2D1B0E" />
+  <circle cx="258" cy="165" r="2.5" fill="#2D1B0E" />
+  <!-- Smile -->
+  <path d="M243 174 Q250 180 257 174" stroke="#2D1B0E" stroke-width="1.5" fill="none" stroke-linecap="round" />
+  <!-- Arms reaching toward chapati -->
+  <path d="M225 210 Q215 200 210 195" stroke="url(#skin)" stroke-width="10" fill="none" stroke-linecap="round" />
+  <path d="M275 210 Q280 200 285 195" stroke="url(#skin)" stroke-width="10" fill="none" stroke-linecap="round" />
+
+  <!-- Warm glow around the chapati (sharing moment) -->
+  <circle cx="160" cy="190" r="50" fill="#FDE68A" opacity="0.3" />
+
+  <!-- Small decorative elements - subtle -->
+  <circle cx="80" cy="60" r="20" fill="#FDE68A" opacity="0.4" />
+  <circle cx="320" cy="70" r="15" fill="#FDE68A" opacity="0.3" />
+</svg>
