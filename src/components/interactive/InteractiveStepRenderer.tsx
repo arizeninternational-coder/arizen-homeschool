@@ -129,7 +129,7 @@ export function InteractiveStepRenderer({
   setInteraction,
   onNext,
   className = "",
-  showChrome = true,
+  showChrome = false,
 }: InteractiveStepRendererProps) {
   const hasNewSpec = !!(step.visualSpec || step.interactionSpec || step.feedbackSpec || step.mediaSpec || (step.interaction && (step.interaction.options || step.interaction.question || step.interaction.type)));
   const theme = (step.visualSpec?.theme || step.interactionSpec?.theme || "plain") as CircleTheme;
