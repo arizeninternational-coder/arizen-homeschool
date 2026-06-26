@@ -464,12 +464,7 @@ export function InteractiveStepRenderer({
               </div>
             )}
 
-            {step.owlText && (
-              <div className="flex items-start gap-2 px-4 py-3 rounded-xl bg-gradient-to-br from-indigo-50/80 to-purple-50/50 border border-indigo-200/60">
-                <OwlTeacher size={32} expression={step.stepKey === "mission" ? "encouraging" : step.stepKey === "think_first" || step.stepKey === "quick_check" ? "thinking" : step.stepKey === "complete" ? "celebrating" : "happy"} />
-                <p className="text-sm text-indigo-800 leading-relaxed font-medium">{step.owlText}</p>
-              </div>
-            )}
+            {/* Owl guidance removed per instruction */}
 
             {/* Student instruction / topic intro */}
             {(() => {
@@ -554,12 +549,7 @@ export function InteractiveStepRenderer({
         </div>
       )}
 
-      {/* Owl text */}
-      {step.owlText && (
-        <div className="flex items-start gap-2 px-4 py-3 rounded-xl bg-gradient-to-br from-indigo-50/80 to-purple-50/50 border border-indigo-200/60">
-          <p className="text-sm text-indigo-800 leading-relaxed font-medium">{step.owlText}</p>
-        </div>
-      )}
+      {/* Owl guidance removed per instruction */}
 
       {/* Student text */}
       {step.studentText && (

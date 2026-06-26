@@ -368,12 +368,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                     <span style={{ fontSize: "0.75rem", color: "#64748b", fontWeight: 600 }}>Step {clampedStep + 1} of {totalSteps}</span>
                   </div>
                 </div>
-                {currentJourneyStep.owlText && (
-                  <div style={{ display: "flex", gap: 10, padding: "12px", borderRadius: 10, background: "linear-gradient(135deg, #F0F9FF, #EDE9FE)", border: "1px solid #C7D2FE", marginTop: 12 }}>
-                    <OwlTeacher size={36} expression={OWL_EXPRESSIONS[getStepType(currentJourneyStep)] || 'happy'} />
-                    <p style={{ fontSize: "0.85rem", color: "#334155", lineHeight: 1.5, margin: 0, flex: 1 }}>{currentJourneyStep.owlText}</p>
-                  </div>
-                )}
+                {/* Owl guidance removed per instruction */}
               </div>
 
               {/* Subject mismatch warning */}
@@ -656,14 +651,7 @@ function LegacyStepContent({ step }: { step: any }) {
         </div>
       )}
 
-      {/* Completion */}
-      {step.stepType === "complete" && (
-        <div style={{ textAlign: "center", padding: "24px 0" }}>
-          <OwlTeacher size={72} expression="celebrating" />
-          <h3 style={{ fontSize: "1.5rem", fontWeight: 800, color: "#1e293b", margin: "16px 0 8px" }}>You Did It! 🏆</h3>
-          <p style={{ fontSize: "1rem", color: "#64748b", marginBottom: 16 }}>Amazing work! You have completed this lesson.</p>
-        </div>
-      )}
+      {/* Owl guidance removed per instruction */}
     </>
   );
 }
