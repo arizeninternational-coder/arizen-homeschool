@@ -349,11 +349,11 @@ export function InteractiveStepRenderer({
     }
 
     if (spec.type === "tap_continue") {
-      const isMission = step.stepKey === "mission";
+      const isWelcome = step.stepKey === "welcome" || step.stepType === "welcome";
       const isComplete = step.stepKey === "complete";
       return (
         <TapContinue
-          prompt={isMission ? undefined : spec.prompt}
+          prompt={isWelcome ? undefined : (isMission ? undefined : spec.prompt)}
           onContinue={() => {
             if (isMission) setMissionAccepted(true);
             if (isComplete) handleLessonComplete();
@@ -723,23 +723,20 @@ function WelcomeStepVisual({ step }: { step: ExtendedJourneyStep }) {
   }
 
   // Case 2: No image — show a single polished student-friendly placeholder
-  const themeAccent = theme === "chapati" ? "text-amber-500" : theme === "orange" ? "text-orange-500" : "text-indigo-500";
+  // Case 2: No image — show a single polished student-friendly placeholder
   const themeBg = theme === "chapati" ? "from-amber-50 to-orange-50" : theme === "orange" ? "from-orange-50 to-amber-50" : "from-indigo-50 to-purple-50";
+  const themeAccent = theme === "chapati" ? "text-amber-500" : theme === "orange" ? "text-orange-500" : "text-indigo-500";
   return (
     <div className="flex justify-center my-4">
-      <div className={`rounded-2xl border border-slate-200/60 bg-gradient-to-br ${themeBg} p-8 flex flex-col items-center gap-4 max-w-md w-full`}>
-        <div className={`w-24 h-24 rounded-full bg-white/80 flex items-center justify-center shadow-sm ${themeAccent}`}>
-          <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-            <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="2" strokeDasharray="4 3" />
-            <circle cx="24" cy="24" r="12" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity="0.1" />
-            <circle cx="24" cy="24" r="6" fill="currentColor" fillOpacity="0.2" />
+      <div className={`rounded-2xl border border-slate-200/60 bg-gradient-to-br ${themeBg} p-6 flex flex-col items-center gap-3 max-w-md w-full`}>
+        <div className="w-20 h-20 rounded-full bg-white/80 flex items-center justify-center shadow-sm">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" className={themeAccent}>
+            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5"/>
+            <path d="M8 12h8M12 8v8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
           </svg>
         </div>
-        <p className="text-sm text-slate-600 text-center font-medium leading-relaxed max-w-xs">
-          Illustration: {caption}
-        </p>
-        <p className="text-[10px] text-slate-400 text-center uppercase tracking-wider font-semibold">
-          {step.title}
+        <p className="text-xs text-slate-500 text-center font-medium">
+          {caption}
         </p>
       </div>
     </div>
