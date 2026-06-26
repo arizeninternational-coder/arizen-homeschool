@@ -195,7 +195,41 @@ export function InteractiveStepRenderer({
     if (!step.visualSpec) return null;
     const vs = step.visualSpec;
 
+    if (vs.type === "welcome_story") {
+      // Clean welcome illustration: a single warm image/placeholder, no heavy concept cards
+      const illo = step.mediaSpec?.illustration;
+      if (illo?.approvedUrl) {
+        return (
+          <div className="flex justify-center my-4">
+            <div className="rounded-2xl overflow-hidden border border-slate-200/50 shadow-sm max-w-sm">
+              <img src={illo.approvedUrl} alt={illo.alt || step.title} className="w-full h-auto max-h-[240px] object-cover" />
+              {illo.caption && <p className="text-xs text-slate-500 text-center py-2 bg-slate-50">{illo.caption}</p>}
+            </div>
+          </div>
+        );
+      }
+      // Polished student-facing placeholder (no admin controls here)
+      const theme = (step.visualSpec?.theme || "plain") as CircleTheme;
+      const themeBg = theme === "chapati" ? "from-amber-50 to-orange-50" : theme === "orange" ? "from-orange-50 to-amber-50" : "from-indigo-50 to-purple-50";
+      return (
+        <div className="flex justify-center my-4">
+          <div className={`rounded-2xl border border-slate-200/60 bg-gradient-to-br ${themeBg} p-6 flex flex-col items-center gap-3 max-w-sm w-full`}>
+            <div className="w-20 h-20 rounded-full bg-white/80 flex items-center justify-center shadow-sm">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" className="text-indigo-400">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5"/>
+                <path d="M12 2v20M2 12h20" stroke="currentColor" strokeWidth="1.5" strokeDasharray="2 2"/>
+              </svg>
+            </div>
+            <p className="text-sm text-slate-600 text-center font-medium leading-relaxed">
+              {step.mediaSpec?.illustration?.caption || step.mediaSpec?.illustration?.alt || "Discover the world of halves"}
+            </p>
+          </div>
+        </div>
+      );
+    }
+
     if (vs.type === "welcome_panel") {
+      // Legacy 4-panel welcome (deprecated — kept for backward compat with other lessons)
       return (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 my-4">
           <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200/60">
@@ -466,8 +500,9 @@ export function InteractiveStepRenderer({
 
             {/* Owl guidance removed per instruction */}
 
-            {/* Student instruction / topic intro */}
+            {/* Student instruction / topic intro — skip for Welcome (visual already conveys the message) */}
             {(() => {
+              if (step.stepKey === "welcome" || step.stepType === "welcome") return null;
               const instruction = step.studentInstruction || step.content || "";
               const prompt = step.interactionSpec?.prompt || "";
               const showInstruction = instruction.trim() && instruction.trim() !== prompt.trim();

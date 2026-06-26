@@ -13,8 +13,8 @@
       {
         "stepKey": "welcome",
         "activityType": "intro",
-        "studentInstruction": "In this lesson, you will learn how to split a chapati into two equal parts. Each part is called one half!",
-        "content": "Look at the whole circle. In this lesson, you will split it into two equal parts.",
+        "studentInstruction": "Hi explorer! Amina has one round chapati to share fairly. How can she make sure both people get the same amount?",
+        "content": "Hi explorer! Amina has one round chapati to share fairly. How can she make sure both people get the same amount?",
         "mediaSpec": {
           "type": "image",
           "source": "generated_or_library",
@@ -49,7 +49,7 @@
         "stepType": "welcome",
         "title": "Welcome to Halves",
         "studentText": "Look at the whole circle. In this lesson, you will split it into two equal parts.",
-        "owlText": "Hi explorer! Today we are going to help Amina share a round chapati fairly. Are you ready?",
+        "owlText": "Hi explorer! Amina has one round chapati to share fairly. How can she make sure both people get the same amount?",
         "interaction": {
           "type": "tap_continue",
           "prompt": "Start lesson",

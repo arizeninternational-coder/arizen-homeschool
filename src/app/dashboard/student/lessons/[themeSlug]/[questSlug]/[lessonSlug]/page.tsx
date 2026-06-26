@@ -328,11 +328,6 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
               <ChevronLeft style={{ width: 16, height: 16 }} /> Exit
             </button>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              {totalSteps > 0 && (
-                <span style={{ fontSize: 12, fontWeight: 700, color: "#64748b" }}>
-                  {clampedStep + 1}/{totalSteps}
-                </span>
-              )}
               {xp > 0 && (
                 <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 700, color: "#B45309", background: "#FEF3C7", padding: "3px 8px", borderRadius: 6 }}>
                   <Zap style={{ width: 10, height: 10 }} /> +{xp} XP
@@ -357,7 +352,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
           {/* Step content */}
           <div style={{ flex: 1, overflow: "auto", padding: "16px" }}>
             <div style={{ maxWidth: 720, margin: "0 auto" }}>
-              {/* Step chrome — page owns title/badge/step count/owl for ALL steps */}
+              {/* Step chrome — page owns title/badge for ALL steps */}
               <div style={{ background: "#fff", borderRadius: 16, padding: "20px", boxShadow: "0 2px 12px rgba(0,0,0,0.04)", marginBottom: 12 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   <div style={{ width: 44, height: 44, borderRadius: 12, background: "linear-gradient(135deg, #6366F1, #8B5CF6)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: "1.3rem", fontWeight: 800, flexShrink: 0 }}>
@@ -365,7 +360,6 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <h2 style={{ fontSize: "1.15rem", fontWeight: 800, color: "#1e293b", margin: 0, lineHeight: 1.2 }}>{currentJourneyStep.title}</h2>
-                    <span style={{ fontSize: "0.75rem", color: "#64748b", fontWeight: 600 }}>Step {clampedStep + 1} of {totalSteps}</span>
                   </div>
                 </div>
                 {/* Owl guidance removed per instruction */}
