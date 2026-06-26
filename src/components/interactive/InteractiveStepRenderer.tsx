@@ -3,6 +3,7 @@
 import React from "react";
 import { FractionCircle, FractionRectangle } from "./FractionVisuals";
 import { StepReveal } from "./StepReveal";
+import OwlTeacher from "@/components/ui/OwlTeacher";
 import { ChoiceGrid } from "./ChoiceGrid";
 import { HorizontalTeachingStrip } from "./HorizontalTeachingStrip";
 import { TapContinue, TapChoice, MultipleChoice, ReflectionChips } from "./InteractionRenderers";
@@ -102,6 +103,7 @@ interface InteractiveStepRendererProps {
   setInteraction: (v: any) => void;
   onNext: () => void;
   className?: string;
+  showChrome?: boolean;
 }
 
 // -- Visual Spec Interpreter --------------------------------------------------
@@ -127,6 +129,7 @@ export function InteractiveStepRenderer({
   setInteraction,
   onNext,
   className = "",
+  showChrome = true,
 }: InteractiveStepRendererProps) {
   const hasNewSpec = !!(step.visualSpec || step.interactionSpec || step.feedbackSpec || step.mediaSpec);
   const theme = (step.visualSpec?.theme || step.interactionSpec?.theme || "plain") as CircleTheme;
@@ -191,6 +194,33 @@ export function InteractiveStepRenderer({
   const renderVisualSpec = () => {
     if (!step.visualSpec) return null;
     const vs = step.visualSpec;
+
+    if (vs.type === "welcome_panel") {
+      return (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 my-4">
+          <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200/60">
+            <span className="text-[10px] font-bold text-amber-700 uppercase tracking-wider">Whole</span>
+            <FractionCircle parts={1} shadedParts={0} equalParts={true} showLabels={false} size={80} theme={theme} />
+            <span className="text-xs text-slate-600 font-medium">One whole chapati</span>
+          </div>
+          <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200/60">
+            <span className="text-[10px] font-bold text-amber-700 uppercase tracking-wider">Two equal parts</span>
+            <FractionCircle parts={2} shadedParts={0} equalParts={true} showLabels={true} labels={["1/2", "1/2"]} size={80} theme={theme} />
+            <span className="text-xs text-slate-600 font-medium">Split in half</span>
+          </div>
+          <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-200/60">
+            <span className="text-[10px] font-bold text-indigo-700 uppercase tracking-wider">One half</span>
+            <FractionCircle parts={2} shadedParts={1} equalParts={true} showLabels={true} labels={["1/2", ""]} size={80} theme={theme} />
+            <span className="text-xs text-slate-600 font-medium">Shade one part</span>
+          </div>
+          <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60">
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Not halves</span>
+            <FractionCircle parts={2} shadedParts={1} equalParts={false} showLabels={false} size={80} theme="plain" />
+            <span className="text-xs text-slate-600 font-medium">Unequal pieces</span>
+          </div>
+        </div>
+      );
+    }
 
     if (vs.type === "fraction_circle") {
       return (
@@ -355,6 +385,7 @@ export function InteractiveStepRenderer({
     }
 
     if (spec.type === "shade_shape") {
+      const isPractice = step.stepKey === "practice";
       return (
         <ShadeShape
           shape={spec.shape || { type: "fraction_circle", parts: 2, equalParts: true, theme }}
@@ -365,6 +396,8 @@ export function InteractiveStepRenderer({
             setInteraction((p: any) => ({ ...p, shadeSubmitted: true, shadeCorrect: correct }));
             if (correct) handleCorrectAnswer();
           }}
+          theme={theme}
+          isPractice={isPractice}
         />
       );
     }
@@ -418,48 +451,46 @@ export function InteractiveStepRenderer({
         <CelebrationBurst active={showBurst} />
         <ConfettiCelebration active={showConfetti} />
 
-        {/* Step title + step number */}
-        {step.title && (
-          <div className="flex items-center gap-3">
-            <div className="flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-500 text-white text-sm font-black shadow-sm">
-              {stepNumber}
-            </div>
-            <h3 className="text-lg font-extrabold text-slate-800">{step.title}</h3>
-            <span className="text-xs text-slate-400 font-semibold">Step {stepNumber} of {totalSteps}</span>
-          </div>
+        {/* Step chrome: title + step number + owl + instruction — only when showChrome is true */}
+        {showChrome && (
+          <>
+            {step.title && (
+              <div className="flex items-center gap-3">
+                <div className="flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-500 text-white text-sm font-black shadow-sm">
+                  {stepNumber}
+                </div>
+                <h3 className="text-lg font-extrabold text-slate-800">{step.title}</h3>
+                <span className="text-xs text-slate-400 font-semibold">Step {stepNumber} of {totalSteps}</span>
+              </div>
+            )}
+
+            {step.owlText && (
+              <div className="flex items-start gap-2 px-4 py-3 rounded-xl bg-gradient-to-br from-indigo-50/80 to-purple-50/50 border border-indigo-200/60">
+                <OwlTeacher size={32} expression={step.stepKey === "mission" ? "encouraging" : step.stepKey === "think_first" || step.stepKey === "quick_check" ? "thinking" : step.stepKey === "complete" ? "celebrating" : "happy"} />
+                <p className="text-sm text-indigo-800 leading-relaxed font-medium">{step.owlText}</p>
+              </div>
+            )}
+
+            {/* Student instruction / topic intro */}
+            {(() => {
+              const instruction = step.studentInstruction || step.content || "";
+              const prompt = step.interactionSpec?.prompt || "";
+              const showInstruction = instruction.trim() && instruction.trim() !== prompt.trim();
+              return showInstruction ? (
+                <div className="prose prose-sm max-w-none">
+                  {instruction.split("\n").filter((l) => l.trim()).map((line, i) => (
+                    <p key={i} className="text-slate-700 leading-relaxed mb-2 last:mb-0">{line}</p>
+                  ))}
+                </div>
+              ) : null;
+            })()}
+          </>
         )}
 
-        {/* Owl / story introduction — clean callout, no emoji */}
-        {step.owlText && (
-          <div className="flex items-start gap-2 px-4 py-3 rounded-xl bg-gradient-to-br from-indigo-50/80 to-purple-50/50 border border-indigo-200/60">
-            <p className="text-sm text-indigo-800 leading-relaxed font-medium">{step.owlText}</p>
-          </div>
-        )}
+        {/* Illustration + visual — single column for full-width, no clipping */}
+        {renderIllustration()}
+        {renderVisualSpec()}
 
-        {/* Student instruction / topic intro */}
-        {(() => {
-          const instruction = step.studentInstruction || step.content || "";
-          const prompt = step.interactionSpec?.prompt || "";
-          const showInstruction = instruction.trim() && instruction.trim() !== prompt.trim();
-          return showInstruction ? (
-            <div className="prose prose-sm max-w-none">
-              {instruction.split("\n").filter((l) => l.trim()).map((line, i) => (
-                <p key={i} className="text-slate-700 leading-relaxed mb-2 last:mb-0">{line}</p>
-              ))}
-            </div>
-          ) : null;
-        })()}
-
-        {/* Two-column layout: illustration + visual */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Left: Illustration */}
-          {renderIllustration()}
-
-          {/* Right: Teaching visual */}
-          <div className="flex flex-col justify-center">
-            {renderVisualSpec()}
-          </div>
-        </div>
 
         {/* Admin Image Controls (admin only) */}
         {process.env.NODE_ENV !== "production" && step.mediaSpec?.illustration && (
@@ -586,7 +617,7 @@ function PracticeShadePanel({ activity, feedback, onAnswer, theme }: { activity:
         {activity.prompt || "Shade one half of the circle"}
       </p>
       <div className="flex justify-center">
-        <FractionCircle parts={2} shadedParts={shadedParts} equalParts={true} showLabels={false} size={170} interactive onClickPart={handlePartClick} theme={theme === "plain" ? "paper_cutout" : theme} />
+        <FractionCircle parts={2} shadedParts={shadedParts} equalParts={true} showLabels={false} size={200} interactive onClickPart={handlePartClick} theme={theme === "plain" ? "paper_cutout" : theme} />
       </div>
       <p className="text-xs text-slate-500 text-center">
         Tap inside one half to shade it, tap again to erase.

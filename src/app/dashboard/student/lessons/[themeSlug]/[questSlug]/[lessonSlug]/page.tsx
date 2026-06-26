@@ -352,18 +352,6 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
           {/* Step content */}
           <div style={{ flex: 1, overflow: "auto", padding: "16px" }}>
             <div style={{ maxWidth: 720, margin: "0 auto" }}>
-              {/* Step header */}
-              <div style={{ background: "#fff", borderRadius: 16, padding: "24px", boxShadow: "0 2px 12px rgba(0,0,0,0.04)", marginBottom: 16 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-                  <div style={{ width: 48, height: 48, borderRadius: 12, background: "linear-gradient(135deg, #6366F1, #8B5CF6)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: "1.5rem" }}>
-                    {STEP_TYPE_ICONS[getStepType(currentJourneyStep)] || "📖"}
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <h2 style={{ fontSize: "1.25rem", fontWeight: 800, color: "#1e293b", margin: 0 }}>{currentJourneyStep.title}</h2>
-                    <span style={{ fontSize: "0.75rem", color: "#64748b" }}>Step {clampedStep + 1} of {totalSteps}</span>
-                  </div>
-                </div>
-
               {/* Subject mismatch warning */}
               {subjectMismatch && (
                 <div style={{ marginBottom: 16, padding: "12px 16px", borderRadius: 12, background: "#FEF2F2", border: "2px solid #DC2626" }}>
@@ -379,15 +367,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                 </div>
               )}
 
-                {/* Owl guidance */}
-                {currentJourneyStep.owlText && (
-                  <div style={{ display: "flex", gap: 12, padding: "16px", borderRadius: 12, background: "linear-gradient(135deg, #F0F9FF, #EDE9FE)", border: "1px solid #C7D2FE", marginBottom: 16 }}>
-                    <OwlTeacher size={40} expression={OWL_EXPRESSIONS[getStepType(currentJourneyStep)] || 'happy'} />
-                    <p style={{ fontSize: "0.875rem", color: "#334155", lineHeight: 1.6, margin: 0, flex: 1 }}>{currentJourneyStep.owlText}</p>
-                  </div>
-                )}
-
-                {/* Interactive renderer for steps with new spec fields */}
+                {/* Interactive renderer for steps with new spec fields — it owns title/Owl/chrome */}
                 {hasInteractiveSpec(currentJourneyStep) ? (
                   <InteractiveStepRenderer
                     step={currentJourneyStep as any}
@@ -402,177 +382,11 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                         setCurrentStep((s) => Math.min(totalSteps - 1, s + 1));
                       }
                     }}
+                    showChrome={true}
                   />
                 ) : (
-                  <>
-                    {/* Student content */}
-                    {currentJourneyStep.studentText && (
-                      <div style={{ marginBottom: 16 }}>
-                        {splitIntoParagraphs(currentJourneyStep.studentText).map((p, i) => (
-                          <p key={i} style={{ fontSize: "1rem", color: "#334155", lineHeight: 1.7, marginBottom: 12 }}>{p}</p>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Math display */}
-                    {currentJourneyStep.mathDisplay && (
-                      <div style={{ padding: "16px", borderRadius: 12, background: "#F8FAFC", border: "1px solid #E2E8F0", textAlign: "center", marginBottom: 16 }}>
-                        <span style={{ fontSize: "1.5rem", fontFamily: "monospace", fontWeight: 700, color: "#1e293b" }}>{currentJourneyStep.mathDisplay}</span>
-                      </div>
-                    )}
-
-                    {/* Illustration */}
-                    {currentJourneyStep.media?.illustration?.approvedUrl && (
-                      <div style={{ marginBottom: 16, borderRadius: 12, overflow: "hidden", border: "1px solid #E2E8F0" }}>
-                        <img src={currentJourneyStep.media.illustration.approvedUrl} alt={currentJourneyStep.media.illustration.altText || ""} style={{ width: "100%", height: "auto", display: "block" }} />
-                      </div>
-                    )}
-
-                    {/* Video */}
-                    {(() => {
-                      const vUrl = currentJourneyStep.media?.video?.approvedUrl;
-                      if (!vUrl) return null;
-                      const videoId = extractYouTubeId(vUrl);
-                      if (!videoId) return null;
-                      return (
-                        <div style={{ marginBottom: 16, borderRadius: 12, overflow: "hidden", border: "1px solid #E2E8F0" }}>
-                          <div style={{ position: "relative", width: "100%", paddingBottom: "56.25%" }}>
-                            <iframe src={`https://www.youtube.com/embed/${videoId}`} title="Lesson video" allowFullScreen style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: "none" }} />
-                          </div>
-                        </div>
-                      );
-                    })()}
-
-                    {/* Callout for "connect" step */}
-                    {currentJourneyStep.stepType === "connect" && (
-                      <div style={{ padding: "14px 16px", borderRadius: 12, background: "#ECFDF5", border: "1px solid #A7F3D0", marginBottom: 16, display: "flex", gap: 10, alignItems: "flex-start" }}>
-                        <Lightbulb style={{ width: 18, height: 18, color: "#059669", flexShrink: 0, marginTop: 2 }} />
-                        <p style={{ fontSize: "0.875rem", color: "#065F46", margin: 0, lineHeight: 1.5 }}>{currentJourneyStep.studentText}</p>
-                      </div>
-                    )}
-
-                    {/* Practice section */}
-                    {currentJourneyStep.stepType === "practice" && !currentJourneyStep.interaction?.options && (
-                      <div style={{ padding: "14px 16px", borderRadius: 12, background: "#F0F9FF", border: "1px solid #BAE6FD", marginBottom: 16 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                          <Pencil style={{ width: 16, height: 16, color: "#0284C7" }} />
-                          <span style={{ fontSize: "0.875rem", fontWeight: 700, color: "#0C4A6E" }}>Your Turn!</span>
-                        </div>
-                        <textarea
-                          value={interaction.practiceEntries[0]}
-                          onChange={e => setInteraction((p: any) => ({ ...p, practiceEntries: [e.target.value, p.practiceEntries[1], p.practiceEntries[2]] }))}
-                          placeholder="Write your answer here..."
-                          rows={4}
-                          style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: "1.5px solid #BAE6FD", fontSize: "0.875rem", color: "#1e293b", outline: "none", resize: "vertical", background: "#fff" }}
-                        />
-                      </div>
-                    )}
-
-                    {/* Multiple choice */}
-                    {currentJourneyStep.interaction?.options && currentJourneyStep.interaction.options.length > 0 && (
-                      <div style={{ marginBottom: 16 }}>
-                        <p style={{ fontSize: "1rem", fontWeight: 700, color: "#1e293b", marginBottom: 12 }}>
-                          {currentJourneyStep.interaction.question || currentJourneyStep.interaction.prompt || ""}
-                        </p>
-                        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                          {currentJourneyStep.interaction.options.map((opt: string, i: number) => {
-                            const isSelected = interaction.selectedChoice === i;
-                            const showFeedback = interaction.choiceFeedback !== null;
-                            const correctIdx = typeof currentJourneyStep.interaction?.correctAnswer === "number" ? currentJourneyStep.interaction.correctAnswer : null;
-                            const isCorrect = i === correctIdx;
-                            let bg = "#fff", border = "#CBD5E1";
-                            if (showFeedback && isSelected && isCorrect) { bg = "#D1FAE5"; border = "#10B981"; }
-                            else if (showFeedback && isSelected && !isCorrect) { bg = "#FEE2E2"; border = "#DC2626"; }
-                            else if (showFeedback && isCorrect) { bg = "#D1FAE5"; border = "#10B981"; }
-                            else if (isSelected) { bg = "#EEF2FF"; border = "#6366F1"; }
-                            return (
-                              <button key={i} onClick={() => {
-                                if (interaction.choiceFeedback !== null) return;
-                                const correct = correctIdx !== null ? i === correctIdx : true;
-                                setInteraction((p: any) => ({ ...p, selectedChoice: i, choiceFeedback: correct ? "correct" : "incorrect" }));
-                              }} disabled={interaction.choiceFeedback !== null}
-                                style={{ padding: "12px 16px", borderRadius: 10, border: `2px solid ${border}`, background: bg, display: "flex", alignItems: "center", gap: 10, cursor: interaction.choiceFeedback !== null ? "default" : "pointer", textAlign: "left", width: "100%" }}>
-                                <span style={{ width: 24, height: 24, borderRadius: "50%", border: `2px solid ${border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.75rem", fontWeight: 700, color: border, flexShrink: 0 }}>
-                                  {String.fromCharCode(65 + i)}
-                                </span>
-                                <span style={{ fontSize: "0.875rem", color: "#334155", flex: 1 }}>{opt}</span>
-                                {showFeedback && isCorrect && <CheckCircle2 style={{ width: 18, height: 18, color: "#059669" }} />}
-                                {showFeedback && isSelected && !isCorrect && <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#DC2626" }}>Try again</span>}
-                              </button>
-                            );
-                          })}
-                        </div>
-                        {interaction.choiceFeedback === "correct" && (
-                          <div style={{ marginTop: 8, padding: "10px 14px", borderRadius: 8, background: "#D1FAE5", border: "1px solid #A7F3D0" }}>
-                            <p style={{ fontSize: "0.875rem", fontWeight: 700, color: "#065F46", margin: 0 }}>✅ Correct! Well done! {currentJourneyStep.interaction?.explanation || ""}</p>
-                          </div>
-                        )}
-                        {interaction.choiceFeedback === "incorrect" && (
-                          <div style={{ marginTop: 8, padding: "10px 14px", borderRadius: 8, background: "#FEF3C7", border: "1px solid #FDE68A" }}>
-                            <p style={{ fontSize: "0.875rem", fontWeight: 700, color: "#92400E", margin: 0 }}>Not quite. Think about it and try again!</p>
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Think first */}
-                    {currentJourneyStep.stepType === "think_first" && (
-                      <div style={{ padding: "14px 16px", borderRadius: 12, background: "#FFFBEB", border: "1px solid #FDE68A", marginBottom: 16 }}>
-                        <textarea
-                          value={interaction.predictionText}
-                          onChange={e => setInteraction((p: any) => ({ ...p, predictionText: e.target.value }))}
-                          placeholder="What do you think? Write your ideas here..."
-                          rows={3}
-                          style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: "1.5px solid #FDE68A", fontSize: "0.875rem", color: "#1e293b", outline: "none", resize: "vertical", background: "#fff" }}
-                        />
-                        {interaction.predictionText.trim() && (
-                          <p style={{ fontSize: "0.75rem", color: "#92400E", marginTop: 4, fontWeight: 600 }}>✓ Your thinking is saved! Click Next to continue.</p>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Reflection */}
-                    {currentJourneyStep.stepType === "reflect" && (
-                      <div style={{ padding: "14px 16px", borderRadius: 12, background: "#FFF1F2", border: "1px solid #FECDD3", marginBottom: 16 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                          <MessageCircle style={{ width: 16, height: 16, color: "#E11D48" }} />
-                          <span style={{ fontSize: "0.875rem", fontWeight: 700, color: "#9F1239" }}>Reflection Time</span>
-                        </div>
-                        <textarea
-                          value={interaction.reflectionText}
-                          onChange={e => setInteraction((p: any) => ({ ...p, reflectionText: e.target.value }))}
-                          placeholder="What did you learn today? How do you feel?"
-                          rows={3}
-                          style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: "1.5px solid #FECDD3", fontSize: "0.875rem", color: "#1e293b", outline: "none", resize: "vertical", background: "#fff", marginBottom: 8 }}
-                        />
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                          {(currentJourneyStep.reflectionOptions || ["I learned something new!", "I need more practice", "This was fun!", "I can teach someone else now"]).map((opt: string, i: number) => (
-                            <button key={i} onClick={() => setInteraction((p: any) => ({ ...p, reflectionChip: p.reflectionChip === i ? null : i }))}
-                              style={{ padding: "6px 12px", borderRadius: 20, border: `2px solid ${interaction.reflectionChip === i ? "#E11D48" : "#FECDD3"}`, background: interaction.reflectionChip === i ? "#E11D48" : "#fff", color: interaction.reflectionChip === i ? "#fff" : "#9F1239", fontSize: "0.75rem", fontWeight: 700, cursor: "pointer" }}>
-                              {opt}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Completion */}
-                    {currentJourneyStep.stepType === "complete" && (
-                      <div style={{ textAlign: "center", padding: "24px 0" }}>
-                        <OwlTeacher size={72} expression="celebrating" />
-                        <h3 style={{ fontSize: "1.5rem", fontWeight: 800, color: "#1e293b", margin: "16px 0 8px" }}>You Did It! 🏆</h3>
-                        <p style={{ fontSize: "1rem", color: "#64748b", marginBottom: 16 }}>Amazing work! You've completed this lesson.</p>
-                        {xp > 0 && (
-                          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 20px", borderRadius: 12, background: "linear-gradient(135deg, #FEF3C7, #FDE68A)", border: "1px solid #F59E0B" }}>
-                            <Zap style={{ width: 20, height: 20, color: "#B45309" }} />
-                            <span style={{ fontSize: "1.125rem", fontWeight: 800, color: "#92400E" }}>+{xp} XP earned!</span>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </>
+                  <LegacyStepContent step={currentJourneyStep} />
                 )}
-              </div>
             </div>
           </div>
 
@@ -711,4 +525,121 @@ function buildLessonJourney(lesson: any) {
         : [];
     return { steps, source: Array.isArray(cb.studentJourney) && cb.studentJourney.length > 0 ? "live" : "draft" };
   } catch { return null; }
+}
+
+// -- Legacy step content (non-interactive steps) -------------------------------
+
+function LegacyStepContent({ step }: { step: any }) {
+  return (
+    <>
+      {/* Student content */}
+      {step.studentText && (
+        <div style={{ marginBottom: 16 }}>
+          {splitIntoParagraphs(step.studentText).map((p: string, i: number) => (
+            <p key={i} style={{ fontSize: "1rem", color: "#334155", lineHeight: 1.7, marginBottom: 12 }}>{p}</p>
+          ))}
+        </div>
+      )}
+
+      {/* Math display */}
+      {step.mathDisplay && (
+        <div style={{ padding: "16px", borderRadius: 12, background: "#F8FAFC", border: "1px solid #E2E8F0", textAlign: "center", marginBottom: 16 }}>
+          <span style={{ fontSize: "1.5rem", fontFamily: "monospace", fontWeight: 700, color: "#1e293b" }}>{step.mathDisplay}</span>
+        </div>
+      )}
+
+      {/* Illustration */}
+      {step.media?.illustration?.approvedUrl && (
+        <div style={{ marginBottom: 16, borderRadius: 12, overflow: "hidden", border: "1px solid #E2E8F0" }}>
+          <img src={step.media.illustration.approvedUrl} alt={step.media.illustration.altText || ""} style={{ width: "100%", height: "auto", display: "block" }} />
+        </div>
+      )}
+
+      {/* Video */}
+      {(() => {
+        const vUrl = step.media?.video?.approvedUrl;
+        if (!vUrl) return null;
+        const videoId = extractYouTubeId(vUrl);
+        if (!videoId) return null;
+        return (
+          <div style={{ marginBottom: 16, borderRadius: 12, overflow: "hidden", border: "1px solid #E2E8F0" }}>
+            <div style={{ position: "relative", width: "100%", paddingBottom: "56.25%" }}>
+              <iframe src={`https://www.youtube.com/embed/${videoId}`} title="Lesson video" allowFullScreen style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: "none" }} />
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* Callout for "connect" step */}
+      {step.stepType === "connect" && (
+        <div style={{ padding: "14px 16px", borderRadius: 12, background: "#ECFDF5", border: "1px solid #A7F3D0", marginBottom: 16, display: "flex", gap: 10, alignItems: "flex-start" }}>
+          <Lightbulb style={{ width: 18, height: 18, color: "#059669", flexShrink: 0, marginTop: 2 }} />
+          <p style={{ fontSize: "0.875rem", color: "#065F46", margin: 0, lineHeight: 1.5 }}>{step.studentText}</p>
+        </div>
+      )}
+
+      {/* Practice section */}
+      {step.stepType === "practice" && !step.interaction?.options && (
+        <div style={{ padding: "14px 16px", borderRadius: 12, background: "#F0F9FF", border: "1px solid #BAE6FD", marginBottom: 16 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+            <Pencil style={{ width: 16, height: 16, color: "#0284C7" }} />
+            <span style={{ fontSize: "0.875rem", fontWeight: 700, color: "#0C4A6E" }}>Your Turn!</span>
+          </div>
+          <textarea
+            value={step._interaction?.practiceEntries?.[0] || ""}
+            onChange={() => {}}
+            placeholder="Write your answer here..."
+            rows={4}
+            style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: "1.5px solid #BAE6FD", fontSize: "0.875rem", color: "#1e293b", outline: "none", resize: "vertical", background: "#fff" }}
+          />
+        </div>
+      )}
+
+      {/* Think first */}
+      {step.stepType === "think_first" && (
+        <div style={{ padding: "14px 16px", borderRadius: 12, background: "#FFFBEB", border: "1px solid #FDE68A", marginBottom: 16 }}>
+          <textarea
+            value={step._interaction?.predictionText || ""}
+            onChange={() => {}}
+            placeholder="What do you think? Write your ideas here..."
+            rows={3}
+            style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: "1.5px solid #FDE68A", fontSize: "0.875rem", color: "#1e293b", outline: "none", resize: "vertical", background: "#fff" }}
+          />
+        </div>
+      )}
+
+      {/* Reflection */}
+      {step.stepType === "reflect" && (
+        <div style={{ padding: "14px 16px", borderRadius: 12, background: "#FFF1F2", border: "1px solid #FECDD3", marginBottom: 16 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+            <MessageCircle style={{ width: 16, height: 16, color: "#E11D48" }} />
+            <span style={{ fontSize: "0.875rem", fontWeight: 700, color: "#9F1239" }}>Reflection Time</span>
+          </div>
+          <textarea
+            value={step._interaction?.reflectionText || ""}
+            onChange={() => {}}
+            placeholder="What did you learn today? How do you feel?"
+            rows={3}
+            style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: "1.5px solid #FECDD3", fontSize: "0.875rem", color: "#1e293b", outline: "none", resize: "vertical", background: "#fff", marginBottom: 8 }}
+          />
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+            {(step.reflectionOptions || ["I learned something new!", "I need more practice", "This was fun!", "I can teach someone else now"]).map((opt: string, i: number) => (
+              <span key={i} style={{ padding: "6px 12px", borderRadius: 20, border: "2px solid #FECDD3", background: "#fff", color: "#9F1239", fontSize: "0.75rem", fontWeight: 700 }}>
+                {opt}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Completion */}
+      {step.stepType === "complete" && (
+        <div style={{ textAlign: "center", padding: "24px 0" }}>
+          <OwlTeacher size={72} expression="celebrating" />
+          <h3 style={{ fontSize: "1.5rem", fontWeight: 800, color: "#1e293b", margin: "16px 0 8px" }}>You Did It! 🏆</h3>
+          <p style={{ fontSize: "1rem", color: "#64748b", marginBottom: 16 }}>Amazing work! You have completed this lesson.</p>
+        </div>
+      )}
+    </>
+  );
 }

@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { FractionCircle, FractionRectangle } from "./FractionVisuals";
+import type { CircleTheme } from "./FractionVisuals";
 import { FeedbackDisplay, TapChoice, MultipleChoice } from "./InteractionRenderers";
 
 // -- Tap Region ----------------------------------------------------------------
@@ -62,7 +63,7 @@ export function TapRegion({
             equalParts={visualSpec.equalParts !== false}
             showLabels={visualSpec.showLabels !== false}
             labels={visualSpec.labels}
-            size={160}
+            size={200}
             interactive
             onClickPart={(i) => handlePartClick(i)}
             theme={theme}
@@ -78,7 +79,7 @@ export function TapRegion({
         equalParts={visualSpec.equalParts !== false}
         showLabels={visualSpec.showLabels !== false}
         labels={visualSpec.labels}
-        size={160}
+        size={200}
         interactive
         onClickPart={(i) => handlePartClick(i)}
         theme={theme}
@@ -115,6 +116,8 @@ interface ShadeShapeProps {
   prompt?: string;
   feedback?: { correct?: string; incorrect?: string; hint?: string };
   onAnswer?: (correct: boolean) => void;
+  theme?: CircleTheme;
+  isPractice?: boolean;
 }
 
 export function ShadeShape({
@@ -123,6 +126,8 @@ export function ShadeShape({
   prompt,
   feedback,
   onAnswer,
+  theme = "plain",
+  isPractice = false,
 }: ShadeShapeProps) {
   const [shadedParts, setShadedParts] = useState(0);
   const [submitted, setSubmitted] = useState(false);
@@ -170,16 +175,16 @@ export function ShadeShape({
             shadedParts={shadedParts}
             equalParts={shape.equalParts !== false}
             showLabels={false}
-            size={160}
+            size={200}
             interactive
             onClickPart={handlePartClick}
+            theme={theme}
           />
         )}
       </div>
 
       <p className="text-xs text-slate-500 text-center">
-        Tap parts to shade. Shade exactly {requiredShadedParts} part{requiredShadedParts > 1 ? "s" : ""}.
-        Currently shaded: {shadedParts}
+        Tap inside one half to shade it, tap again to erase.
       </p>
 
       {!submitted && shadedParts > 0 && (
@@ -190,6 +195,12 @@ export function ShadeShape({
           >
             Check my shading
           </button>
+        </div>
+      )}
+
+      {submitted && isPractice && (
+        <div className="flex justify-center pt-2">
+          <p className="text-sm font-semibold text-emerald-600">Next: Check →</p>
         </div>
       )}
 

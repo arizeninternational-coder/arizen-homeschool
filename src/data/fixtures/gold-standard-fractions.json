@@ -30,11 +30,7 @@
           }
         },
         "visualSpec": {
-          "type": "fraction_circle",
-          "parts": 1,
-          "shadedParts": 0,
-          "equalParts": true,
-          "showLabels": false,
+          "type": "welcome_panel",
           "theme": "chapati"
         },
         "interactionSpec": {
@@ -43,7 +39,7 @@
           "buttonLabel": "Start lesson"
         },
         "feedbackSpec": {
-          "correct": "Great! Let us explore halves together.",
+          "correct": "Great! Let's explore halves together.",
           "incorrect": "",
           "hint": ""
         },
@@ -77,7 +73,8 @@
             "Split it into two equal parts",
             "Shade one equal part",
             "Say: This is one half"
-          ]
+          ],
+          "theme": "chapati"
         },
         "interactionSpec": {
           "type": "tap_continue",
@@ -85,7 +82,7 @@
           "prompt": null
         },
         "feedbackSpec": {
-          "correct": "Mission accepted! Let us begin.",
+          "correct": "Mission accepted! Let's begin.",
           "incorrect": "",
           "hint": ""
         },
@@ -150,18 +147,13 @@
         },
         "interactionSpec": {
           "type": "tap_choice",
-          "prompt": "Which picture shows fair sharing?",
-          "choices": [
-            "A",
-            "B",
-            "C"
-          ],
+          "prompt": "Amina has one chapati to share with one friend. Which picture shows fair sharing?",
           "correctChoiceId": "B",
           "buttonLabel": "Check my answer"
         },
         "feedbackSpec": {
-          "correct": "Yes! Fair sharing means both pieces are the same size.",
-          "incorrect": "Try again. Look for the picture where both people get the same amount.",
+          "correct": "Yes! Two same-size pieces make fair sharing.",
+          "incorrect": "Look carefully. Are the two pieces the same size?",
           "hint": "Fair means same size."
         },
         "successCriteria": "Connects halves to fair sharing.",
@@ -207,6 +199,7 @@
           "steps": [
             {
               "title": "Start with one whole circle",
+              "description": "This is one whole chapati.",
               "visual": {
                 "type": "fraction_circle",
                 "parts": 1,
@@ -217,6 +210,7 @@
             },
             {
               "title": "Split into two equal parts",
+              "description": "Now we have two equal parts.",
               "visual": {
                 "type": "fraction_circle",
                 "parts": 2,
@@ -231,6 +225,7 @@
             },
             {
               "title": "Shade one part",
+              "description": "One half is shaded.",
               "visual": {
                 "type": "fraction_circle",
                 "parts": 2,
@@ -244,7 +239,7 @@
               }
             }
           ],
-          "theme": "paper_cutout"
+          "theme": "chapati"
         },
         "interactionSpec": {
           "type": "step_reveal"
@@ -315,7 +310,7 @@
         "id": "connect",
         "stepType": "connect",
         "title": "Halves Around Us",
-        "studentText": "You can see halves when one chapati is shared equally between two children. When the two pieces are the same size, each piece is one half.",
+        "studentText": "We use halves when we share things fairly in real life.",
         "owlText": "We use halves when we share things fairly in real life.",
         "interaction": {
           "type": "tap_region",
@@ -340,6 +335,7 @@
           "steps": [
             {
               "title": "Amina starts with one whole circle",
+              "description": "This is one whole paper circle.",
               "visual": {
                 "type": "fraction_circle",
                 "parts": 1,
@@ -350,6 +346,7 @@
             },
             {
               "title": "She folds it into two equal parts",
+              "description": "Now there are two equal parts.",
               "visual": {
                 "type": "fraction_circle",
                 "parts": 2,
@@ -364,6 +361,7 @@
             },
             {
               "title": "She shades one part",
+              "description": "One half is shaded.",
               "visual": {
                 "type": "fraction_circle",
                 "parts": 2,
@@ -419,7 +417,7 @@
       {
         "stepKey": "practice",
         "activityType": "guided_practice",
-        "studentInstruction": "Complete each activity.",
+        "studentInstruction": "Shade one half of the circle.",
         "content": "Practise showing one half of a circle.",
         "visualSpec": {
           "type": "practice_set",
@@ -433,94 +431,27 @@
                 "shadedParts": 0,
                 "equalParts": true
               }
-            },
-            {
-              "id": "p2",
-              "type": "tap_choice",
-              "visual": {
-                "type": "choice_grid",
-                "choices": [
-                  {
-                    "id": "A",
-                    "label": "Two equal parts",
-                    "visual": {
-                      "type": "fraction_circle",
-                      "parts": 2,
-                      "shadedParts": 1,
-                      "equalParts": true
-                    }
-                  },
-                  {
-                    "id": "B",
-                    "label": "Two unequal parts",
-                    "visual": {
-                      "type": "fraction_circle",
-                      "parts": 2,
-                      "shadedParts": 1,
-                      "equalParts": false
-                    }
-                  },
-                  {
-                    "id": "C",
-                    "label": "Four equal parts",
-                    "visual": {
-                      "type": "fraction_circle",
-                      "parts": 4,
-                      "shadedParts": 1,
-                      "equalParts": true
-                    }
-                  }
-                ]
-              }
             }
-          ]
+          ],
+          "theme": "paper_cutout"
         },
         "interactionSpec": {
-          "type": "multi_activity",
-          "activities": [
-            {
-              "id": "p1",
-              "type": "shade_shape",
-              "prompt": "Shade one half of the circle.",
-              "shape": {
-                "type": "fraction_circle",
-                "parts": 2,
-                "equalParts": true,
-                "theme": "paper_cutout"
-              },
-              "requiredShadedParts": 1
-            },
-            {
-              "id": "p2",
-              "type": "tap_choice",
-              "prompt": "Which picture shows one half?",
-              "choices": [
-                "A",
-                "B",
-                "C"
-              ],
-              "correctChoiceId": "A"
-            },
-            {
-              "id": "p3",
-              "type": "short_response",
-              "prompt": "A circle is cut into one big part and one small part. Are they halves? Why?",
-              "expectedIdea": "No, because the two parts are not equal.",
-              "keywords": [
-                "no",
-                "not equal",
-                "same size",
-                "equal"
-              ]
-            }
-          ]
+          "type": "shade_shape",
+          "prompt": "Shade one half of the circle.",
+          "shape": {
+            "type": "fraction_circle",
+            "parts": 2,
+            "equalParts": true,
+            "theme": "paper_cutout"
+          },
+          "requiredShadedParts": 1
         },
         "feedbackSpec": {
-          "correct": "Well done. You are showing one half correctly.",
-          "incorrect": "Try again. Remember, halves must be two equal parts.",
+          "correct": "Good. You shaded one out of two equal parts.",
+          "incorrect": "Try again. Remember: shade exactly one of the two equal parts.",
           "hint": "Look for two parts that are the same size."
         },
-        "successCriteria": "Practises shading, identifying, and explaining halves.",
+        "successCriteria": "Practises shading one half.",
         "rewardText": "",
         "id": "practice",
         "stepType": "practice",
@@ -528,8 +459,8 @@
         "studentText": "Practise showing one half of a circle.",
         "owlText": "Now it is your turn to practise finding halves.",
         "interaction": {
-          "type": "multi_activity",
-          "prompt": "Complete each activity.",
+          "type": "shade_shape",
+          "prompt": "Shade one half of the circle.",
           "hint": "Look for two parts that are the same size."
         }
       },
@@ -539,30 +470,52 @@
         "studentInstruction": "Choose the best answer.",
         "content": "Which picture shows one half?",
         "visualSpec": {
-          "type": "fraction_circle",
-          "parts": 2,
-          "shadedParts": 1,
-          "equalParts": true,
-          "showLabels": false,
-          "labels": [
-            "1/2"
+          "type": "choice_grid",
+          "choices": [
+            {
+              "id": "A",
+              "label": "2 equal parts, one shaded",
+              "visual": {
+                "type": "fraction_circle",
+                "parts": 2,
+                "shadedParts": 1,
+                "equalParts": true,
+                "showLabels": false
+              }
+            },
+            {
+              "id": "B",
+              "label": "2 unequal parts, one shaded",
+              "visual": {
+                "type": "fraction_circle",
+                "parts": 2,
+                "shadedParts": 1,
+                "equalParts": false,
+                "showLabels": false
+              }
+            },
+            {
+              "id": "C",
+              "label": "4 equal parts, one shaded",
+              "visual": {
+                "type": "fraction_circle",
+                "parts": 4,
+                "shadedParts": 1,
+                "equalParts": true,
+                "showLabels": false
+              }
+            }
           ],
           "theme": "plain"
         },
         "interactionSpec": {
-          "type": "multiple_choice",
-          "question": "Which picture shows one half?",
-          "options": [
-            "A circle split into 2 equal parts with one part shaded",
-            "A circle split into 2 unequal parts with one part shaded",
-            "A circle split into 4 equal parts with one part shaded",
-            "A whole circle with no parts"
-          ],
-          "correctIndex": 0,
+          "type": "tap_choice",
+          "prompt": "Choose the picture that shows one half.",
+          "correctChoiceId": "A",
           "buttonLabel": "Check"
         },
         "feedbackSpec": {
-          "correct": "Correct. One half means one of two equal parts.",
+          "correct": "Yes. One half is one of two equal parts.",
           "incorrect": "Not quite. A half must be one of two equal parts.",
           "hint": "Look for the answer that mentions two equal parts."
         },
@@ -579,8 +532,7 @@
           "options": [
             "A circle split into 2 equal parts with one part shaded",
             "A circle split into 2 unequal parts with one part shaded",
-            "A circle split into 4 equal parts with one part shaded",
-            "A whole circle with no parts"
+            "A circle split into 4 equal parts with one part shaded"
           ],
           "correctAnswer": 0,
           "hint": "Look for the answer that mentions two equal parts."
@@ -594,7 +546,7 @@
         "visualSpec": {
           "type": "reflection_card",
           "icon": "circle-halves",
-          "sentenceStarter": "I know they are halves because they are..."
+          "sentenceStarter": "I know they are halves because..."
         },
         "interactionSpec": {
           "type": "reflection_chips",
@@ -604,7 +556,7 @@
             "same size",
             "fair sharing"
           ],
-          "sentenceStarter": "I know they are halves because they are..."
+          "sentenceStarter": "I know they are halves because..."
         },
         "feedbackSpec": {
           "correct": "Good reflection. Halves must be two equal parts.",
@@ -627,7 +579,7 @@
             "same size",
             "fair sharing"
           ],
-          "sentenceStarter": "I know they are halves because they are...",
+          "sentenceStarter": "I know they are halves because...",
           "hint": "Use the words equal parts or same size."
         }
       },
