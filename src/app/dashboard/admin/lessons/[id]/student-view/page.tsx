@@ -556,6 +556,7 @@ export default function AdminStudentLessonEditor({ params }: { params: Promise<{
 
                 {/* Illustration — with admin controls */}
                 <AdminIllustration step={currentJourneyStep} stepIndex={clampedStep} meta={meta}
+                  lessonId={lessonId}
                   generating={generating === clampedStep}
                   onGenerate={() => handleGenerateIllustration(clampedStep)} />
 
@@ -734,18 +735,113 @@ export default function AdminStudentLessonEditor({ params }: { params: Promise<{
 
 // ── Admin sub-components ────────────────────────────────────────────────────
 
-function AdminIllustration({ step, stepIndex, meta, generating, onGenerate }: any) {
+function AdminIllustration({ step, stepIndex, meta, lessonId, generating, onGenerate }: any) {
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const approvedUrl = step.media?.illustration?.approvedUrl;
+
+  const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const allowedTypes = ["image/png", "image/jpeg", "image/jpg", "image/webp", "image/svg+xml"];
+    if (!allowedTypes.includes(file.type)) {
+      setUploadError(`Invalid file type: ${file.type}. Allowed: PNG, JPG, JPEG, WEBP, SVG`);
+      return;
+    }
+
+    // Validate file size (5 MB)
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      setUploadError(`File too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Maximum: 5 MB`);
+      return;
+    }
+
+    setUploading(true);
+    setUploadError(null);
+
+    try {
+      // Read file as base64
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const base64 = reader.result as string;
+        const contentType = file.type;
+        const fileName = file.name;
+
+        try {
+          const res = await fetch(`/api/admin/lessons/${lessonId}/illustrations/upload`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({
+              stepIndex,
+              imageData: base64,
+              fileName,
+              contentType,
+            }),
+          });
+
+          const data = await res.json();
+          if (!res.ok) {
+            setUploadError(data.error || "Upload failed");
+          } else {
+            // Reload lesson to show new image
+            window.location.reload();
+          }
+        } catch {
+          setUploadError("Network error. Please try again.");
+        } finally {
+          setUploading(false);
+        }
+      };
+      reader.readAsDataURL(file);
+    } catch {
+      setUploadError("Failed to read file.");
+      setUploading(false);
+    }
+
+    // Reset input so same file can be re-selected
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }, [stepIndex, lessonId]);
+
+  const handleRemove = useCallback(async () => {
+    if (!confirm("Remove this illustration?")) return;
+    try {
+      const res = await fetch(`/api/admin/lessons/${lessonId}/illustrations/upload`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ stepIndex }),
+      });
+      if (res.ok) window.location.reload();
+    } catch {
+      setUploadError("Failed to remove illustration.");
+    }
+  }, [stepIndex, lessonId]);
+
   if (approvedUrl) {
     return (
       <div className="mt-4 rounded-2xl overflow-hidden border border-slate-200/50 shadow-sm">
         <img src={approvedUrl} alt="Illustration" className="w-full h-auto max-h-[220px] object-cover" />
         <div className="px-3 py-1.5 bg-emerald-50 border-t border-emerald-200/40 flex items-center justify-between">
           <span className="text-[10px] font-bold text-emerald-700">✓ Approved</span>
+          <div className="flex items-center gap-2">
+            <label className="text-[10px] font-bold text-indigo-600 hover:text-indigo-700 cursor-pointer">
+              Replace
+              <input ref={fileInputRef} type="file" accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml" className="hidden" onChange={handleFileSelect} />
+            </label>
+            <button onClick={handleRemove} className="text-[10px] font-bold text-red-600 hover:text-red-700">Remove</button>
+          </div>
         </div>
+        {uploading && <div className="px-3 py-1.5 bg-blue-50 text-[10px] font-bold text-blue-600 text-center">Uploading...</div>}
+        {uploadError && <div className="px-3 py-1.5 bg-red-50 text-[10px] font-bold text-red-600">{uploadError}</div>}
       </div>
     );
   }
+
   // Handle flat media structure (POC journeys with media.altText / media.fallbackText)
   const flatMedia = step.media;
   if (flatMedia && !flatMedia.illustration && !flatMedia.video && flatMedia.altText) {
@@ -758,12 +854,20 @@ function AdminIllustration({ step, stepIndex, meta, generating, onGenerate }: an
           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Illustration (Draft)</p>
           <p className={`text-sm font-semibold ${meta.accent} text-center max-w-xs leading-snug`}>{flatMedia.altText}</p>
           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-[9px] font-bold text-amber-600">Draft — not yet approved</span>
+          <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-500 text-white text-xs font-bold hover:bg-indigo-600 disabled:opacity-50 transition-colors cursor-pointer mt-1">
+            {uploading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Upload className="w-3 h-3" />}
+            {uploading ? "Uploading..." : "Upload Image"}
+            <input ref={fileInputRef} type="file" accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml" className="hidden" onChange={handleFileSelect} />
+          </label>
         </div>
+        {uploadError && <div className="px-3 py-1.5 bg-red-50 text-[10px] font-bold text-red-600">{uploadError}</div>}
       </div>
     );
   }
+
   const prompt = step.illustrationPrompt;
   if (!prompt) return null;
+
   return (
     <div className={`mt-4 rounded-2xl border-2 border-dashed ${meta.border} overflow-hidden`}>
       <div className={`bg-gradient-to-br ${meta.softBg || ""} p-5 flex flex-col items-center gap-2.5`}>
@@ -772,12 +876,20 @@ function AdminIllustration({ step, stepIndex, meta, generating, onGenerate }: an
         </div>
         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Illustration</p>
         <p className={`text-sm font-semibold ${meta.accent} text-center max-w-xs leading-snug`}>{prompt}</p>
-        <button onClick={onGenerate} disabled={generating}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-500 text-white text-xs font-bold hover:bg-indigo-600 disabled:opacity-50 transition-colors mt-1">
-          {generating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
-          {generating ? "Generating..." : "Generate AI"}
-        </button>
+        <div className="flex items-center gap-2 mt-1">
+          <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-500 text-white text-xs font-bold hover:bg-indigo-600 disabled:opacity-50 transition-colors cursor-pointer">
+            {uploading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Upload className="w-3 h-3" />}
+            {uploading ? "Uploading..." : "Upload Image"}
+            <input ref={fileInputRef} type="file" accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml" className="hidden" onChange={handleFileSelect} />
+          </label>
+          <button onClick={onGenerate} disabled={generating}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold hover:bg-slate-200 disabled:opacity-50 transition-colors">
+            {generating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+            {generating ? "Generating..." : "Generate AI"}
+          </button>
+        </div>
       </div>
+      {uploadError && <div className="px-3 py-1.5 bg-red-50 text-[10px] font-bold text-red-600">{uploadError}</div>}
     </div>
   );
 }

@@ -158,25 +158,38 @@ export function InteractiveStepRenderer({
     const illo = step.mediaSpec?.illustration;
     if (!illo || illo.mode === "none") return null;
 
+    // Priority 1: Approved image
     if (illo.approvedUrl) {
       return (
-        <div className="rounded-2xl overflow-hidden border border-slate-200/50 shadow-sm">
-          <img src={illo.approvedUrl} alt={illo.alt || step.title} className="w-full h-auto max-h-[220px] object-cover" />
-          {illo.caption && <p className="text-xs text-slate-500 text-center py-2 bg-slate-50">{illo.caption}</p>}
+        <div className="rounded-2xl overflow-hidden border border-slate-200/50 shadow-sm bg-white">
+          <img src={illo.approvedUrl} alt={illo.alt || step.title} className="w-full h-auto max-h-[240px] object-contain" />
+          {illo.caption && <p className="text-xs text-slate-500 text-center py-2 bg-slate-50 border-t border-slate-100">{illo.caption}</p>}
         </div>
       );
     }
 
-    // Compact themed placeholder
+    // Priority 2: Generated candidate images
+    if (illo.candidateUrls && illo.candidateUrls.length > 0) {
+      return (
+        <div className="rounded-2xl overflow-hidden border border-slate-200/50 shadow-sm bg-white">
+          <img src={illo.candidateUrls[0]} alt={illo.alt || step.title} className="w-full h-auto max-h-[240px] object-contain" />
+          {illo.caption && <p className="text-xs text-slate-500 text-center py-2 bg-slate-50 border-t border-slate-100">{illo.caption}</p>}
+        </div>
+      );
+    }
+
+    // Priority 3: Clean placeholder
     const themedBg = theme === "chapati" ? "from-amber-50 to-orange-50" : "from-indigo-50 to-purple-50";
     return (
       <div className={`rounded-2xl border border-slate-200/60 bg-gradient-to-br ${themedBg} p-3 flex flex-col items-center gap-2 min-h-[120px] justify-center`}>
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" className="text-slate-400">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" className="text-slate-400">
           <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.5"/>
           <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/>
           <path d="M21 15l-5-5L5 21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
-        {illo.caption && <p className="text-[10px] text-slate-500 text-center leading-snug">{illo.caption}</p>}
+        <p className="text-[10px] text-slate-500 text-center leading-snug">
+          {illo.caption || "Image coming soon"}
+        </p>
       </div>
     );
   };
@@ -193,9 +206,9 @@ export function InteractiveStepRenderer({
       if (illo?.approvedUrl) {
         return (
           <div className="flex justify-center my-4">
-            <div className="rounded-2xl overflow-hidden border border-slate-200/50 shadow-sm max-w-sm">
-              <img src={illo.approvedUrl} alt={illo.alt || step.title} className="w-full h-auto max-h-[240px] object-cover" />
-              {illo.caption && <p className="text-xs text-slate-500 text-center py-2 bg-slate-50">{illo.caption}</p>}
+            <div className="rounded-2xl overflow-hidden border border-slate-200/50 shadow-sm max-w-sm bg-white">
+              <img src={illo.approvedUrl} alt={illo.alt || step.title} className="w-full h-auto max-h-[260px] object-contain" />
+              {illo.caption && <p className="text-xs text-slate-500 text-center py-2 bg-slate-50 border-t border-slate-100">{illo.caption}</p>}
             </div>
           </div>
         );
@@ -206,14 +219,15 @@ export function InteractiveStepRenderer({
       return (
         <div className="flex justify-center my-4">
           <div className={`rounded-2xl border border-slate-200/60 bg-gradient-to-br ${themeBg} p-6 flex flex-col items-center gap-3 max-w-sm w-full`}>
-            <div className="w-20 h-20 rounded-full bg-white/80 flex items-center justify-center shadow-sm">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" className="text-indigo-400">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5"/>
-                <path d="M12 2v20M2 12h20" stroke="currentColor" strokeWidth="1.5" strokeDasharray="2 2"/>
+            <div className="w-16 h-16 rounded-full bg-white/80 flex items-center justify-center shadow-sm">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" className="text-slate-400">
+                <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.5"/>
+                <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/>
+                <path d="M21 15l-5-5L5 21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </div>
-            <p className="text-sm text-slate-600 text-center font-medium leading-relaxed">
-              {step.mediaSpec?.illustration?.caption || step.mediaSpec?.illustration?.alt || "Discover the world of halves"}
+            <p className="text-xs text-slate-500 text-center font-medium leading-relaxed">
+              Image coming soon: Amina and her brother sharing a chapati
             </p>
           </div>
         </div>
@@ -512,16 +526,19 @@ export function InteractiveStepRenderer({
         {/* Welcome teacher message — ALWAYS renders regardless of showChrome */}
         {(step.stepKey === "welcome" || step.stepType === "welcome") && (
           <div className="space-y-4">
-            {(step.owlText || step.studentInstruction || step.content) && (
+            {/* Owl message: the story context */}
+            {step.owlText && (
               <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-gradient-to-br from-indigo-50/80 to-purple-50/50 border border-indigo-200/60">
+                <span className="text-lg flex-shrink-0 mt-0.5">🦉</span>
                 <p className="text-sm text-indigo-800 leading-relaxed font-medium">
-                  {step.owlText || step.studentInstruction || step.content}
+                  {step.owlText}
                 </p>
               </div>
             )}
-            {step.interactionSpec?.prompt && step.interactionSpec.prompt !== step.studentInstruction && step.interactionSpec.prompt !== step.content && (
+            {/* Lesson intro paragraph: what the child will learn */}
+            {step.studentText && (
               <p className="text-sm text-slate-600 leading-relaxed text-center">
-                Today, you will learn how to split one whole into two equal parts. Each equal part is called one half.
+                {step.studentText}
               </p>
             )}
           </div>
@@ -538,29 +555,7 @@ export function InteractiveStepRenderer({
         )}
 
 
-        {/* Admin Image Controls (admin only) */}
-        {process.env.NODE_ENV !== "production" && step.mediaSpec?.illustration && (
-          <div className="px-3 py-2 rounded-xl bg-slate-50 border border-slate-200/60">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Illustration:</span>
-              <button className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white border border-slate-200 text-[10px] font-semibold text-slate-600 hover:border-indigo-300 hover:text-indigo-600 transition-colors">
-                Upload
-              </button>
-              <button className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white border border-slate-200 text-[10px] font-semibold text-slate-600 hover:border-indigo-300 hover:text-indigo-600 transition-colors">
-                Generate
-              </button>
-              <button className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white border border-slate-200 text-[10px] font-semibold text-slate-600 hover:border-indigo-300 hover:text-indigo-600 transition-colors">
-                Regenerate
-              </button>
-              <button className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-[10px] font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors">
-                Approve
-              </button>
-              <button className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-red-50 border border-red-200 text-[10px] font-semibold text-red-600 hover:bg-red-100 transition-colors">
-                Remove
-              </button>
-            </div>
-          </div>
-        )}
+        {/* Admin Image Controls removed from student renderer — use admin student-view page for uploads */}
 
         {/* Video */}
         <MediaSpecVideoRenderer step={step} />
@@ -708,36 +703,47 @@ function LegacyInteractionRenderer({ step, interaction, setInteraction, onNext }
 
 function WelcomeStepVisual({ step }: { step: ExtendedJourneyStep }) {
   const illo = step.mediaSpec?.illustration;
-  const caption = illo?.caption || "Amina holding a round chapati";
+  const caption = illo?.caption || "Amina has one chapati to share.";
   const theme = (step.visualSpec?.theme || "plain") as CircleTheme;
 
   // Case 1: Real approved image exists — show it as the single main visual
   if (illo?.approvedUrl) {
     return (
       <div className="flex justify-center my-4">
-        <div className="rounded-2xl overflow-hidden border border-slate-200/60 shadow-sm max-w-md w-full">
-          <img src={illo.approvedUrl} alt={illo.alt || "Lesson illustration"} className="w-full h-auto max-h-[280px] object-cover" />
-          {illo.caption && <p className="text-xs text-slate-500 text-center py-2 bg-slate-50">{illo.caption}</p>}
+        <div className="rounded-2xl overflow-hidden border border-slate-200/60 shadow-sm max-w-md w-full bg-white">
+          <img src={illo.approvedUrl} alt={illo.alt || "Lesson illustration"} className="w-full h-auto max-h-[300px] object-contain" />
+          {illo.caption && <p className="text-xs text-slate-500 text-center py-2 bg-slate-50 border-t border-slate-100">{illo.caption}</p>}
         </div>
       </div>
     );
   }
 
-  // Case 2: No image — show a single polished student-friendly placeholder
-  // Case 2: No image — show a single polished student-friendly placeholder
+  // Case 2: Generated image URL exists (not yet approved but available)
+  if (illo?.candidateUrls && illo.candidateUrls.length > 0) {
+    return (
+      <div className="flex justify-center my-4">
+        <div className="rounded-2xl overflow-hidden border border-slate-200/60 shadow-sm max-w-md w-full bg-white">
+          <img src={illo.candidateUrls[0]} alt={illo.alt || "Lesson illustration"} className="w-full h-auto max-h-[300px] object-contain" />
+          {illo.caption && <p className="text-xs text-slate-500 text-center py-2 bg-slate-50 border-t border-slate-100">{illo.caption}</p>}
+        </div>
+      </div>
+    );
+  }
+
+  // Case 3: No image — show a clean, honest placeholder
   const themeBg = theme === "chapati" ? "from-amber-50 to-orange-50" : theme === "orange" ? "from-orange-50 to-amber-50" : "from-indigo-50 to-purple-50";
-  const themeAccent = theme === "chapati" ? "text-amber-500" : theme === "orange" ? "text-orange-500" : "text-indigo-500";
   return (
     <div className="flex justify-center my-4">
       <div className={`rounded-2xl border border-slate-200/60 bg-gradient-to-br ${themeBg} p-6 flex flex-col items-center gap-3 max-w-md w-full`}>
-        <div className="w-20 h-20 rounded-full bg-white/80 flex items-center justify-center shadow-sm">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" className={themeAccent}>
-            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5"/>
-            <path d="M8 12h8M12 8v8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+        <div className="w-16 h-16 rounded-full bg-white/80 flex items-center justify-center shadow-sm">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" className="text-slate-400">
+            <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.5"/>
+            <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/>
+            <path d="M21 15l-5-5L5 21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </div>
-        <p className="text-xs text-slate-500 text-center font-medium">
-          {caption}
+        <p className="text-xs text-slate-500 text-center font-medium leading-relaxed">
+          Image coming soon: Amina and her brother sharing a chapati
         </p>
       </div>
     </div>
