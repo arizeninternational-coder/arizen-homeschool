@@ -479,8 +479,8 @@ export function InteractiveStepRenderer({
         <ConfettiCelebration active={showConfetti} />
 
         {/* Step chrome: title + step number + owl + instruction — only when showChrome is true */}
-        {showChrome && (
-          <>
+        {showChrome ? (
+          <React.Fragment>
             {step.title && (
               <div className="flex items-center gap-3">
                 <div className="flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-500 text-white text-sm font-black shadow-sm">
@@ -493,27 +493,8 @@ export function InteractiveStepRenderer({
 
             {/* Owl guidance removed per instruction */}
 
-            {/* Owl guidance removed per instruction */}
-
-            {/* For Welcome: show teacher message + intro paragraph */}
-            {(step.stepKey === "welcome" || step.stepType === "welcome") ? (
-              <div className="space-y-4">
-                {(step.owlText || step.studentInstruction || step.content) && (
-                  <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-gradient-to-br from-indigo-50/80 to-purple-50/50 border border-indigo-200/60">
-                    <p className="text-sm text-indigo-800 leading-relaxed font-medium">
-                      {step.owlText || step.studentInstruction || step.content}
-                    </p>
-                  </div>
-                )}
-                {step.interactionSpec?.prompt && step.interactionSpec.prompt !== step.studentInstruction && step.interactionSpec.prompt !== step.content && (
-                  <p className="text-sm text-slate-600 leading-relaxed text-center">
-                    Today, you will learn how to split one whole into two equal parts. Each equal part is called one half.
-                  </p>
-                )}
-              </div>
-            ) : (
-              /* Student instruction / topic intro for non-Welcome steps */
-              (() => {
+            {/* Student instruction / topic intro for non-Welcome steps */}
+            {(() => {
                 const instruction = step.studentInstruction || step.content || "";
                 const prompt = step.interactionSpec?.prompt || "";
                 const showInstruction = instruction.trim() && instruction.trim() !== prompt.trim();
@@ -524,9 +505,26 @@ export function InteractiveStepRenderer({
                     ))}
                   </div>
                 ) : null;
-              })()
+              })()}
+          </React.Fragment>
+        ) : null}
+
+        {/* Welcome teacher message — ALWAYS renders regardless of showChrome */}
+        {(step.stepKey === "welcome" || step.stepType === "welcome") && (
+          <div className="space-y-4">
+            {(step.owlText || step.studentInstruction || step.content) && (
+              <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-gradient-to-br from-indigo-50/80 to-purple-50/50 border border-indigo-200/60">
+                <p className="text-sm text-indigo-800 leading-relaxed font-medium">
+                  {step.owlText || step.studentInstruction || step.content}
+                </p>
+              </div>
             )}
-          </>
+            {step.interactionSpec?.prompt && step.interactionSpec.prompt !== step.studentInstruction && step.interactionSpec.prompt !== step.content && (
+              <p className="text-sm text-slate-600 leading-relaxed text-center">
+                Today, you will learn how to split one whole into two equal parts. Each equal part is called one half.
+              </p>
+            )}
+          </div>
         )}
 
         {/* For Welcome step, render only the welcome_story visual (not both illustration + visualSpec) */}
