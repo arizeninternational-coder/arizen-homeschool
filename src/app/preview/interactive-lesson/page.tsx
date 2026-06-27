@@ -7,6 +7,10 @@ import {
 } from "lucide-react";
 import { InteractiveStepRenderer, ExtendedJourneyStep } from "@/components/interactive";
 
+function hasInteractiveSpec(step: any): boolean {
+  return !!(step?.visualSpec || step?.interactionSpec || step?.feedbackSpec || step?.mediaSpec);
+}
+
 // Load fixture data directly — no Supabase, no auth
 import goldStandardFixture from "@/data/fixtures/gold-standard-fractions.json";
 
@@ -183,8 +187,8 @@ export default function PreviewInteractiveLesson() {
                 </div>
               </div>
 
-              {/* Owl guidance */}
-              {step.owlText && (
+              {/* Owl guidance — only for legacy non-interactive steps */}
+              {step.owlText && !hasInteractiveSpec(step) && (
                 <div className="flex items-start gap-3 px-4 py-3 rounded-2xl bg-gradient-to-br from-sky-50/90 via-indigo-50/60 to-purple-50/40 border border-sky-200/50 shadow-sm mb-5">
                   <span className="text-2xl flex-shrink-0">🦉</span>
                   <p className="text-slate-700 text-sm leading-relaxed font-medium">{step.owlText}</p>

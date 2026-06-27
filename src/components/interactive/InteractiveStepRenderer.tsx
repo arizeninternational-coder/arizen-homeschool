@@ -350,7 +350,8 @@ export function InteractiveStepRenderer({
 
     if (spec.type === "tap_continue") {
       const isWelcome = step.stepKey === "welcome" || step.stepType === "welcome";
-      const isComplete = step.stepKey === "complete";
+      const isMission = step.stepKey === "mission" || step.stepType === "mission";
+      const isComplete = step.stepKey === "complete" || step.stepType === "complete";
       return (
         <TapContinue
           prompt={isWelcome ? undefined : (isMission ? undefined : spec.prompt)}
@@ -492,7 +493,9 @@ export function InteractiveStepRenderer({
 
             {/* Owl guidance removed per instruction */}
 
-            {/* For Welcome: show teacher message + intro paragraph once */}
+            {/* Owl guidance removed per instruction */}
+
+            {/* For Welcome: show teacher message + intro paragraph */}
             {(step.stepKey === "welcome" || step.stepType === "welcome") ? (
               <div className="space-y-4">
                 {(step.owlText || step.studentInstruction || step.content) && (
