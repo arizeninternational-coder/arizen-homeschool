@@ -9,6 +9,8 @@ import { HorizontalTeachingStrip } from "./HorizontalTeachingStrip";
 import { TapContinue, TapChoice, MultipleChoice, ReflectionChips } from "./InteractionRenderers";
 import { MediaSpecVideo } from "./MediaSpecVideo";
 import { CelebrationBurst, ConfettiCelebration, SparkleGlow } from "./CelebrationAnimations";
+import ChapatiSharingIllustration from "@/components/ChapatiSharingIllustration";
+import { Upload, Sparkles } from "lucide-react";
 import {
   TapRegion,
   ShadeShape,
@@ -539,29 +541,17 @@ export function InteractiveStepRenderer({
           </React.Fragment>
         ) : null}
 
-        {/* Welcome teacher message — ALWAYS renders regardless of showChrome */}
+        {/* Welcome intro — grouped owl + story in one card */}
         {(step.stepKey === "welcome" || step.stepType === "welcome") && (
-          <div className="space-y-4">
-            {/* Owl message: the story context */}
+          <div className="rounded-xl bg-gradient-to-br from-indigo-50/80 to-purple-50/40 border border-indigo-200/50 p-4 space-y-3">
             {step.owlText && (
-              <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-gradient-to-br from-indigo-50/80 to-purple-50/50 border border-indigo-200/60">
-                <span className="text-lg flex-shrink-0 mt-0.5">🦉</span>
-                <p className="text-sm text-indigo-800 leading-relaxed font-medium">
-                  {step.owlText}
-                </p>
+              <div className="flex items-start gap-3">
+                <span className="text-xl flex-shrink-0">🦉</span>
+                <p className="text-sm text-indigo-800 leading-relaxed font-medium">{step.owlText}</p>
               </div>
             )}
-            {/* Story intro paragraph: why this matters */}
             {step.storyIntro && (
-              <p className="text-sm text-slate-600 leading-relaxed px-1">
-                {step.storyIntro}
-              </p>
-            )}
-            {/* Learning goal sentence */}
-            {step.studentText && (
-              <p className="text-sm text-slate-700 leading-relaxed font-medium text-center">
-                {step.studentText}
-              </p>
+              <p className="text-sm text-slate-600 leading-relaxed pl-8">{step.storyIntro}</p>
             )}
           </div>
         )}
@@ -732,27 +722,38 @@ function WelcomeStepVisual({ step, isAdmin, onUpload, onGenerateAI, generating }
 }) {
   const illo = step.mediaSpec?.illustration;
   const caption = illo?.caption || "Amina has one chapati to share.";
-  const theme = (step.visualSpec?.theme || "plain") as CircleTheme;
   const imageUrl = illo?.approvedUrl;
 
-  // Admin controls (only rendered when isAdmin=true)
+  // Admin controls — compact, attached to image card
+  const hasAI = !!process.env.NEXT_PUBLIC_AI_ENABLED || !!process.env.OPENAI_API_KEY;
   const adminControls = isAdmin && onUpload && onGenerateAI ? (
-    <div className="flex items-center justify-between px-3 py-1.5 bg-slate-50 border-t border-slate-100">
-      <span className="text-[10px] font-bold text-emerald-700">✓ Image Ready</span>
-      <div className="flex items-center gap-2">
-        <label className="text-[10px] font-bold text-indigo-600 hover:text-indigo-700 cursor-pointer">
+    <div className="flex items-center justify-between gap-2 px-3 py-2 bg-slate-50 border-t border-slate-100 flex-wrap">
+      <span className="text-[11px] font-bold text-emerald-700">✓ Ready</span>
+      <div className="flex items-center gap-3 flex-wrap">
+        <label className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-500 text-white text-[11px] font-bold cursor-pointer hover:bg-indigo-600 transition-colors">
+          <Upload className="w-3 h-3" />
           Upload Image
           <input type="file" accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml" className="hidden"
             onChange={e => { const f = e.target.files?.[0]; if (f) onUpload(-1, f); e.target.value = ""; }} />
         </label>
-        <button onClick={() => onGenerateAI(-1, illo?.prompt)} disabled={generating}
-          className="text-[10px] font-bold text-amber-600 hover:text-amber-700 disabled:opacity-50">
-          {generating ? "Generating..." : "Replace with AI"}
-        </button>
+        {hasAI ? (
+          <button onClick={() => onGenerateAI(-1, illo?.prompt)} disabled={generating}
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500 text-white text-[11px] font-bold hover:bg-amber-600 disabled:opacity-50 transition-colors">
+            <Sparkles className="w-3 h-3" />
+            {generating ? "Generating..." : "Replace with AI"}
+          </button>
+        ) : (
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-400 text-[11px] font-bold cursor-not-allowed"
+            title="AI image generation is not configured. Set OPENAI_API_KEY to enable.">
+            <Sparkles className="w-3 h-3" />
+            Replace with AI
+          </span>
+        )}
       </div>
     </div>
   ) : null;
 
+  // Priority 1: Approved uploaded/generated image
   if (imageUrl) {
     return (
       <div className="flex justify-center my-4">
@@ -765,21 +766,12 @@ function WelcomeStepVisual({ step, isAdmin, onUpload, onGenerateAI, generating }
     );
   }
 
-  // Clean, honest placeholder
-  const themeBg = theme === "chapati" ? "from-amber-50 to-orange-50" : theme === "orange" ? "from-orange-50 to-amber-50" : "from-indigo-50 to-purple-50";
+  // Priority 2: HTML/CSS illustration fallback
   return (
     <div className="flex justify-center my-4">
-      <div className={`rounded-2xl border border-slate-200/60 bg-gradient-to-br ${themeBg} p-6 flex flex-col items-center gap-3 max-w-md w-full`}>
-        <div className="w-16 h-16 rounded-full bg-white/80 flex items-center justify-center shadow-sm">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" className="text-slate-400">
-            <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.5"/>
-            <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/>
-            <path d="M21 15l-5-5L5 21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </div>
-        <p className="text-xs text-slate-500 text-center font-medium leading-relaxed">
-          Image coming soon: Amina and her brother sharing a chapati
-        </p>
+      <div className="rounded-2xl overflow-hidden border border-slate-200/60 shadow-sm max-w-md w-full">
+        <ChapatiSharingIllustration />
+        <p className="text-xs text-slate-500 text-center py-2 bg-slate-50 border-t border-slate-100">{caption}</p>
         {adminControls}
       </div>
     </div>
