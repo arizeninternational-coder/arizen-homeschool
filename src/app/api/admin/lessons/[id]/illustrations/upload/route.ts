@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { requireAdmin } from "@/lib/api-guard";
+import { ensureBucketExists } from "@/lib/storage-setup";
 export const dynamic = "force-dynamic";
 
 const BUCKET_NAME = "lesson-illustrations";
@@ -87,26 +88,25 @@ export async function POST(
       );
     }
 
+    // Ensure bucket exists (uses service role key)
+    const bucketStatus = await ensureBucketExists();
+    if (!bucketStatus.ready) {
+      return NextResponse.json(
+        { error: `Storage bucket "${BUCKET_NAME}" does not exist. ${bucketStatus.error}` },
+        { status: 500 }
+      );
+    }
+
     // Upload to Supabase Storage
     const ext = ALLOWED_TYPES[contentType] || "png";
     const timestamp = Date.now();
     const safeName = safeFilename(fileName || "illustration");
     const path = `lessons/${lessonId}/steps/${step.stepKey || stepIndex}/uploads/${timestamp}-${safeName}`;
 
-    let uploadErr = (await supabase.storage.from(BUCKET_NAME).upload(path, buffer, {
+    const { error: uploadErr } = await supabase.storage.from(BUCKET_NAME).upload(path, buffer, {
       contentType: contentType || "image/png",
       upsert: false,
-    })).error;
-
-    // If bucket missing, attempt to create (needs service role — may fail gracefully)
-    if (uploadErr) {
-      await supabase.storage.createBucket(BUCKET_NAME, { public: true });
-      const retry = await supabase.storage.from(BUCKET_NAME).upload(path, buffer, {
-        contentType: contentType || "image/png",
-        upsert: false,
-      });
-      uploadErr = retry.error;
-    }
+    });
 
     if (uploadErr) {
       console.error("[UPLOAD_ILLUSTRATION] Storage error:", uploadErr);
