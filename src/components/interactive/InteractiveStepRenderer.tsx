@@ -725,7 +725,6 @@ function WelcomeStepVisual({ step, isAdmin, onUpload, onGenerateAI, generating }
   const imageUrl = illo?.approvedUrl;
 
   // Admin controls — compact, attached to image card
-  const hasAI = !!process.env.NEXT_PUBLIC_AI_ENABLED || !!process.env.OPENAI_API_KEY;
   const adminControls = isAdmin && onUpload && onGenerateAI ? (
     <div className="flex items-center justify-between gap-2 px-3 py-2 bg-slate-50 border-t border-slate-100 flex-wrap">
       <span className="text-[11px] font-bold text-emerald-700">✓ Ready</span>
@@ -736,19 +735,11 @@ function WelcomeStepVisual({ step, isAdmin, onUpload, onGenerateAI, generating }
           <input type="file" accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml" className="hidden"
             onChange={e => { const f = e.target.files?.[0]; if (f) onUpload(-1, f); e.target.value = ""; }} />
         </label>
-        {hasAI ? (
-          <button onClick={() => onGenerateAI(-1, illo?.prompt)} disabled={generating}
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500 text-white text-[11px] font-bold hover:bg-amber-600 disabled:opacity-50 transition-colors">
-            <Sparkles className="w-3 h-3" />
-            {generating ? "Generating..." : "Replace with AI"}
-          </button>
-        ) : (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-400 text-[11px] font-bold cursor-not-allowed"
-            title="AI image generation is not configured. Set OPENAI_API_KEY to enable.">
-            <Sparkles className="w-3 h-3" />
-            Replace with AI
-          </span>
-        )}
+        <button onClick={() => onGenerateAI(-1, illo?.prompt)} disabled={generating}
+          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500 text-white text-[11px] font-bold hover:bg-amber-600 disabled:opacity-50 transition-colors">
+          <Sparkles className="w-3 h-3" />
+          {generating ? "Generating..." : "Replace with AI"}
+        </button>
       </div>
     </div>
   ) : null;

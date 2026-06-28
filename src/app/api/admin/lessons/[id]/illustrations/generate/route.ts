@@ -3,53 +3,37 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { requireAdmin } from "@/lib/api-guard";
+import { ensureBucketExists } from "@/lib/storage-setup";
 export const dynamic = "force-dynamic";
 
 const BUCKET_NAME = "lesson-illustrations";
+const STATIC_FALLBACK_URL = "/images/lessons/amina-holding-chapati.svg";
 
-// Default prompt for the Welcome step
-const DEFAULT_WELCOME_PROMPT = "Simple flat educational illustration for a Grade 2 math lesson. Show Amina, a young Kenyan girl, standing beside her brother. One round chapati is clearly visible between them or in Amina's hands. Both children are smiling. The scene is warm and simple. No cutting, no fractions, no labels, no text inside the image. Clear shapes, child-friendly, primary school style.";
+const DEFAULT_WELCOME_PROMPT = "Simple flat educational illustration for a Grade 2 math lesson. Show Amina standing on the left and her brother on the right, with one round chapati clearly visible between them. Both children are smiling. Warm simple background. No text, no labels, no fractions, no cutting. Clean child-friendly style.";
 
 /**
- * Generate an image using the configured AI provider.
- * Currently supports: OpenAI DALL-E (if OPENAI_API_KEY is set)
- * Falls back to a placeholder SVG if no provider is configured.
+ * Generate an image using OpenAI DALL-E (if OPENAI_API_KEY is set).
+ * Returns null if no AI provider is configured.
  */
 async function generateImage(prompt: string): Promise<{ url: string; base64: string } | null> {
   const openaiKey = process.env.OPENAI_API_KEY;
+  if (!openaiKey) return null;
 
-  if (openaiKey) {
-    try {
-      const res = await fetch("https://api.openai.com/v1/images/generations", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${openaiKey}`,
-        },
-        body: JSON.stringify({
-          model: "dall-e-3",
-          prompt,
-          n: 1,
-          size: "1024x1024",
-          response_format: "b64_json",
-        }),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        const b64 = data.data[0].b64_json;
-        return {
-          base64: b64,
-          url: `data:image/png;base64,${b64}`,
-        };
-      }
-      console.error("[AI_GENERATE] OpenAI error:", await res.text());
-    } catch (err) {
-      console.error("[AI_GENERATE] OpenAI fetch error:", err);
+  try {
+    const res = await fetch("https://api.openai.com/v1/images/generations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${openaiKey}` },
+      body: JSON.stringify({ model: "dall-e-3", prompt, n: 1, size: "1024x1024", response_format: "b64_json" }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const b64 = data.data[0].b64_json;
+      return { base64: b64, url: `data:image/png;base64,${b64}` };
     }
+    console.error("[AI_GENERATE] OpenAI error:", await res.text());
+  } catch (err) {
+    console.error("[AI_GENERATE] OpenAI fetch error:", err);
   }
-
-  // No AI provider configured — return null to signal fallback needed
   return null;
 }
 
@@ -108,30 +92,31 @@ export async function POST(
     let generatedUrl: string | null = null;
 
     if (result) {
+      // Ensure bucket exists before upload
+      const bucketStatus = await ensureBucketExists();
+      if (!bucketStatus.ready) {
+        return NextResponse.json({ error: bucketStatus.error }, { status: 500 });
+      }
+
       // Upload generated image to Supabase Storage
       const timestamp = Date.now();
       const path = `lessons/${lessonId}/steps/${step.stepKey || stepIndex}/generated/${timestamp}.png`;
       const buffer = Buffer.from(result.base64, "base64");
 
-      let uploadErr = (await supabase.storage.from(BUCKET_NAME).upload(path, buffer, {
+      const { error: uploadErr } = await supabase.storage.from(BUCKET_NAME).upload(path, buffer, {
         contentType: "image/png",
         upsert: false,
-      })).error;
-
-      if (uploadErr) {
-        await supabase.storage.createBucket(BUCKET_NAME, { public: true });
-        const retry = await supabase.storage.from(BUCKET_NAME).upload(path, buffer, {
-          contentType: "image/png",
-          upsert: false,
-        });
-        uploadErr = retry.error;
-      }
+      });
 
       if (!uploadErr) {
         const { data: urlData } = supabase.storage.from(BUCKET_NAME).getPublicUrl(path);
         generatedUrl = urlData?.publicUrl || null;
       }
     }
+
+    // If AI generation failed, fall back to static SVG illustration
+    const finalUrl = generatedUrl || STATIC_FALLBACK_URL;
+    const usedFallback = !generatedUrl;
 
     // Update journey step
     if (!step.mediaSpec) step.mediaSpec = {};
@@ -141,10 +126,10 @@ export async function POST(
       ...step.mediaSpec.illustration,
       prompt,
       generatedUrl: generatedUrl,
-      approvedUrl: approve ? generatedUrl : step.mediaSpec.illustration.approvedUrl,
-      source: generatedUrl ? "generated" : step.mediaSpec.illustration.source,
-      status: generatedUrl ? (approve ? "approved" : "generated") : "failed",
-      generatedAt: generatedUrl ? new Date().toISOString() : null,
+      approvedUrl: approve ? finalUrl : step.mediaSpec.illustration.approvedUrl,
+      source: generatedUrl ? "generated" : "static",
+      status: approve ? "approved" : (generatedUrl ? "generated" : step.mediaSpec.illustration.status),
+      generatedAt: new Date().toISOString(),
       approvedAt: approve ? new Date().toISOString() : step.mediaSpec.illustration.approvedAt,
       mode: generatedUrl ? "generated" : step.mediaSpec.illustration.mode,
       reviewStatus: approve ? "approved" : "needs_review",
@@ -168,13 +153,14 @@ export async function POST(
     }
 
     return NextResponse.json({
-      success: !!generatedUrl,
+      success: true,
       message: generatedUrl
-        ? (approve ? "Image generated and approved." : "Image generated. Preview and approve to make it student-visible.")
-        : "AI provider not configured. Set OPENAI_API_KEY to enable generation.",
+        ? (approve ? "Image generated and approved." : "Image generated. Preview and approve.")
+        : "AI provider not configured. Using static illustration as fallback.",
       stepIndex,
-      generatedUrl,
+      generatedUrl: finalUrl,
       illustration: step.mediaSpec.illustration,
+      usedFallback,
     });
   } catch (err: any) {
     console.error("[AI_GENERATE] Critical error:", err);
