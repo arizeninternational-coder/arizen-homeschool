@@ -1,82 +1,112 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
-  <!-- Background - warm gradient -->
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#FEF3C7;stop-opacity:1" />
       <stop offset="100%" style="stop-color:#FDE68A;stop-opacity:1" />
     </linearGradient>
-    <linearGradient id="chapati" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#D4953A;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#C4852A;stop-opacity:1" />
+    <linearGradient id="aminaShirt" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#818CF8;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6366F1;stop-opacity:1" />
     </linearGradient>
-    <linearGradient id="skin" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#D4A574;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#C4956A;stop-opacity:1" />
-    </linearGradient>
-    <linearGradient id="shirt" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#6366F1;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#4F46E5;stop-opacity:1" />
-    </linearGradient>
-    <linearGradient id="boyShirt" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="brotherShirt" x1="0%" y1="0%" x2="0%" y2="100%">
       <stop offset="0%" style="stop-color:#34D399;stop-opacity:1" />
       <stop offset="100%" style="stop-color:#10B981;stop-opacity:1" />
     </linearGradient>
+    <linearGradient id="chapatiGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E8B060;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#D4953A;stop-opacity:1" />
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#FEF3C7;stop-opacity:0.6" />
+      <stop offset="100%" style="stop-color:#FEF3C7;stop-opacity:0" />
+    </radialGradient>
   </defs>
 
   <!-- Background -->
   <rect width="400" height="300" fill="url(#bg)" rx="16" />
 
-  <!-- Floor shadow -->
-  <ellipse cx="200" cy="270" rx="120" ry="15" fill="#00000015" />
+  <!-- Warm glow behind the sharing moment -->
+  <circle cx="200" cy="200" r="80" fill="url(#glow)" />
 
-  <!-- Amina (girl) - center-left -->
-  <!-- Body -->
-  <ellipse cx="160" cy="220" rx="35" ry="45" fill="url(#shirt)" />
+  <!-- === AMINA (left side) === -->
+  <!-- Legs -->
+  <rect x="82" y="230" width="14" height="35" rx="6" fill="#C4956A" />
+  <rect x="100" y="230" width="14" height="35" rx="6" fill="#C4956A" />
+  <!-- Shoes -->
+  <ellipse cx="89" cy="267" rx="10" ry="5" fill="#4F46E5" />
+  <ellipse cx="107" cy="267" rx="10" ry="5" fill="#4F46E5" />
+  <!-- Body / Dress -->
+  <path d="M75 175 Q75 155 95 150 L115 150 Q135 155 135 175 L130 240 L80 240 Z" fill="url(#aminaShirt)" />
+  <!-- Left arm (reaching toward chapati) -->
+  <path d="M80 175 Q70 190 85 210" stroke="#C4956A" stroke-width="11" fill="none" stroke-linecap="round" />
+  <!-- Right arm (reaching toward chapati) -->
+  <path d="M130 175 Q145 195 135 210" stroke="#C4956A" stroke-width="11" fill="none" stroke-linecap="round" />
   <!-- Head -->
-  <circle cx="160" cy="155" r="30" fill="url(#skin)" />
-  <!-- Hair -->
-  <ellipse cx="160" cy="135" rx="28" ry="20" fill="#2D1B0E" />
-  <ellipse cx="145" cy="145" rx="8" ry="12" fill="#2D1B0E" />
-  <ellipse cx="175" cy="145" rx="8" ry="12" fill="#2D1B0E" />
+  <circle cx="105" cy="120" r="28" fill="#D4A574" />
+  <!-- Hair (top) -->
+  <ellipse cx="105" cy="100" rx="28" ry="18" fill="#2D1B0E" />
+  <!-- Hair (sides) -->
+  <ellipse cx="82" cy="115" rx="7" ry="14" fill="#2D1B0E" />
+  <ellipse cx="128" cy="115" rx="7" ry="14" fill="#2D1B0E" />
   <!-- Eyes -->
-  <circle cx="150" cy="155" r="3" fill="#2D1B0E" />
-  <circle cx="170" cy="155" r="3" fill="#2D1B0E" />
+  <circle cx="95" cy="122" r="3.5" fill="#2D1B0E" />
+  <circle cx="115" cy="122" r="3.5" fill="#2D1B0E" />
+  <!-- Eye shine -->
+  <circle cx="96" cy="121" r="1.2" fill="#FFF" />
+  <circle cx="116" cy="121" r="1.2" fill="#FFF" />
   <!-- Smile -->
-  <path d="M152 165 Q160 172 168 165" stroke="#2D1B0E" stroke-width="2" fill="none" stroke-linecap="round" />
-  <!-- Arms reaching forward with chapati -->
-  <path d="M130 200 Q120 190 110 185" stroke="url(#skin)" stroke-width="12" fill="none" stroke-linecap="round" />
-  <path d="M190 200 Q200 190 210 185" stroke="url(#skin)" stroke-width="12" fill="none" stroke-linecap="round" />
+  <path d="M95 132 Q105 140 115 132" stroke="#2D1B0E" stroke-width="2" fill="none" stroke-linecap="round" />
+  <!-- Cheek blush -->
+  <circle cx="86" cy="130" r="4" fill="#F472B6" opacity="0.3" />
+  <circle cx="124" cy="130" r="4" fill="#F472B6" opacity="0.3" />
 
-  <!-- The Chapati (round, whole) held in both hands -->
-  <circle cx="160" cy="190" r="38" fill="url(#chapati)" />
-  <circle cx="160" cy="190" r="35" fill="#E8B060" stroke="#C4852A" stroke-width="1.5" />
-  <!-- Chapati texture dots -->
-  <circle cx="148" cy="182" r="2" fill="#C4852A" opacity="0.4" />
-  <circle cx="170" cy="178" r="1.5" fill="#C4852A" opacity="0.3" />
-  <circle cx="155" cy="198" r="2" fill="#C4852A" opacity="0.3" />
-  <circle cx="172" cy="195" r="1.5" fill="#C4852A" opacity="0.4" />
-  <circle cx="145" cy="195" r="1.5" fill="#C4852A" opacity="0.3" />
-
-  <!-- Brother (boy) - right side, slightly behind -->
-  <!-- Body -->
-  <ellipse cx="250" cy="225" rx="30" ry="40" fill="url(#boyShirt)" />
+  <!-- === BROTHER (right side) === -->
+  <!-- Legs -->
+  <rect x="258" y="230" width="14" height="35" rx="6" fill="#C4956A" />
+  <rect x="276" y="230" width="14" height="35" rx="6" fill="#C4956A" />
+  <!-- Shoes -->
+  <ellipse cx="265" cy="267" rx="10" ry="5" fill="#059669" />
+  <ellipse cx="283" cy="267" rx="10" ry="5" fill="#059669" />
+  <!-- Body / Shirt -->
+  <path d="M250 175 Q250 155 270 150 L290 150 Q310 155 310 175 L305 240 L255 240 Z" fill="url(#brotherShirt)" />
+  <!-- Left arm (reaching toward chapati) -->
+  <path d="M255 175 Q240 195 250 210" stroke="#C4956A" stroke-width="11" fill="none" stroke-linecap="round" />
+  <!-- Right arm (reaching toward chapati) -->
+  <path d="M305 175 Q315 190 305 210" stroke="#C4956A" stroke-width="11" fill="none" stroke-linecap="round" />
   <!-- Head -->
-  <circle cx="250" cy="165" r="26" fill="url(#skin)" />
+  <circle cx="280" cy="120" r="26" fill="#D4A574" />
   <!-- Hair (short) -->
-  <ellipse cx="250" cy="148" rx="24" ry="12" fill="#1a1a1a" />
-  <!-- Eyes (looking at chapati) -->
-  <circle cx="242" cy="165" r="2.5" fill="#2D1B0E" />
-  <circle cx="258" cy="165" r="2.5" fill="#2D1B0E" />
+  <ellipse cx="280" cy="102" rx="24" ry="14" fill="#1a1a1a" />
+  <!-- Eyes -->
+  <circle cx="271" cy="122" r="3" fill="#2D1B0E" />
+  <circle cx="289" cy="122" r="3" fill="#2D1B0E" />
+  <!-- Eye shine -->
+  <circle cx="272" cy="121" r="1.1" fill="#FFF" />
+  <circle cx="290" cy="121" r="1.1" fill="#FFF" />
   <!-- Smile -->
-  <path d="M243 174 Q250 180 257 174" stroke="#2D1B0E" stroke-width="1.5" fill="none" stroke-linecap="round" />
-  <!-- Arms reaching toward chapati -->
-  <path d="M225 210 Q215 200 210 195" stroke="url(#skin)" stroke-width="10" fill="none" stroke-linecap="round" />
-  <path d="M275 210 Q280 200 285 195" stroke="url(#skin)" stroke-width="10" fill="none" stroke-linecap="round" />
+  <path d="M271 132 Q280 139 289 132" stroke="#2D1B0E" stroke-width="2" fill="none" stroke-linecap="round" />
+  <!-- Cheek blush -->
+  <circle cx="263" cy="130" r="4" fill="#F472B6" opacity="0.3" />
+  <circle cx="297" cy="130" r="4" fill="#F472B6" opacity="0.3" />
 
-  <!-- Warm glow around the chapati (sharing moment) -->
-  <circle cx="160" cy="190" r="50" fill="#FDE68A" opacity="0.3" />
+  <!-- === CHAPATI (centered between them, held at chest level) === -->
+  <!-- Shadow under chapati -->
+  <ellipse cx="200" cy="218" rx="36" ry="8" fill="#00000010" />
+  <!-- Main chapati circle -->
+  <circle cx="200" cy="200" r="34" fill="url(#chapatiGrad)" stroke="#C4852A" stroke-width="2" />
+  <!-- Inner ring -->
+  <circle cx="200" cy="200" r="28" fill="none" stroke="#D4953A" stroke-width="1" opacity="0.5" />
+  <!-- Texture spots -->
+  <circle cx="190" cy="192" r="2.5" fill="#C4852A" opacity="0.35" />
+  <circle cx="210" cy="190" r="2" fill="#C4852A" opacity="0.3" />
+  <circle cx="195" cy="208" r="2" fill="#C4852A" opacity="0.25" />
+  <circle cx="212" cy="205" r="1.5" fill="#C4852A" opacity="0.3" />
+  <circle cx="188" cy="202" r="1.5" fill="#C4852A" opacity="0.2" />
+  <!-- Highlight -->
+  <ellipse cx="192" cy="190" rx="10" ry="6" fill="#FFF" opacity="0.15" />
 
-  <!-- Small decorative elements - subtle -->
-  <circle cx="80" cy="60" r="20" fill="#FDE68A" opacity="0.4" />
-  <circle cx="320" cy="70" r="15" fill="#FDE68A" opacity="0.3" />
+  <!-- Small decorative circles in background -->
+  <circle cx="50" cy="50" r="15" fill="#FDE68A" opacity="0.3" />
+  <circle cx="350" cy="60" r="12" fill="#FDE68A" opacity="0.25" />
+  <circle cx="370" cy="240" r="10" fill="#FDE68A" opacity="0.2" />
 </svg>
