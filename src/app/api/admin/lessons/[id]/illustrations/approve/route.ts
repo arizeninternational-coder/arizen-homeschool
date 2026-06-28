@@ -1,5 +1,5 @@
 // POST /api/admin/lessons/[id]/illustrations/approve
-// Admin-only: Approve an illustration for student visibility
+// Admin-only: Approve an image (generated or uploaded) for student view
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { requireAdmin } from "@/lib/api-guard";
@@ -16,15 +16,16 @@ export async function POST(
 
   try {
     const body = await req.json();
-    const { stepIndex, action } = body; // action: "approve" | "reject" | "remove"
+    const { stepIndex, imageUrl, source } = body;
 
-    if (stepIndex === undefined || !action) {
+    if (stepIndex === undefined || !imageUrl) {
       return NextResponse.json(
-        { error: "stepIndex and action are required" },
+        { error: "stepIndex and imageUrl are required" },
         { status: 400 }
       );
     }
 
+    // Fetch lesson
     const { data: lesson, error: fetchErr } = await supabase
       .from("Lesson")
       .select("id, contentBlocks")
@@ -41,7 +42,9 @@ export async function POST(
     let meta: any = {};
     try { meta = JSON.parse(lesson.contentBlocks || "{}"); } catch {}
 
-    const journey = meta.studentJourney || meta.studentJourneyDraft || [];
+    const hasDraft = Array.isArray(meta.studentJourneyDraft) && meta.studentJourneyDraft.length > 0;
+    const journeyKey = hasDraft ? "studentJourneyDraft" : "studentJourney";
+    const journey = meta[journeyKey] || [];
     const step = journey[stepIndex];
 
     if (!step) {
@@ -51,46 +54,21 @@ export async function POST(
       );
     }
 
-    if (!step.media) step.media = {};
-    if (!step.media.illustration) step.media.illustration = {};
+    // Update illustration with approved URL
+    if (!step.mediaSpec) step.mediaSpec = {};
+    if (!step.mediaSpec.illustration) step.mediaSpec.illustration = {};
 
-    const ill = step.media.illustration;
+    step.mediaSpec.illustration = {
+      ...step.mediaSpec.illustration,
+      approvedUrl: imageUrl,
+      source: source || step.mediaSpec.illustration.source,
+      status: "approved",
+      approvedAt: new Date().toISOString(),
+      mode: source || step.mediaSpec.illustration.mode,
+      reviewStatus: "approved",
+    };
 
-    if (action === "approve") {
-      // Copy generatedUrl or uploadedUrl into approvedUrl
-      const sourceUrl = ill.generatedUrl || ill.uploadedUrl;
-      if (!sourceUrl) {
-        return NextResponse.json(
-          { error: "No generated or uploaded image to approve" },
-          { status: 400 }
-        );
-      }
-      ill.approvedUrl = sourceUrl;
-      ill.approvedByAdmin = true;
-      ill.status = "APPROVED";
-      ill.approvedAt = new Date().toISOString();
-    } else if (action === "reject") {
-      ill.approvedUrl = null;
-      ill.approvedByAdmin = false;
-      ill.status = "GENERATED"; // Keep generated, just not approved
-    } else if (action === "remove") {
-      step.media.illustration = {
-        prompt: ill.prompt || step.illustrationPrompt || "",
-        generatedUrl: null,
-        uploadedUrl: null,
-        approvedUrl: null,
-        approvedByAdmin: false,
-        status: "MISSING",
-        errorMessage: null,
-      };
-    }
-
-    const newMeta = { ...meta };
-    if (meta.studentJourneyDraft) {
-      newMeta.studentJourneyDraft = journey;
-    } else {
-      newMeta.studentJourney = journey;
-    }
+    const newMeta = { ...meta, [journeyKey]: journey };
 
     const { error: updateErr } = await supabase
       .from("Lesson")
@@ -102,22 +80,21 @@ export async function POST(
 
     if (updateErr) {
       return NextResponse.json(
-        { error: "Failed to update illustration. Try again." },
+        { error: "Failed to save approval." },
         { status: 500 }
       );
     }
 
     return NextResponse.json({
       success: true,
-      message: action === "approve" ? "Illustration approved and now visible to students." :
-                action === "reject" ? "Illustration rejected." : "Illustration removed.",
+      message: "Image approved and is now visible to students.",
       stepIndex,
-      illustration: step.media.illustration,
+      illustration: step.mediaSpec.illustration,
     });
   } catch (err: any) {
     console.error("[APPROVE_ILLUSTRATION] Critical error:", err);
     return NextResponse.json(
-      { error: err.message || "Failed to process illustration" },
+      { error: err.message || "Failed to approve image" },
       { status: 500 }
     );
   }

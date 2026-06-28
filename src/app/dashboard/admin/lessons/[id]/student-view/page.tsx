@@ -263,13 +263,17 @@ export default function AdminStudentLessonEditor({ params }: { params: Promise<{
     setSaving(false);
   }, [lessonId, saving, lesson]);
 
-  const handleGenerateIllustration = useCallback(async (stepIndex: number) => {
+  const handleGenerateIllustration = useCallback(async (stepIndex: number, prompt?: string, approve?: boolean) => {
     setGenerating(stepIndex);
     try {
       const step = journey[stepIndex];
       const res = await fetch(`/api/admin/lessons/${lessonId}/illustrations/generate`, {
         method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include",
-        body: JSON.stringify({ stepIndex, illustrationPrompt: step.illustrationPrompt }),
+        body: JSON.stringify({
+          stepIndex,
+          prompt: prompt || step.mediaSpec?.illustration?.prompt || step.illustrationPrompt,
+          approve: approve || false,
+        }),
       });
       if (res.ok) loadLesson(lessonId);
     } catch { /* non-blocking */ }
@@ -738,22 +742,26 @@ export default function AdminStudentLessonEditor({ params }: { params: Promise<{
 function AdminIllustration({ step, stepIndex, meta, lessonId, generating, onGenerate }: any) {
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [showPrompt, setShowPrompt] = useState(false);
+  const [prompt, setPrompt] = useState(step?.mediaSpec?.illustration?.prompt || step?.illustrationPrompt || '');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const approvedUrl = step.media?.illustration?.approvedUrl;
+  const illo = step?.mediaSpec?.illustration;
+  const approvedUrl = illo?.approvedUrl;
+  const generatedUrl = illo?.generatedUrl;
+  const uploadedUrl = illo?.uploadedUrl;
+  const status = illo?.status || 'none';
 
   const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
     const allowedTypes = ["image/png", "image/jpeg", "image/jpg", "image/webp", "image/svg+xml"];
     if (!allowedTypes.includes(file.type)) {
       setUploadError(`Invalid file type: ${file.type}. Allowed: PNG, JPG, JPEG, WEBP, SVG`);
       return;
     }
 
-    // Validate file size (5 MB)
     const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
       setUploadError(`File too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Maximum: 5 MB`);
@@ -764,31 +772,20 @@ function AdminIllustration({ step, stepIndex, meta, lessonId, generating, onGene
     setUploadError(null);
 
     try {
-      // Read file as base64
       const reader = new FileReader();
       reader.onload = async () => {
         const base64 = reader.result as string;
-        const contentType = file.type;
-        const fileName = file.name;
-
         try {
           const res = await fetch(`/api/admin/lessons/${lessonId}/illustrations/upload`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
-            body: JSON.stringify({
-              stepIndex,
-              imageData: base64,
-              fileName,
-              contentType,
-            }),
+            body: JSON.stringify({ stepIndex, imageData: base64, fileName: file.name, contentType: file.type, approve: false }),
           });
-
           const data = await res.json();
           if (!res.ok) {
             setUploadError(data.error || "Upload failed");
           } else {
-            // Reload lesson to show new image
             window.location.reload();
           }
         } catch {
@@ -802,8 +799,6 @@ function AdminIllustration({ step, stepIndex, meta, lessonId, generating, onGene
       setUploadError("Failed to read file.");
       setUploading(false);
     }
-
-    // Reset input so same file can be re-selected
     if (fileInputRef.current) fileInputRef.current.value = "";
   }, [stepIndex, lessonId]);
 
@@ -822,10 +817,33 @@ function AdminIllustration({ step, stepIndex, meta, lessonId, generating, onGene
     }
   }, [stepIndex, lessonId]);
 
+  const handleApprove = useCallback(async (imageUrl: string, source: string) => {
+    try {
+      const res = await fetch(`/api/admin/lessons/${lessonId}/illustrations/approve`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ stepIndex, imageUrl, source }),
+      });
+      if (res.ok) window.location.reload();
+    } catch {
+      setUploadError("Failed to approve image.");
+    }
+  }, [stepIndex, lessonId]);
+
+  const handleGenerate = useCallback(() => {
+    onGenerate(stepIndex, prompt, false);
+  }, [onGenerate, stepIndex, prompt]);
+
+  const handleGenerateAndApprove = useCallback(() => {
+    onGenerate(stepIndex, prompt, true);
+  }, [onGenerate, stepIndex, prompt]);
+
+  // --- Render approved image ---
   if (approvedUrl) {
     return (
       <div className="mt-4 rounded-2xl overflow-hidden border border-slate-200/50 shadow-sm">
-        <img src={approvedUrl} alt="Illustration" className="w-full h-auto max-h-[220px] object-cover" />
+        <img src={approvedUrl} alt="Illustration" className="w-full h-auto max-h-[220px] object-contain bg-white" />
         <div className="px-3 py-1.5 bg-emerald-50 border-t border-emerald-200/40 flex items-center justify-between">
           <span className="text-[10px] font-bold text-emerald-700">✓ Approved</span>
           <div className="flex items-center gap-2">
@@ -836,56 +854,88 @@ function AdminIllustration({ step, stepIndex, meta, lessonId, generating, onGene
             <button onClick={handleRemove} className="text-[10px] font-bold text-red-600 hover:text-red-700">Remove</button>
           </div>
         </div>
+        {/* Show generated draft if different from approved */}
+        {generatedUrl && generatedUrl !== approvedUrl && (
+          <div className="px-3 py-2 border-t border-slate-100">
+            <p className="text-[10px] font-bold text-amber-700 mb-1">AI Draft Preview:</p>
+            <img src={generatedUrl} alt="Generated draft" className="w-full h-auto max-h-[120px] object-contain rounded-lg border border-amber-200/50" />
+            <div className="flex gap-2 mt-1">
+              <button onClick={() => handleApprove(generatedUrl, 'generated')} className="text-[10px] font-bold text-emerald-600 hover:text-emerald-700">Use This</button>
+            </div>
+          </div>
+        )}
+        {/* Show uploaded but not yet approved */}
+        {uploadedUrl && uploadedUrl !== approvedUrl && (
+          <div className="px-3 py-2 border-t border-slate-100">
+            <p className="text-[10px] font-bold text-blue-700 mb-1">Uploaded (pending approval):</p>
+            <img src={uploadedUrl} alt="Uploaded" className="w-full h-auto max-h-[120px] object-contain rounded-lg border border-blue-200/50" />
+            <div className="flex gap-2 mt-1">
+              <button onClick={() => handleApprove(uploadedUrl, 'uploaded')} className="text-[10px] font-bold text-emerald-600 hover:text-emerald-700">Use This</button>
+            </div>
+          </div>
+        )}
         {uploading && <div className="px-3 py-1.5 bg-blue-50 text-[10px] font-bold text-blue-600 text-center">Uploading...</div>}
         {uploadError && <div className="px-3 py-1.5 bg-red-50 text-[10px] font-bold text-red-600">{uploadError}</div>}
       </div>
     );
   }
 
-  // Handle flat media structure (POC journeys with media.altText / media.fallbackText)
-  const flatMedia = step.media;
-  if (flatMedia && !flatMedia.illustration && !flatMedia.video && flatMedia.altText) {
-    return (
-      <div className={`mt-4 rounded-2xl border-2 border-dashed ${meta.border} overflow-hidden`}>
-        <div className={`bg-gradient-to-br ${meta.softBg || ""} p-5 flex flex-col items-center gap-2.5`}>
-          <div className={`w-12 h-12 rounded-xl ${meta.iconBg || "bg-slate-100"} flex items-center justify-center`}>
-            <span className="text-xl">🖼️</span>
-          </div>
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Illustration (Draft)</p>
-          <p className={`text-sm font-semibold ${meta.accent} text-center max-w-xs leading-snug`}>{flatMedia.altText}</p>
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-[9px] font-bold text-amber-600">Draft — not yet approved</span>
-          <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-500 text-white text-xs font-bold hover:bg-indigo-600 disabled:opacity-50 transition-colors cursor-pointer mt-1">
-            {uploading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Upload className="w-3 h-3" />}
-            {uploading ? "Uploading..." : "Upload Image"}
-            <input ref={fileInputRef} type="file" accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml" className="hidden" onChange={handleFileSelect} />
-          </label>
-        </div>
-        {uploadError && <div className="px-3 py-1.5 bg-red-50 text-[10px] font-bold text-red-600">{uploadError}</div>}
-      </div>
-    );
-  }
-
-  const prompt = step.illustrationPrompt;
-  if (!prompt) return null;
-
+  // --- No approved image: show controls ---
   return (
     <div className={`mt-4 rounded-2xl border-2 border-dashed ${meta.border} overflow-hidden`}>
-      <div className={`bg-gradient-to-br ${meta.softBg || ""} p-5 flex flex-col items-center gap-2.5`}>
-        <div className={`w-12 h-12 rounded-xl ${meta.iconBg || "bg-slate-100"} flex items-center justify-center`}>
-          <span className="text-xl">{meta.icon}</span>
-        </div>
-        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Illustration</p>
-        <p className={`text-sm font-semibold ${meta.accent} text-center max-w-xs leading-snug`}>{prompt}</p>
-        <div className="flex items-center gap-2 mt-1">
+      <div className={`bg-gradient-to-br ${meta.softBg || ""} p-5 flex flex-col items-center gap-3`}>
+        {/* Show generated preview if available */}
+        {generatedUrl && (
+          <div className="w-full mb-2">
+            <p className="text-[10px] font-bold text-amber-700 mb-1 text-center">AI Generated Preview:</p>
+            <img src={generatedUrl} alt="AI generated" className="w-full h-auto max-h-[150px] object-contain rounded-lg border border-amber-200/50" />
+            <div className="flex justify-center gap-2 mt-2">
+              <button onClick={() => handleApprove(generatedUrl, 'generated')} className="text-xs font-bold text-emerald-600 hover:text-emerald-700 px-2 py-1 rounded-lg bg-emerald-50">✓ Use This</button>
+              <button onClick={handleGenerate} disabled={generating} className="text-xs font-bold text-amber-600 hover:text-amber-700 px-2 py-1 rounded-lg bg-amber-50">🔄 Regenerate</button>
+            </div>
+          </div>
+        )}
+
+        {/* Show uploaded preview if available */}
+        {uploadedUrl && !generatedUrl && (
+          <div className="w-full mb-2">
+            <p className="text-[10px] font-bold text-blue-700 mb-1 text-center">Uploaded:</p>
+            <img src={uploadedUrl} alt="Uploaded" className="w-full h-auto max-h-[150px] object-contain rounded-lg border border-blue-200/50" />
+            <div className="flex justify-center gap-2 mt-2">
+              <button onClick={() => handleApprove(uploadedUrl, 'uploaded')} className="text-xs font-bold text-emerald-600 hover:text-emerald-700 px-2 py-1 rounded-lg bg-emerald-50">✓ Use This</button>
+            </div>
+          </div>
+        )}
+
+        {/* Prompt editor */}
+        <button onClick={() => setShowPrompt(!showPrompt)} className="text-[10px] font-bold text-slate-500 hover:text-slate-700 self-start">
+          {showPrompt ? "▼ Hide prompt" : "▶ Edit prompt"}
+        </button>
+        {showPrompt && (
+          <textarea
+            value={prompt}
+            onChange={e => setPrompt(e.target.value)}
+            rows={3}
+            className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-300 resize-none"
+            placeholder="Image prompt..."
+          />
+        )}
+
+        {/* Action buttons */}
+        <div className="flex items-center gap-2 flex-wrap justify-center">
           <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-500 text-white text-xs font-bold hover:bg-indigo-600 disabled:opacity-50 transition-colors cursor-pointer">
             {uploading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Upload className="w-3 h-3" />}
             {uploading ? "Uploading..." : "Upload Image"}
             <input ref={fileInputRef} type="file" accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml" className="hidden" onChange={handleFileSelect} />
           </label>
-          <button onClick={onGenerate} disabled={generating}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold hover:bg-slate-200 disabled:opacity-50 transition-colors">
+          <button onClick={handleGenerate} disabled={generating}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 text-white text-xs font-bold hover:bg-amber-600 disabled:opacity-50 transition-colors">
             {generating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
             {generating ? "Generating..." : "Generate AI"}
+          </button>
+          <button onClick={handleGenerateAndApprove} disabled={generating}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500 text-white text-xs font-bold hover:bg-emerald-600 disabled:opacity-50 transition-colors">
+            {generating ? <Loader2 className="w-3 h-3 animate-spin" /> : "✨ Generate & Approve"}
           </button>
         </div>
       </div>

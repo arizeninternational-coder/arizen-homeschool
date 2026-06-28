@@ -7,17 +7,16 @@ export const dynamic = "force-dynamic";
 
 const BUCKET_NAME = "lesson-illustrations";
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
-const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/jpg", "image/webp", "image/svg+xml"];
+const ALLOWED_TYPES: Record<string, string> = {
+  "image/png": "png",
+  "image/jpeg": "jpg",
+  "image/jpg": "jpg",
+  "image/webp": "webp",
+  "image/svg+xml": "svg",
+};
 
-function getExtensionFromType(contentType: string): string {
-  const map: Record<string, string> = {
-    "image/png": "png",
-    "image/jpeg": "jpg",
-    "image/jpg": "jpg",
-    "image/webp": "webp",
-    "image/svg+xml": "svg",
-  };
-  return map[contentType] || "bin";
+function safeFilename(name: string): string {
+  return name.replace(/[^a-zA-Z0-9._-]/g, "_");
 }
 
 export async function POST(
@@ -31,9 +30,8 @@ export async function POST(
 
   try {
     const body = await req.json();
-    const { stepIndex, imageData, fileName, contentType } = body;
+    const { stepIndex, imageData, fileName, contentType, approve } = body;
 
-    // Validate inputs
     if (stepIndex === undefined || !imageData) {
       return NextResponse.json(
         { error: "stepIndex and imageData (base64) are required" },
@@ -42,9 +40,9 @@ export async function POST(
     }
 
     // Validate file type
-    if (contentType && !ALLOWED_TYPES.includes(contentType)) {
+    if (contentType && !ALLOWED_TYPES[contentType]) {
       return NextResponse.json(
-        { error: `Invalid file type: ${contentType}. Allowed: ${ALLOWED_TYPES.join(", ")}` },
+        { error: `Invalid file type: ${contentType}. Allowed: ${Object.keys(ALLOWED_TYPES).join(", ")}` },
         { status: 400 }
       );
     }
@@ -76,9 +74,10 @@ export async function POST(
     let meta: any = {};
     try { meta = JSON.parse(lesson.contentBlocks || "{}"); } catch {}
 
-    const journey = meta.studentJourneyDraft?.length
-      ? meta.studentJourneyDraft
-      : meta.studentJourney || [];
+    // Determine which journey array to update
+    const hasDraft = Array.isArray(meta.studentJourneyDraft) && meta.studentJourneyDraft.length > 0;
+    const journeyKey = hasDraft ? "studentJourneyDraft" : "studentJourney";
+    const journey = meta[journeyKey] || [];
     const step = journey[stepIndex];
 
     if (!step) {
@@ -89,18 +88,17 @@ export async function POST(
     }
 
     // Upload to Supabase Storage
-    const ext = getExtensionFromType(contentType || "image/png");
+    const ext = ALLOWED_TYPES[contentType] || "png";
     const timestamp = Date.now();
-    const safeFileName = (fileName || "illustration").replace(/[^a-zA-Z0-9._-]/g, "_");
-    const path = `lessons/${lessonId}/steps/${step.stepKey || stepIndex}-${timestamp}-${safeFileName}.${ext}`;
+    const safeName = safeFilename(fileName || "illustration");
+    const path = `lessons/${lessonId}/steps/${step.stepKey || stepIndex}/uploads/${timestamp}-${safeName}`;
 
-    // Try uploading — if bucket doesn't exist, attempt to create it (requires service role)
     let uploadErr = (await supabase.storage.from(BUCKET_NAME).upload(path, buffer, {
       contentType: contentType || "image/png",
       upsert: false,
     })).error;
 
-    // If first upload fails (bucket missing), try creating bucket (no-op if exists)
+    // If bucket missing, attempt to create (needs service role — may fail gracefully)
     if (uploadErr) {
       await supabase.storage.createBucket(BUCKET_NAME, { public: true });
       const retry = await supabase.storage.from(BUCKET_NAME).upload(path, buffer, {
@@ -119,10 +117,7 @@ export async function POST(
     }
 
     // Get public URL
-    const { data: urlData } = supabase.storage
-      .from(BUCKET_NAME)
-      .getPublicUrl(path);
-
+    const { data: urlData } = supabase.storage.from(BUCKET_NAME).getPublicUrl(path);
     const publicUrl = urlData?.publicUrl;
 
     if (!publicUrl) {
@@ -132,32 +127,24 @@ export async function POST(
       );
     }
 
-    // Update journey step with the new image
-    if (!step.media) step.media = {};
-    if (!step.media.illustration) step.media.illustration = {};
+    // Update journey step with new image model
+    if (!step.mediaSpec) step.mediaSpec = {};
+    if (!step.mediaSpec.illustration) step.mediaSpec.illustration = {};
 
-    // Keep previous URL for history
-    const previousUrl = step.media.illustration.approvedUrl || null;
-    
-    step.media.illustration = {
-      ...step.media.illustration,
+    step.mediaSpec.illustration = {
+      ...step.mediaSpec.illustration,
       uploadedUrl: publicUrl,
-      approvedUrl: publicUrl, // Auto-approve admin uploads
-      approvedByAdmin: true,
-      status: "APPROVED",
+      approvedUrl: approve ? publicUrl : step.mediaSpec.illustration.approvedUrl,
+      source: "uploaded",
+      status: approve ? "approved" : (step.mediaSpec.illustration.status || "generated"),
       uploadedAt: new Date().toISOString(),
-      approvedAt: new Date().toISOString(),
-      errorMessage: null,
+      approvedAt: approve ? new Date().toISOString() : step.mediaSpec.illustration.approvedAt,
       mode: "uploaded",
+      reviewStatus: approve ? "approved" : step.mediaSpec.illustration.reviewStatus,
     };
 
-    // Update the journey in contentBlocks
-    const newMeta = { ...meta };
-    if (meta.studentJourneyDraft?.length) {
-      newMeta.studentJourneyDraft = journey;
-    } else {
-      newMeta.studentJourney = journey;
-    }
+    // Save back to contentBlocks
+    const newMeta = { ...meta, [journeyKey]: journey };
 
     const { error: updateErr } = await supabase
       .from("Lesson")
@@ -176,10 +163,10 @@ export async function POST(
 
     return NextResponse.json({
       success: true,
-      message: "Image uploaded and approved. Visible to students immediately.",
+      message: approve ? "Image uploaded and approved." : "Image uploaded. Approve to make it student-visible.",
       stepIndex,
       publicUrl,
-      illustration: step.media.illustration,
+      illustration: step.mediaSpec.illustration,
     });
   } catch (err: any) {
     console.error("[UPLOAD_ILLUSTRATION] Critical error:", err);
@@ -209,7 +196,6 @@ export async function DELETE(
       return NextResponse.json({ error: "stepIndex is required" }, { status: 400 });
     }
 
-    // Fetch lesson
     const { data: lesson, error: fetchErr } = await supabase
       .from("Lesson")
       .select("id, contentBlocks")
@@ -223,48 +209,40 @@ export async function DELETE(
     let meta: any = {};
     try { meta = JSON.parse(lesson.contentBlocks || "{}"); } catch {}
 
-    const journey = meta.studentJourneyDraft?.length
-      ? meta.studentJourneyDraft
-      : meta.studentJourney || [];
+    const hasDraft = Array.isArray(meta.studentJourneyDraft) && meta.studentJourneyDraft.length > 0;
+    const journeyKey = hasDraft ? "studentJourneyDraft" : "studentJourney";
+    const journey = meta[journeyKey] || [];
     const step = journey[stepIndex];
 
     if (!step) {
       return NextResponse.json({ error: `Step at index ${stepIndex} not found` }, { status: 404 });
     }
 
-    // Remove illustration from step
-    if (step.media?.illustration) {
-      const oldUrl = step.media.illustration.approvedUrl || step.media.illustration.uploadedUrl;
-      
-      // Try to delete from storage if it's a storage URL
-      if (oldUrl && oldUrl.includes(BUCKET_NAME)) {
-        const path = oldUrl.split(`${BUCKET_NAME}/`)[1];
-        if (path) {
-          supabase.storage.from(BUCKET_NAME).remove([path]).catch(() => {
-            // Non-blocking: don't fail if delete doesn't work
-          });
+    // Try to delete from storage if it's a storage URL
+    if (step.mediaSpec?.illustration?.uploadedUrl) {
+      const oldUrl = step.mediaSpec.illustration.uploadedUrl;
+      if (oldUrl.includes(BUCKET_NAME)) {
+        const filePath = oldUrl.split(`${BUCKET_NAME}/`)[1];
+        if (filePath) {
+          supabase.storage.from(BUCKET_NAME).remove([filePath]).catch(() => {});
         }
       }
-
-      step.media.illustration = {
-        mode: "none",
-        uploadedUrl: null,
-        approvedUrl: null,
-        approvedByAdmin: false,
-        status: "MISSING",
-        uploadedAt: null,
-        approvedAt: null,
-        errorMessage: null,
-      };
     }
 
-    // Update the journey
-    const newMeta = { ...meta };
-    if (meta.studentJourneyDraft?.length) {
-      newMeta.studentJourneyDraft = journey;
-    } else {
-      newMeta.studentJourney = journey;
-    }
+    // Reset illustration
+    step.mediaSpec.illustration = {
+      caption: step.mediaSpec.illustration?.caption || "",
+      prompt: step.mediaSpec.illustration?.prompt || "",
+      approvedUrl: null,
+      generatedUrl: null,
+      uploadedUrl: null,
+      source: "fallback",
+      status: "none",
+      mode: "none",
+      reviewStatus: "needs_review",
+    };
+
+    const newMeta = { ...meta, [journeyKey]: journey };
 
     const { error: updateErr } = await supabase
       .from("Lesson")

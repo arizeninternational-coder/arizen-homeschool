@@ -61,13 +61,20 @@ export interface ExtendedJourneyStep {
     source?: string;
     name?: string;
     illustration?: {
-      mode?: "none" | "uploaded" | "generated";
+      mode?: "none" | "uploaded" | "generated" | "static";
       prompt?: string;
       approvedUrl?: string;
+      generatedUrl?: string;
+      uploadedUrl?: string;
       candidateUrls?: string[];
       reviewStatus?: string;
       alt?: string;
       caption?: string;
+      source?: "generated" | "uploaded" | "static" | "fallback";
+      status?: "none" | "generating" | "generated" | "approved" | "rejected" | "failed";
+      uploadedAt?: string;
+      approvedAt?: string;
+      generatedAt?: string;
     };
   };
   visualSpec?: {
@@ -713,31 +720,21 @@ function WelcomeStepVisual({ step }: { step: ExtendedJourneyStep }) {
   const caption = illo?.caption || "Amina has one chapati to share.";
   const theme = (step.visualSpec?.theme || "plain") as CircleTheme;
 
-  // Case 1: Real approved image exists — show it as the single main visual
-  if (illo?.approvedUrl) {
+  // Student route priority: approvedUrl → static fallback → placeholder
+  const imageUrl = illo?.approvedUrl;
+
+  if (imageUrl) {
     return (
       <div className="flex justify-center my-4">
         <div className="rounded-2xl overflow-hidden border border-slate-200/60 shadow-sm max-w-md w-full bg-white">
-          <img src={illo.approvedUrl} alt={illo.alt || "Lesson illustration"} className="w-full h-auto max-h-[300px] object-contain" />
+          <img src={imageUrl} alt={illo.alt || "Lesson illustration"} className="w-full h-auto max-h-[300px] object-contain" />
           {illo.caption && <p className="text-xs text-slate-500 text-center py-2 bg-slate-50 border-t border-slate-100">{illo.caption}</p>}
         </div>
       </div>
     );
   }
 
-  // Case 2: Generated image URL exists (not yet approved but available)
-  if (illo?.candidateUrls && illo.candidateUrls.length > 0) {
-    return (
-      <div className="flex justify-center my-4">
-        <div className="rounded-2xl overflow-hidden border border-slate-200/60 shadow-sm max-w-md w-full bg-white">
-          <img src={illo.candidateUrls[0]} alt={illo.alt || "Lesson illustration"} className="w-full h-auto max-h-[300px] object-contain" />
-          {illo.caption && <p className="text-xs text-slate-500 text-center py-2 bg-slate-50 border-t border-slate-100">{illo.caption}</p>}
-        </div>
-      </div>
-    );
-  }
-
-  // Case 3: No image — show a clean, honest placeholder
+  // Clean, honest placeholder — never pretends to be an illustration
   const themeBg = theme === "chapati" ? "from-amber-50 to-orange-50" : theme === "orange" ? "from-orange-50 to-amber-50" : "from-indigo-50 to-purple-50";
   return (
     <div className="flex justify-center my-4">
