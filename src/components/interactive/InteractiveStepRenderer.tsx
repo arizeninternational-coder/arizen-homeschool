@@ -543,15 +543,15 @@ export function InteractiveStepRenderer({
 
         {/* Welcome intro — grouped owl + story in one card */}
         {(step.stepKey === "welcome" || step.stepType === "welcome") && (
-          <div className="rounded-xl bg-gradient-to-br from-indigo-50/80 to-purple-50/40 border border-indigo-200/50 p-4 space-y-3">
+          <div className="rounded-2xl bg-white/80 border border-purple-200/60 shadow-sm p-5 space-y-3">
             {step.owlText && (
               <div className="flex items-start gap-3">
-                <span className="text-xl flex-shrink-0">🦉</span>
-                <p className="text-sm text-indigo-800 leading-relaxed font-medium">{step.owlText}</p>
+                <span className="text-2xl flex-shrink-0 mt-0.5">🦉</span>
+                <p className="text-[15px] text-slate-800 leading-relaxed font-semibold">{step.owlText}</p>
               </div>
             )}
             {step.storyIntro && (
-              <p className="text-sm text-slate-600 leading-relaxed pl-8">{step.storyIntro}</p>
+              <p className="text-sm text-slate-600 leading-relaxed pl-9">{step.storyIntro}</p>
             )}
           </div>
         )}

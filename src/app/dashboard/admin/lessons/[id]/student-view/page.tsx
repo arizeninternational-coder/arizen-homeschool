@@ -297,7 +297,7 @@ export default function AdminStudentLessonEditor({ params }: { params: Promise<{
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
-          body: JSON.stringify({ stepIndex: 0, imageData: reader.result, fileName: file.name, contentType: file.type, approve: true }),
+          body: JSON.stringify({ stepIndex: clampedStep, imageData: reader.result, fileName: file.name, contentType: file.type, approve: true }),
         });
         const data = await res.json();
         if (!res.ok) alert(data.error || "Upload failed");
@@ -305,18 +305,18 @@ export default function AdminStudentLessonEditor({ params }: { params: Promise<{
       } catch { alert("Network error. Please try again."); }
     };
     reader.readAsDataURL(file);
-  }, [lessonId]);
+  }, [lessonId, clampedStep]);
 
   const handleAdminGenerateAI = useCallback(async (_stepIdx?: number, prompt?: string) => {
-    setGenerating(0);
+    setGenerating(clampedStep);
     try {
-      const step = journey[0];
+      const step = journey[clampedStep];
       const res = await fetch(`/api/admin/lessons/${lessonId}/illustrations/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
-          stepIndex: 0,
+          stepIndex: clampedStep,
           prompt: prompt || step?.mediaSpec?.illustration?.prompt || step?.illustrationPrompt,
           approve: true,
         }),
@@ -326,7 +326,7 @@ export default function AdminStudentLessonEditor({ params }: { params: Promise<{
       else window.location.reload();
     } catch { alert("Network error."); }
     setGenerating(null);
-  }, [lessonId, journey]);
+  }, [lessonId, journey, clampedStep]);
 
   const handleAddVideo = useCallback(async (stepIndex: number) => {
     const url = videoUrl[stepIndex];
