@@ -112,6 +112,10 @@ interface InteractiveStepRendererProps {
   onNext: () => void;
   className?: string;
   showChrome?: boolean;
+  isAdmin?: boolean;
+  onUpload?: (stepIndex: number, file: File) => void;
+  onGenerateAI?: (stepIndex: number, prompt?: string) => void;
+  generating?: boolean;
 }
 
 // -- Visual Spec Interpreter --------------------------------------------------
@@ -138,6 +142,10 @@ export function InteractiveStepRenderer({
   onNext,
   className = "",
   showChrome = false,
+  isAdmin = false,
+  onUpload,
+  onGenerateAI,
+  generating = false,
 }: InteractiveStepRendererProps) {
   const hasNewSpec = !!(step.visualSpec || step.interactionSpec || step.feedbackSpec || step.mediaSpec || (step.interaction && (step.interaction.options || step.interaction.question || step.interaction.type)));
   const theme = (step.visualSpec?.theme || step.interactionSpec?.theme || "plain") as CircleTheme;
@@ -560,7 +568,7 @@ export function InteractiveStepRenderer({
 
         {/* For Welcome step, render only the welcome_story visual (not both illustration + visualSpec) */}
         {step.stepKey === "welcome" || step.stepType === "welcome" ? (
-          <WelcomeStepVisual step={step} />
+          <WelcomeStepVisual step={step} isAdmin={isAdmin} onUpload={onUpload} onGenerateAI={onGenerateAI} generating={generating} />
         ) : (
           <>
             {renderIllustration()}
@@ -715,13 +723,35 @@ function LegacyInteractionRenderer({ step, interaction, setInteraction, onNext }
 // Single polished visual for the Welcome step: shows the illustration or a clean placeholder.
 // This prevents double-rendering (illustration + visualSpec) for Welcome steps.
 
-function WelcomeStepVisual({ step }: { step: ExtendedJourneyStep }) {
+function WelcomeStepVisual({ step, isAdmin, onUpload, onGenerateAI, generating }: {
+  step: ExtendedJourneyStep;
+  isAdmin?: boolean;
+  onUpload?: (stepIndex: number, file: File) => void;
+  onGenerateAI?: (stepIndex: number, prompt?: string) => void;
+  generating?: boolean;
+}) {
   const illo = step.mediaSpec?.illustration;
   const caption = illo?.caption || "Amina has one chapati to share.";
   const theme = (step.visualSpec?.theme || "plain") as CircleTheme;
-
-  // Student route priority: approvedUrl → static fallback → placeholder
   const imageUrl = illo?.approvedUrl;
+
+  // Admin controls (only rendered when isAdmin=true)
+  const adminControls = isAdmin && onUpload && onGenerateAI ? (
+    <div className="flex items-center justify-between px-3 py-1.5 bg-slate-50 border-t border-slate-100">
+      <span className="text-[10px] font-bold text-emerald-700">✓ Image Ready</span>
+      <div className="flex items-center gap-2">
+        <label className="text-[10px] font-bold text-indigo-600 hover:text-indigo-700 cursor-pointer">
+          Upload Image
+          <input type="file" accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml" className="hidden"
+            onChange={e => { const f = e.target.files?.[0]; if (f) onUpload(-1, f); e.target.value = ""; }} />
+        </label>
+        <button onClick={() => onGenerateAI(-1, illo?.prompt)} disabled={generating}
+          className="text-[10px] font-bold text-amber-600 hover:text-amber-700 disabled:opacity-50">
+          {generating ? "Generating..." : "Replace with AI"}
+        </button>
+      </div>
+    </div>
+  ) : null;
 
   if (imageUrl) {
     return (
@@ -729,12 +759,13 @@ function WelcomeStepVisual({ step }: { step: ExtendedJourneyStep }) {
         <div className="rounded-2xl overflow-hidden border border-slate-200/60 shadow-sm max-w-md w-full bg-white">
           <img src={imageUrl} alt={illo.alt || "Lesson illustration"} className="w-full h-auto max-h-[300px] object-contain" />
           {illo.caption && <p className="text-xs text-slate-500 text-center py-2 bg-slate-50 border-t border-slate-100">{illo.caption}</p>}
+          {adminControls}
         </div>
       </div>
     );
   }
 
-  // Clean, honest placeholder — never pretends to be an illustration
+  // Clean, honest placeholder
   const themeBg = theme === "chapati" ? "from-amber-50 to-orange-50" : theme === "orange" ? "from-orange-50 to-amber-50" : "from-indigo-50 to-purple-50";
   return (
     <div className="flex justify-center my-4">
@@ -749,6 +780,7 @@ function WelcomeStepVisual({ step }: { step: ExtendedJourneyStep }) {
         <p className="text-xs text-slate-500 text-center font-medium leading-relaxed">
           Image coming soon: Amina and her brother sharing a chapati
         </p>
+        {adminControls}
       </div>
     </div>
   );

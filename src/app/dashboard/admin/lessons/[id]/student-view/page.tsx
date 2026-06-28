@@ -280,6 +280,54 @@ export default function AdminStudentLessonEditor({ params }: { params: Promise<{
     setGenerating(null);
   }, [lessonId, journey]);
 
+  const handleAdminUpload = useCallback(async (_stepIdx: number, file: File) => {
+    const allowedTypes = ["image/png", "image/jpeg", "image/jpg", "image/webp", "image/svg+xml"];
+    if (!allowedTypes.includes(file.type)) {
+      alert(`Invalid file type: ${file.type}. Allowed: PNG, JPG, JPEG, WEBP, SVG`);
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      alert(`File too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Maximum: 5 MB`);
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = async () => {
+      try {
+        const res = await fetch(`/api/admin/lessons/${lessonId}/illustrations/upload`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ stepIndex: 0, imageData: reader.result, fileName: file.name, contentType: file.type, approve: true }),
+        });
+        const data = await res.json();
+        if (!res.ok) alert(data.error || "Upload failed");
+        else window.location.reload();
+      } catch { alert("Network error. Please try again."); }
+    };
+    reader.readAsDataURL(file);
+  }, [lessonId]);
+
+  const handleAdminGenerateAI = useCallback(async (_stepIdx?: number, prompt?: string) => {
+    setGenerating(0);
+    try {
+      const step = journey[0];
+      const res = await fetch(`/api/admin/lessons/${lessonId}/illustrations/generate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          stepIndex: 0,
+          prompt: prompt || step?.mediaSpec?.illustration?.prompt || step?.illustrationPrompt,
+          approve: true,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) alert(data.error || "Generation failed");
+      else window.location.reload();
+    } catch { alert("Network error."); }
+    setGenerating(null);
+  }, [lessonId, journey]);
+
   const handleAddVideo = useCallback(async (stepIndex: number) => {
     const url = videoUrl[stepIndex];
     if (!url?.trim()) return;
@@ -539,6 +587,10 @@ export default function AdminStudentLessonEditor({ params }: { params: Promise<{
                     setCurrentStep((s) => Math.min(totalSteps - 1, s + 1));
                   }
                 }}
+                isAdmin={true}
+                onUpload={handleAdminUpload}
+                onGenerateAI={handleAdminGenerateAI}
+                generating={generating === clampedStep}
               />
             )}
 
@@ -577,11 +629,6 @@ export default function AdminStudentLessonEditor({ params }: { params: Promise<{
               </>
             )}
 
-            {/* Admin image controls — visible for ALL steps in admin mode */}
-            <AdminIllustration step={currentJourneyStep} stepIndex={clampedStep} meta={meta}
-              lessonId={lessonId}
-              generating={generating === clampedStep}
-              onGenerate={(idx: number, prompt?: string, approve?: boolean) => handleGenerateIllustration(idx, prompt, approve)} />
           </div>
 
           {/* Step-level admin actions */}
