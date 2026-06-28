@@ -27,6 +27,7 @@ export interface ExtendedJourneyStep {
   title: string;
   studentText?: string;
   owlText?: string;
+  storyIntro?: string;
   mathDisplay?: string;
   visualType?: string;
   illustrationPrompt?: string;
@@ -535,9 +536,15 @@ export function InteractiveStepRenderer({
                 </p>
               </div>
             )}
-            {/* Lesson intro paragraph: what the child will learn */}
+            {/* Story intro paragraph: why this matters */}
+            {step.storyIntro && (
+              <p className="text-sm text-slate-600 leading-relaxed px-1">
+                {step.storyIntro}
+              </p>
+            )}
+            {/* Learning goal sentence */}
             {step.studentText && (
-              <p className="text-sm text-slate-600 leading-relaxed text-center">
+              <p className="text-sm text-slate-700 leading-relaxed font-medium text-center">
                 {step.studentText}
               </p>
             )}
