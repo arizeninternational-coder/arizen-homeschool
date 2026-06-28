@@ -525,7 +525,7 @@ export default function AdminStudentLessonEditor({ params }: { params: Promise<{
             )}
 
             {/* Interactive renderer for steps with new spec fields */}
-            {hasInteractiveSpec(currentJourneyStep) ? (
+            {hasInteractiveSpec(currentJourneyStep) && (
               <InteractiveStepRenderer
                 step={currentJourneyStep}
                 stepNumber={clampedStep + 1}
@@ -540,9 +540,11 @@ export default function AdminStudentLessonEditor({ params }: { params: Promise<{
                   }
                 }}
               />
-            ) : (
+            )}
+
+            {/* Legacy non-interactive step content */}
+            {!hasInteractiveSpec(currentJourneyStep) && (
               <>
-                {/* Student text */}
                 {currentJourneyStep.studentText && (
                   <div className="flex flex-col gap-3 mb-4">
                     {currentJourneyStep.studentText.split("\n").filter(Boolean).map((p: string, i: number) => (
@@ -550,34 +552,12 @@ export default function AdminStudentLessonEditor({ params }: { params: Promise<{
                     ))}
                   </div>
                 )}
-
-                {/* Math display */}
                 {currentJourneyStep.mathDisplay && (
                   <div className="mt-4 px-5 py-4 rounded-xl bg-slate-50 border border-slate-200/60 text-center">
                     <span className="text-xl font-mono font-bold text-slate-800">{currentJourneyStep.mathDisplay}</span>
                   </div>
                 )}
-
-                {/* Illustration — with admin controls */}
-                <AdminIllustration step={currentJourneyStep} stepIndex={clampedStep} meta={meta}
-                  lessonId={lessonId}
-                  generating={generating === clampedStep}
-                  onGenerate={() => handleGenerateIllustration(clampedStep)} />
-
-                {/* Video — with admin controls */}
-                <AdminVideo step={currentJourneyStep} stepIndex={clampedStep}
-                  videoUrl={videoUrl[clampedStep] || ""} videoTitle={videoTitle[clampedStep] || ""}
-                  adding={addingVideo === clampedStep}
-                  onUrlChange={v => setVideoUrl(prev => ({ ...prev, [clampedStep]: v }))}
-                  onTitleChange={v => setVideoTitle(prev => ({ ...prev, [clampedStep]: v }))}
-                  onAdd={() => handleAddVideo(clampedStep)}
-                  onApprove={() => handleApproveVideo(clampedStep)}
-                  onRemove={() => handleRemoveVideo(clampedStep)} />
-
-                {/* Interaction */}
                 <AdminInteraction step={currentJourneyStep} interaction={interaction} setInteraction={setInteraction} />
-
-                {/* Materials */}
                 {currentJourneyStep.materials?.length > 0 && (
                   <div className="mt-4 px-4 py-3 rounded-xl bg-amber-50/60 border border-amber-200/50">
                     <p className="text-[10px] font-extrabold uppercase tracking-wider text-amber-700 mb-1.5">What you might need:</p>
@@ -588,8 +568,6 @@ export default function AdminStudentLessonEditor({ params }: { params: Promise<{
                     </div>
                   </div>
                 )}
-
-                {/* Completion */}
                 {currentJourneyStep.stepType === "complete" && (
                   <div className="mt-4 text-center py-4">
                     <h3 className="text-xl font-black text-slate-900 mb-1">Lesson Complete! 🏆</h3>
@@ -598,6 +576,22 @@ export default function AdminStudentLessonEditor({ params }: { params: Promise<{
                 )}
               </>
             )}
+
+            {/* Admin image controls — visible for ALL steps in admin mode */}
+            <AdminIllustration step={currentJourneyStep} stepIndex={clampedStep} meta={meta}
+              lessonId={lessonId}
+              generating={generating === clampedStep}
+              onGenerate={(idx: number, prompt?: string, approve?: boolean) => handleGenerateIllustration(idx, prompt, approve)} />
+
+            {/* Video — with admin controls */}
+            <AdminVideo step={currentJourneyStep} stepIndex={clampedStep}
+              videoUrl={videoUrl[clampedStep] || ""} videoTitle={videoTitle[clampedStep] || ""}
+              adding={addingVideo === clampedStep}
+              onUrlChange={v => setVideoUrl(prev => ({ ...prev, [clampedStep]: v }))}
+              onTitleChange={v => setVideoTitle(prev => ({ ...prev, [clampedStep]: v }))}
+              onAdd={() => handleAddVideo(clampedStep)}
+              onApprove={() => handleApproveVideo(clampedStep)}
+              onRemove={() => handleRemoveVideo(clampedStep)} />
           </div>
 
           {/* Step-level admin actions */}
