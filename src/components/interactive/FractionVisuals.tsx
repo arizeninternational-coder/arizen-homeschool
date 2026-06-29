@@ -188,6 +188,81 @@ export function FractionCircle({
   );
 }
 
+// -- Fraction Semicircle (half chapati) -------------------------------------
+
+interface FractionSemicircleProps {
+  theme?: CircleTheme;
+  size?: number;
+  shaded?: boolean;
+}
+
+export function FractionSemicircle({ theme = "plain", size = 80, shaded = true }: FractionSemicircleProps) {
+  const tc = THEME_CONFIG[theme];
+  const center = size / 2;
+  const radius = size / 2 - 4;
+
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      {/* Semicircle: top half */}
+      <path
+        d={`M ${center - radius} ${center} A ${radius} ${radius} 0 0 1 ${center + radius} ${center} Z`}
+        fill={shaded ? tc.shadedFill : tc.baseFill}
+        stroke={tc.strokeColor}
+        strokeWidth={tc.strokeWidth}
+      />
+      {/* Flat bottom line */}
+      <line
+        x1={center - radius}
+        y1={center}
+        x2={center + radius}
+        y2={center}
+        stroke={tc.strokeColor}
+        strokeWidth={tc.strokeWidth}
+      />
+      {/* Decorations */}
+      {theme === "chapati" && (
+        <g opacity="0.3">
+          <circle cx={center - radius * 0.3} cy={center - radius * 0.3} r={radius * 0.08} fill="#C4852A" />
+          <circle cx={center + radius * 0.2} cy={center - radius * 0.4} r={radius * 0.06} fill="#C4852A" />
+        </g>
+      )}
+    </svg>
+  );
+}
+
+// -- Fraction Circle with Dotted Split Line ---------------------------------
+
+interface FractionCircleWithDottedLineProps {
+  theme?: CircleTheme;
+  size?: number;
+}
+
+export function FractionCircleWithDottedLine({ theme = "plain", size = 80 }: FractionCircleWithDottedLineProps) {
+  const tc = THEME_CONFIG[theme];
+  const center = size / 2;
+  const radius = size / 2 - 4;
+
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      {/* Full circle outline */}
+      <circle cx={center} cy={center} r={radius} fill={tc.baseFill} stroke={tc.strokeColor} strokeWidth={tc.strokeWidth} />
+      {/* Dotted vertical split line */}
+      <line
+        x1={center}
+        y1={center - radius + 3}
+        x2={center}
+        y2={center + radius - 3}
+        stroke={tc.accent || tc.strokeColor}
+        strokeWidth="2"
+        strokeDasharray="4 3"
+        strokeLinecap="round"
+      />
+      {/* Decorations */}
+      {renderThemeDecorations(theme, center, center, radius)}
+    </svg>
+  );
+}
+
 // -- Fraction Rectangle -------------------------------------------------------
 
 interface FractionRectangleProps {

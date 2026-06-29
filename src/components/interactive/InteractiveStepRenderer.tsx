@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { FractionCircle, FractionRectangle } from "./FractionVisuals";
+import { FractionCircle, FractionRectangle, FractionSemicircle, FractionCircleWithDottedLine } from "./FractionVisuals";
 import { StepReveal } from "./StepReveal";
 import OwlTeacher from "@/components/ui/OwlTeacher";
 import { ChoiceGrid } from "./ChoiceGrid";
@@ -125,10 +125,16 @@ interface InteractiveStepRendererProps {
 function renderVisualElement(visual: any, theme?: CircleTheme): React.ReactNode {
   if (!visual || typeof visual !== "object") return null;
   if (visual.type === "fraction_circle") {
-    return <FractionCircle parts={visual.parts || 1} shadedParts={visual.shadedParts || 0} equalParts={visual.equalParts !== false} showLabels={visual.showLabels !== false} labels={visual.labels} size={120} theme={theme} />;
+    return <FractionCircle parts={visual.parts || 1} shadedParts={visual.shadedParts || 0} equalParts={visual.equalParts !== false} showLabels={visual.showLabels !== false} labels={visual.labels} size={visual.size || 120} theme={theme} />;
   }
   if (visual.type === "fraction_rectangle") {
     return <FractionRectangle parts={visual.parts || 1} shadedParts={visual.shadedParts || 0} equalParts={visual.equalParts !== false} orientation={(visual.orientation as any) || "vertical"} showLabels={visual.showLabels !== false} labels={visual.labels} width={140} height={90} />;
+  }
+  if (visual.type === "fraction_semicircle") {
+    return <FractionSemicircle theme={theme} size={visual.size || 72} shaded={visual.shaded !== false} />;
+  }
+  if (visual.type === "fraction_circle_dotted") {
+    return <FractionCircleWithDottedLine theme={theme} size={visual.size || 72} />;
   }
   return null;
 }

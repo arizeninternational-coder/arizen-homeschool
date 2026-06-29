@@ -1,4 +1,4 @@
-export { FractionCircle, FractionRectangle } from "./FractionVisuals";
+export { FractionCircle, FractionRectangle, FractionSemicircle, FractionCircleWithDottedLine } from "./FractionVisuals";
 export { StepReveal } from "./StepReveal";
 export { ChoiceGrid } from "./ChoiceGrid";
 export {
