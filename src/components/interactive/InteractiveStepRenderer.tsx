@@ -301,9 +301,11 @@ export function InteractiveStepRenderer({
         title: s.title,
         description: s.description,
         visual: renderVisualElement(s.visual, theme),
+        symbol: s.symbol,
+        highlight: s.highlight,
       }));
       if (step.stepKey === "learn" || step.stepKey === "example") {
-        return <HorizontalTeachingStrip steps={revealSteps} theme={theme} />;
+        return <HorizontalTeachingStrip steps={revealSteps} theme={theme} intro={vs.intro || step.storyIntro} />;
       }
       return <StepReveal steps={revealSteps} onComplete={onNext} mode="carousel" />;
     }
