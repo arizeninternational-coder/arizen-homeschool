@@ -59,6 +59,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Get recent activity per learner (with lesson titles)
+    // Also get emotional check-ins
     const children = [];
     for (const profile of profiles) {
       const { data: recent } = await supabase
@@ -67,11 +68,28 @@ export async function GET(req: NextRequest) {
           lessonId,
           completedAt,
           lastAccessed,
+          masteryPercent,
           lesson:Lesson(title)
         `)
         .eq("learnerId", profile.id)
         .order("lastAccessed", { ascending: false })
         .limit(5);
+
+      // Get latest emotional check-in
+      const { data: latestCheckin } = await supabase
+        .from("EmotionalCheckin")
+        .select("emotion, emotionLabel, createdAt")
+        .eq("learnerId", profile.id)
+        .order("createdAt", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      // Count in-progress lessons (started but not completed)
+      const { count: inProgressCount } = await supabase
+        .from("Progress")
+        .select("id", { count: "exact", head: true })
+        .eq("learnerId", profile.id)
+        .is("completedAt", null);
 
       children.push({
         id: profile.userId,
@@ -83,12 +101,19 @@ export async function GET(req: NextRequest) {
         bestStreak: profile.bestStreak || 0,
         coins: walletMap.get(profile.id) || 0,
         lessonsCompleted: completedCounts[profile.id] || 0,
+        lessonsInProgress: inProgressCount || 0,
         recentActivity: (recent || []).map((r: any) => ({
           lessonId: r.lessonId,
           lessonTitle: r.lesson?.title || "Lesson",
           completedAt: r.completedAt,
           lastAccessed: r.lastAccessed,
+          masteryPercent: r.masteryPercent || 0,
         })),
+        latestCheckin: latestCheckin ? {
+          emotion: latestCheckin.emotion,
+          emotionLabel: latestCheckin.emotionLabel,
+          createdAt: latestCheckin.createdAt,
+        } : null,
       });
     }
 

@@ -140,6 +140,13 @@ export default function ParentProgressPage() {
                 textColor="text-indigo-700"
               />
               <StatCard
+                label="In Progress"
+                value={child.lessonsInProgress || 0}
+                icon={<Clock className="w-5 h-5 text-amber-500" />}
+                gradient="bg-white"
+                textColor="text-amber-700"
+              />
+              <StatCard
                 label="Total XP"
                 value={child.xp.toLocaleString()}
                 icon={<Star className="w-5 h-5 text-amber-500" />}
@@ -154,14 +161,30 @@ export default function ParentProgressPage() {
                 textColor="text-pink-600"
                 sublabel={child.bestStreak > 0 ? `Best: ${child.bestStreak}d` : undefined}
               />
-              <StatCard
-                label="Coins"
-                value={child.coins}
-                icon={<Award className="w-5 h-5 text-emerald-500" />}
-                gradient="bg-white"
-                textColor="text-emerald-700"
-              />
             </div>
+
+            {/* Emotional Check-in */}
+            {child.latestCheckin && (
+              <div className="mb-5 p-3 rounded-xl bg-gradient-to-r from-violet-50 to-purple-50 border border-violet-200/60">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm text-lg">
+                    {child.latestCheckin.emotion === "HAPPY" ? "😊" :
+                     child.latestCheckin.emotion === "CALM" ? "😌" :
+                     child.latestCheckin.emotion === "TIRED" ? "😴" :
+                     child.latestCheckin.emotion === "WORRIED" ? "😟" :
+                     child.latestCheckin.emotion === "SAD" ? "😢" :
+                     child.latestCheckin.emotion === "ANGRY" ? "😠" : "🙂"}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-bold text-violet-800">Latest Check-in</p>
+                    <p className="text-[11px] text-violet-600">
+                      Feeling <span className="font-bold">{child.latestCheckin.emotionLabel}</span>
+                      {" "}· {new Date(child.latestCheckin.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Level progress */}
             <div className="mb-5">
@@ -182,20 +205,27 @@ export default function ParentProgressPage() {
                       {activity.completedAt ? (
                         <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
                       ) : (
-                        <Clock className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                        <Clock className="w-4 h-4 text-amber-500 flex-shrink-0" />
                       )}
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-bold text-text truncate">
-                          {activity.completedAt ? "Completed" : "Worked on"} a lesson
+                          {activity.completedAt ? "Completed" : "Working on"}: {activity.lessonTitle || "Lesson"}
                         </p>
-                        {activity.lastAccessed && (
-                          <p className="text-[10px] text-text-muted">
-                            {new Date(activity.lastAccessed).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
-                          </p>
-                        )}
+                        <div className="flex items-center gap-2">
+                          {activity.lastAccessed && (
+                            <p className="text-[10px] text-text-muted">
+                              {new Date(activity.lastAccessed).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                            </p>
+                          )}
+                          {!activity.completedAt && activity.masteryPercent > 0 && (
+                            <span className="px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-700 text-[9px] font-extrabold">{activity.masteryPercent}%</span>
+                          )}
+                        </div>
                       </div>
-                      {activity.completedAt && (
+                      {activity.completedAt ? (
                         <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[9px] font-extrabold">Done</span>
+                      ) : (
+                        <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 text-[9px] font-extrabold">In Progress</span>
                       )}
                     </div>
                   ))}
