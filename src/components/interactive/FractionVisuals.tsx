@@ -203,27 +203,27 @@ export function FractionSemicircle({ theme = "plain", size = 80, shaded = true }
 
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-      {/* Semicircle: top half */}
+      {/* Semicircle: right half (upright, flat edge on left) */}
       <path
-        d={`M ${center - radius} ${center} A ${radius} ${radius} 0 0 1 ${center + radius} ${center} Z`}
+        d={`M ${center} ${center - radius} A ${radius} ${radius} 0 0 1 ${center} ${center + radius} Z`}
         fill={shaded ? tc.shadedFill : tc.baseFill}
         stroke={tc.strokeColor}
         strokeWidth={tc.strokeWidth}
       />
-      {/* Flat bottom line */}
+      {/* Flat left edge (vertical line) */}
       <line
-        x1={center - radius}
-        y1={center}
-        x2={center + radius}
-        y2={center}
+        x1={center}
+        y1={center - radius}
+        x2={center}
+        y2={center + radius}
         stroke={tc.strokeColor}
         strokeWidth={tc.strokeWidth}
       />
       {/* Decorations */}
       {theme === "chapati" && (
         <g opacity="0.3">
-          <circle cx={center - radius * 0.3} cy={center - radius * 0.3} r={radius * 0.08} fill="#C4852A" />
-          <circle cx={center + radius * 0.2} cy={center - radius * 0.4} r={radius * 0.06} fill="#C4852A" />
+          <circle cx={center + radius * 0.3} cy={center - radius * 0.3} r={radius * 0.08} fill="#C4852A" />
+          <circle cx={center + radius * 0.2} cy={center + radius * 0.2} r={radius * 0.06} fill="#C4852A" />
         </g>
       )}
     </svg>
