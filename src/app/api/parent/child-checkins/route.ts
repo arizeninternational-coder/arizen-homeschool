@@ -20,13 +20,24 @@ export const GET = withAuth(async (req: NextRequest, user: any) => {
 
     const childIds = links.map((l: any) => l.childUserId);
 
+    // Map child User IDs to LearnerProfile IDs (EmotionalCheckin uses learnerId = LearnerProfile.id)
+    const { data: learnerProfiles } = await supabase
+      .from("LearnerProfile")
+      .select("id, userId")
+      .in("userId", childIds);
+
+    const learnerIds = (learnerProfiles || []).map((p: any) => p.id);
+
+    if (learnerIds.length === 0) {
+      return NextResponse.json({ checkins: [] });
+    }
+
     // Use Africa/Nairobi timezone for "today" boundaries
     const NAIROBI_TZ = "Africa/Nairobi";
     const now = new Date();
     const nairobiDateStr = new Intl.DateTimeFormat("en-CA", {
       timeZone: NAIROBI_TZ, year: "numeric", month: "2-digit", day: "2-digit",
     }).format(now);
-    // Build today/tomorrow in Nairobi time by parsing the date string
     const todayStart = new Date(nairobiDateStr + "T00:00:00+03:00");
     const tomorrowStart = new Date(nairobiDateStr + "T23:59:59+03:00");
 
@@ -45,7 +56,7 @@ export const GET = withAuth(async (req: NextRequest, user: any) => {
           user:User(name, email)
         )
       `)
-      .in("learnerId", childIds)
+      .in("learnerId", learnerIds)
       .gte("createdAt", todayStart.toISOString())
       .lt("createdAt", tomorrowStart.toISOString());
 
@@ -63,7 +74,7 @@ export const GET = withAuth(async (req: NextRequest, user: any) => {
 
     const checkedInIds = new Set((checkins || []).map((c: any) => c.learner?.id));
     const childrenWithoutCheckin = (children || [])
-      .filter((l: any) => !checkedInIds.has(l.childUser?.id))
+      .filter((l: any) => !checkedInIds.has(l.childUser?.learnerProfile?.id))
       .map((l: any) => ({
         childName: l.childUser?.learnerProfile?.displayName || l.childUser?.name || "Your child",
         emotion: null,
