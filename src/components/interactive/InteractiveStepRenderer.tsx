@@ -942,66 +942,98 @@ function WorkedExampleGrid({ intro, steps, theme }: WorkedExampleGridProps) {
   const accentBg = theme === "chapati" ? "from-amber-50/50 to-orange-50/30" : theme === "paper_cutout" ? "from-sky-50/40 to-indigo-50/30" : "from-slate-50 to-white";
 
   const renderStepVisual = (vs: WorkedExampleStep) => {
-    const t = theme || "plain";
     switch (vs.visualType) {
       case "trace_circle":
         return (
-          <svg width="80" height="80" viewBox="0 0 80 80">
-            {/* Paper */}
-            <rect x="10" y="10" width="60" height="60" rx="4" fill="#FFFDF7" stroke="#CBD5E1" strokeWidth="1.5" />
-            {/* Lid (cup) */}
-            <ellipse cx="40" cy="32" rx="18" ry="6" fill="#94A3B8" opacity="0.5" />
-            <rect x="22" y="32" width="36" height="12" fill="#94A3B8" opacity="0.4" rx="2" />
-            <ellipse cx="40" cy="44" rx="18" ry="6" fill="#64748B" opacity="0.6" />
-            {/* Circle outline being traced */}
-            <circle cx="40" cy="50" r="16" fill="none" stroke="#7C3AED" strokeWidth="2" strokeDasharray="4 2" />
+          <svg width="120" height="120" viewBox="0 0 120 120">
+            {/* Paper sheet */}
+            <rect x="15" y="15" width="90" height="90" rx="3" fill="#FFFEF9" stroke="#CBD5E1" strokeWidth="2" />
+            {/* Paper texture lines */}
+            <line x1="25" y1="30" x2="95" y2="30" stroke="#E2E8F0" strokeWidth="0.5" />
+            <line x1="25" y1="40" x2="95" y2="40" stroke="#E2E8F0" strokeWidth="0.5" />
+            <line x1="25" y1="50" x2="95" y2="50" stroke="#E2E8F0" strokeWidth="0.5" />
+            {/* Lid / cup */}
+            <ellipse cx="60" cy="48" rx="22" ry="8" fill="#94A3B8" opacity="0.4" />
+            <rect x="38" y="48" width="44" height="16" fill="#94A3B8" opacity="0.3" rx="2" />
+            <ellipse cx="60" cy="64" rx="22" ry="8" fill="#64748B" opacity="0.5" />
+            {/* Lid rim */}
+            <ellipse cx="60" cy="48" rx="22" ry="8" fill="none" stroke="#475569" strokeWidth="2" />
+            {/* Dotted circle being traced */}
+            <circle cx="60" cy="72" r="20" fill="none" stroke="#7C3AED" strokeWidth="2.5" strokeDasharray="6 3" strokeLinecap="round" />
             {/* Pencil */}
-            <line x1="58" y1="28" x2="68" y2="18" stroke="#F59E0B" strokeWidth="3" strokeLinecap="round" />
-            <line x1="68" y1="18" x2="72" y2="14" stroke="#1E293B" strokeWidth="2" strokeLinecap="round" />
+            <g transform="translate(82, 36) rotate(-25)">
+              <rect x="0" y="0" width="28" height="5" rx="1" fill="#F59E0B" />
+              <polygon points="28,0 34,2.5 28,5" fill="#1E293B" />
+              <rect x="0" y="0" width="5" height="5" fill="#FBBF24" rx="1" />
+            </g>
+            {/* Small hand hint */}
+            <circle cx="82" cy="32" r="4" fill="#FDBA74" opacity="0.6" />
           </svg>
         );
       case "cut_out":
         return (
-          <svg width="80" height="80" viewBox="0 0 80 80">
+          <svg width="120" height="120" viewBox="0 0 120 120">
             {/* Paper circle */}
-            <circle cx="35" cy="40" r="20" fill="#FFFDF7" stroke="#CBD5E1" strokeWidth="1.5" />
-            <circle cx="35" cy="40" r="20" fill="none" stroke="#7C3AED" strokeWidth="1.5" strokeDasharray="3 2" />
+            <circle cx="55" cy="60" r="28" fill="#FFFEF9" stroke="#CBD5E1" strokeWidth="2" />
+            {/* Dashed cut line */}
+            <circle cx="55" cy="60" r="28" fill="none" stroke="#7C3AED" strokeWidth="2" strokeDasharray="5 3" strokeLinecap="round" />
+            {/* Cut marks / snip lines */}
+            <path d="M 55 32 L 55 28" stroke="#DC2626" strokeWidth="2" strokeLinecap="round" />
+            <path d="M 70 35 L 73 32" stroke="#DC2626" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M 82 48 L 86 46" stroke="#DC2626" strokeWidth="1.5" strokeLinecap="round" />
             {/* Scissors */}
-            <g transform="translate(50, 25) rotate(30)">
-              <circle cx="0" cy="0" r="5" fill="none" stroke="#64748B" strokeWidth="2" />
-              <circle cx="0" cy="8" r="5" fill="none" stroke="#64748B" strokeWidth="2" />
-              <line x1="3" y1="-2" x2="14" y2="-10" stroke="#94A3B8" strokeWidth="2.5" strokeLinecap="round" />
-              <line x1="3" y1="10" x2="14" y2="18" stroke="#94A3B8" strokeWidth="2.5" strokeLinecap="round" />
+            <g transform="translate(82, 42) rotate(15)">
+              {/* Handles */}
+              <ellipse cx="0" cy="-4" rx="7" ry="4" fill="none" stroke="#475569" strokeWidth="2.5" />
+              <ellipse cx="0" cy="6" rx="7" ry="4" fill="none" stroke="#475569" strokeWidth="2.5" />
+              {/* Blades */}
+              <line x1="5" y1="-2" x2="22" y2="-10" stroke="#94A3B8" strokeWidth="3" strokeLinecap="round" />
+              <line x1="5" y1="4" x2="22" y2="12" stroke="#94A3B8" strokeWidth="3" strokeLinecap="round" />
+              {/* Pivot */}
+              <circle cx="4" cy="1" r="2.5" fill="#475569" />
             </g>
-            {/* Cut line hint */}
-            <path d="M 25 30 Q 35 40 25 50" fill="none" stroke="#DC2626" strokeWidth="1" strokeDasharray="2 2" opacity="0.5" />
+            {/* Small paper piece falling */}
+            <rect x="30" y="90" width="8" height="6" rx="1" fill="#E2E8F0" stroke="#CBD5E1" strokeWidth="1" transform="rotate(15, 34, 93)" />
           </svg>
         );
       case "fold_circle":
         return (
-          <svg width="80" height="80" viewBox="0 0 80 80">
-            {/* Folded circle (half visible) */}
-            <path d="M 20 25 A 15 15 0 0 1 20 55 Z" fill={t === "paper_cutout" ? "#E0E7FF" : "#FDE8CC"} stroke={t === "paper_cutout" ? "#6366F1" : "#C4852A"} strokeWidth="2" />
-            <line x1="20" y1="25" x2="20" y2="55" stroke={t === "paper_cutout" ? "#6366F1" : "#C4852A"} strokeWidth="2" />
-            {/* Alignment arrows showing edges match */}
-            <path d="M 12 25 L 12 55" fill="none" stroke="#7C3AED" strokeWidth="1.5" markerEnd="url(#arrowhead)" />
-            <text x="8" y="42" fontSize="8" fill="#7C3AED" fontWeight="bold">✓</text>
-            {/* Fold arrow */}
-            <path d="M 50 20 Q 40 15 30 20" fill="none" stroke="#94A3B8" strokeWidth="1.5" strokeDasharray="3 2" />
-            <text x="42" y="16" fontSize="9" fill="#64748B">fold</text>
+          <svg width="120" height="120" viewBox="0 0 120 120">
+            {/* Full circle (before fold) */}
+            <circle cx="60" cy="60" r="28" fill="#FFFEF9" stroke="#CBD5E1" strokeWidth="2" />
+            {/* Dashed fold line (vertical center) */}
+            <line x1="60" y1="32" x2="60" y2="88" stroke="#7C3AED" strokeWidth="2.5" strokeDasharray="6 3" strokeLinecap="round" />
+            {/* Fold arrows (curved, showing top folding down) */}
+            <path d="M 45 40 Q 40 30 50 25" fill="none" stroke="#7C3AED" strokeWidth="2" strokeLinecap="round" markerEnd="url(#arrow)" />
+            <path d="M 75 40 Q 80 30 70 25" fill="none" stroke="#7C3AED" strokeWidth="2" strokeLinecap="round" markerEnd="url(#arrow)" />
+            {/* Arrowhead marker */}
+            <defs>
+              <marker id="arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                <path d="M 0 0 L 6 3 L 0 6 Z" fill="#7C3AED" />
+              </marker>
+            </defs>
+            {/* Alignment checkmarks showing edges match */}
+            <text x="38" y="50" fontSize="10" fill="#16A34A" fontWeight="bold">✓</text>
+            <text x="76" y="50" fontSize="10" fill="#16A34A" fontWeight="bold">✓</text>
+            <text x="38" y="74" fontSize="10" fill="#16A34A" fontWeight="bold">✓</text>
+            <text x="76" y="74" fontSize="10" fill="#16A34A" fontWeight="bold">✓</text>
+            {/* "fold" label */}
+            <text x="48" y="22" fontSize="10" fill="#7C3AED" fontWeight="bold">fold</text>
           </svg>
         );
       case "shade_half":
         return (
-          <svg width="80" height="80" viewBox="0 0 80 80">
-            {/* Circle with fold line */}
-            <circle cx="40" cy="40" r="22" fill={t === "paper_cutout" ? "#F1F5F9" : "#FDE8CC"} stroke={t === "paper_cutout" ? "#CBD5E1" : "#C4852A"} strokeWidth="2" />
-            {/* Shaded right half */}
-            <path d="M 40 18 A 22 22 0 0 1 40 62 Z" fill={t === "paper_cutout" ? "#6366F1" : "#D4953A"} opacity="0.8" stroke={t === "paper_cutout" ? "#6366F1" : "#C4852A"} strokeWidth="2" />
+          <svg width="120" height="120" viewBox="0 0 120 120">
+            {/* Full circle */}
+            <circle cx="60" cy="60" r="32" fill="#FFFEF9" stroke="#CBD5E1" strokeWidth="2.5" />
+            {/* Right half shaded */}
+            <path d="M 60 28 A 32 32 0 0 1 60 92 Z" fill="#7C3AED" opacity="0.75" stroke="#7C3AED" strokeWidth="2.5" />
             {/* Center fold line */}
-            <line x1="40" y1="18" x2="40" y2="62" stroke={t === "paper_cutout" ? "#6366F1" : "#C4852A"} strokeWidth="1.5" strokeDasharray="3 2" />
-            {/* Label */}
-            <text x="52" y="44" fontSize="10" fill="#fff" fontWeight="bold">1/2</text>
+            <line x1="60" y1="28" x2="60" y2="92" stroke="#4C1D95" strokeWidth="2" strokeDasharray="5 3" strokeLinecap="round" />
+            {/* 1/2 label on shaded part */}
+            <text x="76" y="64" fontSize="14" fill="#fff" fontWeight="800">1/2</text>
+            {/* "shaded" label */}
+            <text x="22" y="64" fontSize="9" fill="#64748B" fontWeight="600">whole</text>
           </svg>
         );
       default:
@@ -1017,12 +1049,12 @@ function WorkedExampleGrid({ intro, steps, theme }: WorkedExampleGridProps) {
         </p>
       )}
 
-      <div className={`rounded-2xl border border-slate-200/60 bg-gradient-to-br ${accentBg} p-4 lg:p-5`}>
-        <div className="grid grid-cols-2 gap-4 lg:gap-5">
+      <div className={`rounded-2xl border border-slate-200/60 bg-gradient-to-br ${accentBg} p-4 lg:p-6`}>
+        <div className="grid grid-cols-2 gap-5 lg:gap-6">
           {steps.map((s, i) => (
             <div key={i} className="flex flex-col items-center">
               {/* Step number */}
-              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black mb-2 ${
+              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-black mb-2 ${
                 theme === "paper_cutout"
                   ? "bg-gradient-to-br from-sky-400 to-indigo-500 text-white shadow-sm"
                   : "bg-amber-100 text-amber-700"
@@ -1042,7 +1074,7 @@ function WorkedExampleGrid({ intro, steps, theme }: WorkedExampleGridProps) {
 
               {/* Description */}
               {s.description && (
-                <p className="text-[11px] text-slate-500 text-center leading-snug font-medium">
+                <p className="text-[11px] text-slate-500 text-center leading-snug font-medium max-w-[140px]">
                   {s.description}
                 </p>
               )}
