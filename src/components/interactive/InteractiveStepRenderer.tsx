@@ -809,7 +809,7 @@ function PredictChoiceCard({ prompt, instruction, options, correctId, feedbackMa
       )}
 
       {/* Option cards */}
-      <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${Math.min(options.length, 3)}, 1fr)` }}>
+      <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${options.length >= 4 ? 2 : Math.min(options.length, 3)}, 1fr)` }}>
         {options.map((opt) => {
           const state = getCardState(opt.id);
           const isSelected = state === 'selected';
@@ -819,11 +819,11 @@ function PredictChoiceCard({ prompt, instruction, options, correctId, feedbackMa
             <button
               key={opt.id}
               onClick={() => {
-                if (!isSubmitted) {
+                if (!isSubmitted || !isCorrect) {
                   onSelect(opt.id, opt.id === correctId);
                 }
               }}
-              disabled={isSubmitted}
+              disabled={isSubmitted && isCorrect}
               className={`relative rounded-2xl border-2 p-4 pt-5 text-center transition-all duration-200 ${stateStyles[state]}`}
             >
               {/* Letter badge */}
