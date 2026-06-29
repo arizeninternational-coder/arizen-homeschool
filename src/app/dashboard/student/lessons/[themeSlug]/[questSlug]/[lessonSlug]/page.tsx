@@ -223,6 +223,15 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
           if (data.lesson) {
             setLesson(data.lesson);
             setCompleted(data.lesson.isCompleted);
+            // Save "lesson started" progress so parent dashboard sees activity
+            if (data.lesson.id && !data.lesson.isCompleted) {
+              fetch("/api/learner/progress", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ lessonId: data.lesson.id, questId: p.questSlug || null, action: "start" }),
+              }).catch(() => {});
+            }
           }
         })
         .catch(console.error)
@@ -493,16 +502,9 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
           </div>
         )}
 
-        {/* Start / Continue button */}
-        {!completed && (
-          <GradientButton variant="primary" size="lg" icon={<Play style={{ width: 18, height: 18 }} />} onClick={() => { setCurrentStep(0); setViewing(true); }} style={{ width: "100%", marginBottom: 16 }}>
-            {completedSteps.length > 0 ? "Continue Lesson" : "Start Lesson"}
-          </GradientButton>
-        )}
-
-        {/* Last step info */}
+        {/* Current Step card — appears ABOVE the Start button */}
         {currentJourneyStep && !viewing && (
-          <div style={{ background: "#fff", borderRadius: 16, padding: "20px", boxShadow: "0 2px 12px rgba(0,0,0,0.04)" }}>
+          <div style={{ background: "#fff", borderRadius: 16, padding: "20px", boxShadow: "0 2px 12px rgba(0,0,0,0.04)", marginBottom: 16 }}>
             <p style={{ fontSize: "0.75rem", fontWeight: 700, color: "#6366F1", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 8 }}>Current Step</p>
             <h3 style={{ fontSize: "1.125rem", fontWeight: 800, color: "#1e293b", marginBottom: 8 }}>{currentJourneyStep.title}</h3>
             {currentJourneyStep.owlText && (
@@ -512,6 +514,13 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
               </div>
             )}
           </div>
+        )}
+
+        {/* Start / Continue button — appears BELOW the Current Step card */}
+        {!completed && (
+          <GradientButton variant="primary" size="lg" icon={<Play style={{ width: 18, height: 18 }} />} onClick={() => { setCurrentStep(0); setViewing(true); }} style={{ width: "100%", marginBottom: 16 }}>
+            {completedSteps.length > 0 ? "Continue Lesson" : "Start Lesson"}
+          </GradientButton>
         )}
 
         {completed && (

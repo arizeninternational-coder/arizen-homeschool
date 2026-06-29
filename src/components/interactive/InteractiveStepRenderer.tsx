@@ -442,7 +442,7 @@ export function InteractiveStepRenderer({
               onNext();
             }
           }}
-          feedback={feedback}
+          feedback={isMission ? undefined : feedback}
           buttonLabel={spec.buttonLabel}
         />
       );
