@@ -308,6 +308,27 @@ export function InteractiveStepRenderer({
       return <StepReveal steps={revealSteps} onComplete={onNext} mode="carousel" />;
     }
 
+    if (vs.type === "predict_choice") {
+      return (
+        <PredictChoiceCard
+          prompt={vs.prompt || step.interactionSpec?.prompt || step.studentInstruction}
+          instruction={vs.instruction}
+          options={vs.choices || []}
+          correctId={step.interactionSpec?.correctChoiceId || step.interaction?.correctAnswer}
+          feedbackMap={vs.feedbackMap || {}}
+          correctFeedback={step.feedbackSpec?.correct}
+          incorrectFeedback={step.feedbackSpec?.incorrect}
+          theme={theme}
+          onSelect={(choiceId, isCorrect) => {
+            setInteraction((p: any) => ({ ...p, selectedChoiceId: choiceId, choiceCorrect: isCorrect, choiceSubmitted: true }));
+            if (isCorrect) handleCorrectAnswer();
+          }}
+          onContinue={onNext}
+          interaction={interaction}
+        />
+      );
+    }
+
     if (vs.type === "choice_grid") {
       const choices = (vs.choices || []).map((c) => ({
         id: c.id, label: c.label, description: c.description, visual: renderVisualElement(c.visual, theme),
@@ -699,6 +720,170 @@ function PracticeShadePanel({ activity, feedback, onAnswer, theme }: { activity:
           ) : (
             <p className="text-sm font-bold text-orange-600">{feedback.incorrect || "Try again. Remember: shade exactly one of the two equal parts."}</p>
           )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// -- Predict Choice Card ---------------------------------------------------
+
+interface PredictOption {
+  id: string;
+  label: string;
+  description?: string;
+  visual?: any;
+  feedback?: string;
+}
+
+interface PredictChoiceCardProps {
+  prompt?: string;
+  instruction?: string;
+  options: PredictOption[];
+  correctId?: string;
+  feedbackMap?: Record<string, string>;
+  correctFeedback?: string;
+  incorrectFeedback?: string;
+  theme?: CircleTheme;
+  onSelect: (choiceId: string, isCorrect: boolean) => void;
+  onContinue: () => void;
+  interaction: any;
+}
+
+function PredictChoiceCard({ prompt, instruction, options, correctId, feedbackMap, correctFeedback, incorrectFeedback, theme, onSelect, onContinue, interaction }: PredictChoiceCardProps) {
+  const selectedId = interaction?.selectedChoiceId;
+  const isSubmitted = interaction?.choiceSubmitted;
+  const isCorrect = interaction?.choiceCorrect;
+  const selectedOpt = options.find(o => o.id === selectedId);
+  const selectedFeedback = selectedOpt?.feedback || feedbackMap?.[selectedId || ''];
+  const showFeedback = isSubmitted && selectedId;
+
+  const getCardState = (optId: string) => {
+    if (!isSubmitted) return selectedId === optId ? 'selected' : 'idle';
+    if (optId === correctId) return 'correct';
+    if (optId === selectedId) return 'incorrect';
+    return 'dimmed';
+  };
+
+  const stateStyles: Record<string, string> = {
+    idle: 'border-slate-200 bg-white hover:border-violet-300 hover:shadow-lg cursor-pointer',
+    selected: 'border-violet-400 bg-violet-50/60 shadow-lg shadow-violet-100 cursor-pointer',
+    correct: 'border-emerald-400 bg-emerald-50/70 shadow-lg shadow-emerald-100',
+    incorrect: 'border-orange-400 bg-orange-50/70 shadow-lg shadow-orange-100',
+    dimmed: 'border-slate-200 bg-slate-50/50 opacity-60',
+  };
+
+  const badgeStyles: Record<string, string> = {
+    idle: 'bg-slate-400 text-white',
+    selected: 'bg-violet-500 text-white',
+    correct: 'bg-emerald-500 text-white',
+    incorrect: 'bg-orange-500 text-white',
+    dimmed: 'bg-slate-300 text-white',
+  };
+
+  return (
+    <div className="mt-4 space-y-4">
+      {/* Prompt card */}
+      {prompt && (
+        <div className="rounded-2xl border border-amber-200/60 bg-gradient-to-br from-amber-50/80 via-orange-50/40 to-yellow-50/30 p-4 shadow-sm">
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-orange-400 flex items-center justify-center flex-shrink-0 shadow-sm">
+              <span className="text-sm">💭</span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-slate-800 leading-relaxed">{prompt}</p>
+              {instruction && (
+                <p className="text-xs text-amber-700 font-medium mt-1.5">{instruction}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Option cards */}
+      <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${Math.min(options.length, 3)}, 1fr)` }}>
+        {options.map((opt) => {
+          const state = getCardState(opt.id);
+          const isSelected = state === 'selected';
+          const visualNode = opt.visual ? renderVisualElement(opt.visual, theme) : null;
+
+          return (
+            <button
+              key={opt.id}
+              onClick={() => {
+                if (!isSubmitted) {
+                  onSelect(opt.id, opt.id === correctId);
+                }
+              }}
+              disabled={isSubmitted}
+              className={`relative rounded-2xl border-2 p-4 pt-5 text-center transition-all duration-200 ${stateStyles[state]}`}
+            >
+              {/* Letter badge */}
+              <div className={`absolute -top-2.5 -left-1 w-8 h-8 rounded-full flex items-center justify-center text-sm font-black shadow-sm ${badgeStyles[state]}`}>
+                {state === 'correct' ? '✓' : state === 'incorrect' ? '✗' : opt.label}
+              </div>
+
+              {/* Visual */}
+              {visualNode && (
+                <div className="flex justify-center mb-3 mt-1">
+                  <div className="transform scale-90">{visualNode}</div>
+                </div>
+              )}
+
+              {/* Description */}
+              {opt.description && (
+                <p className={`text-xs font-semibold leading-snug ${state === 'correct' ? 'text-emerald-700' : state === 'incorrect' ? 'text-orange-700' : 'text-slate-600'}`}>
+                  {opt.description}
+                </p>
+              )}
+
+              {/* Correct check overlay */}
+              {state === 'correct' && (
+                <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center shadow-sm">
+                  <svg width="12" height="12" viewBox="0 0 10 10" fill="none">
+                    <path d="M2 5L4 7L8 3" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Feedback area */}
+      {showFeedback && (
+        <div className={`rounded-xl px-4 py-3 shadow-sm animate-fade-in ${
+          isCorrect
+            ? 'bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200/70'
+            : 'bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200/70'
+        }`}>
+          <div className="flex items-start gap-2.5">
+            <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
+              isCorrect ? 'bg-emerald-500' : 'bg-orange-400'
+            }`}>
+              <span className="text-white text-[10px] font-bold">{isCorrect ? '✓' : '✗'}</span>
+            </div>
+            <p className={`text-sm font-semibold leading-snug ${
+              isCorrect ? 'text-emerald-700' : 'text-orange-700'
+            }`}>
+              {isCorrect
+                ? (selectedFeedback || correctFeedback || "Yes! That's correct!")
+                : (selectedFeedback || incorrectFeedback || "Not quite. Try again!")
+              }
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Continue button after correct answer */}
+      {isSubmitted && isCorrect && (
+        <div className="flex justify-center pt-1 animate-fade-in">
+          <button
+            onClick={onContinue}
+            className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-violet-500 to-purple-600 text-white font-bold text-sm shadow-md hover:shadow-lg transition-all active:scale-[0.97]"
+          >
+            Continue →
+          </button>
         </div>
       )}
     </div>
