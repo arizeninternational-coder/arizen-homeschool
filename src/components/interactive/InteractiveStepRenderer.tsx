@@ -331,21 +331,20 @@ export function InteractiveStepRenderer({
       return <RealLifeFraction object={vs.object || "shape"} parts={vs.parts || 2} equalParts={vs.equalParts !== false} highlightPart={vs.highlightPart || 1} label={vs.label} theme={theme} />;
     }
 
+    if (vs.type === "mission_brief") {
+      return (
+        <MissionBriefCard
+          title={vs.title || "Your mission has 4 parts:"}
+          missionIntro={vs.missionIntro || step.storyIntro}
+          items={vs.items || []}
+          icons={vs.icons}
+          accepted={missionAccepted}
+          theme={theme}
+        />
+      );
+    }
+
     if (vs.type === "checklist") {
-      if (step.stepKey === "mission" && !missionAccepted) {
-        return (
-          <div className="mt-4 rounded-2xl border border-slate-200/60 bg-gradient-to-br from-slate-50 to-white p-5 space-y-3">
-            <div className="space-y-2">
-              {(vs.items || []).map((item, i) => (
-                <div key={i} className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white/60 border border-slate-100">
-                  <span className="w-5 h-5 rounded-full border-2 border-slate-300 flex-shrink-0" />
-                  <span className="text-sm font-medium text-slate-700">{item}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-      }
       return <RecapChecklist items={vs.items || []} heading={step.title} variant="bullet" />;
     }
 
@@ -388,9 +387,16 @@ export function InteractiveStepRenderer({
         <TapContinue
           prompt={isWelcome ? undefined : (isMission ? undefined : spec.prompt)}
           onContinue={() => {
-            if (isMission) setMissionAccepted(true);
-            if (isComplete) handleLessonComplete();
-            onNext();
+            if (isMission) {
+              setMissionAccepted(true);
+              // Show success message, then advance after delay
+              setTimeout(() => {
+                onNext();
+              }, 1800);
+            } else {
+              if (isComplete) handleLessonComplete();
+              onNext();
+            }
           }}
           feedback={feedback}
           buttonLabel={spec.buttonLabel}
@@ -496,7 +502,16 @@ export function InteractiveStepRenderer({
 
   const renderMissionConfirmation = () => {
     if (step.stepKey === "mission" && missionAccepted && step.feedbackSpec?.correct) {
-      return <p className="text-sm font-semibold text-emerald-600 text-center mt-2 animate-fade-in">{step.feedbackSpec.correct}</p>;
+      return (
+        <div className="mt-4 px-4 py-3 rounded-xl bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200/70 shadow-sm animate-fade-in">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+              <span className="text-white text-xs font-bold">✓</span>
+            </div>
+            <p className="text-sm font-bold text-emerald-700">{step.feedbackSpec.correct}</p>
+          </div>
+        </div>
+      );
     }
     return null;
   };
@@ -707,6 +722,81 @@ function LegacyInteractionRenderer({ step, interaction, setInteraction, onNext }
     return <MultipleChoice question={step.interaction.question || ""} options={options} correctIndex={correctIdx} onAnswer={(correct: boolean, idx: number) => setInteraction((p: any) => ({ ...p, selectedChoice: idx, choiceFeedback: correct ? "correct" : "incorrect" }))} />;
   }
   return null;
+}
+
+// -- Mission Brief Card ----------------------------------------------------
+
+const MISSION_ICONS = ["🍞", "✂️", "📏", "🗣️"];
+
+interface MissionBriefCardProps {
+  title: string;
+  missionIntro?: string;
+  items: string[];
+  icons?: string[];
+  accepted: boolean;
+  theme?: CircleTheme;
+}
+
+function MissionBriefCard({ title, missionIntro, items, icons, accepted, theme }: MissionBriefCardProps) {
+  const accentGradient = "from-violet-500 to-purple-600";
+  const cardBg = theme === "chapati"
+    ? "from-amber-50/40 via-violet-50/30 to-purple-50/40"
+    : "from-violet-50/60 via-purple-50/40 to-indigo-50/30";
+
+  return (
+    <div className={`mt-4 rounded-2xl border-2 border-violet-200/70 bg-gradient-to-br ${cardBg} shadow-md overflow-hidden`}>
+      {/* Header */}
+      <div className="px-5 pt-5 pb-3">
+        <div className="flex items-center gap-2.5 mb-3">
+          <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${accentGradient} flex items-center justify-center shadow-md`}>
+            <span className="text-lg">🎯</span>
+          </div>
+          <div>
+            <h4 className="font-extrabold text-violet-800 text-base tracking-tight">Mission</h4>
+            <p className="text-[11px] text-violet-500 font-medium">Your challenge today</p>
+          </div>
+        </div>
+        {missionIntro && (
+          <p className="text-sm text-slate-700 leading-relaxed font-medium">
+            {missionIntro}
+          </p>
+        )}
+      </div>
+
+      {/* Mission items */}
+      <div className="px-5 pb-4">
+        <p className="text-[11px] font-bold text-violet-600 uppercase tracking-wider mb-2.5">{title}</p>
+        <div className="space-y-2">
+          {items.map((item, i) => {
+            const icon = icons?.[i] || MISSION_ICONS[i] || `${i + 1}`;
+            return (
+              <div
+                key={i}
+                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-300 ${
+                  accepted
+                    ? "bg-white/90 border border-violet-200/70 shadow-sm"
+                    : "bg-white/60 border border-violet-100/60"
+                }`}
+              >
+                <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold transition-all duration-500 ${
+                  accepted
+                    ? "bg-gradient-to-br from-violet-500 to-purple-600 text-white shadow-sm"
+                    : "bg-violet-100 text-violet-600"
+                }`}>
+                  {accepted ? "✓" : icon}
+                </div>
+                <span className={`text-sm font-semibold transition-colors duration-300 ${
+                  accepted ? "text-violet-800" : "text-slate-700"
+                }`}>
+                  {item}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 // -- Welcome Step Visual ---------------------------------------------------
