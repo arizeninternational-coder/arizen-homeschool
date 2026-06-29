@@ -337,6 +337,21 @@ export function InteractiveStepRenderer({
       );
     }
 
+    if (vs.type === "worked_example") {
+      return (
+        <WorkedExampleGrid
+          intro={vs.intro || step.storyIntro}
+          steps={(vs.steps || []).map((s: any) => ({
+            title: s.title,
+            description: s.description,
+            visualType: s.visualType,
+            visualProps: s.visualProps,
+          }))}
+          theme={theme}
+        />
+      );
+    }
+
     if (vs.type === "choice_grid") {
       const choices = (vs.choices || []).map((c) => ({
         id: c.id, label: c.label, description: c.description, visual: renderVisualElement(c.visual, theme),
@@ -739,6 +754,7 @@ function PracticeShadePanel({ activity, feedback, onAnswer, theme }: { activity:
 interface PredictOption {
   id: string;
   label: string;
+  title?: string;
   description?: string;
   visual?: any;
   feedback?: string;
@@ -831,6 +847,15 @@ function PredictChoiceCard({ prompt, instruction, options, correctId, feedbackMa
                 {state === 'correct' ? '✓' : state === 'incorrect' ? '✗' : opt.label}
               </div>
 
+              {/* Title (e.g. fraction name) */}
+              {opt.title && (
+                <h5 className={`text-sm font-bold text-slate-700 mb-1 ${
+                  state === 'correct' ? 'text-emerald-700' : state === 'incorrect' ? 'text-orange-700' : ''
+                }`}>
+                  {opt.title}
+                </h5>
+              )}
+
               {/* Visual */}
               {visualNode && (
                 <div className="flex justify-center mb-3 mt-1">
@@ -894,6 +919,137 @@ function PredictChoiceCard({ prompt, instruction, options, correctId, feedbackMa
           </button>
         </div>
       )}
+    </div>
+  );
+}
+
+// -- Worked Example Grid ---------------------------------------------------
+
+interface WorkedExampleStep {
+  title: string;
+  description?: string;
+  visualType: string;
+  visualProps?: any;
+}
+
+interface WorkedExampleGridProps {
+  intro?: string;
+  steps: WorkedExampleStep[];
+  theme?: CircleTheme;
+}
+
+function WorkedExampleGrid({ intro, steps, theme }: WorkedExampleGridProps) {
+  const accentBg = theme === "chapati" ? "from-amber-50/50 to-orange-50/30" : theme === "paper_cutout" ? "from-sky-50/40 to-indigo-50/30" : "from-slate-50 to-white";
+
+  const renderStepVisual = (vs: WorkedExampleStep) => {
+    const t = theme || "plain";
+    switch (vs.visualType) {
+      case "trace_circle":
+        return (
+          <svg width="80" height="80" viewBox="0 0 80 80">
+            {/* Paper */}
+            <rect x="10" y="10" width="60" height="60" rx="4" fill="#FFFDF7" stroke="#CBD5E1" strokeWidth="1.5" />
+            {/* Lid (cup) */}
+            <ellipse cx="40" cy="32" rx="18" ry="6" fill="#94A3B8" opacity="0.5" />
+            <rect x="22" y="32" width="36" height="12" fill="#94A3B8" opacity="0.4" rx="2" />
+            <ellipse cx="40" cy="44" rx="18" ry="6" fill="#64748B" opacity="0.6" />
+            {/* Circle outline being traced */}
+            <circle cx="40" cy="50" r="16" fill="none" stroke="#7C3AED" strokeWidth="2" strokeDasharray="4 2" />
+            {/* Pencil */}
+            <line x1="58" y1="28" x2="68" y2="18" stroke="#F59E0B" strokeWidth="3" strokeLinecap="round" />
+            <line x1="68" y1="18" x2="72" y2="14" stroke="#1E293B" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+        );
+      case "cut_out":
+        return (
+          <svg width="80" height="80" viewBox="0 0 80 80">
+            {/* Paper circle */}
+            <circle cx="35" cy="40" r="20" fill="#FFFDF7" stroke="#CBD5E1" strokeWidth="1.5" />
+            <circle cx="35" cy="40" r="20" fill="none" stroke="#7C3AED" strokeWidth="1.5" strokeDasharray="3 2" />
+            {/* Scissors */}
+            <g transform="translate(50, 25) rotate(30)">
+              <circle cx="0" cy="0" r="5" fill="none" stroke="#64748B" strokeWidth="2" />
+              <circle cx="0" cy="8" r="5" fill="none" stroke="#64748B" strokeWidth="2" />
+              <line x1="3" y1="-2" x2="14" y2="-10" stroke="#94A3B8" strokeWidth="2.5" strokeLinecap="round" />
+              <line x1="3" y1="10" x2="14" y2="18" stroke="#94A3B8" strokeWidth="2.5" strokeLinecap="round" />
+            </g>
+            {/* Cut line hint */}
+            <path d="M 25 30 Q 35 40 25 50" fill="none" stroke="#DC2626" strokeWidth="1" strokeDasharray="2 2" opacity="0.5" />
+          </svg>
+        );
+      case "fold_circle":
+        return (
+          <svg width="80" height="80" viewBox="0 0 80 80">
+            {/* Folded circle (half visible) */}
+            <path d="M 20 25 A 15 15 0 0 1 20 55 Z" fill={t === "paper_cutout" ? "#E0E7FF" : "#FDE8CC"} stroke={t === "paper_cutout" ? "#6366F1" : "#C4852A"} strokeWidth="2" />
+            <line x1="20" y1="25" x2="20" y2="55" stroke={t === "paper_cutout" ? "#6366F1" : "#C4852A"} strokeWidth="2" />
+            {/* Alignment arrows showing edges match */}
+            <path d="M 12 25 L 12 55" fill="none" stroke="#7C3AED" strokeWidth="1.5" markerEnd="url(#arrowhead)" />
+            <text x="8" y="42" fontSize="8" fill="#7C3AED" fontWeight="bold">✓</text>
+            {/* Fold arrow */}
+            <path d="M 50 20 Q 40 15 30 20" fill="none" stroke="#94A3B8" strokeWidth="1.5" strokeDasharray="3 2" />
+            <text x="42" y="16" fontSize="9" fill="#64748B">fold</text>
+          </svg>
+        );
+      case "shade_half":
+        return (
+          <svg width="80" height="80" viewBox="0 0 80 80">
+            {/* Circle with fold line */}
+            <circle cx="40" cy="40" r="22" fill={t === "paper_cutout" ? "#F1F5F9" : "#FDE8CC"} stroke={t === "paper_cutout" ? "#CBD5E1" : "#C4852A"} strokeWidth="2" />
+            {/* Shaded right half */}
+            <path d="M 40 18 A 22 22 0 0 1 40 62 Z" fill={t === "paper_cutout" ? "#6366F1" : "#D4953A"} opacity="0.8" stroke={t === "paper_cutout" ? "#6366F1" : "#C4852A"} strokeWidth="2" />
+            {/* Center fold line */}
+            <line x1="40" y1="18" x2="40" y2="62" stroke={t === "paper_cutout" ? "#6366F1" : "#C4852A"} strokeWidth="1.5" strokeDasharray="3 2" />
+            {/* Label */}
+            <text x="52" y="44" fontSize="10" fill="#fff" fontWeight="bold">1/2</text>
+          </svg>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="mt-2">
+      {intro && (
+        <p className="text-sm text-slate-600 font-medium text-center mb-3 leading-relaxed">
+          {intro}
+        </p>
+      )}
+
+      <div className={`rounded-2xl border border-slate-200/60 bg-gradient-to-br ${accentBg} p-4 lg:p-5`}>
+        <div className="grid grid-cols-2 gap-4 lg:gap-5">
+          {steps.map((s, i) => (
+            <div key={i} className="flex flex-col items-center">
+              {/* Step number */}
+              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black mb-2 ${
+                theme === "paper_cutout"
+                  ? "bg-gradient-to-br from-sky-400 to-indigo-500 text-white shadow-sm"
+                  : "bg-amber-100 text-amber-700"
+              }`}>
+                {i + 1}
+              </div>
+
+              {/* Title */}
+              <h4 className="font-bold text-slate-700 text-xs text-center leading-tight mb-2">
+                {s.title}
+              </h4>
+
+              {/* Visual */}
+              <div className="flex justify-center mb-2">
+                {renderStepVisual(s)}
+              </div>
+
+              {/* Description */}
+              {s.description && (
+                <p className="text-[11px] text-slate-500 text-center leading-snug font-medium">
+                  {s.description}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
