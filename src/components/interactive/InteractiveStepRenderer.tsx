@@ -136,6 +136,19 @@ function renderVisualElement(visual: any, theme?: CircleTheme): React.ReactNode 
   if (visual.type === "fraction_circle_dotted") {
     return <FractionCircleWithDottedLine theme={theme} size={visual.size || 72} />;
   }
+  if (visual.type === "shade_quarter") {
+    // Render a full circle divided into 4 equal parts with one quadrant shaded
+    return (
+      <svg width={visual.size || 120} height={visual.size || 120} viewBox="0 0 120 120">
+        <circle cx="60" cy="60" r="32" fill="#FFFEF9" stroke="#CBD5E1" strokeWidth="2.5" />
+        <line x1="60" y1="28" x2="60" y2="92" stroke="#CBD5E1" strokeWidth="2" strokeDasharray="5 3" strokeLinecap="round" />
+        <line x1="28" y1="60" x2="92" y2="60" stroke="#CBD5E1" strokeWidth="2" strokeDasharray="5 3" strokeLinecap="round" />
+        <path d="M 60 28 A 32 32 0 0 1 92 60 L 60 60 Z" fill="#7C3AED" opacity="0.75" stroke="#7C3AED" strokeWidth="2.5" />
+        <circle cx="60" cy="60" r="3" fill="#4C1D95" />
+        <text x="80" y="48" fontSize="14" fill="#fff" fontWeight="800">1/4</text>
+      </svg>
+    );
+  }
   return null;
 }
 
@@ -1036,8 +1049,25 @@ function WorkedExampleGrid({ intro, steps, theme }: WorkedExampleGridProps) {
             <text x="22" y="64" fontSize="9" fill="#64748B" fontWeight="600">whole</text>
           </svg>
         );
-      default:
-        return null;
+              case "shade_quarter":
+                return (
+                  <svg width="120" height="120" viewBox="0 0 120 120">
+                    {/* Full circle divided into 4 equal parts */}
+                    <circle cx="60" cy="60" r="32" fill="#FFFEF9" stroke="#CBD5E1" strokeWidth="2.5" />
+                    {/* Vertical division line */}
+                    <line x1="60" y1="28" x2="60" y2="92" stroke="#CBD5E1" strokeWidth="2" strokeDasharray="5 3" strokeLinecap="round" />
+                    {/* Horizontal division line */}
+                    <line x1="28" y1="60" x2="92" y2="60" stroke="#CBD5E1" strokeWidth="2" strokeDasharray="5 3" strokeLinecap="round" />
+                    {/* Shade one quadrant (top-right) */}
+                    <path d="M 60 28 A 32 32 0 0 1 92 60 L 60 60 Z" fill="#7C3AED" opacity="0.75" stroke="#7C3AED" strokeWidth="2.5" />
+                    {/* Center point */}
+                    <circle cx="60" cy="60" r="3" fill="#4C1D95" />
+                    {/* 1/4 label on shaded quadrant */}
+                    <text x="80" y="48" fontSize="14" fill="#fff" fontWeight="800">1/4</text>
+                  </svg>
+                );
+              default:
+                return null;
     }
   };
 
