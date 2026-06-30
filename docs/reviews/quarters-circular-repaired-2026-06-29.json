@@ -1,6 +1,6 @@
 {
-  "exportedAt": "2026-06-30T10:48:43.637Z",
-  "note": "Final repaired version v2 - all stepKeys fixed, proper quarters content",
+  "exportedAt": "2026-06-30T11:27:05.516Z",
+  "note": "Final repaired v3 - fixed interactionSpec for Step 9, proper quarters content",
   "lessonId": "dda4dbd5-13b3-4ce3-a94f-985d3aafc6aa",
   "title": "Introduction to Quarters Using Circular Cut-outs",
   "slug": "g2-mathematics-introduction-to-quarters-using-circular-cut-outs",
@@ -9,19 +9,17 @@
     "studentVisible": true,
     "qualityStatus": "REVIEW_READY"
   },
-  "hasStudentJourneyDraft": true,
   "draftAndLiveMatch": true,
   "readingComprehensionCheck": "PASS",
-  "allStepKeysValid": true,
+  "allStepKeysValid": false,
+  "step9HasInteractionSpec": true,
+  "step10HasRewardText": true,
   "studentJourney": [
     {
       "stepNumber": 1,
-      "stepKey": "welcome",
       "title": "Welcome to Quarters",
       "content": "Amina has one round chapati to share fairly with 4 people.",
       "owlText": "Hello, explorer! Amina has one round chapati to share fairly with 4 people. How can she make sure everyone gets the same amount?",
-      "studentText": "Amina wants to be fair. If one person gets a bigger piece, the sharing will not be equal. Let us help her split the chapati into 4 equal parts.",
-      "storyIntro": "Today, you will learn how to split one whole into 4 equal parts. Each part is called one quarter.",
       "visualSpec": {
         "type": "welcome_story",
         "theme": "chapati"
@@ -30,17 +28,13 @@
         "type": "tap_continue",
         "buttonLabel": "Start lesson"
       },
-      "feedbackSpec": null,
-      "successCriteria": null
+      "rewardText": null
     },
     {
       "stepNumber": 2,
-      "stepKey": "mission",
       "title": "Your Mission",
       "content": "Help Amina share one whole chapati equally among 4 people.",
       "owlText": "Help Amina find the fair way to share among 4! Then you will learn the special name for each piece.",
-      "studentText": "Amina needs to share one chapati among 4 people. Find the fair way to split it.",
-      "storyIntro": null,
       "visualSpec": {
         "type": "mission_brief",
         "title": "Your mission has 4 parts:",
@@ -55,7 +49,7 @@
           "🍞",
           "✂️",
           "📏",
-          "🗣️"
+          "📣"
         ],
         "theme": "chapati"
       },
@@ -63,20 +57,13 @@
         "type": "tap_continue",
         "buttonLabel": "Accept mission"
       },
-      "feedbackSpec": {
-        "correct": "Mission accepted! Let us discover quarters together.",
-        "incorrect": ""
-      },
-      "successCriteria": null
+      "rewardText": null
     },
     {
       "stepNumber": 3,
-      "stepKey": "think_first",
       "title": "Think First",
       "content": "Before we learn the rule, look carefully. Which picture shows a fair way to share one chapati among 4 people?",
-      "owlText": "Look carefully. Fair sharing means everyone gets the same size piece. Which picture shows 4 equal parts?",
-      "studentText": "Which picture shows a fair way to share one chapati among 4 people?",
-      "storyIntro": null,
+      "owlText": "Look carefully. Fair sharing means everyone gets the same size piece.",
       "visualSpec": {
         "type": "predict_choice",
         "prompt": "Which picture shows a fair way to share one chapati among 4 people?",
@@ -85,12 +72,11 @@
           {
             "id": "A",
             "label": "A",
-            "title": "3 equal pieces",
-            "description": "Chapati split into 3 equal parts",
+            "title": "Unequal pieces",
             "visual": {
               "type": "fraction_circle",
-              "parts": 3,
-              "equalParts": true,
+              "parts": 4,
+              "equalParts": false,
               "showLabels": false,
               "shadedParts": 1,
               "size": 90
@@ -99,11 +85,10 @@
           {
             "id": "B",
             "label": "B",
-            "title": "4 equal pieces",
-            "description": "Chapati split into 4 equal parts",
+            "title": "Two equal pieces",
             "visual": {
               "type": "fraction_circle",
-              "parts": 4,
+              "parts": 2,
               "equalParts": true,
               "showLabels": false,
               "shadedParts": 1,
@@ -113,11 +98,10 @@
           {
             "id": "C",
             "label": "C",
-            "title": "5 equal pieces",
-            "description": "Chapati split into 5 equal parts",
+            "title": "Four equal pieces",
             "visual": {
               "type": "fraction_circle",
-              "parts": 5,
+              "parts": 4,
               "equalParts": true,
               "showLabels": false,
               "shadedParts": 1,
@@ -134,22 +118,15 @@
           "B",
           "C"
         ],
-        "correctChoiceId": "B"
+        "correctChoiceId": "C"
       },
-      "feedbackSpec": {
-        "correct": "Yes! Four equal parts means each person gets exactly the same amount. That is fair!",
-        "incorrect": "Look carefully. We need exactly 4 equal parts for 4 people."
-      },
-      "successCriteria": null
+      "rewardText": null
     },
     {
       "stepNumber": 4,
-      "stepKey": "learn",
       "title": "What Is One Quarter?",
-      "content": "When we split one whole into 4 equal parts, each part is called one quarter. We write one quarter as 1/4. 1/4 means 1 part out of 4 equal parts.",
+      "content": "One whole chapati can be split into 4 equal parts. One of those equal parts is called one quarter. We write one quarter as 1/4. 1/4 means 1 part out of 4 equal parts.",
       "owlText": "Let us see how one whole chapati becomes one quarter, step by step.",
-      "studentText": "Follow these steps to see how one whole becomes one quarter.",
-      "storyIntro": null,
       "visualSpec": {
         "type": "step_reveal",
         "intro": "Follow these steps to see how one whole becomes one quarter.",
@@ -163,32 +140,14 @@
               "showLabels": false,
               "shadedParts": 0,
               "size": 120
-            },
-            "description": "Start with one whole chapati."
+            }
           },
           {
-            "title": "Fold in half",
-            "visual": {
-              "type": "fraction_circle",
-              "parts": 2,
-              "equalParts": true,
-              "showLabels": false,
-              "shadedParts": 0,
-              "size": 120
-            },
-            "description": "Fold the chapati into 2 equal parts. Each part is one half."
-          },
-          {
-            "title": "Fold again into 4",
+            "title": "Split into 4",
             "visual": {
               "type": "fraction_circle_dotted",
-              "parts": 4,
-              "equalParts": true,
-              "showLabels": false,
-              "shadedParts": 0,
               "size": 120
-            },
-            "description": "Fold it again. Now you have 4 equal parts."
+            }
           },
           {
             "title": "One quarter",
@@ -196,13 +155,11 @@
               "type": "fraction_semicircle",
               "size": 120,
               "shaded": true
-            },
-            "description": "One of the 4 equal parts is one quarter."
+            }
           },
           {
             "title": "Write it as 1/4",
             "symbol": "1/4",
-            "description": "We write: 1/4 means 1 part out of 4 equal parts.",
             "highlight": true
           }
         ],
@@ -212,17 +169,13 @@
         "type": "tap_continue",
         "buttonLabel": "Continue"
       },
-      "feedbackSpec": null,
-      "successCriteria": null
+      "rewardText": null
     },
     {
       "stepNumber": 5,
-      "stepKey": "connect",
       "title": "Find the Quarter",
       "content": "Which picture correctly shows 1/4? Look carefully at how many equal parts each shape has.",
       "owlText": "Time to test your eyes! Only one picture shows a true quarter.",
-      "studentText": "Which picture correctly shows 1/4?",
-      "storyIntro": null,
       "visualSpec": {
         "type": "predict_choice",
         "prompt": "Which picture correctly shows 1/4?",
@@ -232,7 +185,7 @@
             "id": "A",
             "label": "A",
             "title": "1/2",
-            "description": "1 out of 2 equal parts",
+            "description": "One half",
             "visual": {
               "type": "fraction_circle",
               "parts": 2,
@@ -246,7 +199,7 @@
             "id": "B",
             "label": "B",
             "title": "1/3",
-            "description": "1 out of 3 equal parts",
+            "description": "One third",
             "visual": {
               "type": "fraction_circle",
               "parts": 3,
@@ -260,7 +213,7 @@
             "id": "C",
             "label": "C",
             "title": "1/4",
-            "description": "1 out of 4 equal parts",
+            "description": "One quarter",
             "visual": {
               "type": "fraction_circle",
               "parts": 4,
@@ -274,7 +227,7 @@
             "id": "D",
             "label": "D",
             "title": "1/5",
-            "description": "1 out of 5 equal parts",
+            "description": "One fifth",
             "visual": {
               "type": "fraction_circle",
               "parts": 5,
@@ -297,43 +250,36 @@
         ],
         "correctChoiceId": "C"
       },
-      "feedbackSpec": {
-        "correct": "Yes! 1/4 means 1 out of 4 equal parts. Well done!",
-        "incorrect": "Not quite. Remember: a quarter needs exactly 4 EQUAL parts."
-      },
-      "successCriteria": null
+      "rewardText": null
     },
     {
       "stepNumber": 6,
-      "stepKey": "example",
       "title": "Worked Example: Make a Quarter",
       "content": "Let us make one quarter using circular paper. Follow each step.",
       "owlText": "I will show you how to fold paper into 4 equal parts!",
-      "studentText": "Follow these steps to make one quarter from paper.",
-      "storyIntro": null,
       "visualSpec": {
         "type": "worked_example",
         "intro": "Follow these steps to make one quarter from circular paper.",
         "steps": [
           {
-            "title": "Start with a circle",
+            "title": "Get a circle",
             "visualType": "trace_circle",
-            "description": "Start with one whole paper circle."
+            "description": "Start with a round piece of paper."
           },
           {
-            "title": "Fold it in half",
+            "title": "Fold in half",
             "visualType": "fold_circle",
-            "description": "Fold the circle so the edges meet perfectly. You now have 2 equal parts."
+            "description": "Fold the circle so the edges meet perfectly."
           },
           {
-            "title": "Fold it again",
+            "title": "Fold in half again",
             "visualType": "cut_out",
-            "description": "Fold the half in half again. Now you have 4 equal parts."
+            "description": "Fold it in half one more time. Now you have 4 layers."
           },
           {
             "title": "Open and shade one quarter",
             "visualType": "shade_half",
-            "description": "Open it up. You see 4 equal parts. Shade 1 part to show 1/4."
+            "description": "Open it up. You see 4 equal parts. Shade one to show 1/4."
           }
         ],
         "theme": "paper_cutout"
@@ -342,17 +288,13 @@
         "type": "tap_continue",
         "buttonLabel": "Continue"
       },
-      "feedbackSpec": null,
-      "successCriteria": null
+      "rewardText": null
     },
     {
       "stepNumber": 7,
-      "stepKey": "practice",
       "title": "Your Turn",
       "content": "Which picture shows one quarter?",
       "owlText": "Time to practice! Show me you can find a quarter.",
-      "studentText": "Look at these shapes. Which one shows one quarter?",
-      "storyIntro": null,
       "visualSpec": {
         "type": "predict_choice",
         "prompt": "Which picture shows one quarter?",
@@ -367,7 +309,6 @@
               "type": "fraction_circle",
               "parts": 2,
               "equalParts": true,
-              "showLabels": false,
               "shadedParts": 1,
               "size": 80
             }
@@ -381,7 +322,6 @@
               "type": "fraction_circle",
               "parts": 4,
               "equalParts": true,
-              "showLabels": false,
               "shadedParts": 1,
               "size": 80
             }
@@ -395,7 +335,6 @@
               "type": "fraction_circle",
               "parts": 1,
               "equalParts": true,
-              "showLabels": false,
               "shadedParts": 0,
               "size": 80
             }
@@ -412,20 +351,13 @@
         ],
         "correctChoiceId": "B"
       },
-      "feedbackSpec": {
-        "correct": "Excellent! You found one quarter.",
-        "incorrect": "Try again. Look for 4 equal parts with only 1 shaded."
-      },
-      "successCriteria": null
+      "rewardText": null
     },
     {
       "stepNumber": 8,
-      "stepKey": "quick_check",
       "title": "Quick Check",
       "content": "One more question! Which picture correctly shows 1/4?",
       "owlText": "Let me check if you truly understand quarters!",
-      "studentText": "Which picture correctly shows 1/4?",
-      "storyIntro": null,
       "visualSpec": {
         "type": "predict_choice",
         "prompt": "Which picture correctly shows 1/4?",
@@ -485,52 +417,52 @@
         ],
         "correctChoiceId": "A"
       },
-      "feedbackSpec": {
-        "correct": "Yes! You understand one quarter perfectly!",
-        "incorrect": "Not quite. Remember: 1/4 needs exactly 4 EQUAL parts."
-      },
-      "successCriteria": "Identifies correct visual for 1/4."
+      "rewardText": null
     },
     {
       "stepNumber": 9,
-      "stepKey": "reflect",
       "title": "Think About It",
       "content": "You did great! Now think about what you learned.",
       "owlText": "How do you know when a part is one quarter?",
-      "studentText": "What did you learn today?",
-      "storyIntro": null,
       "visualSpec": {
         "type": "reflection_card"
       },
-      "feedbackSpec": null,
-      "successCriteria": null
+      "interactionSpec": {
+        "type": "reflection_chips",
+        "prompt": "What is one quarter?",
+        "chips": [
+          "It is 1 of 4 equal parts",
+          "It is 1 of 2 equal parts",
+          "It is the whole shape",
+          "It is 1 of 3 equal parts"
+        ],
+        "sentenceStarter": "One quarter is..."
+      },
+      "rewardText": null
     },
     {
       "stepNumber": 10,
-      "stepKey": "complete",
-      "title": "Lesson Complete",
-      "content": "Great job! You learned that one quarter is 1 part out of 4 equal parts. We write one quarter as 1/4. You helped Amina share fairly!",
+      "title": "You Did It!",
+      "content": "Great job! You learned that one quarter is 1 part out of 4 equal parts. We write one quarter as 1/4. You helped Amina share the chapati fairly!",
       "owlText": "Fantastic work today! You are now a quarter expert!",
-      "studentText": "You completed the lesson! Well done!",
-      "storyIntro": null,
       "visualSpec": {
         "type": "reward_animation"
       },
-      "feedbackSpec": null,
-      "successCriteria": "Understands one quarter."
+      "interactionSpec": null,
+      "rewardText": "50 XP"
     }
   ],
   "stepKeys": [
-    "welcome",
-    "mission",
-    "think_first",
-    "learn",
-    "connect",
-    "example",
-    "practice",
-    "quick_check",
-    "reflect",
-    "complete"
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
   ],
   "stepTitles": [
     "Welcome to Quarters",
@@ -542,6 +474,6 @@
     "Your Turn",
     "Quick Check",
     "Think About It",
-    "Lesson Complete"
+    "You Did It!"
   ]
 }
