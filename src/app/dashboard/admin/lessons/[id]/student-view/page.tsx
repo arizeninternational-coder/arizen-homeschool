@@ -61,12 +61,12 @@ interface LessonData {
 const STEP_META: Record<string, { icon: string; label: string; color: string; bg: string; border: string; gradient: string }> = {
   welcome:    { icon: "🦉", label: "Welcome", color: "text-indigo-700", bg: "bg-indigo-50/60", border: "border-indigo-200/60", gradient: "from-indigo-500 to-purple-500" },
   mission:    { icon: "🎯", label: "Mission", color: "text-violet-700", bg: "bg-violet-50/60", border: "border-violet-200/60", gradient: "from-violet-500 to-purple-500" },
-  think_first:{ icon: "💭", label: "Predict", color: "text-amber-700", bg: "bg-amber-50/60", border: "border-amber-200/60", gradient: "from-amber-500 to-orange-500" },
+  think_first:{ icon: "💭", label: "Think First", color: "text-amber-700", bg: "bg-amber-50/60", border: "border-amber-200/60", gradient: "from-amber-500 to-orange-500" },
   learn:      { icon: "📖", label: "Learn", color: "text-emerald-700", bg: "bg-emerald-50/60", border: "border-emerald-200/60", gradient: "from-emerald-500 to-teal-500" },
-  connect:    { icon: "🔗", label: "Connect", color: "text-teal-700", bg: "bg-teal-50/60", border: "border-teal-200/60", gradient: "from-teal-500 to-cyan-500" },
-  example:    { icon: "💡", label: "Example", color: "text-cyan-700", bg: "bg-cyan-50/60", border: "border-cyan-200/60", gradient: "from-cyan-500 to-blue-500" },
+  connect:    { icon: "🔍", label: "Find the Quarter", color: "text-teal-700", bg: "bg-teal-50/60", border: "border-teal-200/60", gradient: "from-teal-500 to-cyan-500" },
+  example:    { icon: "💡", label: "Worked Example", color: "text-cyan-700", bg: "bg-cyan-50/60", border: "border-cyan-200/60", gradient: "from-cyan-500 to-blue-500" },
   practice:   { icon: "✏️", label: "Practice", color: "text-sky-700", bg: "bg-sky-50/60", border: "border-sky-200/60", gradient: "from-sky-500 to-blue-500" },
-  quick_check:{ icon: "✅", label: "Check", color: "text-lime-700", bg: "bg-lime-50/60", border: "border-lime-200/60", gradient: "from-lime-500 to-green-500" },
+  quick_check:{ icon: "✅", label: "Quick Check", color: "text-lime-700", bg: "bg-lime-50/60", border: "border-lime-200/60", gradient: "from-lime-500 to-green-500" },
   reflect:    { icon: "🪞", label: "Reflect", color: "text-rose-700", bg: "bg-rose-50/60", border: "border-rose-200/60", gradient: "from-rose-500 to-pink-500" },
   complete:   { icon: "🏆", label: "Done", color: "text-yellow-700", bg: "bg-yellow-50/60", border: "border-yellow-200/60", gradient: "from-yellow-500 to-amber-500" },
 };
@@ -673,7 +673,7 @@ export default function AdminStudentLessonEditor({ params }: { params: Promise<{
                       }`}>
                         {i < clampedStep ? "✓" : sm.icon}
                       </span>
-                      <span className="truncate">{sm.label}</span>
+                      <span className="truncate">{s.title || sm.label}</span>
                     </button>
                   );
                 })}

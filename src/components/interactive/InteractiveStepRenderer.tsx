@@ -251,7 +251,7 @@ export function InteractiveStepRenderer({
               </svg>
             </div>
             <p className="text-xs text-slate-500 text-center font-medium leading-relaxed">
-              Image coming soon: Amina and her brother sharing a chapati
+              {step.title ? step.title : "Image coming soon"}
             </p>
           </div>
         </div>
