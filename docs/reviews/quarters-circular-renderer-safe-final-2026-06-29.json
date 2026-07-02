@@ -512,7 +512,14 @@
         "content": "Great job! You learned that one quarter is 1 part out of 4 equal parts. We write one quarter as 1/4. You helped Amina share the chapati fairly!",
         "owlText": "Fantastic work today! You are now a quarter expert!",
         "visualSpec": {
-          "type": "recap_checklist"
+          "type": "recap_checklist",
+          "heading": "What you learned",
+          "items": [
+            "One whole can be split into 4 equal parts.",
+            "One equal part is called one quarter.",
+            "One quarter is written as 1/4.",
+            "1/4 means 1 part out of 4 equal parts."
+          ]
         },
         "interactionSpec": {
           "type": "tap_continue",
@@ -1020,7 +1027,14 @@
         "content": "Great job! You learned that one quarter is 1 part out of 4 equal parts. We write one quarter as 1/4. You helped Amina share the chapati fairly!",
         "owlText": "Fantastic work today! You are now a quarter expert!",
         "visualSpec": {
-          "type": "recap_checklist"
+          "type": "recap_checklist",
+          "heading": "What you learned",
+          "items": [
+            "One whole can be split into 4 equal parts.",
+            "One equal part is called one quarter.",
+            "One quarter is written as 1/4.",
+            "1/4 means 1 part out of 4 equal parts."
+          ]
         },
         "interactionSpec": {
           "type": "tap_continue",
@@ -1189,21 +1203,10 @@
             }
           },
           {
-            "title": "1 quarter",
-            "visual": {
-              "type": "fraction_circle",
-              "parts": 4,
-              "equalParts": true,
-              "showLabels": true,
-              "labels": [
-                "1/4",
-                "1/4",
-                "1/4",
-                "1/4"
-              ],
-              "shadedParts": 1,
-              "size": 140
-            }
+            "title": "Write it as 1/4",
+            "symbol": "1/4",
+            "highlight": true,
+            "description": "1/4 means 1 part out of 4 equal parts."
           }
         ],
         "theme": "chapati"
@@ -1535,10 +1538,17 @@
     {
       "stepNumber": 10,
       "title": "You Did It!",
-      "content": "Great job! You learned that one quarter is 1 part out of 4 equal parts. We write one quarter as 1/4. You helped Amina share the chapati fairly!",
+      "content": "Great job! You learned that one quarter is 1 part out of 4 equal parts. You helped Amina share the chapati fairly with 4 people.",
       "owlText": "Fantastic work today! You are now a quarter expert!",
       "visualSpec": {
-        "type": "recap_checklist"
+        "type": "recap_checklist",
+        "items": [
+          "One whole can be split into 4 equal parts.",
+          "One equal part is called one quarter.",
+          "One quarter is written as 1/4.",
+          "1/4 means 1 part out of 4 equal parts."
+        ],
+        "heading": "You Did It!"
       },
       "interactionSpec": {
         "type": "tap_continue",
