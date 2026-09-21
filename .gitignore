@@ -37,3 +37,4 @@ npm-debug.log*
 test-content.js
 
 .vercel
+.env*
