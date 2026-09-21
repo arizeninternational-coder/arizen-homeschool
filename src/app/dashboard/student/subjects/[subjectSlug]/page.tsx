@@ -117,7 +117,7 @@ export default function StudentSubjectDetailPage() {
                   mod.lessons
                     .sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0))
                     .map((lesson, li) => (
-                      <Link key={lesson.id} href={`/dashboard/student/lessons/${lesson.slug}`}
+                      <Link key={lesson.id} href={`/dashboard/student/lesson/${lesson.slug}`}
                         style={{
                           display: "flex", alignItems: "center", gap: 12,
                           padding: "12px 8px", borderRadius: 12, textDecoration: "none",
