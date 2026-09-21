@@ -18,6 +18,15 @@ export interface SyllabusTopic {
   estimatedMinutes: number;
 }
 
+export interface SyllabusTheme {
+  id?: string;
+  title?: string;
+  slug?: string;
+  description?: string;
+  strand?: string;
+  subStrand?: string;
+}
+
 export interface LessonTemplate {
   topic: SyllabusTheme;
   title: string;
@@ -112,6 +121,16 @@ export const gradeConfig: Record<number, {
     contentBlocksPerLesson: [4, 6],
     xpMultiplier: 1.0,
     tone: "adventurous, quest-driven, analytical",
+    quizStyle: "mixed",
+    hasExperiments: true,
+    hasJournaling: true,
+  },
+  4: {
+    uiMode: "transitional",
+    lessonDurationRange: [25, 40],
+    contentBlocksPerLesson: [3, 5],
+    xpMultiplier: 1.0,
+    tone: "curious, exploratory, real-world connections",
     quizStyle: "mixed",
     hasExperiments: true,
     hasJournaling: true,
