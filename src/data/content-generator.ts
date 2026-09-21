@@ -37,3 +37,10 @@ export function getGrade2Stats() {
 
 // Grade 5 content will be in a separate file due to size
 export { generateAllGrade5 } from "./grade5-all";
+
+// Grade 4 Math content
+import { generateGrade4Math } from "./grade4-math";
+
+export function generateAllGrade4(): QuestGroup[] {
+  return generateGrade4Math();
+}
