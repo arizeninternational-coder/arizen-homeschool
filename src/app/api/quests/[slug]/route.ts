@@ -50,7 +50,11 @@ export const GET = withAuth(async (req, user, url) => {
           if (typeof cb === "string") { try { cb = JSON.parse(cb); } catch { return false; } }
           if (!cb || typeof cb !== "object") return false;
           const aiMeta = cb.aiMetadata || {};
-          if (aiMeta.studentVisible !== true) return false;
+          if (aiMeta.studentVisible !== true) {
+            // Compatibility: Grade 4 flat contentBlocks array
+            if (Array.isArray(cb)) return true;
+            return false;
+          }
           const journey = cb.studentJourney || [];
           if (!Array.isArray(journey) || journey.length !== 10) return false;
           // Check no reading comprehension contamination for non-English lessons

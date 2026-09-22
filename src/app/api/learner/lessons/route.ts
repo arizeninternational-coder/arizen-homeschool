@@ -14,7 +14,11 @@ function isLessonStudentVisible(lesson: any): boolean {
   if (!cb || typeof cb !== "object") return false;
 
   const aiMeta = cb.aiMetadata || {};
-  if (aiMeta.studentVisible !== true) return false;
+  if (aiMeta.studentVisible !== true) {
+    // Compatibility: Grade 4 flat contentBlocks array
+    if (Array.isArray(cb)) return true;
+    return false;
+  }
   if (!STUDENT_VISIBLE_QUALITY_STATUSES.includes(aiMeta.qualityStatus)) return false;
 
   const journey = cb.studentJourney || [];

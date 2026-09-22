@@ -106,6 +106,16 @@ export const gradeConfig: Record<number, {
     hasExperiments: true,
     hasJournaling: true,
   },
+  4: {
+    uiMode: "transitional",
+    lessonDurationRange: [25, 40],
+    contentBlocksPerLesson: [3, 5],
+    xpMultiplier: 1.0,
+    tone: "curious, exploratory, real-world connections",
+    quizStyle: "mixed",
+    hasExperiments: true,
+    hasJournaling: true,
+  },
   5: {
     uiMode: "rpg",
     lessonDurationRange: [30, 50],
