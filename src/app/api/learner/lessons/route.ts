@@ -13,12 +13,19 @@ function isLessonStudentVisible(lesson: any): boolean {
   if (typeof cb === "string") { try { cb = JSON.parse(cb); } catch { return false; } }
   if (!cb || typeof cb !== "object") return false;
 
-  const aiMeta = cb.aiMetadata || {};
-  if (aiMeta.studentVisible !== true) {
-    // Compatibility: Grade 4 flat contentBlocks array
-    if (Array.isArray(cb)) return true;
+  // Grade 4 flat contentBlocks array — journey is built at render time
+  // by buildLessonJourney() → isGrade4MathContent() → buildGrade4JourneyFromBlocks().
+  // These lessons have text+quiz+journal blocks (no studentJourney array,
+  // no aiMetadata). They are always student-visible when published.
+  if (Array.isArray(cb)) {
+    const types = new Set(cb.map((b: any) => b?.type));
+    if (types.has("text") && types.has("quiz") && types.has("journal")) return true;
+    // Other flat-array legacy formats are not student-visible
     return false;
   }
+
+  const aiMeta = cb.aiMetadata || {};
+  if (aiMeta.studentVisible !== true) return false;
   if (!STUDENT_VISIBLE_QUALITY_STATUSES.includes(aiMeta.qualityStatus)) return false;
 
   const journey = cb.studentJourney || [];

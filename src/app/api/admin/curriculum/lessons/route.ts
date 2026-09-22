@@ -47,12 +47,12 @@ export async function GET(req: NextRequest) {
     const subjectName = SUBJECT_NAME_MAP[subjectSlug.toLowerCase()] || subjectSlug;
     const themeSlug = `g${gradeId}-${slugify(subjectName)}`;
 
-    // Fix: use exact match on slug + grade instead of loose ilike
+    // Also check for the CBC curriculum seed format: theme-g4-mathematics-whole-numbers
     const { data: themes } = await supabase
       .from("Theme")
       .select("id, title, slug")
       .eq("grade", gradeId)
-      .eq("slug", themeSlug)
+      .or(`slug.eq.${themeSlug},slug.like.g${gradeId}-${slugify(subjectSlug)}%`)
       .limit(1);
 
     if (!themes || themes.length === 0) {
