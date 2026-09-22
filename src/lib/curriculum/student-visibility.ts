@@ -85,6 +85,21 @@ export function isLessonStudentVisible(lesson: any): VisibilityResult {
     return { visible: false, reasons: ["No contentBlocks"] };
   }
 
+  // ── Grade 4 flat contentBlocks — always student-visible ────────────────
+  // Grade 4 Math lessons store content as a flat array of {type, data}
+  // blocks (text/quiz/experiment/journal). The journey is built at render
+  // time by buildLessonJourney() → isGrade4MathContent() → buildGrade4JourneyFromBlocks().
+  // These lessons have no aiMetadata or studentJourney array.
+  if (Array.isArray(cb)) {
+    const types = new Set(cb.map((b: any) => b?.type));
+    if (types.has("text") && types.has("quiz") && types.has("journal")) {
+      return { visible: true, reasons: [] };
+    }
+    return { visible: false, reasons: ["Flat contentBlocks without required types (text+quiz+journal)"] };
+  }
+
+  // ── Grade 2/5 structured contentBlocks — full validation ─────────────────
+
   // 1. Check aiMetadata.studentVisible flag
   const aiMeta = cb.aiMetadata || {};
   if (aiMeta.studentVisible !== true) {
