@@ -263,10 +263,15 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export function GET() {
+export async function GET(req: NextRequest) {
+  // Allow GET to trigger the seed via query param (one-time setup)
+  const { searchParams } = new URL(req.url);
+  if (searchParams.get("setup") === "grade4") {
+    return POST(req);
+  }
   return NextResponse.json({
-    message: "Use POST to seed Grade 4 Mathematics content.",
-    usage: "Send a POST request to this endpoint while authenticated as admin.",
-    note: "This creates the Grade 4 Mathematics theme, quest, and 5 lessons with flat contentBlocks arrays that the student journey renderer can transform. Existing records are not overwritten.",
+    message: "Use POST to seed Grade 4 Mathematics content, or visit ?setup=grade4",
+    usage: "Visit this endpoint with ?setup=grade4 to trigger the seed (admin auth required).",
+    note: "Idempotent — existing records are not overwritten.",
   });
 }
