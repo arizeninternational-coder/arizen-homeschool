@@ -189,37 +189,41 @@ function stepRevealVisual(steps: Array<{ title: string; visual: Record<string, u
  * using the Grade 2 fractions journey as the UX reference.
  */
 export function buildPlaceValueJourney(): JourneyStep[] {
-  const blocks = lessonTemplates["place-value"];
-  const texts = textBlocks(blocks);
-  const quizzes = quizBlocks(blocks);
-  const experiments = experimentBlocks(blocks);
-  const journals = journalBlocks(blocks);
+  // ── Content from grade4-math.ts lesson1 (Place Value & Number Reading) ────
+  // The Place Value lesson in grade4-math.ts has 2 text blocks, 2 quiz blocks,
+  // 1 experiment, 1 journal. The content here mirrors that structure.
+  // First text block content
+  const firstTextContent =
+    "Place value is the value of each digit in a number. It tells us what each digit is worth based on its position. In a 4-digit number, the positions are: ones, tens, hundreds, and thousands. For example, in the number 4,729, the 4 is in the thousands place and is worth 4,000. The 7 is in the hundreds place and is worth 700. The 2 is in the tens place and is worth 20. The 9 is in the ones place and is worth 9. We can write 4,729 in expanded form as: 4,000 + 700 + 20 + 9 = 4,729. Place value helps us read, write, and compare big numbers. It also helps us understand what each digit means in real life, like the number of people in a town or the price of an item at the market.";
 
-  const firstTextContent = texts[0]?.data.content || "";
-  const secondTextContent = texts[1]?.data.content || "";
+  // Second text block content
+  const secondTextContent =
+    "In real life, numbers like 3,042 people in a town use place value. The 3 means 3,000 people, the 0 means no hundreds, the 4 means 4 tens (40), and the 2 means 2 ones. When we read 3,042 aloud, we say 'three thousand, forty-two.' Notice that we skip the zero hundreds. Place value helps us read big numbers correctly. For example, a school with 2,500 students has 2 thousands, 5 hundreds, 0 tens, and 0 ones. We read it as 'two thousand, five hundred.' Understanding place value makes it easier to work with big numbers every day.";
 
   // Quiz 1: "What does the digit 7 represent in the number 4,729?"
-  const quiz1 = quizzes[0];
-  const quiz1Question = quiz1?.data.question || "";
-  const quiz1Options = quiz1?.data.options || [];
-  const quiz1Correct = (quiz1?.data.correctIndex ?? 0) as number;
+  const quiz1Question =
+    "What does the digit 7 represent in the number 4,729?";
+  const quiz1Options = [
+    "7 ones",
+    "7 tens",
+    "7 hundreds",
+    "7 thousands",
+  ];
+  const quiz1Correct = 2; // hundreds
+  const quiz1Explanation =
+    "The 7 is in the hundreds place, so it represents 700.";
 
   // Quiz 2: "Which number is read as 'three thousand, forty-two'?"
-  const quiz2 = quizzes[1];
-  const quiz2Question = quiz2?.data.question || "";
-  const quiz2Options = quiz2?.data.options || [];
-  const quiz2Correct = (quiz2?.data.correctIndex ?? 0) as number;
+  const quiz2Question =
+    "Which number is read as 'three thousand, forty-two'?";
+  const quiz2Options = ["3,402", "3,042", "3,024", "3,240"];
+  const quiz2Correct = 1; // 3,042
+  const quiz2Explanation =
+    "'Three thousand' = 3,000, 'forty-two' = 42. So the number is 3,042.";
 
   // Reuse existing quiz content for the quick_check step
-  const quickCheckQuestion = quiz2Question || "Which number is read as 'three thousand, forty-two'?";
-  const quickCheckOptions = quiz2Options.length
-    ? quiz2Options
-    : [
-        "3,402",
-        "3,042",
-        "3,024",
-        "3,240",
-      ];
+  const quickCheckQuestion = quiz2Question;
+  const quickCheckOptions = quiz2Options;
 
   return [
     // ── 1. Welcome ──────────────────────────────────────────────────────────
@@ -887,10 +891,13 @@ const GRADE_4_MATH_LESSON_TITLES = [
 export function isGrade4MathContent(blocks: ContentBlock[]): boolean {
   if (!Array.isArray(blocks) || blocks.length === 0) return false;
   const types = new Set(blocks.map((b) => b.type));
+  // Grade 4 Math lessons have text + quiz + journal blocks.
+  // Some also have experiments, but not all — the core trio is sufficient
+  // to distinguish them from other legacy content (e.g. Grade 2 fractions
+  // uses a different block structure with studentJourney arrays, not flat blocks).
   return (
     types.has("text") &&
     types.has("quiz") &&
-    types.has("experiment") &&
     types.has("journal")
   );
 }
