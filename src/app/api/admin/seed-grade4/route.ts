@@ -180,9 +180,9 @@ export async function POST(req: NextRequest) {
         .from("Quest")
         .insert({
           themeId,
-          title: `${GRADE_MATH.subStrand} Quest`,
+          title: `${GRADE_4_MATH.subStrand} Quest`,
           slug: questSlug,
-          description: `Grade ${GRADE} ${SUBJECT_NAME}: ${GRADE_MATH.subStrand}`,
+          description: `Grade ${GRADE} ${SUBJECT_NAME}: ${GRADE_4_MATH.subStrand}`,
           questType: "MAIN",
           orderIndex: 1,
           xpReward: JSON.stringify({ base: 50 }),
