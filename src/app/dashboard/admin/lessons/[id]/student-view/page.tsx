@@ -11,7 +11,8 @@ import {
   Image, Video, Trash2, Upload, MoreVertical, ExternalLink,
   RefreshCw, MessageCircle, Send
 } from "lucide-react";
-import { convertLegacyBlocksToJourney } from "@/lib/curriculum/lesson-journey";
+import { convertLegacyBlocksToJourney, JourneyStep } from "@/lib/curriculum/lesson-journey";
+import { isGrade4MathContent, buildGrade4JourneyFromBlocks } from "@/lib/curriculum/grade4-journeys";
 import { InteractiveStepRenderer } from "@/components/interactive";
 import { isLessonStudentVisible } from "@/lib/curriculum/student-visibility";
 
@@ -99,6 +100,12 @@ function buildLessonJourney(lesson: LessonData | null, mode: "live" | "draft" = 
     const cb = typeof lesson.contentBlocks === "string" ? JSON.parse(lesson.contentBlocks) : lesson.contentBlocks;
     // Handle both dict format {studentJourney: [...]} and legacy array format [{type: "text", ...}]
     if (Array.isArray(cb)) {
+      // Detect Grade 4 Math content (legacy array with text/quiz/experiment/journal blocks)
+      // and transform into a rich journey using the Grade 4 journey builder.
+      if (isGrade4MathContent(cb)) {
+        const journey = buildGrade4JourneyFromBlocks(cb, lesson.title);
+        if (journey.length > 0) return journey;
+      }
       // Legacy array format — convert to journey steps
       return convertLegacyBlocksToJourney(cb, lesson.title || "Lesson");
     }

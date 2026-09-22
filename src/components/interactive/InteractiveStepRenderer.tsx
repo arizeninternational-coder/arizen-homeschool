@@ -19,6 +19,8 @@ import {
   RecapChecklist,
   RewardAnimation,
 } from "./AdvancedRenderers";
+import { PlaceValueChart } from "./PlaceValueChart";
+import { NumberLine } from "./NumberLine";
 
 // -- Extended Journey Step Type -----------------------------------------------
 
@@ -185,6 +187,38 @@ function renderVisualElement(visual: any): React.ReactNode {
     );
   }
 
+  if (visual.type === "place_value_chart") {
+    return (
+      <div className="flex justify-center">
+        <PlaceValueChart
+          digits={visual.digits || []}
+          columns={visual.columns || ["Ten Thousands", "Thousands", "Hundreds", "Tens", "Ones"]}
+          highlightColumn={visual.highlightColumn}
+          showValues={visual.showValues !== false}
+          width={140}
+          height={120}
+        />
+      </div>
+    );
+  }
+
+  if (visual.type === "number_line") {
+    return (
+      <div className="flex justify-center">
+        <NumberLine
+          rangeMin={visual.rangeMin != null ? visual.rangeMin : 0}
+          rangeMax={visual.rangeMax != null ? visual.rangeMax : 1000}
+          tickInterval={visual.tickInterval || 100}
+          markers={visual.markers}
+          markerValue={visual.markerValue}
+          markerLabel={visual.markerLabel}
+          width={140}
+          height={80}
+        />
+      </div>
+    );
+  }
+
   return null;
 }
 
@@ -281,6 +315,38 @@ export function InteractiveStepRenderer({
           highlightPart={vs.highlightPart || 1}
           label={vs.label}
         />
+      );
+    }
+
+    if (vs.type === "place_value_chart") {
+      return (
+        <div className="flex justify-center my-4">
+          <PlaceValueChart
+            digits={vs.digits || []}
+            columns={vs.columns || ["Ten Thousands", "Thousands", "Hundreds", "Tens", "Ones"]}
+            highlightColumn={vs.highlightColumn}
+            showValues={vs.showValues !== false}
+            width={vs.width || 520}
+            height={vs.height || 160}
+          />
+        </div>
+      );
+    }
+
+    if (vs.type === "number_line") {
+      return (
+        <div className="flex justify-center my-4">
+          <NumberLine
+            rangeMin={vs.rangeMin != null ? vs.rangeMin : 0}
+            rangeMax={vs.rangeMax != null ? vs.rangeMax : 1000}
+            tickInterval={vs.tickInterval || 100}
+            markers={vs.markers}
+            markerValue={vs.markerValue}
+            markerLabel={vs.markerLabel}
+            width={vs.width || 520}
+            height={vs.height || 120}
+          />
+        </div>
       );
     }
 
