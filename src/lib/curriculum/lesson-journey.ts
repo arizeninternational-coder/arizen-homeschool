@@ -1252,6 +1252,7 @@ export function convertLegacyBlocksToJourney(
       block.content ||
       block.heading ||
       block.title ||
+      (block.data && (block.data.text || block.data.content || block.data.question || block.data.prompt || block.data.title || block.data.heading)) ||
       "";
 
     if (!text || typeof text !== "string" || !text.trim()) continue;
