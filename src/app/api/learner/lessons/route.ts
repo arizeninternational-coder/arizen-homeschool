@@ -84,6 +84,7 @@ export async function GET(req: NextRequest) {
         title,
         slug,
         description,
+        contentBlocks,
         status,
         orderIndex,
         xpReward,
