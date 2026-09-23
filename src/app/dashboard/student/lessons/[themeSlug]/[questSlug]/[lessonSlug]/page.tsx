@@ -434,16 +434,21 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                       // Adaptive evaluation for Place Value lesson
                       const isAdaptiveStep = isPlaceValueLesson(lesson?.title) && 
                         ['multiple_choice', 'tap_choice'].includes(currentJourneyStep?.interactionSpec?.type);
+                      console.log('[ADAPTIVE] onAnswer fired:', { selectedIdx, correct, lessonTitle: lesson?.title, stepType: currentJourneyStep?.interactionSpec?.type, isAdaptiveStep });
                       if (isAdaptiveStep) {
                         const mapping = PLACE_VALUE_QUIZ_MAPPINGS.find(m => m.conceptId === 'digit-value');
+                        console.log('[ADAPTIVE] mapping found:', !!mapping);
                         if (mapping) {
                           // Get options from either format (multiple_choice uses options[], tap_choice uses choices[])
                           const options = currentJourneyStep.interactionSpec.options || 
                             currentJourneyStep.interactionSpec.choices?.map((c: any) => c.label) || [];
                           const expectedIdx = mapping.expectedAnswer ? options.indexOf(mapping.expectedAnswer) : 0;
+                          console.log('[ADAPTIVE] calling submitAnswer:', { conceptId: mapping.conceptId, selectedIdx, expectedIdx, options });
                           const result = adaptive.submitAnswer(mapping.conceptId, selectedIdx, expectedIdx, options);
+                          console.log('[ADAPTIVE] submitAnswer result:', { correct: result.correct, shouldRemediate: result.shouldRemediate, hasRemediationStep: !!result.remediationStep, misconceptionId: result.misconceptionId });
                           if (!correct && result.shouldRemediate && result.remediationStep) {
                             // Show remediation as inline overlay (not a new numbered step)
+                            console.log('[ADAPTIVE] setting active remediation');
                             setActiveRemediation(result.remediationStep);
                           }
                         }
