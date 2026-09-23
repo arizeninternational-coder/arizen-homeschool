@@ -443,16 +443,13 @@ export function InteractiveStepRenderer({
           }))}
           correctChoiceId={spec.correctChoiceId}
           onSelect={(choiceId) => {
-            (window as any).__tapChoiceOnSelectCalled = { choiceId, timestamp: Date.now() };
             setInteraction((p: any) => ({
               ...p,
               selectedChoiceId: choiceId,
               choiceSubmitted: true,
             }));
             // Report answer to parent for adaptive evaluation
-            (window as any).__onAnswerCheck = { onAnswerExists: !!onAnswer, timestamp: Date.now() };
             if (onAnswer) {
-              (window as any).__onAnswerAboutToFire = { choiceId, timestamp: Date.now() };
               const correctChoiceIdx = choices.findIndex((c: any) =>
                 (typeof c === "object" && c.id === spec.correctChoiceId) ||
                 (typeof c === "string" && String(choices.indexOf(c)) === spec.correctChoiceId)
@@ -462,7 +459,6 @@ export function InteractiveStepRenderer({
                 (typeof c === "string" && String(choices.indexOf(c)) === choiceId)
               );
               onAnswer(selectedIdx >= 0 ? selectedIdx : parseInt(choiceId), selectedIdx === correctChoiceIdx);
-              (window as any).__onAnswerCompleted = { choiceId, timestamp: Date.now() };
             }
           }}
           feedback={feedback}

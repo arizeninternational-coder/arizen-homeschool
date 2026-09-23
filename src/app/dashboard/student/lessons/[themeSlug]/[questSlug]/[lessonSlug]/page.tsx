@@ -286,6 +286,26 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
     } catch { /* non-blocking */ }
   }, []);
 
+  // Adaptive evaluation via useEffect — watches for choice submission changes
+  // This is more reliable than the onAnswer callback chain which can be interrupted
+  // by React state update batching
+  useEffect(() => {
+    if (!interaction.choiceSubmitted || !isPlaceValueLesson(lesson?.title)) return;
+    const step = currentJourneyStep;
+    if (!step || !['multiple_choice', 'tap_choice'].includes(step.interactionSpec?.type)) return;
+    const mapping = PLACE_VALUE_QUIZ_MAPPINGS.find(m => m.conceptId === 'digit-value');
+    if (!mapping) return;
+    const options = step.interactionSpec.options || 
+      step.interactionSpec.choices?.map((c: any) => c.label) || [];
+    const expectedIdx = mapping.expectedAnswer ? options.indexOf(mapping.expectedAnswer) : 0;
+    const selectedIdx = interaction.selectedChoiceId || 0;
+    const correct = selectedIdx === expectedIdx;
+    const result = adaptive.submitAnswer(mapping.conceptId, selectedIdx, expectedIdx, options);
+    if (!correct && result.shouldRemediate && result.remediationStep) {
+      setActiveRemediation(result.remediationStep);
+    }
+  }, [interaction.choiceSubmitted, lesson?.title, currentJourneyStep, adaptive]);
+
   const handleComplete = useCallback(async () => {
     if (!slugs || hasCompletedRef.current) return;
     hasCompletedRef.current = true;
@@ -440,20 +460,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                 )}
 
                 {/* Interactive renderer for steps with new spec fields */}
-                {(() => {
-                  const __hasSpec = hasInteractiveSpec(currentJourneyStep);
-                  const __stepInfo = {
-                    stepNumber: clampedStep + 1,
-                    stepId: currentJourneyStep?.id,
-                    stepType: currentJourneyStep?.stepType,
-                    interactionSpecType: currentJourneyStep?.interactionSpec?.type,
-                    hasInteractiveSpec: __hasSpec,
-                    rendererPath: __hasSpec ? 'InteractiveStepRenderer' : 'fallback',
-                    onAnswerProvided: typeof arguments[0] === 'function' || true, // always true since we define it below
-                  };
-                  (window as any).__renderBoundaryDebug = __stepInfo;
-                  return __hasSpec;
-                })() ? (
+                {hasInteractiveSpec(currentJourneyStep) ? (
                   <InteractiveStepRenderer
                     step={currentJourneyStep as any}
                     stepNumber={clampedStep + 1}
