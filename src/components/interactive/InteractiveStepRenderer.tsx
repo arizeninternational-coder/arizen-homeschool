@@ -151,6 +151,7 @@ interface InteractiveStepRendererProps {
   interaction: any;
   setInteraction: (v: any) => void;
   onNext: () => void;
+  onAnswer?: (selectedIndex: number, correct: boolean) => void;
   className?: string;
 }
 
@@ -433,6 +434,36 @@ export function InteractiveStepRenderer({
               selectedChoice: selectedIdx,
               choiceFeedback: correct ? "correct" : "incorrect",
             }));
+            // Report answer to parent for adaptive evaluation
+            if (onAnswer) {
+              onAnswer(selectedIdx, correct);
+            }
+          }}
+        />
+      );
+    }
+
+    if (spec.type === "adaptive-evaluation") {
+      // Adaptive evaluation: render the question and report answer to parent
+      // The parent component owns the adaptive state and decides next activity
+      const options = spec.options || spec.choices || [];
+      const correctIdx = spec.correctIndex != null ? spec.correctIndex : (typeof spec.correctAnswer === "number" ? spec.correctAnswer : 0);
+      return (
+        <MultipleChoice
+          question={spec.question || spec.prompt || ""}
+          options={options}
+          correctIndex={correctIdx}
+          feedback={feedback}
+          onAnswer={(correct, selectedIdx) => {
+            setInteraction((p: any) => ({
+              ...p,
+              selectedChoice: selectedIdx,
+              choiceFeedback: correct ? "correct" : "incorrect",
+            }));
+            // Report answer to parent for adaptive evaluation
+            if (onAnswer) {
+              onAnswer(selectedIdx, correct);
+            }
           }}
         />
       );

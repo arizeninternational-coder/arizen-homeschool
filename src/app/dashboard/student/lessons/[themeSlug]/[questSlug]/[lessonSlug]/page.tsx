@@ -16,7 +16,8 @@ import { STEP_TYPE_ICONS } from "@/lib/curriculum/lesson-journey";
 import { InteractiveStepRenderer } from "@/components/interactive";
 import { isLessonStudentVisible } from "@/lib/curriculum/student-visibility";
 import { isGrade4MathContent, buildGrade4JourneyFromBlocks } from "@/lib/curriculum/grade4-journeys";
-import { isPlaceValueLesson, buildAdaptivePlaceValueJourney } from "@/lib/curriculum/adaptive-journey";
+import { isPlaceValueLesson, buildAdaptivePlaceValueJourney, PLACE_VALUE_QUIZ_MAPPINGS } from "@/lib/curriculum/adaptive-journey";
+import { useAdaptiveLesson } from "@/lib/curriculum/useAdaptiveLesson";
 
 function getStepType(step: any): JourneyStepType {
   return (step?.stepType || "welcome") as JourneyStepType;
@@ -131,8 +132,13 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
     reflectionChip: null, reflectionSaved: false,
   });
 
-  const journey = buildLessonJourney(lesson);
-  const journeySteps = journey?.steps || [];
+  // Adaptive learning state (Place Value pilot)
+  const adaptive = useAdaptiveLesson();
+  const [adaptiveJourney, setAdaptiveJourney] = useState<any[]|null>(null);
+
+  const baseJourney = buildLessonJourney(lesson);
+  // Use adaptive journey for Place Value
+  const journeySteps = adaptiveJourney || baseJourney?.steps || [];
   const totalSteps = journeySteps.length;
   const isLastStep = currentStep >= totalSteps - 1;
   const clampedStep = Math.min(currentStep, Math.max(totalSteps - 1, 0));
@@ -140,6 +146,23 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
   const xp = getRewardValue(lesson?.xpReward);
   const subject = lesson?.quest?.theme?.themeSubjects?.[0]?.subject || "";
   const grade = lesson?.quest?.theme?.grade || 0;
+
+  // Initialize adaptive state for Place Value lesson
+  useEffect(() => {
+    if (lesson && isPlaceValueLesson(lesson.title) && session?.user) {
+      adaptive.initLearningState((session.user as any).id || 'unknown', lesson.id);
+    }
+  }, [lesson, session, adaptive]);
+
+  // Inject adaptive journey when in Place Value lesson
+  useEffect(() => {
+    if (isPlaceValueLesson(lesson?.title) && baseJourney?.steps) {
+      const result = buildAdaptivePlaceValueJourney(lesson?.title || '', '');
+      setAdaptiveJourney(result.steps);
+    } else {
+      setAdaptiveJourney(null);
+    }
+  }, [lesson, baseJourney]);
 
   // ── Debug logging in development ──────────────────────────────────────────
   if (process.env.NODE_ENV === "development") {
@@ -152,8 +175,9 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
       questId: lesson?.questId,
       questTitle: lesson?.quest?.title,
       themeSlug: lesson?.quest?.theme?.slug,
-      journeySource: journey?.source,
+      journeySource: baseJourney?.source,
       journeySteps: journeySteps.length,
+      adaptive: isPlaceValueLesson(lesson?.title),
     });
   }
 
