@@ -451,22 +451,33 @@ export function InteractiveStepRenderer({
           }))}
           correctChoiceId={spec.correctChoiceId}
           onSelect={(choiceId) => {
-            setInteraction((p: any) => ({
-              ...p,
-              selectedChoiceId: choiceId,
-              choiceSubmitted: true,
-            }));
-            // Report answer to parent for adaptive evaluation
-            if (onAnswer) {
-              const correctChoiceIdx = choices.findIndex((c: any) =>
-                (typeof c === "object" && c.id === spec.correctChoiceId) ||
-                (typeof c === "string" && String(choices.indexOf(c)) === spec.correctChoiceId)
-              );
-              const selectedIdx = choices.findIndex((c: any) =>
-                (typeof c === "object" && c.id === choiceId) ||
-                (typeof c === "string" && String(choices.indexOf(c)) === choiceId)
-              );
-              onAnswer(selectedIdx >= 0 ? selectedIdx : parseInt(choiceId), selectedIdx === correctChoiceIdx);
+            try {
+              setInteraction((p: any) => ({
+                ...p,
+                selectedChoiceId: choiceId,
+                choiceSubmitted: true,
+              }));
+              (window as any).__afterSetInteraction = { reached: true, timestamp: Date.now() };
+              if (onAnswer) {
+                (window as any).__beforeOnAnswer = { reached: true, timestamp: Date.now() };
+                const correctChoiceIdx = choices.findIndex((c: any) =>
+                  (typeof c === "object" && c.id === spec.correctChoiceId) ||
+                  (typeof c === "string" && String(choices.indexOf(c)) === spec.correctChoiceId)
+                );
+                const selectedIdx = choices.findIndex((c: any) =>
+                  (typeof c === "object" && c.id === choiceId) ||
+                  (typeof c === "string" && String(choices.indexOf(c)) === choiceId)
+                );
+                onAnswer(selectedIdx >= 0 ? selectedIdx : parseInt(choiceId), selectedIdx === correctChoiceIdx);
+                (window as any).__onAnswerCompleted = { reached: true, timestamp: Date.now() };
+              }
+            } catch (error) {
+              (window as any).__setInteractionError = {
+                message: error instanceof Error ? error.message : String(error),
+                stack: error instanceof Error ? error.stack : null,
+                timestamp: Date.now(),
+              };
+              throw error;
             }
           }}
           feedback={feedback}
