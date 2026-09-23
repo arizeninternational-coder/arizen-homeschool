@@ -69,6 +69,7 @@ export const STEP_TYPE_ICONS: Record<JourneyStepType, string> = {
   quick_check: "✅",
   reflect: "🪞",
   complete: "🏆",
+  "adaptive-eval": "🔍",
 };
 
 // ── Interaction Types ───────────────────────────────────────────────────────
