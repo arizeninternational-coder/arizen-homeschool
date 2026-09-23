@@ -410,13 +410,19 @@ export function MultiActivity({
             onClick={handleNextActivity}
             className="px-5 py-2.5 rounded-xl bg-indigo-500 text-white text-sm font-bold hover:bg-indigo-600 transition-colors"
           >
-            {isLastActivity ? "Complete Practice ✓" : "Next Activity →"}
+            {isLastActivity ? "Finish Activity" : "Next Activity →"}
           </button>
         </div>
       )}
 
       {allSubmitted && feedback && (
-        <FeedbackDisplay feedback={feedback} state="correct" />
+        <FeedbackDisplay 
+          feedback={{ 
+            ...feedback, 
+            correct: "Practice complete. Review the explanations above to learn more." 
+          }} 
+          state="correct" 
+        />
       )}
     </div>
   );

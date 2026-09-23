@@ -135,6 +135,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
   // Adaptive learning state (Place Value pilot)
   const adaptive = useAdaptiveLesson();
   const [adaptiveJourney, setAdaptiveJourney] = useState<any[]|null>(null);
+  const [activeRemediation, setActiveRemediation] = useState<any>(null);
 
   const baseJourney = useMemo(() => buildLessonJourney(lesson), [lesson]);
   // Use adaptive journey for Place Value
@@ -233,6 +234,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
       selfChecked: null, reflectionText: "",
       reflectionChip: null, reflectionSaved: false,
     });
+    setActiveRemediation(null);
   }, [currentStep]);
 
   useEffect(() => {
@@ -441,10 +443,8 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                           const expectedIdx = mapping.expectedAnswer ? options.indexOf(mapping.expectedAnswer) : 0;
                           const result = adaptive.submitAnswer(mapping.conceptId, selectedIdx, expectedIdx, options);
                           if (!correct && result.shouldRemediate && result.remediationStep) {
-                            // Insert remediation step after current step
-                            const newSteps = [...journeySteps];
-                            newSteps.splice(clampedStep + 1, 0, result.remediationStep);
-                            setAdaptiveJourney(newSteps);
+                            // Show remediation as inline overlay (not a new numbered step)
+                            setActiveRemediation(result.remediationStep);
                           }
                         }
                       }
@@ -620,6 +620,64 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                   </>
                 )}
               </div>
+
+              {/* Inline adaptive remediation overlay */}
+              {activeRemediation && (
+                <div style={{ marginTop: 16, padding: "20px", borderRadius: 16, background: "linear-gradient(135deg, #F0F9FF, #EDE9FE)", border: "2px solid #8B5CF6", boxShadow: "0 8px 32px rgba(139, 92, 246, 0.15)" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+                    <span style={{ fontSize: "1.5rem" }}>🔍</span>
+                    <h4 style={{ fontSize: "1.1rem", fontWeight: 800, color: "#4C1D95", margin: 0 }}>{activeRemediation.title || "Let me help you with this"}</h4>
+                  </div>
+                  {activeRemediation.studentText && (
+                    <p style={{ fontSize: "0.95rem", color: "#334155", lineHeight: 1.6, marginBottom: 12 }}>{activeRemediation.studentText}</p>
+                  )}
+                  {activeRemediation.owlText && (
+                    <div style={{ display: "flex", gap: 10, padding: "12px", borderRadius: 10, background: "rgba(255,255,255,0.7)", marginBottom: 12 }}>
+                      <OwlTeacher size={32} expression="encouraging" />
+                      <p style={{ fontSize: "0.85rem", color: "#334155", margin: 0, flex: 1 }}>{activeRemediation.owlText}</p>
+                    </div>
+                  )}
+                  {activeRemediation.visualSpec && (
+                    <div style={{ marginBottom: 12 }}>
+                      <InteractiveStepRenderer
+                        step={activeRemediation}
+                        stepNumber={clampedStep + 1}
+                        totalSteps={totalSteps}
+                        interaction={{}}
+                        setInteraction={() => {}}
+                        onNext={() => {}}
+                        onAnswer={() => {}}
+                        isRemediation={true}
+                      />
+                    </div>
+                  )}
+                  {activeRemediation.interactionSpec?.type === 'tap_choice' && activeRemediation.interactionSpec.choices && (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
+                      {activeRemediation.interactionSpec.choices.map((choice: any, i: number) => (
+                        <button
+                          key={i}
+                          onClick={() => {
+                            const isCorrect = choice.id === activeRemediation.interactionSpec.correctChoiceId;
+                            if (isCorrect) {
+                              adaptive.recordRecovery(activeRemediation.interactionSpec.conceptId || 'digit-value');
+                              setActiveRemediation(null);
+                            }
+                          }}
+                          style={{ padding: "12px 16px", borderRadius: 10, border: "2px solid #CBD5E1", background: "#fff", textAlign: "left", cursor: "pointer", fontSize: "0.9rem", fontWeight: 600, color: "#334155" }}
+                        >
+                          {choice.label} {choice.description ? `— ${choice.description}` : ''}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  <button
+                    onClick={() => setActiveRemediation(null)}
+                    style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#8B5CF6", color: "#fff", fontWeight: 700, fontSize: "0.9rem", cursor: "pointer" }}
+                  >
+                    Continue →
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
