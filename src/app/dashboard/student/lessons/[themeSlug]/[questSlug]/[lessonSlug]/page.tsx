@@ -440,7 +440,20 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                 )}
 
                 {/* Interactive renderer for steps with new spec fields */}
-                {hasInteractiveSpec(currentJourneyStep) ? (
+                {(() => {
+                  const __hasSpec = hasInteractiveSpec(currentJourneyStep);
+                  const __stepInfo = {
+                    stepNumber: clampedStep + 1,
+                    stepId: currentJourneyStep?.id,
+                    stepType: currentJourneyStep?.stepType,
+                    interactionSpecType: currentJourneyStep?.interactionSpec?.type,
+                    hasInteractiveSpec: __hasSpec,
+                    rendererPath: __hasSpec ? 'InteractiveStepRenderer' : 'fallback',
+                    onAnswerProvided: typeof arguments[0] === 'function' || true, // always true since we define it below
+                  };
+                  (window as any).__renderBoundaryDebug = __stepInfo;
+                  return __hasSpec;
+                })() ? (
                   <InteractiveStepRenderer
                     step={currentJourneyStep as any}
                     stepNumber={clampedStep + 1}
