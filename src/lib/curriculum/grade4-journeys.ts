@@ -245,15 +245,13 @@ export function buildPlaceValueJourney(): JourneyStep[] {
       studentText: firstTextContent,
       owlText:
         "Hello explorer! Today we're going to become number detectives. Every digit in a big number has a secret job — and you're going to discover what each one does!",
-      studentInstruction:
-        "Look at the place value chart. It shows the columns where digits live.",
+      studentInstruction: "Get ready to explore how numbers work.",
       interactionSpec: {
         type: "tap_continue",
         prompt: "Begin your place value journey",
         buttonLabel: "Start lesson",
         hint: "Each digit has a special place.",
       },
-      visualSpec: pvVisual(["", "", "", ""]),
       feedbackSpec: {
         hint: "Each digit has a special place.",
       },
@@ -601,7 +599,7 @@ export function buildPlaceValueJourney(): JourneyStep[] {
       studentInstruction: "You have completed the lesson.",
       interactionSpec: {
         type: "tap_continue",
-        prompt: "Tap the button to collect your badge.",
+        prompt: "Complete lesson",
         buttonLabel: "Finish lesson",
       },
       visualSpec: {
@@ -846,7 +844,7 @@ export function buildGrade4Journey(blocks: ContentBlock[]): JourneyStep[] {
     studentInstruction: "Collect your reward.",
     interactionSpec: {
       type: "tap_continue",
-      prompt: "Tap to collect your badge",
+      prompt: "Complete lesson",
       buttonLabel: "Finish lesson",
     },
     visualSpec: {
