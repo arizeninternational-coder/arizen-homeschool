@@ -130,22 +130,33 @@ function secondText(blocks: ContentBlock[]): string {
   return t?.data.content || "";
 }
 
-/** Build a place-value-chart visualSpec for a 4-5 digit number.
- *  digits: array of digit strings, e.g. ["4","7","2","9"] or ["1","2","3","4","5"]
- *  highlightColumn: 0=ones, 1=tens, 2=hundreds, 3=thousands, 4=ten-thousands
- *  showValues: also show the place value below each digit
+/**
+ * Build a place-value-chart visualSpec.
+ * Automatically derives the correct columns from the digit count.
+ * 4 digits → ["Thousands", "Hundreds", "Tens", "Ones"]
+ * 5 digits → ["Ten Thousands", "Thousands", "Hundreds", "Tens", "Ones"]
+ *
+ * highlightColumn: left-based index (0 = most significant / leftmost)
+ *   For ["4","7","2","9"]: 0=thousands(4), 1=hundreds(7), 2=tens(2), 3=ones(9)
+ *   To highlight the 7 (hundreds), use highlightColumn=1
  */
 function pvVisual(
   digits: string[],
   highlightColumn?: number,
   showValues = false,
 ): Record<string, unknown> {
+  // Derive columns from digit count (PlaceValueChart does this too, but we keep
+  // the explicit columns for backward compatibility)
+  const colCount = digits.length;
+  const allColumns = ["Ten Thousands", "Thousands", "Hundreds", "Tens", "Ones"];
+  const columns = allColumns.slice(5 - colCount);
+
   return {
     type: "place_value_chart",
     digits,
     highlightColumn,
     showValues,
-    columns: ["Ten Thousands", "Thousands", "Hundreds", "Tens", "Ones"],
+    columns,
   };
 }
 
@@ -242,11 +253,7 @@ export function buildPlaceValueJourney(): JourneyStep[] {
         buttonLabel: "Start lesson",
         hint: "Each digit has a special place.",
       },
-      visualSpec: {
-        type: "place_value_chart",
-        digits: ["", "", "", ""],
-        columns: ["Ten Thousands", "Thousands", "Hundreds", "Tens", "Ones"],
-      },
+      visualSpec: pvVisual(["", "", "", ""]),
       feedbackSpec: {
         correct: "Great! Let us explore place value together.",
         hint: "Each digit has a special place.",
@@ -263,19 +270,18 @@ export function buildPlaceValueJourney(): JourneyStep[] {
         "By the end of this lesson, you will be able to read big numbers, explain what each digit means, and write numbers in expanded form.",
       owlText:
         "Here is your mission! You will learn to decode numbers like a pro — reading them aloud, finding what each digit is worth, and breaking them into expanded form.",
-      studentInstruction: "Accept your mission.",
+      studentInstruction: "Your mission is to master place value by the end of this lesson.",
       interactionSpec: {
         type: "tap_continue",
         prompt: "Accept mission",
-        buttonLabel: "Accept mission",
       },
       visualSpec: {
         type: "checklist",
         items: [
-          "Read a 4-digit number aloud",
-          "Tell what each digit represents",
-          "Write a number in expanded form",
-          "Compare two big numbers",
+          "I will read a 4-digit number aloud",
+          "I will tell what each digit represents",
+          "I will write a number in expanded form",
+          "I will compare two big numbers",
         ],
       },
       feedbackSpec: {
@@ -308,7 +314,7 @@ export function buildPlaceValueJourney(): JourneyStep[] {
         correctChoiceId: "C",
         hint: "Look at which column the 7 is in on the chart.",
       },
-      visualSpec: pvVisual(["4", "7", "2", "9"], /*highlightColumn=*/ 2, /*showValues=*/ true),
+      visualSpec: pvVisual(["4", "7", "2", "9"], /*highlightColumn=*/ 1, /*showValues=*/ true),
       feedbackSpec: {
         correct:
           "Yes! The 7 is in the hundreds place, so it represents 700. Excellent thinking!",
@@ -343,19 +349,19 @@ export function buildPlaceValueJourney(): JourneyStep[] {
         },
         {
           title: "The 4 is in the Thousands place — worth 4,000",
-          visual: pvVisual(["4", "7", "2", "9"], /*highlightColumn=*/ 3, true),
+          visual: pvVisual(["4", "7", "2", "9"], /*highlightColumn=*/ 0, true),
         },
         {
           title: "The 7 is in the Hundreds place — worth 700",
-          visual: pvVisual(["4", "7", "2", "9"], /*highlightColumn=*/ 2, true),
-        },
-        {
-          title: "The 2 is in the Tens place — worth 20",
           visual: pvVisual(["4", "7", "2", "9"], /*highlightColumn=*/ 1, true),
         },
         {
+          title: "The 2 is in the Tens place — worth 20",
+          visual: pvVisual(["4", "7", "2", "9"], /*highlightColumn=*/ 2, true),
+        },
+        {
           title: "The 9 is in the Ones place — worth 9",
-          visual: pvVisual(["4", "7", "2", "9"], /*highlightColumn=*/ 0, true),
+          visual: pvVisual(["4", "7", "2", "9"], /*highlightColumn=*/ 3, true),
         },
         {
           title: "Expanded form: 4,000 + 700 + 20 + 9 = 4,729",
@@ -424,11 +430,11 @@ export function buildPlaceValueJourney(): JourneyStep[] {
       visualSpec: stepRevealVisual([
         {
           title: "Start with the thousands: 3 thousand",
-          visual: pvVisual(["3", "0", "4", "2"], /*highlightColumn=*/ 3, true),
+          visual: pvVisual(["3", "0", "4", "2"], /*highlightColumn=*/ 0, true),
         },
         {
           title: "No hundreds — we skip it (0 hundreds)",
-          visual: pvVisual(["3", "0", "4", "2"], /*highlightColumn=*/ 2, true),
+          visual: pvVisual(["3", "0", "4", "2"], /*highlightColumn=*/ 1, true),
         },
         {
           title: "42 in the tens and ones places",
@@ -597,7 +603,7 @@ export function buildPlaceValueJourney(): JourneyStep[] {
       interactionSpec: {
         type: "tap_continue",
         prompt: "Finish lesson",
-        buttonLabel: "Finish lesson",
+        buttonLabel: "✓ Finish lesson",
       },
       visualSpec: {
         type: "recap_checklist",

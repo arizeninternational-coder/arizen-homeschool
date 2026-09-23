@@ -1,8 +1,13 @@
 /**
  * Place Value Chart — SVG visual for Grade 4 math journeys.
  *
- * Displays a number's digits in place-value columns:
- *   Ten Thousands | Thousands | Hundreds | Tens | Ones
+ * Displays a number's digits in place-value columns.
+ * Automatically derives column labels from the number of digits.
+ *
+ * Examples:
+ *   4,729 → ["Thousands", "Hundreds", "Tens", "Ones"] → 4 columns
+ *   3,042 → ["Thousands", "Hundreds", "Tens", "Ones"] → 4 columns
+ *   12,345 → ["Ten Thousands", "Thousands", "Hundreds", "Tens", "Ones"] → 5 columns
  *
  * Shows the place value beneath each digit when showValues is true.
  * Can highlight a single column to draw attention to a specific place.
@@ -15,7 +20,7 @@ import React from "react";
 interface PlaceValueChartProps {
   /** Digit strings, e.g. ["4","7","2","9"] — empty strings for blank columns */
   digits: string[];
-  /** Column labels, most-significant first */
+  /** Column labels, most-significant first. If omitted, derived from digits.length. */
   columns?: string[];
   /** Index of column to highlight (0 = rightmost / ones place) */
   highlightColumn?: number | null;
@@ -29,13 +34,32 @@ interface PlaceValueChartProps {
   interactive?: boolean;
 }
 
-const DEFAULT_COLUMNS = ["Ten Thousands", "Thousands", "Hundreds", "Tens", "Ones"];
-const PLACE_VALUES = [10000, 1000, 100, 10, 1];
+/**
+ * Derive place-value column labels from the number of digits.
+ * 2 digits → ["Tens", "Ones"]
+ * 3 digits → ["Hundreds", "Tens", "Ones"]
+ * 4 digits → ["Thousands", "Hundreds", "Tens", "Ones"]
+ * 5 digits → ["Ten Thousands", "Thousands", "Hundreds", "Tens", "Ones"]
+ */
+function deriveColumns(digitCount: number): string[] {
+  const allColumns = ["Ten Thousands", "Thousands", "Hundreds", "Tens", "Ones"];
+  // Return the rightmost N columns
+  return allColumns.slice(5 - digitCount);
+}
 
-function digitValue(digit: string, colIndex: number): string {
+const PLACE_VALUES: Record<string, number> = {
+  "Ones": 1,
+  "Tens": 10,
+  "Hundreds": 100,
+  "Thousands": 1000,
+  "Ten Thousands": 10000,
+};
+
+function digitValue(digit: string, columnName: string): string {
   const d = parseInt(digit, 10);
-  if (isNaN(d) || d === 0) return "0";
-  const pv = PLACE_VALUES[colIndex];
+  if (isNaN(d)) return "0";
+  if (d === 0) return "0";
+  const pv = PLACE_VALUES[columnName];
   if (!pv) return String(d);
   const val = d * pv;
   return val.toLocaleString("en-US");
@@ -59,13 +83,15 @@ function columnLabel(label: string, width: number): string {
 
 export function PlaceValueChart({
   digits,
-  columns = DEFAULT_COLUMNS,
+  columns: explicitColumns,
   highlightColumn = null,
   showValues = false,
   width = 520,
   height = 160,
   interactive = false,
 }: PlaceValueChartProps) {
+  // Derive columns from digit count if not explicitly provided
+  const columns = explicitColumns || deriveColumns(digits.length);
   const colCount = columns.length;
   const cw = columnWidth(width, colCount);
   const gap = 8;
@@ -156,7 +182,7 @@ export function PlaceValueChart({
                   fontWeight="700"
                   fontFamily="'Segoe UI', system-ui, sans-serif"
                 >
-                  {digitValue(digits[ci], ci)}
+                  {digitValue(digits[ci], label)}
                 </text>
               )}
             </g>
@@ -165,6 +191,7 @@ export function PlaceValueChart({
 
         {/* Equal sign and expanded form (shown when showValues and all columns filled) */}
         {showValues &&
+          digits.length > 0 &&
           digits.every((d) => d !== "" && d !== undefined) && (
             <g>
               <text
@@ -187,7 +214,7 @@ export function PlaceValueChart({
               >
                 {digits
                   .map((d, ci) => {
-                    const v = digitValue(d, ci);
+                    const v = digitValue(d, columns[ci]);
                     return v !== "0" ? v : null;
                   })
                   .filter(Boolean)
@@ -203,8 +230,11 @@ export function PlaceValueChart({
               >
                 {digits
                   .map((d, ci) => {
-                    const v = digitValue(d, ci);
-                    return v !== "0" ? `${d} × ${PLACE_VALUES[ci].toLocaleString()}` : null;
+                    const colName = columns[ci];
+                    const pv = PLACE_VALUES[colName];
+                    const parsed = parseInt(d, 10);
+                    if (isNaN(parsed) || pv === undefined) return null;
+                    return `${d} × ${pv.toLocaleString()}`;
                   })
                   .filter(Boolean)
                   .join(" + ")}
