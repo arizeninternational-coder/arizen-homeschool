@@ -64,6 +64,19 @@ function splitIntoParagraphs(text: string): string[] {
   return [text];
 }
 
+function useMediaQuery(query: string): boolean {
+  const [matches, setMatches] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia(query);
+    setMatches(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setMatches(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, [query]);
+  return matches;
+}
+
 function extractYouTubeId(url: string): string | null {
   if (!url) return null;
   const patterns = [
@@ -282,10 +295,14 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
   const fireConfetti = useCallback(async () => {
     try {
       const confetti = (await import("canvas-confetti")).default;
-      confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
-      setTimeout(() => confetti({ particleCount: 40, angle: 60, spread: 55, origin: { x: 0, y: 0.6 } }), 150);
-      setTimeout(() => confetti({ particleCount: 40, angle: 120, spread: 55, origin: { x: 1, y: 0.6 } }), 300);
-    } catch { /* non-blocking */ }
+      // Initial burst from center
+      confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 }, colors: ["#6366F1", "#8B5CF6", "#EC4899", "#F59E0B", "#10B981", "#3B82F6"] });
+      // Side cannons
+      setTimeout(() => confetti({ particleCount: 80, angle: 60, spread: 60, origin: { x: 0, y: 0.7 }, colors: ["#EC4899", "#F59E0B", "#10B981"] }), 200);
+      setTimeout(() => confetti({ particleCount: 80, angle: 120, spread: 60, origin: { x: 1, y: 0.7 }, colors: ["#6366F1", "#8B5CF6", "#3B82F6"] }), 400);
+      // Final celebration burst
+      setTimeout(() => confetti({ particleCount: 200, spread: 120, origin: { y: 0.5 }, colors: ["#6366F1", "#8B5CF6", "#EC4899", "#F59E0B", "#10B981", "#3B82F6"], scalar: 1.2 }), 600);
+    } catch (e) { console.warn("Confetti failed:", e); }
   }, []);
 
   // Stable adaptive answer handler — avoids stale closures from inline JSX callbacks
@@ -327,6 +344,10 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
       hasCompletedRef.current = false;
     }
   }, [slugs, lesson, fireConfetti]);
+
+  const handleNavigateHome = useCallback(() => {
+    router.push("/dashboard/student");
+  }, [router]);
 
   if (status === "unauthenticated") return null;
 
@@ -385,6 +406,8 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
 
   const learnerName = session?.user?.name || "Learner";
 
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
+
   if (viewing && currentJourneyStep) {
     return (
       <LessonErrorBoundary>
@@ -421,9 +444,49 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
             </div>
           )}
 
+          {/* Desktop progression panel */}
+          {isDesktop && (
+            <div style={{
+              position: "fixed", right: 0, top: 70, bottom: 0, width: 260,
+              background: "#fff", borderLeft: "1px solid #E2E8F0",
+              padding: "24px 20px", overflow: "auto", zIndex: 5,
+            }}>
+              <h4 style={{ fontSize: "0.875rem", fontWeight: 800, color: "#6366f1", textTransform: "uppercase", letterSpacing: "0.05em", margin: "0 0 16px" }}>Journey Progress</h4>
+              <div style={{ height: 8, background: "#F1F5F9", borderRadius: 4, overflow: "hidden", marginBottom: 16 }}>
+                <div style={{ width: `${totalSteps > 0 ? Math.round((currentStep / totalSteps) * 100) : 0}%`, height: "100%", background: "linear-gradient(90deg, #6366F1, #8B5CF6)", borderRadius: 4, transition: "width 0.5s ease" }} />
+              </div>
+              <p style={{ fontSize: "0.75rem", fontWeight: 700, color: "#64748b", marginBottom: 16 }}>Step {clampedStep + 1} of {totalSteps} · {Math.round(((clampedStep + 1) / totalSteps) * 100)}%</p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                {journeySteps.map((step: any, i: number) => {
+                  const isCompleted = i < clampedStep;
+                  const isCurrent = i === clampedStep;
+                  return (
+                    <div key={step.id} style={{
+                      display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 10,
+                      background: isCurrent ? "linear-gradient(135deg, #EEF2FF, #EDE9FE)" : "transparent",
+                      border: isCurrent ? "2px solid #818CF8" : "2px solid transparent",
+                      opacity: isCompleted || isCurrent ? 1 : 0.6,
+                    }}>
+                      <div style={{
+                        width: 28, height: 28, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                        background: isCompleted ? "#10B981" : isCurrent ? "#6366F1" : "#F1F5F9",
+                        color: isCompleted || isCurrent ? "#fff" : "#94A3B8",
+                      }}>
+                        {isCompleted ? <CheckCircle2 style={{ width: 16, height: 16 }} /> : <span style={{ fontSize: "0.75rem", fontWeight: 800 }}>{i + 1}</span>}
+                      </div>
+                      <span style={{ fontSize: "0.8125rem", fontWeight: isCurrent ? 700 : 500, color: isCurrent ? "#312E81" : "#64748b", lineHeight: 1.3 }}>
+                        {step.title}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           {/* Step content */}
           <div style={{ flex: 1, overflow: "auto", padding: "16px" }}>
-            <div style={{ maxWidth: 720, margin: "0 auto" }}>
+            <div style={{ maxWidth: isDesktop ? 720 : 720, margin: "0 auto" }}>
               {/* Step header */}
               <div style={{ background: "#fff", borderRadius: 16, padding: "24px", boxShadow: "0 2px 12px rgba(0,0,0,0.04)", marginBottom: 16 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
@@ -641,8 +704,8 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                             <span style={{ fontSize: "1.25rem", fontWeight: 800, color: "#92400E" }}>+{xp} XP earned!</span>
                           </div>
                         )}
-                        <button onClick={() => { handleComplete(); router.push("/dashboard/student"); }} style={{ padding: "14px 32px", borderRadius: 12, border: "none", background: "linear-gradient(135deg, #059669, #10B981)", color: "#fff", fontWeight: 800, fontSize: 16, cursor: "pointer", boxShadow: "0 4px 16px rgba(5,150,105,0.3)" }}>
-                          Back to Dashboard
+                        <button onClick={handleComplete} style={{ padding: "14px 32px", borderRadius: 12, border: "none", background: "linear-gradient(135deg, #059669, #10B981)", color: "#fff", fontWeight: 800, fontSize: 16, cursor: "pointer", boxShadow: "0 4px 16px rgba(5,150,105,0.3)" }}>
+                          Complete Lesson
                         </button>
                       </div>
                     )}
@@ -727,6 +790,58 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                   </button>
                 )
               )}
+            </div>
+          )}
+
+          {/* Completion celebration screen */}
+          {showCelebration && (
+            <div style={{
+              position: "fixed", inset: 0, zIndex: 100,
+              display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+              background: "linear-gradient(135deg, rgba(99,102,241,0.95), rgba(139,92,246,0.95), rgba(236,72,153,0.95))",
+              backdropFilter: "blur(8px)", padding: "24px", textAlign: "center",
+            }}>
+              <OwlTeacher size={120} expression="celebrating" />
+              <h1 style={{ fontSize: "2.5rem", fontWeight: 900, color: "#fff", margin: "24px 0 12px", textShadow: "0 2px 8px rgba(0,0,0,0.2)" }}>
+                🎉 You Did It! 🎉
+              </h1>
+              <p style={{ fontSize: "1.25rem", color: "rgba(255,255,255,0.95)", marginBottom: 8, fontWeight: 600 }}>
+                Amazing work, {learnerName}!
+              </p>
+              <p style={{ fontSize: "1rem", color: "rgba(255,255,255,0.85)", marginBottom: 24 }}>
+                You've completed this lesson. You're a Place Value Pro!
+              </p>
+              {xpEarned > 0 && (
+                <div style={{
+                  display: "inline-flex", alignItems: "center", gap: 10, padding: "16px 32px",
+                  borderRadius: 16, background: "rgba(255,255,255,0.2)", border: "2px solid rgba(255,255,255,0.3)",
+                  marginBottom: 12,
+                }}>
+                  <Zap style={{ width: 28, height: 28, color: "#FDE047" }} />
+                  <span style={{ fontSize: "1.5rem", fontWeight: 900, color: "#FDE047" }}>+{xpEarned} XP earned!</span>
+                </div>
+              )}
+              {newBadges?.length > 0 && (
+                <div style={{ marginBottom: 12 }}>
+                  <p style={{ fontSize: "0.875rem", color: "rgba(255,255,255,0.8)", marginBottom: 8 }}>New badges earned:</p>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}>
+                    {newBadges.map((badge, i) => (
+                      <span key={i} style={{
+                        padding: "6px 14px", borderRadius: 20, background: "rgba(255,255,255,0.2)",
+                        border: "1px solid rgba(255,255,255,0.3)", color: "#fff", fontSize: "0.875rem", fontWeight: 700,
+                      }}>🏆 {badge}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <button onClick={handleNavigateHome} style={{
+                marginTop: 20, padding: "16px 40px", borderRadius: 14, border: "none",
+                background: "linear-gradient(135deg, #fff, #f1f5f9)", color: "#4f46e5",
+                fontWeight: 800, fontSize: 18, cursor: "pointer",
+                boxShadow: "0 6px 24px rgba(0,0,0,0.2)",
+              }}>
+                Back to Dashboard
+              </button>
             </div>
           )}
         </div>
