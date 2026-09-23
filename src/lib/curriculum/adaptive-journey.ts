@@ -103,50 +103,13 @@ export function buildAdaptivePlaceValueJourney(
   const { buildPlaceValueJourney } = require('./grade4-journeys');
   const baseSteps = buildPlaceValueJourney();
   
-  let adaptiveInserted = false;
-  const remediationStepIds: string[] = [];
-  
-  // Track quiz encounters for adaptive insertion
-  let quizEncounter = 0;
-  const augmentedSteps: JourneyStep[] = [];
-  
-  for (const step of baseSteps) {
-    augmentedSteps.push(step);
-    
-    // After a quick_check step, inject adaptive logic
-    if (step.stepType === 'quick_check' && step.interactionSpec?.type === 'multiple_choice') {
-      const mapping = PLACE_VALUE_QUIZ_MAPPINGS[quizEncounter];
-      
-      if (mapping) {
-        // Add an adaptive wrapper step that will evaluate the answer
-        const adaptiveStep: JourneyStep = {
-          id: `adaptive-eval-${quizEncounter}`,
-          stepType: 'adaptive-eval',
-          title: 'Checking your understanding...',
-          studentText: 'Let me check your answer...',
-          interactionSpec: {
-            type: 'adaptive-evaluation',
-            conceptId: mapping.conceptId,
-            quizIndex: quizEncounter,
-          },
-          feedbackSpec: {
-            correct: 'Great! Let us continue.',
-            incorrect: 'Let me help you with this.',
-          },
-        };
-        augmentedSteps.push(adaptiveStep);
-        remediationStepIds.push(adaptiveStep.id);
-        adaptiveInserted = true;
-      }
-      
-      quizEncounter++;
-    }
-  }
-  
+  // Return base steps without injecting extra adaptive-eval steps.
+  // Adaptive evaluation happens via the onAnswer callback in the student player,
+  // not as a separate numbered learner step.
   return {
-    steps: augmentedSteps,
-    adaptiveInserted,
-    remediationStepIds,
+    steps: baseSteps,
+    adaptiveInserted: false,
+    remediationStepIds: [],
   };
 }
 

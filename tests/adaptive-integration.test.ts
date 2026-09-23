@@ -211,13 +211,13 @@ function testAdaptiveJourneyBuilding() {
 
   const result = buildAdaptivePlaceValueJourney('Place Value and Number Reading', 'test-student');
 
-  assert(result.steps.length > 0, 'Journey has steps');
-  assert(result.adaptiveInserted, 'Adaptive steps were inserted');
-  assert(result.remediationStepIds.length > 0, 'Remediation step IDs tracked');
+  assert(result.steps.length === 10, 'Journey has exactly 10 steps');
+  assert(!result.adaptiveInserted, 'No extra adaptive steps inserted (evaluation happens via onAnswer)');
+  assert(result.remediationStepIds.length === 0, 'No remediation IDs at build time');
 
   const adaptiveStep = result.steps.find(s => s.stepType === 'adaptive-eval');
-  assert(adaptiveStep !== undefined, 'adaptive-eval step exists');
-  console.log('  ✓ Adaptive journey builds with evaluation steps');
+  assert(adaptiveStep === undefined, 'No empty adaptive-eval step in journey');
+  console.log('  ✓ Adaptive journey has exactly 10 steps, no empty adaptive-eval steps');
 }
 
 // ============================================================

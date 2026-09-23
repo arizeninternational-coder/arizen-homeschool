@@ -333,7 +333,7 @@ export function buildPlaceValueJourney(): JourneyStep[] {
       owlText:
         "Let me show you how it works. Watch carefully — each digit lives in a special place!",
       studentInstruction:
-        "Tap Show me to see how each digit in 4,729 has a different value.",
+        "Follow each step to see how each digit in 4,729 has a different value.",
       interactionSpec: {
         type: "step_reveal",
         prompt: "Show me",
@@ -593,15 +593,15 @@ export function buildPlaceValueJourney(): JourneyStep[] {
     {
       id: "complete",
       stepType: "complete",
-      title: "Lesson Complete!",
+      title: "You're done!",
       studentText: "Today you learned about place value!",
       owlText:
         "Amazing work! You can now read big numbers, explain what each digit means, and write numbers in expanded form. You are a Place Value Pro!",
-      studentInstruction: "You have completed the lesson.",
+      studentInstruction: "You completed this lesson.",
       interactionSpec: {
         type: "tap_continue",
-        prompt: "Complete lesson",
-        buttonLabel: "Finish lesson",
+        prompt: "You completed this lesson.",
+        buttonLabel: "Done",
       },
       visualSpec: {
         type: "recap_checklist",
