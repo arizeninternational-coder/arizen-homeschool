@@ -193,7 +193,7 @@ function renderVisualElement(visual: any): React.ReactNode {
       <div className="flex justify-center">
         <PlaceValueChart
           digits={visual.digits || []}
-          columns={visual.columns || ["Ten Thousands", "Thousands", "Hundreds", "Tens", "Ones"]}
+          columns={visual.columns}
           highlightColumn={visual.highlightColumn}
           showValues={visual.showValues !== false}
           width={140}
@@ -325,7 +325,7 @@ export function InteractiveStepRenderer({
         <div className="flex justify-center my-4">
           <PlaceValueChart
             digits={vs.digits || []}
-            columns={vs.columns || ["Ten Thousands", "Thousands", "Hundreds", "Tens", "Ones"]}
+            columns={vs.columns}
             highlightColumn={vs.highlightColumn}
             showValues={vs.showValues !== false}
             width={vs.width || 520}

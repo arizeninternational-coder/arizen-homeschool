@@ -1,24 +1,27 @@
 // @ts-nocheck
 /**
  * Regression test: tap_choice → onSelect → onAnswer → adaptive evaluation
- * 
+ *
  * This test verifies the actual production callback chain that was broken:
  * - InteractiveStepRenderer renders TapChoice for tap_choice steps
  * - TapChoice's onSelect fires when user clicks an option
  * - InteractiveStepRenderer's onSelect callback invokes onAnswer
  * - Student page's onAnswer handler runs adaptive evaluation
  * - Remediation is generated for incorrect answers
- * 
+ *
  * This test would FAIL if:
  * - tap_choice stops invoking onSelect
  * - InteractiveStepRenderer stops passing onAnswer
- * - The useEffect watching choiceSubmitted stops working
  * - The journey transformation strips interactionSpec
+ * - The onAnswer handler captures stale closures
+ * - The remediation uses wrong digits/columns/correctChoiceId
  */
 
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import { buildPlaceValueJourney } from '../src/lib/curriculum/grade4-journeys';
 import { buildAdaptivePlaceValueJourney } from '../src/lib/curriculum/adaptive-journey';
-import { isPlaceValueLesson, PLACE_VALUE_QUIZ_MAPPINGS } from '../src/lib/curriculum/adaptive-journey';
+import { isPlaceValueLesson, PLACE_VALUE_QUIZ_MAPPINGS, generateRemediationStep } from '../src/lib/curriculum/adaptive-journey';
 import { useAdaptiveLesson } from '../src/lib/curriculum/useAdaptiveLesson';
 import { evaluateAnswer, detectMisconception, recordEvidence, createInitialLearningState } from '../src/lib/curriculum/adaptive-engine';
 
@@ -132,6 +135,56 @@ if (adaptiveEvalSteps.length > 0) {
   throw new Error(`Found ${adaptiveEvalSteps.length} adaptive-eval steps (should be 0)`);
 }
 console.log('✅ Journey has exactly 10 steps, no empty adaptive-eval steps');
+
+// Test 11: Remediation uses correct canonical number (4,729)
+console.log('\n--- Test: Remediation uses correct canonical number ---');
+const remediation = generateRemediationStep('digit-not-value', 'digit-value');
+if (!remediation) throw new Error('Remediation step not generated');
+const remediationDigits = remediation.visualSpec?.digits as string[];
+if (remediationDigits.length !== 4) {
+  throw new Error(`Remediation should use 4-digit number, got ${remediationDigits.length} digits: ${remediationDigits}`);
+}
+if (remediationDigits.join('') !== '4729') {
+  throw new Error(`Remediation should use 4,729, got ${remediationDigits.join('')}`);
+}
+console.log('✅ Remediation uses correct 4-digit number 4,729');
+
+// Test 12: Remediation correctChoiceId matches answer choices
+console.log('\n--- Test: Remediation correctChoiceId matches choices ---');
+const remediationChoices = remediation.interactionSpec?.choices as string[];
+const remediationCorrectId = remediation.interactionSpec?.correctChoiceId;
+const remediationCorrectIdx = remediationChoices.findIndex(
+  (c: any) => (typeof c === 'object' && c.id === remediationCorrectId) ||
+              (typeof c === 'string' && String(remediationChoices.indexOf(c)) === remediationCorrectId)
+);
+if (remediationCorrectIdx !== 2) {
+  throw new Error(`Remediation correctChoiceId should point to index 2 (Hundreds), got index ${remediationCorrectIdx}`);
+}
+console.log('✅ Remediation correctChoiceId correctly points to Hundreds (index 2)');
+
+// Test 13: Remediation visual chart matches answer choices
+console.log('\n--- Test: Remediation visual chart matches answer choices ---');
+// PlaceValueChart highlightColumn convention: 0 = rightmost (Ones), 1 = Tens, 2 = Hundreds, 3 = Thousands
+// For 4,729 with columns [Thousands, Hundreds, Tens, Ones], the Hundreds column is highlightColumn=2
+const highlightCol = remediation.visualSpec?.highlightColumn;
+if (highlightCol !== 2) {
+  throw new Error(`Remediation highlightColumn should be 2 (Hundreds, right-to-left convention), got ${highlightCol}`);
+}
+console.log('✅ Remediation visual chart correctly highlights Hundreds column');
+
+// Test 14: InteractiveStepRenderer does not hardcode 5-column default
+console.log('\n--- Test: InteractiveStepRenderer does not hardcode 5-column default ---');
+// This test verifies the fix for the 47,290 bug
+// The renderer should pass columns=undefined to PlaceValueChart when not specified,
+// allowing PlaceValueChart to derive columns from digit count
+const rendererSource = readFileSync(
+  join(__dirname, '../src/components/interactive/InteractiveStepRenderer.tsx'),
+  'utf8'
+);
+if (rendererSource.includes('columns || ["Ten Thousands"')) {
+  throw new Error('InteractiveStepRenderer still has hardcoded 5-column default');
+}
+console.log('✅ InteractiveStepRenderer does not hardcode 5-column default');
 
 console.log('\n' + '='.repeat(50));
 console.log('All adaptive callback chain regression tests passed!');

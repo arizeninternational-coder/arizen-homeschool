@@ -139,7 +139,7 @@ export function generateRemediationStep(
         type: 'tap_choice',
         prompt: 'Which column is the 7 in?',
         choices: ['Ones', 'Tens', 'Hundreds', 'Thousands'],
-        correctChoiceId: 'C',
+        correctChoiceId: '2',
         hint: 'Look at the labels above each column.',
       },
     },
