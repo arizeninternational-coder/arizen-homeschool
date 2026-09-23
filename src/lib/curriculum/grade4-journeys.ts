@@ -276,12 +276,12 @@ export function buildPlaceValueJourney(): JourneyStep[] {
         prompt: "Accept mission",
       },
       visualSpec: {
-        type: "checklist",
+        type: "mission_preview",
         items: [
-          "I will read a 4-digit number aloud",
-          "I will tell what each digit represents",
-          "I will write a number in expanded form",
-          "I will compare two big numbers",
+          "Read a 4-digit number aloud",
+          "Tell what each digit represents",
+          "Write a number in expanded form",
+          "Compare two big numbers",
         ],
       },
       feedbackSpec: {
@@ -511,11 +511,11 @@ export function buildPlaceValueJourney(): JourneyStep[] {
         ],
       },
       visualSpec: {
-        type: "checklist",
+        type: "practice_set",
         items: [
-          "Build a number from its parts",
-          "Add expanded-form values",
-          "Compare two numbers using place value",
+          { id: "p1", type: "tap_choice", prompt: "Build a number from its parts" },
+          { id: "p2", type: "multiple_choice", prompt: "Add expanded-form values" },
+          { id: "p3", type: "tap_choice", prompt: "Compare two numbers using place value" },
         ],
       },
       feedbackSpec: {
@@ -602,8 +602,8 @@ export function buildPlaceValueJourney(): JourneyStep[] {
       studentInstruction: "You have completed the lesson.",
       interactionSpec: {
         type: "tap_continue",
-        prompt: "Finish lesson",
-        buttonLabel: "✓ Finish lesson",
+        prompt: "Tap the button to collect your badge.",
+        buttonLabel: "Finish lesson",
       },
       visualSpec: {
         type: "recap_checklist",
@@ -658,7 +658,7 @@ export function buildGrade4Journey(blocks: ContentBlock[]): JourneyStep[] {
       buttonLabel: "Start lesson",
     },
     visualSpec: {
-      type: "checklist",
+      type: "mission_preview",
       items: ["Explore a new math idea", "Try some activities", "Show what you learned"],
     },
     feedbackSpec: { correct: "Great! Let us begin.", hint: "" },
@@ -680,7 +680,7 @@ export function buildGrade4Journey(blocks: ContentBlock[]): JourneyStep[] {
       buttonLabel: "Accept mission",
     },
     visualSpec: {
-      type: "checklist",
+      type: "mission_preview",
       items: [
         "Explore the math idea",
         "Try the activities",
@@ -771,11 +771,8 @@ export function buildGrade4Journey(blocks: ContentBlock[]): JourneyStep[] {
         activities: activitySteps,
       },
       visualSpec: {
-        type: "checklist",
-        items:
-          exp.data.materials?.map((m) => `Get: ${m}`) ||
-          exp.data.steps?.map((s, i) => `Step ${i + 1}: ${s}`) ||
-          [],
+        type: "practice_set",
+        items: exp.data.steps?.map((s, i) => ({ id: `step-${i}`, type: "tap_continue", prompt: s })) || [],
       },
       feedbackSpec: {
         correct: "Well done! You completed the activity.",

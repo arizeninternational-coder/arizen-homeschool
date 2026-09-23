@@ -355,6 +355,27 @@ export function InteractiveStepRenderer({
       return <RecapChecklist items={vs.items || []} />;
     }
 
+    if (vs.type === "mission_preview") {
+      return (
+        <div className="mt-4 rounded-2xl border border-indigo-200/60 bg-gradient-to-br from-indigo-50 to-white p-5 space-y-3">
+          <p className="text-sm font-bold text-indigo-700 text-center">What you'll learn today</p>
+          <div className="space-y-2">
+            {vs.items?.map((item, i) => (
+              <div
+                key={i}
+                className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-indigo-50 border border-indigo-200/60"
+              >
+                <span className="w-5 h-5 rounded-full bg-indigo-500 flex items-center justify-center flex-shrink-0 text-xs font-bold text-white">
+                  {i + 1}
+                </span>
+                <span className="text-sm font-medium text-indigo-800">{item}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
     if (vs.type === "reflection_card") {
       return (
         <div className="flex flex-col items-center gap-2 my-4">
@@ -370,7 +391,22 @@ export function InteractiveStepRenderer({
     }
 
     if (vs.type === "practice_set") {
-      return null; // Handled by multi_activity interaction
+      // Render a list of practice steps without completion checkmarks
+      return (
+        <div className="mt-4 space-y-2">
+          {vs.items?.map((item: any, i: number) => (
+            <div
+              key={i}
+              className="flex items-center gap-3 px-4 py-2 rounded-xl bg-indigo-50 border border-indigo-200/60"
+            >
+              <span className="w-5 h-5 rounded-full bg-indigo-400 flex items-center justify-center flex-shrink-0 text-xs font-bold text-white">
+                {i + 1}
+              </span>
+              <span className="text-sm font-medium text-indigo-700">{item.prompt || item}</span>
+            </div>
+          ))}
+        </div>
+      );
     }
 
     return null;
