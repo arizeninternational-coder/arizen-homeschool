@@ -227,6 +227,30 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
     ? STEP_TYPE_ICONS[journeySteps[clampedStep + 1].stepType as JourneyStepType] + " " + (journeySteps[clampedStep + 1].title || "Next")
     : null;
 
+  // ── RENDER DIAGNOSTIC (temporary) ─────────────────────────────────────
+  useEffect(() => {
+    const step = currentJourneyStep;
+    const hasSpec = step ? !!(step.visualSpec || step.interactionSpec || step.feedbackSpec || step.mediaSpec) : false;
+    (window as any).__renderDebug = {
+      stepNumber: clampedStep + 1,
+      stepId: step?.id,
+      stepType: step?.stepType,
+      interactionSpecType: step?.interactionSpec?.type,
+      interactionSpecChoices: step?.interactionSpec?.choices?.length,
+      interactionSpecCorrectChoiceId: step?.interactionSpec?.correctChoiceId,
+      hasVisualSpec: !!step?.visualSpec,
+      hasInteractionSpec: !!step?.interactionSpec,
+      hasFeedbackSpec: !!step?.feedbackSpec,
+      hasMediaSpec: !!step?.mediaSpec,
+      hasInteractiveSpec: hasSpec,
+      rendererPath: hasSpec ? "InteractiveStepRenderer" : "fallback",
+      adaptiveJourneySet: !!adaptiveJourney,
+      baseJourneyStepsLength: baseJourney?.steps?.length,
+      adaptiveJourneyStepsLength: adaptiveJourney?.length,
+      journeyStepsLength: journeySteps.length,
+    };
+  }, [clampedStep, currentJourneyStep, adaptiveJourney, baseJourney, journeySteps.length]);
+
   useEffect(() => {
     setInteraction({
       predictionText: "", practiceEntries: ["", "", ""],
@@ -434,22 +458,14 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                       // Adaptive evaluation for Place Value lesson
                       const isAdaptiveStep = isPlaceValueLesson(lesson?.title) && 
                         ['multiple_choice', 'tap_choice'].includes(currentJourneyStep?.interactionSpec?.type);
-                      (window as any).__adaptiveDebug = { selectedIdx, correct, lessonTitle: lesson?.title, stepType: currentJourneyStep?.interactionSpec?.type, isAdaptiveStep, timestamp: Date.now() };
                       if (isAdaptiveStep) {
                         const mapping = PLACE_VALUE_QUIZ_MAPPINGS.find(m => m.conceptId === 'digit-value');
-                        (window as any).__adaptiveDebug.mappingFound = !!mapping;
                         if (mapping) {
-                          // Get options from either format (multiple_choice uses options[], tap_choice uses choices[])
                           const options = currentJourneyStep.interactionSpec.options || 
                             currentJourneyStep.interactionSpec.choices?.map((c: any) => c.label) || [];
                           const expectedIdx = mapping.expectedAnswer ? options.indexOf(mapping.expectedAnswer) : 0;
-                          (window as any).__adaptiveDebug.options = options;
-                          (window as any).__adaptiveDebug.expectedIdx = expectedIdx;
                           const result = adaptive.submitAnswer(mapping.conceptId, selectedIdx, expectedIdx, options);
-                          (window as any).__adaptiveDebug.result = { correct: result.correct, shouldRemediate: result.shouldRemediate, hasRemediationStep: !!result.remediationStep, misconceptionId: result.misconceptionId };
                           if (!correct && result.shouldRemediate && result.remediationStep) {
-                            // Show remediation as inline overlay (not a new numbered step)
-                            (window as any).__adaptiveDebug.setRemediation = true;
                             setActiveRemediation(result.remediationStep);
                           }
                         }
