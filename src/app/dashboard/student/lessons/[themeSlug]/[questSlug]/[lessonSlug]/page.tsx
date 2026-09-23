@@ -430,10 +430,14 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                     }}
                     onAnswer={(selectedIdx, correct) => {
                       // Adaptive evaluation for Place Value lesson
-                      if (isPlaceValueLesson(lesson?.title) && currentJourneyStep?.interactionSpec?.type === 'multiple_choice') {
+                      const isAdaptiveStep = isPlaceValueLesson(lesson?.title) && 
+                        ['multiple_choice', 'tap_choice'].includes(currentJourneyStep?.interactionSpec?.type);
+                      if (isAdaptiveStep) {
                         const mapping = PLACE_VALUE_QUIZ_MAPPINGS.find(m => m.conceptId === 'digit-value');
                         if (mapping) {
-                          const options = currentJourneyStep.interactionSpec.options || [];
+                          // Get options from either format (multiple_choice uses options[], tap_choice uses choices[])
+                          const options = currentJourneyStep.interactionSpec.options || 
+                            currentJourneyStep.interactionSpec.choices?.map((c: any) => c.label) || [];
                           const expectedIdx = mapping.expectedAnswer ? options.indexOf(mapping.expectedAnswer) : 0;
                           const result = adaptive.submitAnswer(mapping.conceptId, selectedIdx, expectedIdx, options);
                           if (!correct && result.shouldRemediate && result.remediationStep) {

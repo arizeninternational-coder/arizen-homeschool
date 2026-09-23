@@ -448,6 +448,18 @@ export function InteractiveStepRenderer({
               selectedChoiceId: choiceId,
               choiceSubmitted: true,
             }));
+            // Report answer to parent for adaptive evaluation
+            if (onAnswer) {
+              const correctChoiceIdx = choices.findIndex((c: any) => 
+                (typeof c === "object" && c.id === spec.correctChoiceId) || 
+                (typeof c === "string" && String(choices.indexOf(c)) === spec.correctChoiceId)
+              );
+              const selectedIdx = choices.findIndex((c: any) => 
+                (typeof c === "object" && c.id === choiceId) || 
+                (typeof c === "string" && String(choices.indexOf(c)) === choiceId)
+              );
+              onAnswer(selectedIdx >= 0 ? selectedIdx : parseInt(choiceId), selectedIdx === correctChoiceIdx);
+            }
           }}
           feedback={feedback}
           disabled={interaction.choiceSubmitted}
