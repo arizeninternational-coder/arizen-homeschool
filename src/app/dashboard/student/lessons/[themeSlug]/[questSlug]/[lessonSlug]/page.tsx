@@ -690,12 +690,10 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                 </button>
               ) : <div />}
               {isLastStep ? (
-                <button onClick={handleComplete} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 24px", borderRadius: 12, border: "none", background: "linear-gradient(135deg, #059669, #10B981)", color: "#fff", fontWeight: 800, fontSize: 15, cursor: "pointer" }}>
-                  <Trophy style={{ width: 18, height: 18 }} /> Complete Lesson
-                </button>
+                <div />
               ) : (
                 nextStepLabel && (
-                  <button onClick={() => setCurrentStep(clampedStep + 1)} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "10px 20px", borderRadius: 10, border: "none", background: "linear-gradient(135deg, #6366F1, #8B5CF6)", color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>
+                  <button onClick={() => setCurrentStep(clampedStep + 1)} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "10px 20px", borderRadius: 10, border: "none", background: "linear-gradient(135deg, #6366F1, #8B5CF6)", color: "#fff", fontWeight: 700, fontSize: "14", cursor: "pointer" }}>
                     {nextStepLabel} <ChevronRight style={{ width: 16, height: 16 }} />
                   </button>
                 )
