@@ -349,6 +349,9 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
     router.push("/dashboard/student");
   }, [router]);
 
+  // useMediaQuery must be called before any conditional returns (hooks rule)
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
+
   if (status === "unauthenticated") return null;
 
   if (loading) {
@@ -405,8 +408,6 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
   // ── Journey View ─────────────────────────────────────────────────────────
 
   const learnerName = session?.user?.name || "Learner";
-
-  const isDesktop = useMediaQuery("(min-width: 1024px)");
 
   if (viewing && currentJourneyStep) {
     return (
