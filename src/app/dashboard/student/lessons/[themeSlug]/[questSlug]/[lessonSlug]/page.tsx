@@ -428,6 +428,23 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                         setCurrentStep((s) => Math.min(totalSteps - 1, s + 1));
                       }
                     }}
+                    onAnswer={(selectedIdx, correct) => {
+                      // Adaptive evaluation for Place Value lesson
+                      if (isPlaceValueLesson(lesson?.title) && currentJourneyStep?.interactionSpec?.type === 'multiple_choice') {
+                        const mapping = PLACE_VALUE_QUIZ_MAPPINGS.find(m => m.conceptId === 'digit-value');
+                        if (mapping) {
+                          const options = currentJourneyStep.interactionSpec.options || [];
+                          const expectedIdx = mapping.expectedAnswer ? options.indexOf(mapping.expectedAnswer) : 0;
+                          const result = adaptive.submitAnswer(mapping.conceptId, selectedIdx, expectedIdx, options);
+                          if (!correct && result.shouldRemediate && result.remediationStep) {
+                            // Insert remediation step after current step
+                            const newSteps = [...journeySteps];
+                            newSteps.splice(clampedStep + 1, 0, result.remediationStep);
+                            setAdaptiveJourney(newSteps);
+                          }
+                        }
+                      }
+                    }}
                   />
                 ) : (
                   <>
