@@ -136,7 +136,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
   const adaptive = useAdaptiveLesson();
   const [adaptiveJourney, setAdaptiveJourney] = useState<any[]|null>(null);
 
-  const baseJourney = buildLessonJourney(lesson);
+  const baseJourney = useMemo(() => buildLessonJourney(lesson), [lesson]);
   // Use adaptive journey for Place Value
   const journeySteps = adaptiveJourney || baseJourney?.steps || [];
   const totalSteps = journeySteps.length;
@@ -154,7 +154,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
     }
   }, [lesson, session, adaptive]);
 
-  // Inject adaptive journey when in Place Value lesson
+  // Derive adaptive journey (only depends on lesson, not on render-specific state)
   useEffect(() => {
     if (isPlaceValueLesson(lesson?.title) && baseJourney?.steps) {
       const result = buildAdaptivePlaceValueJourney(lesson?.title || '', '');
