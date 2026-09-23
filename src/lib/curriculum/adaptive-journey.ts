@@ -26,21 +26,31 @@ interface QuizConceptMapping {
   lessonSlug: string;
   quizIndex: number; // 0-based index within the lesson's quiz blocks
   conceptId: string;
+  expectedAnswer?: string; // optional, for documentation
   misconceptionCheck?: (selected: string, expected: string) => string | null;
 }
 
-const PLACE_VALUE_QUIZ_MAPPINGS: QuizConceptMapping[] = [
+export const PLACE_VALUE_QUIZ_MAPPINGS: QuizConceptMapping[] = [
   {
     lessonSlug: 'place-value',
     quizIndex: 0,
     conceptId: 'digit-value',
+    // Curriculum question: "What is the place value of 7 in 4,729?"
+    // 4,729 → 4=thousands, 7=hundreds, 2=tens, 9=ones
+    // Correct: index 2 = "7 hundreds"
+    expectedAnswer: '7 hundreds',
     misconceptionCheck: (selected, expected) => {
-      // If student chose "7 ones" instead of "7 hundreds" → digit-not-value
-      if (selected.toLowerCase().includes('ones') && expected.toLowerCase().includes('hundreds')) {
+      const sel = selected.toLowerCase();
+      const exp = expected.toLowerCase();
+      // Chose "7 ones" → digit-vs-value confusion (picked face value)
+      if (sel.includes('ones') && !exp.includes('ones')) {
         return 'digit-not-value';
       }
-      // If student chose wrong position
-      if (selected !== expected) {
+      // Chose wrong position (e.g., tens instead of hundreds)
+      const places = ['ones', 'tens', 'hundreds', 'thousands'];
+      const selPlace = places.find(p => sel.includes(p));
+      const expPlace = places.find(p => exp.includes(p));
+      if (selPlace && expPlace && selPlace !== expPlace) {
         return 'position-confusion';
       }
       return null;
@@ -51,7 +61,6 @@ const PLACE_VALUE_QUIZ_MAPPINGS: QuizConceptMapping[] = [
     quizIndex: 1,
     conceptId: 'expanded-form',
     misconceptionCheck: (selected, expected) => {
-      // Zero-skip detection
       if (selected.includes('0') && !expected.includes('0')) {
         return 'expanded-form-skip';
       }
@@ -60,7 +69,14 @@ const PLACE_VALUE_QUIZ_MAPPINGS: QuizConceptMapping[] = [
   },
 ];
 
-// -- Adaptive step injection --------------------------------------------------
+/**
+ * Check if a lesson is the Place Value lesson that should use adaptive path.
+ */
+export function isPlaceValueLesson(lessonTitle?: string): boolean {
+  if (!lessonTitle) return false;
+  const title = lessonTitle.toLowerCase();
+  return title.includes('place value') || title.includes('place-value');
+}
 
 export interface AdaptiveJourneyResult {
   steps: JourneyStep[];

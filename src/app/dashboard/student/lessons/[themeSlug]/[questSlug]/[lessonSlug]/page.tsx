@@ -16,6 +16,7 @@ import { STEP_TYPE_ICONS } from "@/lib/curriculum/lesson-journey";
 import { InteractiveStepRenderer } from "@/components/interactive";
 import { isLessonStudentVisible } from "@/lib/curriculum/student-visibility";
 import { isGrade4MathContent, buildGrade4JourneyFromBlocks } from "@/lib/curriculum/grade4-journeys";
+import { isPlaceValueLesson, buildAdaptivePlaceValueJourney } from "@/lib/curriculum/adaptive-journey";
 
 function getStepType(step: any): JourneyStepType {
   return (step?.stepType || "welcome") as JourneyStepType;
@@ -708,6 +709,11 @@ function buildLessonJourney(lesson: any) {
 
     // Grade 4 flat contentBlocks — transform into journey at render time
     if (Array.isArray(cb) && isGrade4MathContent(cb)) {
+      // Place Value lesson uses the adaptive journey
+      if (isPlaceValueLesson(lesson?.title)) {
+        const result = buildAdaptivePlaceValueJourney(lesson?.title || '', '');
+        return { steps: result.steps, source: "adaptive" };
+      }
       const steps = buildGrade4JourneyFromBlocks(cb, lesson?.title);
       return { steps, source: "grade4" };
     }

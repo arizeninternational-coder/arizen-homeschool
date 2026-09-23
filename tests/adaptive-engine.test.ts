@@ -210,8 +210,10 @@ function testScenarioF_AdvancedLearner() {
   assertEqual(state.concepts['digit-value'].level, 'proficient', 'digit-value is proficient');
   
   // Three correct answers for expanded-form
-  state = simulateAnswer(state, 'expanded-form', 0, 0, ['4000+200+9', '4000+200+0+9', '4000+20+9', '4209']).state;
+  // 4,209 = 4000 + 200 + 0 + 9 (expanded form must include zero tens)
+  state = simulateAnswer(state, 'expanded-form', 1, 1, ['4000+200+9', '4000+200+0+9']).state;
   state = simulateAnswer(state, 'expanded-form', 1, 1, ['4000+200+0+9', '4000+200+9']).state;
+  // 3,507 = 3000 + 500 + 0 + 7
   state = simulateAnswer(state, 'expanded-form', 0, 0, ['3000+500+0+7', '3000+500+7']).state;
   
   assertEqual(state.concepts['expanded-form'].level, 'proficient', 'expanded-form is proficient');
