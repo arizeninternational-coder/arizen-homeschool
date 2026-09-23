@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef, Component, ReactNode } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo, Component, ReactNode } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import {
