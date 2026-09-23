@@ -140,7 +140,7 @@ function secondText(blocks: ContentBlock[]): string {
  *   For ["4","7","2","9"]: 0=thousands(4), 1=hundreds(7), 2=tens(2), 3=ones(9)
  *   To highlight the 7 (hundreds), use highlightColumn=1
  */
-function pvVisual(
+export function pvVisual(
   digits: string[],
   highlightColumn?: number,
   showValues = false,
@@ -249,13 +249,12 @@ export function buildPlaceValueJourney(): JourneyStep[] {
         "Look at the place value chart. It shows the columns where digits live.",
       interactionSpec: {
         type: "tap_continue",
-        prompt: "Start lesson",
+        prompt: "Begin your place value journey",
         buttonLabel: "Start lesson",
         hint: "Each digit has a special place.",
       },
       visualSpec: pvVisual(["", "", "", ""]),
       feedbackSpec: {
-        correct: "Great! Let us explore place value together.",
         hint: "Each digit has a special place.",
       },
       successCriteria: "Ready to explore place value.",
@@ -273,7 +272,8 @@ export function buildPlaceValueJourney(): JourneyStep[] {
       studentInstruction: "Your mission is to master place value by the end of this lesson.",
       interactionSpec: {
         type: "tap_continue",
-        prompt: "Accept mission",
+        prompt: "Accept your mission to begin learning",
+        buttonLabel: "Accept mission",
       },
       visualSpec: {
         type: "mission_preview",
@@ -281,11 +281,10 @@ export function buildPlaceValueJourney(): JourneyStep[] {
           "Read a 4-digit number aloud",
           "Tell what each digit represents",
           "Write a number in expanded form",
-          "Compare two big numbers",
+          "Compare big numbers",
         ],
       },
       feedbackSpec: {
-        correct: "Mission accepted! Let us begin.",
         hint: "You will learn to read, explain, and build big numbers.",
       },
       successCriteria: "Understands the learning goals.",
@@ -654,14 +653,14 @@ export function buildGrade4Journey(blocks: ContentBlock[]): JourneyStep[] {
     studentInstruction: "Look at what we will explore today.",
     interactionSpec: {
       type: "tap_continue",
-      prompt: "Start lesson",
+      prompt: "Begin your learning journey",
       buttonLabel: "Start lesson",
     },
     visualSpec: {
       type: "mission_preview",
       items: ["Explore a new math idea", "Try some activities", "Show what you learned"],
     },
-    feedbackSpec: { correct: "Great! Let us begin.", hint: "" },
+    feedbackSpec: { hint: "" },
     successCriteria: "Ready to learn.",
   });
 
@@ -676,7 +675,7 @@ export function buildGrade4Journey(blocks: ContentBlock[]): JourneyStep[] {
     studentInstruction: "Accept your mission.",
     interactionSpec: {
       type: "tap_continue",
-      prompt: "Accept mission",
+      prompt: "Accept your mission to begin learning",
       buttonLabel: "Accept mission",
     },
     visualSpec: {
@@ -688,7 +687,7 @@ export function buildGrade4Journey(blocks: ContentBlock[]): JourneyStep[] {
         "Reflect on what you learned",
       ],
     },
-    feedbackSpec: { correct: "Mission accepted! Let us begin.", hint: "" },
+    feedbackSpec: { hint: "" },
     successCriteria: "Understands the goal.",
   });
 
@@ -844,10 +843,10 @@ export function buildGrade4Journey(blocks: ContentBlock[]): JourneyStep[] {
     title: "Lesson Complete",
     studentText: "You completed this lesson!",
     owlText: "Great work! You learned something new today.",
-    studentInstruction: "You have finished the lesson.",
+    studentInstruction: "Collect your reward.",
     interactionSpec: {
       type: "tap_continue",
-      prompt: "Finish lesson",
+      prompt: "Tap to collect your badge",
       buttonLabel: "Finish lesson",
     },
     visualSpec: {
