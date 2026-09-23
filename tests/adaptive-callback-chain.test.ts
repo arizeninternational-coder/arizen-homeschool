@@ -162,15 +162,15 @@ if (remediationCorrectIdx !== 2) {
 }
 console.log('✅ Remediation correctChoiceId correctly points to Hundreds (index 2)');
 
-// Test 13: Remediation visual chart matches answer choices
-console.log('\n--- Test: Remediation visual chart matches answer choices ---');
-// PlaceValueChart highlightColumn convention: 0 = rightmost (Ones), 1 = Tens, 2 = Hundreds, 3 = Thousands
-// For 4,729 with columns [Thousands, Hundreds, Tens, Ones], the Hundreds column is highlightColumn=2
+// Test 13: Remediation visual chart highlights 7/Hundreds (not 2/Tens)
+console.log('\n--- Test: Remediation visual chart highlights 7/Hundreds ---');
+// PlaceValueChart highlightColumn convention: 0 = leftmost (Thousands), 1 = Hundreds, 2 = Tens, 3 = Ones
+// For 4,729 with columns [Thousands, Hundreds, Tens, Ones], the Hundreds column is highlightColumn=1
 const highlightCol = remediation.visualSpec?.highlightColumn;
-if (highlightCol !== 2) {
-  throw new Error(`Remediation highlightColumn should be 2 (Hundreds, right-to-left convention), got ${highlightCol}`);
+if (highlightCol !== 1) {
+  throw new Error(`Remediation highlightColumn should be 1 (Hundreds, where 7 lives), got ${highlightCol} (would highlight Tens=2)`);
 }
-console.log('✅ Remediation visual chart correctly highlights Hundreds column');
+console.log('✅ Remediation visual chart correctly highlights Hundreds column (7, not 2)');
 
 // Test 14: InteractiveStepRenderer does not hardcode 5-column default
 console.log('\n--- Test: InteractiveStepRenderer does not hardcode 5-column default ---');

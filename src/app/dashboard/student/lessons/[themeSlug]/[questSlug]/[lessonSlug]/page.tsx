@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo, Component, ReactNode } from "react";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowLeft, CheckCircle2, Zap, BookOpen, Flame,
@@ -112,6 +113,7 @@ class LessonErrorBoundary extends Component<EBProps, EBState> {
 
 export default function StudentLessonPlayer({ params }: { params: Promise<{ themeSlug: string; questSlug: string; lessonSlug: string }> }) {
   const { data: session, status } = useSession();
+  const router = useRouter();
   const [slugs, setSlugs] = useState<{ themeSlug: string; questSlug: string; lessonSlug: string } | null>(null);
   const [lesson, setLesson] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -381,6 +383,8 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
 
   // ── Journey View ─────────────────────────────────────────────────────────
 
+  const learnerName = session?.user?.name || "Learner";
+
   if (viewing && currentJourneyStep) {
     return (
       <LessonErrorBoundary>
@@ -627,16 +631,19 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
 
                     {/* Completion */}
                     {currentJourneyStep.stepType === "complete" && (
-                      <div style={{ textAlign: "center", padding: "24px 0" }}>
-                        <OwlTeacher size={72} expression="celebrating" />
-                        <h3 style={{ fontSize: "1.5rem", fontWeight: 800, color: "#1e293b", margin: "16px 0 8px" }}>You Did It! 🏆</h3>
-                        <p style={{ fontSize: "1rem", color: "#64748b", marginBottom: 16 }}>Amazing work! You've completed this lesson.</p>
+                      <div style={{ textAlign: "center", padding: "32px 0" }}>
+                        <OwlTeacher size={96} expression="celebrating" />
+                        <h3 style={{ fontSize: "2rem", fontWeight: 900, color: "#1e293b", margin: "20px 0 12px" }}>You Did It! 🏆</h3>
+                        <p style={{ fontSize: "1.1rem", color: "#64748b", marginBottom: 20 }}>Amazing work! You've completed this lesson.</p>
                         {xp > 0 && (
-                          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 20px", borderRadius: 12, background: "linear-gradient(135deg, #FEF3C7, #FDE68A)", border: "1px solid #F59E0B" }}>
-                            <Zap style={{ width: 20, height: 20, color: "#B45309" }} />
-                            <span style={{ fontSize: "1.125rem", fontWeight: 800, color: "#92400E" }}>+{xp} XP earned!</span>
+                          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "14px 24px", borderRadius: 14, background: "linear-gradient(135deg, #FEF3C7, #FDE68A)", border: "1px solid #F59E0B", marginBottom: 24 }}>
+                            <Zap style={{ width: 24, height: 24, color: "#B45309" }} />
+                            <span style={{ fontSize: "1.25rem", fontWeight: 800, color: "#92400E" }}>+{xp} XP earned!</span>
                           </div>
                         )}
+                        <button onClick={() => { handleComplete(); router.push("/dashboard/student"); }} style={{ padding: "14px 32px", borderRadius: 12, border: "none", background: "linear-gradient(135deg, #059669, #10B981)", color: "#fff", fontWeight: 800, fontSize: 16, cursor: "pointer", boxShadow: "0 4px 16px rgba(5,150,105,0.3)" }}>
+                          Back to Dashboard
+                        </button>
                       </div>
                     )}
                   </>

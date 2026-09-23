@@ -132,7 +132,7 @@ export function generateRemediationStep(
       visualSpec: {
         type: 'place_value_chart',
         digits: ['4', '7', '2', '9'],
-        highlightColumn: 2,
+        highlightColumn: 1,
         showValues: true,
       },
       interactionSpec: {
