@@ -232,8 +232,16 @@ export function InteractiveStepRenderer({
   interaction,
   setInteraction,
   onNext,
+  onAnswer,
   className = "",
 }: InteractiveStepRendererProps) {
+  if (typeof window !== "undefined") {
+    (window as any).__interactiveRendererMounted = {
+      hasOnAnswer: typeof onAnswer === "function",
+      stepType: step?.interactionSpec?.type ?? null,
+      timestamp: Date.now(),
+    };
+  }
   const hasNewSpec = !!(step.visualSpec || step.interactionSpec || step.feedbackSpec || step.mediaSpec);
 
   // -- Render visual spec ----------------------------------------------------

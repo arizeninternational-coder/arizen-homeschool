@@ -295,16 +295,20 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
     if (!step || !['multiple_choice', 'tap_choice'].includes(step.interactionSpec?.type)) return;
     const mapping = PLACE_VALUE_QUIZ_MAPPINGS.find(m => m.conceptId === 'digit-value');
     if (!mapping) return;
-    const options = step.interactionSpec.options || 
-      step.interactionSpec.choices?.map((c: any) => c.label) || [];
+    const choices = step.interactionSpec.choices || step.interactionSpec.options || [];
+    const options = choices.map((c: any) => typeof c === 'string' ? c : c.label);
     const expectedIdx = mapping.expectedAnswer ? options.indexOf(mapping.expectedAnswer) : 0;
-    const selectedIdx = interaction.selectedChoiceId || 0;
+    // Convert string choice ID (e.g. "A") to numeric index
+    const selectedIdx = choices.findIndex((c: any) => 
+      (typeof c === "object" && c.id === interaction.selectedChoiceId) || 
+      (typeof c === "string" && String(choices.indexOf(c)) === interaction.selectedChoiceId)
+    );
     const correct = selectedIdx === expectedIdx;
     const result = adaptive.submitAnswer(mapping.conceptId, selectedIdx, expectedIdx, options);
     if (!correct && result.shouldRemediate && result.remediationStep) {
       setActiveRemediation(result.remediationStep);
     }
-  }, [interaction.choiceSubmitted, lesson?.title, currentJourneyStep, adaptive]);
+  }, [interaction.choiceSubmitted, interaction.selectedChoiceId, lesson?.title, currentJourneyStep, adaptive]);
 
   const handleComplete = useCallback(async () => {
     if (!slugs || hasCompletedRef.current) return;
