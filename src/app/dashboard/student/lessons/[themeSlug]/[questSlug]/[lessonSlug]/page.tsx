@@ -286,11 +286,9 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
     } catch { /* non-blocking */ }
   }, []);
 
-  // Adaptive evaluation via useEffect — watches for choice submission changes
-  // This is more reliable than the onAnswer callback chain which can be interrupted
-  // by React state update batching
-  useEffect(() => {
-    if (!interaction.choiceSubmitted || !isPlaceValueLesson(lesson?.title)) return;
+  // Stable adaptive answer handler — avoids stale closures from inline JSX callbacks
+  const handleAdaptiveAnswer = useCallback((selectedIdx: number, correct: boolean) => {
+    if (!isPlaceValueLesson(lesson?.title)) return;
     const step = currentJourneyStep;
     if (!step || !['multiple_choice', 'tap_choice'].includes(step.interactionSpec?.type)) return;
     const mapping = PLACE_VALUE_QUIZ_MAPPINGS.find(m => m.conceptId === 'digit-value');
@@ -298,17 +296,11 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
     const choices = step.interactionSpec.choices || step.interactionSpec.options || [];
     const options = choices.map((c: any) => typeof c === 'string' ? c : c.label);
     const expectedIdx = mapping.expectedAnswer ? options.indexOf(mapping.expectedAnswer) : 0;
-    // Convert string choice ID (e.g. "A") to numeric index
-    const selectedIdx = choices.findIndex((c: any) => 
-      (typeof c === "object" && c.id === interaction.selectedChoiceId) || 
-      (typeof c === "string" && String(choices.indexOf(c)) === interaction.selectedChoiceId)
-    );
-    const correct = selectedIdx === expectedIdx;
     const result = adaptive.submitAnswer(mapping.conceptId, selectedIdx, expectedIdx, options);
     if (!correct && result.shouldRemediate && result.remediationStep) {
       setActiveRemediation(result.remediationStep);
     }
-  }, [interaction.choiceSubmitted, interaction.selectedChoiceId, lesson?.title, currentJourneyStep, adaptive]);
+  }, [lesson?.title, currentJourneyStep, adaptive]);
 
   const handleComplete = useCallback(async () => {
     if (!slugs || hasCompletedRef.current) return;
@@ -478,23 +470,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                         setCurrentStep((s) => Math.min(totalSteps - 1, s + 1));
                       }
                     }}
-                    onAnswer={(selectedIdx, correct) => {
-                      // Adaptive evaluation for Place Value lesson
-                      const isAdaptiveStep = isPlaceValueLesson(lesson?.title) && 
-                        ['multiple_choice', 'tap_choice'].includes(currentJourneyStep?.interactionSpec?.type);
-                      if (isAdaptiveStep) {
-                        const mapping = PLACE_VALUE_QUIZ_MAPPINGS.find(m => m.conceptId === 'digit-value');
-                        if (mapping) {
-                          const options = currentJourneyStep.interactionSpec.options || 
-                            currentJourneyStep.interactionSpec.choices?.map((c: any) => c.label) || [];
-                          const expectedIdx = mapping.expectedAnswer ? options.indexOf(mapping.expectedAnswer) : 0;
-                          const result = adaptive.submitAnswer(mapping.conceptId, selectedIdx, expectedIdx, options);
-                          if (!correct && result.shouldRemediate && result.remediationStep) {
-                            setActiveRemediation(result.remediationStep);
-                          }
-                        }
-                      }
-                    }}
+                    onAnswer={handleAdaptiveAnswer}
                   />
                 ) : (
                   <>
