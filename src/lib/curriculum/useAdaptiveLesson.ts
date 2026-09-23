@@ -84,16 +84,12 @@ export function useAdaptiveLesson(): UseAdaptiveLessonReturn {
     expectedIndex: number,
     options: string[],
   ): AdaptiveAnswerResult => {
-    const currentState = stateRef.current;
+    let currentState = stateRef.current;
     if (!currentState) {
-      const correct = selectedIndex === expectedIndex;
-      return {
-        correct,
-        misconceptionId: null,
-        feedbackMessage: correct ? 'Correct!' : 'Keep trying.',
-        remediationStep: null,
-        shouldRemediate: false,
-      };
+      // Initialize on the fly if not already initialized
+      const conceptIds = PLACE_VALUE_CONCEPTS.map(c => c.id);
+      currentState = createInitialLearningState('unknown', 'unknown', conceptIds);
+      stateRef.current = currentState;
     }
 
     const result = evaluateAnswer(selectedIndex, expectedIndex, options);
