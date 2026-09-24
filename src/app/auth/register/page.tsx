@@ -43,23 +43,26 @@ function RegisterForm() {
       });
       const data = await res.json();
       if (!res.ok) { setError(data.error || "Failed to create account"); setLoading(false); return; }
-      const { signIn } = await import("next-auth/react");
-      const result = await signIn("credentials", {
-        email: form.email.toLowerCase().trim(),
-        password: form.password,
-        redirect: false,
+      // Use our custom login endpoint (NextAuth credentials is not implemented)
+      const loginRes = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: form.email.toLowerCase().trim(),
+          password: form.password,
+        }),
       });
-      if (result?.error) {
-        setError(`Login after registration failed: ${result.error}. Please log in manually.`);
+      if (!loginRes.ok) {
+        const loginData = await loginRes.json();
+        setError(`Login after registration failed: ${loginData.error || "Unknown error"}. Please log in manually.`);
         setLoading(false);
-      } else {
-        const sessionRes = await fetch("/api/auth/session");
-        const sessionData = await sessionRes.json();
-        const role = sessionData?.user?.role;
-        if (role === "ADMIN") window.location.replace("/dashboard/admin");
-        else if (role === "PARENT") window.location.replace("/dashboard/parent");
-        else window.location.replace("/dashboard/student");
+        return;
       }
+      const loginData = await loginRes.json();
+      const role = loginData?.user?.role;
+      if (role === "ADMIN") window.location.replace("/dashboard/admin");
+      else if (role === "PARENT") window.location.replace("/dashboard/parent");
+      else window.location.replace("/dashboard/student");
     } catch { setError("Something went wrong. Please try again."); }
     finally { setLoading(false); }
   }
