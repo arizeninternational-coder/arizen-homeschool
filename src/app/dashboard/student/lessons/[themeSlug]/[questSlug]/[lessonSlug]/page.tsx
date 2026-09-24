@@ -323,6 +323,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
 
   const handleComplete = useCallback(async () => {
     const lessonId = lesson?.id;
+    console.log("[COMPLETE DEBUG]", { lessonId, lessonSlug: lesson?.slug, slugs, hasCompleted: hasCompletedRef.current, lesson: lesson ? { id: lesson.id, title: lesson.title } : null });
     if (!lessonId || hasCompletedRef.current) return;
     hasCompletedRef.current = true;
     try {
