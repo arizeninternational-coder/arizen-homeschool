@@ -9,7 +9,6 @@ export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   try {
-    // Try to select from InteractionResponse to check if it exists
     const { data, error } = await supabase
       .from("InteractionResponse")
       .select("id")
@@ -38,44 +37,29 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const user = await requireAdmin(req);
-    if (!user) {
-      return NextResponse.json({ error: "Admin access required" }, { status: 403 });
-    }
+    const adminRes = await requireAdmin(req);
+    if (adminRes) return adminRes;
 
-    // Try to create the table using RPC (requires a stored procedure)
-    // If no stored procedure exists, return the SQL for manual execution
-    const { data, error } = await supabase.rpc("exec_sql", {
-      sql: `
-        CREATE TABLE IF NOT EXISTS "InteractionResponse" (
-          id TEXT NOT NULL DEFAULT gen_random_uuid(),
-          "learnerId" TEXT NOT NULL,
-          "lessonId" TEXT NOT NULL,
-          "activityId" TEXT NOT NULL,
-          "conceptId" TEXT,
-          "selectedAnswer" TEXT NOT NULL,
-          "expectedAnswer" TEXT NOT NULL,
-          correct BOOLEAN NOT NULL DEFAULT false,
-          "timestamp" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-          CONSTRAINT "InteractionResponse_pkey" PRIMARY KEY (id)
-        );
-        CREATE INDEX IF NOT EXISTS "InteractionResponse_learnerId_idx" ON "InteractionResponse"("learnerId");
-        CREATE INDEX IF NOT EXISTS "InteractionResponse_lessonId_idx" ON "InteractionResponse"("lessonId");
-        CREATE INDEX IF NOT EXISTS "InteractionResponse_learnerId_lessonId_idx" ON "InteractionResponse"("learnerId", "lessonId");
-        ALTER TABLE "InteractionResponse" ADD CONSTRAINT "InteractionResponse_learnerId_fkey" 
-          FOREIGN KEY ("learnerId") REFERENCES "LearnerProfile"(id) ON DELETE RESTRICT ON UPDATE CASCADE;
-        ALTER TABLE "InteractionResponse" ADD CONSTRAINT "InteractionResponse_lessonId_fkey" 
-          FOREIGN KEY ("lessonId") REFERENCES "Lesson"(id) ON DELETE RESTRICT ON UPDATE CASCADE;
-      `,
+    const { error } = await supabase.rpc("exec_sql", {
+      sql: `CREATE TABLE IF NOT EXISTS "InteractionResponse" (
+        id TEXT NOT NULL DEFAULT gen_random_uuid(),
+        "learnerId" TEXT NOT NULL,
+        "lessonId" TEXT NOT NULL,
+        "activityId" TEXT NOT NULL,
+        "conceptId" TEXT,
+        "selectedAnswer" TEXT NOT NULL,
+        "expectedAnswer" TEXT NOT NULL,
+        correct BOOLEAN NOT NULL DEFAULT false,
+        "timestamp" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT "InteractionResponse_pkey" PRIMARY KEY (id)
+      );CREATE INDEX IF NOT EXISTS "InteractionResponse_learnerId_idx" ON "InteractionResponse"("learnerId");CREATE INDEX IF NOT EXISTS "InteractionResponse_lessonId_idx" ON "InteractionResponse"("lessonId");CREATE INDEX IF NOT EXISTS "InteractionResponse_learnerId_lessonId_idx" ON "InteractionResponse"("learnerId","lessonId");`,
     });
 
     if (error) {
-      // RPC not available, return SQL for manual execution
       return NextResponse.json({
         success: false,
         message: "Automatic migration not available. Please execute the SQL manually.",
-        sql: `
-CREATE TABLE IF NOT EXISTS "InteractionResponse" (
+        sql: `CREATE TABLE IF NOT EXISTS "InteractionResponse" (
     id TEXT NOT NULL DEFAULT gen_random_uuid(),
     "learnerId" TEXT NOT NULL,
     "lessonId" TEXT NOT NULL,
@@ -93,8 +77,7 @@ CREATE INDEX IF NOT EXISTS "InteractionResponse_learnerId_lessonId_idx" ON "Inte
 ALTER TABLE "InteractionResponse" ADD CONSTRAINT "InteractionResponse_learnerId_fkey" 
     FOREIGN KEY ("learnerId") REFERENCES "LearnerProfile"(id) ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "InteractionResponse" ADD CONSTRAINT "InteractionResponse_lessonId_fkey" 
-    FOREIGN KEY ("lessonId") REFERENCES "Lesson"(id) ON DELETE RESTRICT ON UPDATE CASCADE;
-        `,
+    FOREIGN KEY ("lessonId") REFERENCES "Lesson"(id) ON DELETE RESTRICT ON UPDATE CASCADE;`,
       });
     }
 
@@ -106,7 +89,7 @@ ALTER TABLE "InteractionResponse" ADD CONSTRAINT "InteractionResponse_lessonId_f
     return NextResponse.json({
       success: false,
       error: err.message,
-      message: "Migration failed. Please execute the SQL manually in Supabase Dashboard.",
+      message: "Migration failed. Please execute the SQL manually.",
     }, { status: 500 });
   }
 }
