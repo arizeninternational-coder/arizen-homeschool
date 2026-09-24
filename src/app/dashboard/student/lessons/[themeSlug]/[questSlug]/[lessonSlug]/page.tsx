@@ -180,23 +180,25 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
     }
   }, [lesson, session, adaptive, completed]);
 
-  // Restore previous answers from persisted adaptive state
-  const restorePreviousAnswers = useCallback((state: any) => {
-    if (!state?.concepts) return;
-    const evidenceMap: Record<string, { answer: string; correct: boolean }> = {};
-    for (const [conceptId, conceptState] of Object.entries(state.concepts)) {
-      const cs = conceptState as any;
-      if (cs.lastEvidence) {
-        evidenceMap[conceptId] = {
-          answer: cs.lastEvidence.answer || '',
-          correct: cs.lastEvidence.correct,
-        };
-      }
-    }
-    if (Object.keys(evidenceMap).length > 0) {
-      (window as any).__restoredAnswers = evidenceMap;
-    }
-  }, []);
+  // Load persisted interaction responses when entering review mode
+  useEffect(() => {
+    if (!completed || !lesson?.id) return;
+    
+    fetch("/api/learner/responses?lessonId=" + lesson.id, {
+      credentials: "include",
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.responses?.length) {
+          const map: Record<string, { answer: string; correct: boolean }> = {};
+          for (const r of data.responses) {
+            map[r.activityId] = { answer: r.selectedAnswer, correct: r.correct };
+          }
+          (window as any).__restoredAnswers = map;
+        }
+      })
+      .catch(() => {});
+  }, [completed, lesson?.id]);
 
   // Derive adaptive journey (only depends on lesson, not on render-specific state)
   useEffect(() => {
@@ -209,17 +211,15 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
   }, [lesson, baseJourney]);
 
   // Apply restored answers when a step renders (review mode)
+  // Uses stable activity ID (step.id or step-{index}) for mapping
   useEffect(() => {
     const restored = (window as any).__restoredAnswers;
     if (!restored || !currentJourneyStep?.interactionSpec) return;
     const choices = currentJourneyStep.interactionSpec.choices || currentJourneyStep.interactionSpec.options || [];
     const options = choices.map((c: any) => typeof c === 'string' ? c : c.label);
-    const mapping = PLACE_VALUE_QUIZ_MAPPINGS.find(m => {
-      const conceptState = adaptive.learningState?.concepts?.[m.conceptId];
-      return conceptState?.lastEvidence && restored[m.conceptId];
-    });
-    if (!mapping) return;
-    const evidence = restored[mapping.conceptId];
+    const activityId = currentJourneyStep.id || `step-${clampedStep}`;
+    const evidence = restored[activityId];
+    if (!evidence) return;
     const idx = options.indexOf(evidence.answer);
     if (idx >= 0) {
       setInteraction((p: any) => ({
@@ -228,7 +228,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
         choiceFeedback: evidence.correct ? 'correct' : 'incorrect',
       }));
     }
-  }, [currentStep, currentJourneyStep, adaptive.learningState]);
+  }, [currentStep, currentJourneyStep, clampedStep]);
 
   // ── Debug logging in development ──────────────────────────────────────────
   if (process.env.NODE_ENV === "development") {
@@ -355,6 +355,28 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
     } catch (e) { console.warn("Confetti failed:", e); }
   }, []);
 
+  // Persist interaction response to the database (server-side)
+  const persistResponse = useCallback(async (activityId: string, selectedAnswer: string, expectedAnswer: string, correct: boolean, conceptId?: string) => {
+    if (!lesson?.id) return;
+    try {
+      await fetch("/api/learner/responses", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          lessonId: lesson.id,
+          activityId,
+          conceptId: conceptId || null,
+          selectedAnswer,
+          expectedAnswer,
+          correct,
+        }),
+      });
+    } catch (e) {
+      console.warn("[persistResponse] Failed:", e);
+    }
+  }, [lesson?.id]);
+
   // Stable adaptive answer handler — avoids stale closures from inline JSX callbacks
   const handleAdaptiveAnswer = useCallback((selectedIdx: number, correct: boolean) => {
     if (!isPlaceValueLesson(lesson?.title)) return;
@@ -365,11 +387,18 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
     const choices = step.interactionSpec.choices || step.interactionSpec.options || [];
     const options = choices.map((c: any) => typeof c === 'string' ? c : c.label);
     const expectedIdx = mapping.expectedAnswer ? options.indexOf(mapping.expectedAnswer) : 0;
+    const selectedAnswer = options[selectedIdx] || '';
+    const expectedAnswer = mapping.expectedAnswer || options[expectedIdx] || '';
+    const activityId = step.id || `step-${clampedStep}`;
+    
+    // Persist to database (fire and forget)
+    persistResponse(activityId, selectedAnswer, expectedAnswer, correct, mapping.conceptId);
+    
     const result = adaptive.submitAnswer(mapping.conceptId, selectedIdx, expectedIdx, options);
     if (!correct && result.shouldRemediate && result.remediationStep) {
       setActiveRemediation(result.remediationStep);
     }
-  }, [lesson?.title, currentJourneyStep, adaptive]);
+  }, [lesson?.title, currentJourneyStep, adaptive, clampedStep, persistResponse]);
 
   const handleComplete = useCallback(async () => {
     const lessonId = lesson?.id;
