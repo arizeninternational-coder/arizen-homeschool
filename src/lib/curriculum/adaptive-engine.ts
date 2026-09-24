@@ -112,6 +112,20 @@ export const PLACE_VALUE_MISCONCEPTIONS: Misconception[] = [
     indicators: ['ones reported as thousands', 'reversed positions'],
     remediationActivities: ['place-value-chart-explorer', 'column-matching'],
   },
+  {
+    id: 'comparison-reverse',
+    label: 'Confuses greater-than/less-than direction',
+    description: 'Student picks the smaller number when asked which is larger',
+    indicators: ['chooses smaller when asked for larger', 'reverses comparison'],
+    remediationActivities: ['comparison-number-line', 'place-value-chart-explorer'],
+  },
+  {
+    id: 'comparison-equal',
+    label: 'Treats numbers with different digits as equal',
+    description: 'Student ignores digit differences and assumes numbers are equal',
+    indicators: ['says equal when digits differ', 'ignores place differences'],
+    remediationActivities: ['comparison-number-line', 'digit-by-digit-compare'],
+  },
 ];
 
 // -- Learning State Manager ---------------------------------------------------

@@ -20,6 +20,7 @@ import { isGrade4MathContent, buildGrade4JourneyFromBlocks } from "@/lib/curricu
 import { isPlaceValueLesson, buildAdaptivePlaceValueJourney, PLACE_VALUE_QUIZ_MAPPINGS } from "@/lib/curriculum/adaptive-journey";
 import { getPerformanceBand } from "@/lib/curriculum/performance-bands";
 import { getScoredActivities, calculateLessonScore } from "@/lib/curriculum/scoring-config";
+import { getStepConceptMapping, getAllScoredStepIds } from "@/lib/curriculum/step-concept-mappings";
 import { useAdaptiveLesson } from "@/lib/curriculum/useAdaptiveLesson";
 
 function getStepType(step: any): JourneyStepType {
@@ -409,14 +410,16 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
         
         persistResponse(activityId, selectedAnswer, expectedAnswer, correct, step.stepType);
         
-        // Also call adaptive engine for place-value lesson
+        // Call adaptive engine using step concept mapping
         if (isPlaceValueLesson(lesson?.title)) {
-          const mapping = PLACE_VALUE_QUIZ_MAPPINGS.find(m => m.conceptId === 'digit-value');
-          if (mapping) {
-            const expectedIdx = mapping.expectedAnswer ? options.indexOf(mapping.expectedAnswer) : 0;
-            const result = adaptive.submitAnswer(mapping.conceptId, selectedIdx, expectedIdx, options);
-            if (!correct && result.shouldRemediate && result.remediationStep) {
-              setActiveRemediation(result.remediationStep);
+          const stepMapping = getStepConceptMapping(activityId);
+          if (stepMapping) {
+            const misconceptionId = stepMapping.misconceptionCheck(selectedAnswer, expectedAnswer);
+            if (!correct && misconceptionId && adaptive.learningState) {
+              const result = adaptive.submitAnswer(stepMapping.conceptId, selectedIdx, options.indexOf(expectedAnswer), options);
+              if (result.shouldRemediate && result.remediationStep) {
+                setActiveRemediation(result.remediationStep);
+              }
             }
           }
         }
@@ -444,19 +447,22 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
       }
       
       persistResponse(activityId, selectedAnswer, expectedAnswer, correct, step.stepType);
-    }
-    
-    if (!isPlaceValueLesson(lesson?.title)) return;
-    
-    const mapping = PLACE_VALUE_QUIZ_MAPPINGS.find(m => m.conceptId === 'digit-value');
-    if (!mapping) return;
-    
-    const expectedIdx = mapping.expectedAnswer ? options.indexOf(mapping.expectedAnswer) : 0;
-    const result = adaptive.submitAnswer(mapping.conceptId, selectedIdx, expectedIdx, options);
-    if (!correct && result.shouldRemediate && result.remediationStep) {
-      setActiveRemediation(result.remediationStep);
-    }
-  }, [lesson?.title, currentJourneyStep, adaptive, clampedStep, persistResponse]);
+      
+        // Call adaptive engine using step concept mapping
+        if (isPlaceValueLesson(lesson?.title)) {
+          const stepMapping = getStepConceptMapping(step.id);
+          if (stepMapping) {
+            const misconceptionId = stepMapping.misconceptionCheck(selectedAnswer, expectedAnswer);
+            if (!correct && misconceptionId && adaptive.learningState) {
+              const result = adaptive.submitAnswer(stepMapping.conceptId, selectedIdx, options.indexOf(expectedAnswer), options);
+              if (result.shouldRemediate && result.remediationStep) {
+                setActiveRemediation(result.remediationStep);
+              }
+            }
+          }
+        }
+      }
+      }, [lesson?.title, currentJourneyStep, adaptive, clampedStep, persistResponse]);
 
   const handleComplete = useCallback(async () => {
     const lessonId = lesson?.id;
