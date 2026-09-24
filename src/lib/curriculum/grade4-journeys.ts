@@ -244,7 +244,7 @@ export function buildPlaceValueJourney(): JourneyStep[] {
       title: "Welcome to Place Value",
       studentText: firstTextContent,
       owlText:
-        "Hello explorer! Today we're going to become number detectives. Every digit in a big number has a secret job — and you're going to discover what each one does!",
+        "Today we're going to become number detectives. Every digit in a big number has a secret job — and you're going to discover what each one does!",
       studentInstruction: "Get ready to explore how numbers work.",
       interactionSpec: {
         type: "tap_continue",
@@ -648,7 +648,7 @@ export function buildGrade4Journey(blocks: ContentBlock[]): JourneyStep[] {
     stepType: "welcome",
     title: "Welcome",
     studentText: firstText(blocks) || "In this lesson, you will explore an important math idea.",
-    owlText: "Hello explorer! Today we are going to learn something new. Ready?",
+    owlText: "Today we are going to learn something new. Ready?",
     studentInstruction: "Look at what we will explore today.",
     interactionSpec: {
       type: "tap_continue",
