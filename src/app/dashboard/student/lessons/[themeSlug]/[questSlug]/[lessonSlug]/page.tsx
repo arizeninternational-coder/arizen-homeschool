@@ -341,6 +341,10 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
         setCompleted(true); setJustCompleted(true);
         setXpEarned(getRewardValue(data.rewards?.xp));
         if (data.newBadges?.length) setNewBadges(data.newBadges);
+      } else if (data.alreadyCompleted) {
+        // Review mode — lesson already completed, no duplicate rewards
+        setCompleted(true); setJustCompleted(true);
+        setXpEarned(getRewardValue(lesson?.xpReward));
       } else {
         // Persistence failed — show error but don't remove the celebration
         setCompleteError("Progress saved locally. Will sync later.");
@@ -920,8 +924,12 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
           </div>
         )}
 
-        {/* Start / Continue button */}
-        {!completed && (
+        {/* Start / Continue / Review button */}
+        {completed ? (
+          <GradientButton variant="primary" size="lg" icon={<Play style={{ width: 18, height: 18 }} />} onClick={() => { setCurrentStep(0); setViewing(true); }} style={{ width: "100%", marginBottom: 16 }}>
+            Review Lesson
+          </GradientButton>
+        ) : (
           <GradientButton variant="primary" size="lg" icon={<Play style={{ width: 18, height: 18 }} />} onClick={() => { setCurrentStep(0); setViewing(true); }} style={{ width: "100%", marginBottom: 16 }}>
             {completedSteps.length > 0 ? "Continue Lesson" : "Start Lesson"}
           </GradientButton>
