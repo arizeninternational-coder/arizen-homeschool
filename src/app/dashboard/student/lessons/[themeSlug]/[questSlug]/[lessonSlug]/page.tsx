@@ -379,21 +379,42 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
 
   // Stable adaptive answer handler — avoids stale closures from inline JSX callbacks
   const handleAdaptiveAnswer = useCallback((selectedIdx: number, correct: boolean) => {
-    if (!isPlaceValueLesson(lesson?.title)) return;
     const step = currentJourneyStep;
-    if (!step || !['multiple_choice', 'tap_choice'].includes(step.interactionSpec?.type)) return;
-    const mapping = PLACE_VALUE_QUIZ_MAPPINGS.find(m => m.conceptId === 'digit-value');
-    if (!mapping) return;
-    const choices = step.interactionSpec.choices || step.interactionSpec.options || [];
-    const options = choices.map((c: any) => typeof c === 'string' ? c : c.label);
-    const expectedIdx = mapping.expectedAnswer ? options.indexOf(mapping.expectedAnswer) : 0;
-    const selectedAnswer = options[selectedIdx] || '';
-    const expectedAnswer = mapping.expectedAnswer || options[expectedIdx] || '';
+    if (!step) return;
+    
+    // Always persist the response for any interactive step with choices
+    const choices = step.interactionSpec?.choices || step.interactionSpec?.options || [];
     const activityId = step.id || `step-${clampedStep}`;
     
-    // Persist to database (fire and forget)
-    persistResponse(activityId, selectedAnswer, expectedAnswer, correct, mapping.conceptId);
+    if (choices.length > 0) {
+      const options = choices.map((c: any) => typeof c === 'string' ? c : c.label);
+      const selectedAnswer = options[selectedIdx] || '';
+      
+      // Find expected answer from step data
+      let expectedAnswer = '';
+      if (step.interactionSpec?.correctChoiceId) {
+        const correctChoice = choices.find((c: any) => 
+          (typeof c === 'object' && c.id === step.interactionSpec.correctChoiceId)
+        );
+        expectedAnswer = correctChoice ? (correctChoice.label || correctChoice) : options[0];
+      } else if (step.interactionSpec?.correctIndex != null) {
+        expectedAnswer = options[step.interactionSpec.correctIndex] || options[0];
+      } else if (step.interactionSpec?.correctAnswer) {
+        expectedAnswer = step.interactionSpec.correctAnswer;
+      }
+      
+      // Persist to database (fire and forget)
+      persistResponse(activityId, selectedAnswer, expectedAnswer, correct, step.stepType);
+    }
     
+    // Also call adaptive engine for place-value lesson
+    if (!isPlaceValueLesson(lesson?.title)) return;
+    
+    // Find concept mapping if available (for adaptive behavior)
+    const mapping = PLACE_VALUE_QUIZ_MAPPINGS.find(m => m.conceptId === 'digit-value');
+    if (!mapping) return;
+    
+    const expectedIdx = mapping.expectedAnswer ? options.indexOf(mapping.expectedAnswer) : 0;
     const result = adaptive.submitAnswer(mapping.conceptId, selectedIdx, expectedIdx, options);
     if (!correct && result.shouldRemediate && result.remediationStep) {
       setActiveRemediation(result.remediationStep);
