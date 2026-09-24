@@ -18,6 +18,7 @@ import { InteractiveStepRenderer } from "@/components/interactive";
 import { isLessonStudentVisible } from "@/lib/curriculum/student-visibility";
 import { isGrade4MathContent, buildGrade4JourneyFromBlocks } from "@/lib/curriculum/grade4-journeys";
 import { isPlaceValueLesson, buildAdaptivePlaceValueJourney, PLACE_VALUE_QUIZ_MAPPINGS } from "@/lib/curriculum/adaptive-journey";
+import { getPerformanceBand } from "@/lib/curriculum/performance-bands";
 import { useAdaptiveLesson } from "@/lib/curriculum/useAdaptiveLesson";
 
 function getStepType(step: any): JourneyStepType {
@@ -139,6 +140,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
   const [newBadges, setNewBadges] = useState<string[]>([]);
   const [showCelebration, setShowCelebration] = useState(false);
   const [completeError, setCompleteError] = useState<string | null>(null);
+  const [lessonScore, setLessonScore] = useState<{ correct: number; total: number; percentage: number; band: any } | null>(null);
   const hasCompletedRef = useRef(false);
   const [interaction, setInteraction] = useState<any>({
     predictionText: "", practiceEntries: ["", "", ""],
@@ -430,6 +432,36 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
     setShowCelebration(true);
     fireConfetti();
 
+    // Fetch responses to calculate score
+    try {
+      const res = await fetch("/api/learner/responses?lessonId=" + lessonId, {
+        credentials: "include",
+      });
+      const data = await res.json();
+      
+      // Count scored responses (only choice-based steps with expected answers)
+      const scoredResponses = (data.responses || []).filter((r: any) => {
+        const step = journeySteps.find((s: any) => s.id === r.activityId);
+        if (!step) return false;
+        // Only count steps with defined correct answers
+        const hasCorrectAnswer = step.interactionSpec?.correctChoiceId || 
+                                 step.interactionSpec?.correctIndex != null ||
+                                 step.interactionSpec?.correctAnswer;
+        return hasCorrectAnswer;
+      });
+      
+      const total = scoredResponses.length;
+      const correct = scoredResponses.filter((r: any) => r.correct).length;
+      const percentage = total > 0 ? Math.round((correct / total) * 100) : 0;
+      
+      // Get performance band
+      const band = getPerformanceBand(percentage);
+      
+      setLessonScore({ correct, total, percentage, band });
+    } catch (e) {
+      console.warn("[handleComplete] Failed to calculate score:", e);
+    }
+
     // Persist completion in the background
     try {
       const res = await fetch("/api/learner/progress", {
@@ -453,7 +485,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
       // Network failed — show error but don't remove the celebration
       setCompleteError("Progress saved locally. Will sync later.");
     }
-  }, [lesson?.id, lesson?.questId, fireConfetti]);
+  }, [lesson?.id, lesson?.questId, fireConfetti, journeySteps]);
 
   const handleNavigateHome = useCallback(() => {
     // Try router.push first, fall back to window.location for reliability
@@ -933,6 +965,36 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
               <p style={{ fontSize: "1rem", color: "rgba(255,255,255,0.85)", marginBottom: 24 }}>
                 You've completed this lesson. You're a Place Value Pro!
               </p>
+              
+              {/* Score Display */}
+              {lessonScore && (
+                <div style={{
+                  background: "rgba(255,255,255,0.15)", borderRadius: 20, padding: "24px 40px",
+                  marginBottom: 16, textAlign: "center", border: "2px solid rgba(255,255,255,0.3)",
+                }}>
+                  <p style={{ fontSize: "0.875rem", color: "rgba(255,255,255,0.8)", margin: "0 0 8px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                    Your Lesson Score
+                  </p>
+                  <p style={{ fontSize: "3.5rem", fontWeight: 900, color: "#FDE047", margin: "0 0 4px", lineHeight: 1 }}>
+                    {lessonScore.correct} / {lessonScore.total}
+                  </p>
+                  <p style={{ fontSize: "1.5rem", fontWeight: 700, color: "#fff", margin: "0 0 12px" }}>
+                    {lessonScore.percentage}%
+                  </p>
+                  <div style={{
+                    display: "inline-block", padding: "8px 20px", borderRadius: 20,
+                    background: "rgba(255,255,255,0.25)", border: "1px solid rgba(255,255,255,0.4)",
+                  }}>
+                    <span style={{ fontSize: "1rem", fontWeight: 800, color: "#fff" }}>
+                      {lessonScore.band.label}
+                    </span>
+                  </div>
+                  <p style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.9)", margin: "16px 0 0", maxWidth: 400, lineHeight: 1.5 }}>
+                    {lessonScore.band.feedback}
+                  </p>
+                </div>
+              )}
+              
               {xpEarned > 0 && (
                 <div style={{
                   display: "inline-flex", alignItems: "center", gap: 10, padding: "16px 32px",
@@ -972,20 +1034,21 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
   }
 
   // ── Landing / Start View ─────────────────────────────────────────────────
-
-  const completedSteps = journeySteps.filter((_: any, i: number) => i < currentStep);
-  const progress = totalSteps > 0 ? Math.round((completedSteps.length / totalSteps) * 100) : 0;
+  
+  // Get the welcome step for personalized content
+  const welcomeStep = journeySteps.find((s: any) => s.stepType === 'welcome') || journeySteps[0];
+  const learnerDisplayName = session?.user?.name || session?.user?.displayName || learnerName;
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F0F4FF" }}>
+    <div style={{ minHeight: "100vh", background: "linear-gradient(180deg, #F0F4FF 0%, #EDE9FE 100%)" }}>
       {/* Hero */}
-      <div style={{ background: "linear-gradient(135deg, #6366F1 0%, #8B5CF6 50%, #A78BFA 100%)", padding: "32px 16px", color: "#fff" }}>
+      <div style={{ background: "linear-gradient(135deg, #6366F1 0%, #8B5CF6 50%, #A78BFA 100%)", padding: "28px 16px 40px", color: "#fff" }}>
         <div style={{ maxWidth: 720, margin: "0 auto" }}>
           <Link href="/dashboard/student" style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "rgba(255,255,255,0.8)", fontWeight: 600, fontSize: 13, textDecoration: "none", marginBottom: 16 }}>
-            <ArrowLeft style={{ width: 14, height: 14 }} /> Back to Dashboard
+            <ArrowLeft style={{ width: 14, height: 14 }} /> Back to Home
           </Link>
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <div style={{ fontSize: "3rem" }}>{STEP_TYPE_ICONS[getStepType(journeySteps[0])] || "🦉"}</div>
+            <div style={{ fontSize: "2.5rem" }}>🦉</div>
             <div>
               <h1 style={{ fontSize: "1.75rem", fontWeight: 900, margin: 0, color: "#fff" }}>{cleanTitle(lesson.title)}</h1>
               {subject && <p style={{ fontSize: "0.875rem", color: "rgba(255,255,255,0.8)", margin: "4px 0 0" }}>{subject}{grade ? ` · Grade ${grade}` : ""}</p>}
@@ -1001,30 +1064,56 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
       </div>
 
       <div style={{ maxWidth: 720, margin: "0 auto", padding: "24px 16px" }}>
-        {/* Journey overview */}
-        {journeySteps.length > 0 && (
-          <div style={{ background: "#fff", borderRadius: 16, padding: "20px", boxShadow: "0 2px 12px rgba(0,0,0,0.04)", marginBottom: 16 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-              <h3 style={{ fontSize: "1rem", fontWeight: 800, color: "#1e293b", margin: 0 }}>Lesson Journey</h3>
-              <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#6366F1", background: "#EEF2FF", padding: "3px 8px", borderRadius: 6 }}>{progress}% Complete</span>
+        {/* Personalized Mission Card */}
+        {welcomeStep && (
+          <div style={{ background: "#fff", borderRadius: 20, padding: "28px", boxShadow: "0 4px 24px rgba(0,0,0,0.06)", marginBottom: 20, border: "2px solid #EDE9FE" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+              <div style={{ fontSize: "2rem" }}>🎯</div>
+              <h2 style={{ fontSize: "1.25rem", fontWeight: 800, color: "#4C1D95", margin: 0 }}>Today's Mission</h2>
             </div>
-            {/* Progress bar */}
-            <div style={{ height: 8, background: "#F1F5F9", borderRadius: 4, overflow: "hidden", marginBottom: 16 }}>
+            <p style={{ fontSize: "1.05rem", color: "#334155", margin: "0 0 12px", lineHeight: 1.6 }}>
+              <strong>Hi {learnerDisplayName}!</strong> Today you're going to uncover the secret job of every digit in a number.
+            </p>
+            {welcomeStep.owlText && (
+              <div style={{ display: "flex", gap: 10, padding: "14px", borderRadius: 12, background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                <OwlTeacher size={36} expression="happy" />
+                <p style={{ fontSize: "0.9rem", color: "#475569", margin: 0, lineHeight: 1.6 }}>{welcomeStep.owlText}</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Learning Goals */}
+        {journeySteps.length > 0 && (
+          <div style={{ background: "#fff", borderRadius: 20, padding: "24px", boxShadow: "0 2px 12px rgba(0,0,0,0.04)", marginBottom: 20 }}>
+            <h3 style={{ fontSize: "1rem", fontWeight: 800, color: "#1e293b", margin: "0 0 12px" }}>By the end of this lesson, you'll be able to:</h3>
+            <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.8 }}>
+              <li style={{ color: "#475569", fontSize: "0.95rem" }}>Read numbers up to tens of thousands</li>
+              <li style={{ color: "#475569", fontSize: "0.95rem" }}>Identify the place value of any digit</li>
+              <li style={{ color: "#475569", fontSize: "0.95rem" }}>Write numbers in expanded form</li>
+              <li style={{ color: "#475569", fontSize: "0.95rem" }}>Compare and order big numbers</li>
+            </ul>
+          </div>
+        )}
+
+        {/* Journey Progress */}
+        {journeySteps.length > 0 && (
+          <div style={{ background: "#fff", borderRadius: 20, padding: "24px", boxShadow: "0 2px 12px rgba(0,0,0,0.04)", marginBottom: 20 }}>
+            <h3 style={{ fontSize: "1rem", fontWeight: 800, color: "#1e293b", margin: "0 0 12px" }}>Your Journey</h3>
+            <div style={{ height: 8, background: "#F1F5F9", borderRadius: 4, overflow: "hidden", marginBottom: 12 }}>
               <div style={{ width: `${progress}%`, height: "100%", background: "linear-gradient(90deg, #6366F1, #8B5CF6)", borderRadius: 4, transition: "width 0.5s ease" }} />
             </div>
-            {/* Step indicators */}
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
               {journeySteps.map((step: any, i: number) => {
                 const isCompleted = i < currentStep;
                 const isCurrent = i === currentStep;
                 return (
-                  <button key={step.id} onClick={() => setCurrentStep(i)} style={{
+                  <button key={step.id} onClick={() => !viewing && setCurrentStep(i)} style={{
                     width: 36, height: 36, borderRadius: 10, border: "none",
                     background: isCurrent ? "#6366F1" : isCompleted ? "#10B981" : "#F1F5F9",
                     color: isCurrent || isCompleted ? "#fff" : "#94A3B8",
                     fontSize: "0.875rem", fontWeight: 700, cursor: "pointer",
                     display: "flex", alignItems: "center", justifyContent: "center",
-                    position: "relative",
                     boxShadow: isCurrent ? "0 4px 12px rgba(99,102,241,0.3)" : "none",
                   }}>
                     {isCompleted ? <CheckCircle2 style={{ width: 16, height: 16 }} /> : (STEP_TYPE_ICONS[getStepType(step)] || (i + 1))}
@@ -1035,37 +1124,24 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
           </div>
         )}
 
-        {/* Start / Continue / Review button */}
-        {completed ? (
-          <GradientButton variant="primary" size="lg" icon={<Play style={{ width: 18, height: 18 }} />} onClick={() => { setCurrentStep(0); setViewing(true); }} style={{ width: "100%", marginBottom: 16 }}>
-            Review Lesson
-          </GradientButton>
-        ) : (
-          <GradientButton variant="primary" size="lg" icon={<Play style={{ width: 18, height: 18 }} />} onClick={() => { setCurrentStep(0); setViewing(true); }} style={{ width: "100%", marginBottom: 16 }}>
-            {completedSteps.length > 0 ? "Continue Lesson" : "Start Lesson"}
-          </GradientButton>
-        )}
-
-        {/* Last step info */}
-        {currentJourneyStep && !viewing && (
-          <div style={{ background: "#fff", borderRadius: 16, padding: "20px", boxShadow: "0 2px 12px rgba(0,0,0,0.04)" }}>
-            <p style={{ fontSize: "0.75rem", fontWeight: 700, color: "#6366F1", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 8 }}>Current Step</p>
-            <h3 style={{ fontSize: "1.125rem", fontWeight: 800, color: "#1e293b", marginBottom: 8 }}>{currentJourneyStep.title}</h3>
-            {currentJourneyStep.owlText && (
-              <div style={{ display: "flex", gap: 10, padding: "12px", borderRadius: 10, background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
-                <OwlTeacher size={32} expression={OWL_EXPRESSIONS[getStepType(currentJourneyStep)] || 'happy'} />
-                <p style={{ fontSize: "0.8125rem", color: "#475569", margin: 0, lineHeight: 1.5 }}>{currentJourneyStep.owlText.slice(0, 150)}{currentJourneyStep.owlText.length > 150 ? "..." : ""}</p>
-              </div>
-            )}
-          </div>
-        )}
-
+        {/* Review completed lesson message */}
         {completed && (
-          <div style={{ textAlign: "center", padding: "32px 0" }}>
+          <div style={{ textAlign: "center", padding: "24px 0", marginBottom: 16 }}>
             <Trophy style={{ width: 48, height: 48, color: "#F59E0B", margin: "0 auto 12px" }} />
             <h3 style={{ fontSize: "1.25rem", fontWeight: 800, color: "#1e293b" }}>Lesson Complete! 🎉</h3>
             <p style={{ fontSize: "0.875rem", color: "#64748b" }}>You've finished this lesson. Great work!</p>
           </div>
+        )}
+
+        {/* Start / Continue / Review button — LAST primary CTA */}
+        {completed ? (
+          <GradientButton variant="primary" size="lg" icon={<Play style={{ width: 18, height: 18 }} />} onClick={() => { setCurrentStep(0); setViewing(true); }} style={{ width: "100%" }}>
+            Review Lesson
+          </GradientButton>
+        ) : (
+          <GradientButton variant="primary" size="lg" icon={<Play style={{ width: 18, height: 18 }} />} onClick={() => { setCurrentStep(0); setViewing(true); }} style={{ width: "100%" }}>
+            {completedSteps.length > 0 ? "Continue Lesson" : "Start Lesson"}
+          </GradientButton>
         )}
       </div>
     </div>
