@@ -219,12 +219,14 @@ interface MultiActivityProps {
   activities: ActivityItem[];
   feedback?: { correct?: string; incorrect?: string; hint?: string };
   onComplete?: () => void;
+  onAnswer?: (activityId: string, selectedAnswer: string, correctAnswer: string, correct: boolean) => void;
 }
 
 export function MultiActivity({
   activities,
   feedback,
   onComplete,
+  onAnswer,
 }: MultiActivityProps) {
   const [currentActivity, setCurrentActivity] = useState(0);
   const [activityStates, setActivityStates] = useState<Record<string, any>>({});
@@ -248,6 +250,34 @@ export function MultiActivity({
     }
   };
 
+  const getCorrectAnswer = (act: ActivityItem): string => {
+    if (act.type === "tap_choice" && act.choices && act.correctChoiceId) {
+      const correctChoice = act.choices.find((c: any) => {
+        const id = typeof c === 'object' ? c.id : String(act.choices.indexOf(c));
+        return id === act.correctChoiceId;
+      });
+      return correctChoice ? (typeof correctChoice === 'string' ? correctChoice : correctChoice.label) : '';
+    } else if (act.type === "multiple_choice" && act.options && act.correctIndex != null) {
+      return act.options[act.correctIndex] || '';
+    }
+    return '';
+  };
+
+  const getSelectedAnswer = (act: ActivityItem, choiceId: string): string => {
+    if (act.type === "tap_choice" && act.choices) {
+      const choice = act.choices.find((c: any) => {
+        const id = typeof c === 'object' ? c.id : String(act.choices.indexOf(c));
+        return id === choiceId;
+      });
+      return choice ? (typeof choice === 'string' ? choice : choice.label) : '';
+    } else if (act.type === "multiple_choice" && act.options && act.correctIndex != null) {
+      // For multiple choice, we need to find by index
+      const idx = parseInt(choiceId);
+      return act.options[idx] || '';
+    }
+    return '';
+  };
+
   const renderActivity = (act: ActivityItem) => {
     const actState = activityStates[act.id] || {};
 
@@ -265,7 +295,10 @@ export function MultiActivity({
           correctChoiceId={act.correctChoiceId}
           onSelect={(choiceId) => {
             const isCorrect = choiceId === act.correctChoiceId;
+            const selectedAnswer = getSelectedAnswer(act, choiceId);
+            const correctAnswer = getCorrectAnswer(act);
             handleActivityAnswer(act.id, { selectedChoiceId: choiceId, submitted: true, isCorrect });
+            onAnswer?.(act.id, selectedAnswer, correctAnswer, isCorrect);
           }}
           feedback={actState.submitted ? {
             correct: "Correct!",
@@ -291,8 +324,11 @@ export function MultiActivity({
             incorrect: "Not quite.",
             hint: act.hint,
           } : undefined}
-          onAnswer={(correct) => {
+          onAnswer={(correct, selectedIdx) => {
+            const selectedAnswer = options[selectedIdx] || '';
+            const correctAnswer = options[correctIdx] || '';
             handleActivityAnswer(act.id, { submitted: true, isCorrect: correct });
+            onAnswer?.(act.id, selectedAnswer, correctAnswer, correct);
           }}
         />
       );

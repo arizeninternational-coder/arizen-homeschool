@@ -580,6 +580,12 @@ export function InteractiveStepRenderer({
           onComplete={() => {
             setInteraction((p: any) => ({ ...p, multiActivityComplete: true }));
           }}
+          onAnswer={(activityId, selectedAnswer, correctAnswer, correct) => {
+            if (onAnswer) {
+              // For multi-activity, propagate the sub-activity ID so the parent can persist correctly
+              onAnswer(-1, correct, activityId, selectedAnswer, correctAnswer);
+            }
+          }}
         />
       );
     }

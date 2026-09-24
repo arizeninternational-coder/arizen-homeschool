@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-const PROD = 'https://arizen-homeschool-dvt9jrbzb-arizeninternational-coders-projects.vercel.app';
+const PROD = 'https://arizen-homeschool-5z69zzlop-arizeninternational-coders-projects.vercel.app';
 
 test('Lesson landing page renders without ReferenceError', async ({ page }) => {
   const errors: string[] = [];
@@ -25,6 +25,7 @@ test('Lesson landing page renders without ReferenceError', async ({ page }) => {
   const pageText = await page.innerText('body');
   expect(pageText).toContain('Place Value');
   expect(pageText).not.toContain('Hello explorer');
+  expect(pageText).toContain('Hi Grade 4 Review Test');
   
   const startCount = await page.locator('button:has-text("Start Lesson")').count();
   const reviewCount = await page.locator('button:has-text("Review Lesson")').count();

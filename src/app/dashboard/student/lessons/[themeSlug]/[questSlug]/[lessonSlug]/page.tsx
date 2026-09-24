@@ -19,6 +19,7 @@ import { isLessonStudentVisible } from "@/lib/curriculum/student-visibility";
 import { isGrade4MathContent, buildGrade4JourneyFromBlocks } from "@/lib/curriculum/grade4-journeys";
 import { isPlaceValueLesson, buildAdaptivePlaceValueJourney, PLACE_VALUE_QUIZ_MAPPINGS } from "@/lib/curriculum/adaptive-journey";
 import { getPerformanceBand } from "@/lib/curriculum/performance-bands";
+import { getScoredActivities, calculateLessonScore } from "@/lib/curriculum/scoring-config";
 import { useAdaptiveLesson } from "@/lib/curriculum/useAdaptiveLesson";
 
 function getStepType(step: any): JourneyStepType {
@@ -380,19 +381,56 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
   }, [lesson?.id]);
 
   // Stable adaptive answer handler — avoids stale closures from inline JSX callbacks
-  const handleAdaptiveAnswer = useCallback((selectedIdx: number, correct: boolean) => {
+  const handleAdaptiveAnswer = useCallback((selectedIdx: number, correct: boolean, overrideActivityId?: string, overrideSelectedAnswer?: string, overrideExpectedAnswer?: string) => {
     const step = currentJourneyStep;
     if (!step) return;
     
-    // Always persist the response for any interactive step with choices
+    // Determine activity ID - use override if provided (for multi-activity steps)
+    const activityId = overrideActivityId || step.id || `step-${clampedStep}`;
+    
+    // For multi-activity steps, find the sub-activity
+    if (step.stepType === 'practice' && step.interactionSpec?.activities && overrideActivityId) {
+      const subActivity = step.interactionSpec.activities.find((a: any) => a.id === overrideActivityId);
+      if (subActivity) {
+        const choices = subActivity.choices || subActivity.options || [];
+        const options = choices.map((c: any) => typeof c === 'string' ? c : c.label);
+        const selectedAnswer = overrideSelectedAnswer || options[selectedIdx] || '';
+        
+        let expectedAnswer = overrideExpectedAnswer || '';
+        if (!expectedAnswer && subActivity.correctChoiceId) {
+          const correctChoice = subActivity.choices?.find((c: any) => {
+            const id = typeof c === 'object' ? c.id : String(subActivity.choices.indexOf(c));
+            return id === subActivity.correctChoiceId;
+          });
+          expectedAnswer = correctChoice ? (typeof correctChoice === 'string' ? correctChoice : correctChoice.label) : '';
+        } else if (!expectedAnswer && subActivity.correctIndex != null) {
+          expectedAnswer = subActivity.options?.[subActivity.correctIndex] || '';
+        }
+        
+        persistResponse(activityId, selectedAnswer, expectedAnswer, correct, step.stepType);
+        
+        // Also call adaptive engine for place-value lesson
+        if (isPlaceValueLesson(lesson?.title)) {
+          const mapping = PLACE_VALUE_QUIZ_MAPPINGS.find(m => m.conceptId === 'digit-value');
+          if (mapping) {
+            const expectedIdx = mapping.expectedAnswer ? options.indexOf(mapping.expectedAnswer) : 0;
+            const result = adaptive.submitAnswer(mapping.conceptId, selectedIdx, expectedIdx, options);
+            if (!correct && result.shouldRemediate && result.remediationStep) {
+              setActiveRemediation(result.remediationStep);
+            }
+          }
+        }
+        return;
+      }
+    }
+    
+    // Standard single-activity persistence
     const choices = step.interactionSpec?.choices || step.interactionSpec?.options || [];
-    const activityId = step.id || `step-${clampedStep}`;
+    const options = choices.map((c: any) => typeof c === 'string' ? c : c.label);
     
     if (choices.length > 0) {
-      const options = choices.map((c: any) => typeof c === 'string' ? c : c.label);
       const selectedAnswer = options[selectedIdx] || '';
       
-      // Find expected answer from step data
       let expectedAnswer = '';
       if (step.interactionSpec?.correctChoiceId) {
         const correctChoice = choices.find((c: any) => 
@@ -405,14 +443,11 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
         expectedAnswer = step.interactionSpec.correctAnswer;
       }
       
-      // Persist to database (fire and forget)
       persistResponse(activityId, selectedAnswer, expectedAnswer, correct, step.stepType);
     }
     
-    // Also call adaptive engine for place-value lesson
     if (!isPlaceValueLesson(lesson?.title)) return;
     
-    // Find concept mapping if available (for adaptive behavior)
     const mapping = PLACE_VALUE_QUIZ_MAPPINGS.find(m => m.conceptId === 'digit-value');
     if (!mapping) return;
     
@@ -432,31 +467,25 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
     setShowCelebration(true);
     fireConfetti();
 
-    // Fetch responses to calculate score
+    // Fetch responses to calculate score using reusable scoring config
     try {
       const res = await fetch("/api/learner/responses?lessonId=" + lessonId, {
         credentials: "include",
       });
       const data = await res.json();
-      
-      // Count scored responses (only choice-based steps with expected answers)
-      const scoredResponses = (data.responses || []).filter((r: any) => {
-        const step = journeySteps.find((s: any) => s.id === r.activityId);
-        if (!step) return false;
-        // Only count steps with defined correct answers
-        const hasCorrectAnswer = step.interactionSpec?.correctChoiceId || 
-                                 step.interactionSpec?.correctIndex != null ||
-                                 step.interactionSpec?.correctAnswer;
-        return hasCorrectAnswer;
-      });
-      
-      const total = scoredResponses.length;
-      const correct = scoredResponses.filter((r: any) => r.correct).length;
-      const percentage = total > 0 ? Math.round((correct / total) * 100) : 0;
-      
+        
+      // Get all scored activities from lesson structure
+      const scoredActivities = getScoredActivities(journeySteps);
+        
+      // Calculate score using reusable function
+      const { correct, total, percentage } = calculateLessonScore(
+        data.responses || [],
+        scoredActivities
+      );
+        
       // Get performance band
       const band = getPerformanceBand(percentage);
-      
+        
       setLessonScore({ correct, total, percentage, band });
     } catch (e) {
       console.warn("[handleComplete] Failed to calculate score:", e);
@@ -1085,44 +1114,18 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
           </div>
         )}
 
-        {/* Learning Goals */}
+        {/* Learning Objectives */}
         {journeySteps.length > 0 && (
           <div style={{ background: "#fff", borderRadius: 20, padding: "24px", boxShadow: "0 2px 12px rgba(0,0,0,0.04)", marginBottom: 20 }}>
             <h3 style={{ fontSize: "1rem", fontWeight: 800, color: "#1e293b", margin: "0 0 12px" }}>By the end of this lesson, you'll be able to:</h3>
-            <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.8 }}>
-              <li style={{ color: "#475569", fontSize: "0.95rem" }}>Read numbers up to tens of thousands</li>
-              <li style={{ color: "#475569", fontSize: "0.95rem" }}>Identify the place value of any digit</li>
-              <li style={{ color: "#475569", fontSize: "0.95rem" }}>Write numbers in expanded form</li>
-              <li style={{ color: "#475569", fontSize: "0.95rem" }}>Compare and order big numbers</li>
+            <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
+              {['Read numbers up to tens of thousands', 'Identify the place value of any digit', 'Write numbers in expanded form', 'Compare and order big numbers'].map((obj, i) => (
+                              <li key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 0", color: "#475569", fontSize: "0.95rem" }}>
+                                <span style={{ color: "#10B981", fontSize: "1.1rem", fontWeight: 700 }}>✓</span>
+                                {obj}
+                              </li>
+                            ))}
             </ul>
-          </div>
-        )}
-
-        {/* Journey Progress */}
-        {journeySteps.length > 0 && (
-          <div style={{ background: "#fff", borderRadius: 20, padding: "24px", boxShadow: "0 2px 12px rgba(0,0,0,0.04)", marginBottom: 20 }}>
-            <h3 style={{ fontSize: "1rem", fontWeight: 800, color: "#1e293b", margin: "0 0 12px" }}>Your Journey</h3>
-            <div style={{ height: 8, background: "#F1F5F9", borderRadius: 4, overflow: "hidden", marginBottom: 12 }}>
-              <div style={{ width: `${progress}%`, height: "100%", background: "linear-gradient(90deg, #6366F1, #8B5CF6)", borderRadius: 4, transition: "width 0.5s ease" }} />
-            </div>
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-              {journeySteps.map((step: any, i: number) => {
-                const isCompleted = i < currentStep;
-                const isCurrent = i === currentStep;
-                return (
-                  <button key={step.id} onClick={() => !viewing && setCurrentStep(i)} style={{
-                    width: 36, height: 36, borderRadius: 10, border: "none",
-                    background: isCurrent ? "#6366F1" : isCompleted ? "#10B981" : "#F1F5F9",
-                    color: isCurrent || isCompleted ? "#fff" : "#94A3B8",
-                    fontSize: "0.875rem", fontWeight: 700, cursor: "pointer",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    boxShadow: isCurrent ? "0 4px 12px rgba(99,102,241,0.3)" : "none",
-                  }}>
-                    {isCompleted ? <CheckCircle2 style={{ width: 16, height: 16 }} /> : (STEP_TYPE_ICONS[getStepType(step)] || (i + 1))}
-                  </button>
-                );
-              })}
-            </div>
           </div>
         )}
 
