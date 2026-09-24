@@ -20,49 +20,29 @@ export async function POST(req: NextRequest) {
 
     if (!lessonId || !activityId || selectedAnswer === undefined || expectedAnswer === undefined || correct === undefined) {
       return NextResponse.json(
-        { error: "lessonId, activityId, selectedAnswer, expectedAnswer, required" },
+        { error: "lessonId, activityId, selectedAnswer, expectedAnswer, correct required" },
         { status: 400 }
       );
     }
 
-    // Check for duplicate response (idempotency)
-    const { data: existing } = await supabase
+    // Upsert: insert or update on unique (learnerId, lessonId, activityId)
+    const { data, error } = await supabase
       .from("InteractionResponse")
-      .select("id")
-      .eq("learnerId", user.learnerProfileId)
-      .eq("lessonId", lessonId)
-      .eq("activityId", activityId)
-      .maybeSingle();
-
-    if (existing) {
-      // Update existing response instead of creating duplicate
-      const { data, error } = await supabase
-        .from("InteractionResponse")
-        .update({
+      .upsert(
+        {
+          learnerId: user.learnerProfileId,
+          lessonId,
+          activityId,
+          conceptId: conceptId || null,
           selectedAnswer: String(selectedAnswer),
           expectedAnswer: String(expectedAnswer),
           correct,
-          conceptId: conceptId || null,
-        })
-        .eq("id", existing.id)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return NextResponse.json({ success: true, response: data, updated: true });
-    }
-
-    const { data, error } = await supabase
-      .from("InteractionResponse")
-      .insert({
-        learnerId: user.learnerProfileId,
-        lessonId,
-        activityId,
-        conceptId: conceptId || null,
-        selectedAnswer: String(selectedAnswer),
-        expectedAnswer: String(expectedAnswer),
-        correct,
-      })
+        },
+        {
+          onConflict: "learnerId,lessonId,activityId",
+          ignoreDuplicates: false,
+        }
+      )
       .select()
       .single();
 
