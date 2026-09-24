@@ -1038,6 +1038,8 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
   // Get the welcome step for personalized content
   const welcomeStep = journeySteps.find((s: any) => s.stepType === 'welcome') || journeySteps[0];
   const learnerDisplayName = session?.user?.name || session?.user?.displayName || learnerName;
+  const completedSteps = journeySteps.filter((_: any, i: number) => i < currentStep);
+  const progress = totalSteps > 0 ? Math.round((completedSteps.length / totalSteps) * 100) : 0;
 
   return (
     <div style={{ minHeight: "100vh", background: "linear-gradient(180deg, #F0F4FF 0%, #EDE9FE 100%)" }}>
