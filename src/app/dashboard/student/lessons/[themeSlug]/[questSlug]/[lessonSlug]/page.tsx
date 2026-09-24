@@ -322,12 +322,13 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
   }, [lesson?.title, currentJourneyStep, adaptive]);
 
   const handleComplete = useCallback(async () => {
-    if (!slugs || hasCompletedRef.current) return;
+    const lessonId = lesson?.id;
+    if (!lessonId || hasCompletedRef.current) return;
     hasCompletedRef.current = true;
     try {
       const res = await fetch("/api/learner/progress", {
         method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include",
-        body: JSON.stringify({ lessonId: lesson?.id, questId: slugs.questSlug || null, action: "complete" }),
+        body: JSON.stringify({ lessonId, questId: slugs?.questSlug || null, action: "complete" }),
       });
       const data = await res.json();
       if (data.success || data.completed) {
@@ -343,7 +344,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
       setCompleteError("Network error. Please try again.");
       hasCompletedRef.current = false;
     }
-  }, [slugs, lesson, fireConfetti]);
+  }, [lesson?.id, slugs?.questSlug, fireConfetti]);
 
   const handleNavigateHome = useCallback(() => {
     router.push("/dashboard/student");
