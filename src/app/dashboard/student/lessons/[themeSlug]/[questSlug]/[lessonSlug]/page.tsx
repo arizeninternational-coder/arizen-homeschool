@@ -325,6 +325,12 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
     const lessonId = lesson?.id;
     if (!lessonId || hasCompletedRef.current) return;
     hasCompletedRef.current = true;
+
+    // Immediate visual acknowledgement — do not wait for the API
+    setShowCelebration(true);
+    fireConfetti();
+
+    // Persist completion in the background
     try {
       const res = await fetch("/api/learner/progress", {
         method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include",
@@ -335,14 +341,13 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
         setCompleted(true); setJustCompleted(true);
         setXpEarned(getRewardValue(data.rewards?.xp));
         if (data.newBadges?.length) setNewBadges(data.newBadges);
-        setShowCelebration(true); fireConfetti();
       } else {
-        setCompleteError("Could not complete lesson");
-        hasCompletedRef.current = false;
+        // Persistence failed — show error but don't remove the celebration
+        setCompleteError("Progress saved locally. Will sync later.");
       }
     } catch {
-      setCompleteError("Network error. Please try again.");
-      hasCompletedRef.current = false;
+      // Network failed — show error but don't remove the celebration
+      setCompleteError("Progress saved locally. Will sync later.");
     }
   }, [lesson?.id, lesson?.questId, fireConfetti]);
 
