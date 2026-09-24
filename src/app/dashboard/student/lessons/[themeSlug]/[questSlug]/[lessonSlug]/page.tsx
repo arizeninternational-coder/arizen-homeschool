@@ -933,30 +933,42 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                     </div>
                   )}
                   {activeRemediation.interactionSpec?.type === 'tap_choice' && activeRemediation.interactionSpec.choices && (
-                    <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
-                      {activeRemediation.interactionSpec.choices.map((choice: any, i: number) => (
-                        <button
-                          key={i}
-                          onClick={() => {
-                            const isCorrect = choice.id === activeRemediation.interactionSpec.correctChoiceId;
-                            if (isCorrect) {
-                              adaptive.recordRecovery(activeRemediation.interactionSpec.conceptId || 'digit-value');
-                              setActiveRemediation(null);
-                            }
-                          }}
-                          style={{ padding: "12px 16px", borderRadius: 10, border: "2px solid #CBD5E1", background: "#fff", textAlign: "left", cursor: "pointer", fontSize: "0.9rem", fontWeight: 600, color: "#334155" }}
-                        >
-                          {choice.label} {choice.description ? `— ${choice.description}` : ''}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                  <button
-                    onClick={() => setActiveRemediation(null)}
-                    style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#8B5CF6", color: "#fff", fontWeight: 700, fontSize: "0.9rem", cursor: "pointer" }}
-                  >
-                    Continue →
-                  </button>
+                            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
+                              {activeRemediation.interactionSpec.choices.map((choice: any, i: number) => (
+                                <button
+                                  key={i}
+                                  onClick={() => {
+                                    const isCorrect = choice.id === activeRemediation.interactionSpec.correctChoiceId;
+                                    if (isCorrect) {
+                                      adaptive.recordRecovery(activeRemediation.interactionSpec.conceptId || 'digit-value');
+                                      setActiveRemediation(null);
+                                    }
+                                  }}
+                                  style={{ padding: "12px 16px", borderRadius: 10, border: "2px solid #CBD5E1", background: "#fff", textAlign: "left", cursor: "pointer", fontSize: "0.9rem", fontWeight: 600, color: "#334155" }}
+                                >
+                                  {choice.label} {choice.description ? `— ${choice.description}` : ''}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                            <button
+                              onClick={() => {
+                                // Retry: clear the current step's interaction and reload
+                                setInteraction({});
+                                setCurrentStep(clampedStep);
+                              }}
+                              style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#10B981", color: "#fff", fontWeight: 700, fontSize: "0.9rem", cursor: "pointer" }}
+                            >
+                              Try Again
+                            </button>
+                            <button
+                              onClick={() => setActiveRemediation(null)}
+                              style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#8B5CF6", color: "#fff", fontWeight: 700, fontSize: "0.9rem", cursor: "pointer" }}
+                            >
+                              Continue →
+                            </button>
+                          </div>
                 </div>
               )}
             </div>
@@ -1060,6 +1072,13 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                 boxShadow: "0 6px 24px rgba(0,0,0,0.2)",
               }}>
                 Back to Dashboard
+              </button>
+              <button onClick={() => { setShowCompleted(false); setCurrentStep(0); setViewing(true); }} style={{
+                marginTop: 12, padding: "12px 32px", borderRadius: 12, border: "2px solid #fff",
+                background: "transparent", color: "#fff",
+                fontWeight: 700, fontSize: 15, cursor: "pointer",
+              }}>
+                Review Lesson
               </button>
             </div>
           )}

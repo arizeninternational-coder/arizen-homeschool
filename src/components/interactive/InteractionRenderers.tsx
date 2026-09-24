@@ -141,8 +141,7 @@ export function TapChoice({
               btnClass = "border-emerald-500 bg-emerald-50 text-emerald-800 shadow-lg shadow-emerald-100";
             else if (isSelected && !isCorrect)
               btnClass = "border-orange-500 bg-orange-50 text-orange-800 shadow-lg shadow-orange-100";
-            else if (!isSelected && isCorrect)
-              btnClass = "border-emerald-300 bg-emerald-50 text-emerald-700";
+            // DO NOT reveal the correct answer — learner must try again
             else btnClass = "border-slate-200 bg-slate-50 text-slate-400 opacity-60";
           } else if (isSelected) {
             btnClass = "border-indigo-500 bg-indigo-50 text-indigo-800 shadow-lg shadow-indigo-100";
@@ -218,8 +217,7 @@ export function MultipleChoice({
               btnClass = "border-emerald-500 bg-emerald-50 text-emerald-800 shadow-lg shadow-emerald-100";
             else if (isSelected && !isCorrect)
               btnClass = "border-orange-500 bg-orange-50 text-orange-800 shadow-lg shadow-orange-100";
-            else if (!isSelected && isCorrect)
-              btnClass = "border-emerald-300 bg-emerald-50 text-emerald-700";
+            // DO NOT reveal the correct answer — learner must try again
             else btnClass = "border-slate-200 bg-slate-50 text-slate-400 opacity-60";
           } else if (isSelected) {
             btnClass = "border-indigo-500 bg-indigo-50 text-indigo-800 shadow-lg shadow-indigo-100";
