@@ -40,18 +40,17 @@ export interface UseAdaptiveLessonReturn {
  * useAdaptiveLesson — client-side hook for the Place Value adaptive pilot.
  * 
  * Survives React rerenders via useState + useRef.
- * Persists to sessionStorage for navigation within lesson.
- * Does NOT persist across browser sessions (pilot scope).
+ * Persists to localStorage for cross-session review (pilot scope).
  */
 export function useAdaptiveLesson(): UseAdaptiveLessonReturn {
   const [learningState, setLearningState] = useState<LearningState | null>(null);
   const stateRef = useRef<LearningState | null>(null);
 
-  // Load from sessionStorage on mount
+  // Load from localStorage on mount
   useEffect(() => {
     if (typeof window === 'undefined') return;
     try {
-      const stored = sessionStorage.getItem(STORAGE_KEY);
+      const stored = localStorage.getItem(STORAGE_KEY) || sessionStorage.getItem(STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored);
         setLearningState(parsed);
@@ -65,6 +64,7 @@ export function useAdaptiveLesson(): UseAdaptiveLessonReturn {
     if (typeof window === 'undefined') return;
     if (learningState) {
       try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(learningState));
         sessionStorage.setItem(STORAGE_KEY, JSON.stringify(learningState));
       } catch {}
       stateRef.current = learningState;
@@ -149,7 +149,10 @@ export function useAdaptiveLesson(): UseAdaptiveLessonReturn {
     setLearningState(null);
     stateRef.current = null;
     if (typeof window !== 'undefined') {
-      try { sessionStorage.removeItem(STORAGE_KEY); } catch {}
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+        sessionStorage.removeItem(STORAGE_KEY);
+      } catch {}
     }
   }, []);
 

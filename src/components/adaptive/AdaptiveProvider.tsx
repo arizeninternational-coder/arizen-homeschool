@@ -36,28 +36,43 @@ const AdaptiveContext = createContext<AdaptiveContextType | null>(null);
 
 const STORAGE_KEY = 'arizen-adaptive-state';
 
+function loadState(): LearningState | null {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY) || sessionStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      // Also write to localStorage for persistence
+      localStorage.setItem(STORAGE_KEY, stored);
+      return parsed;
+    }
+  } catch {}
+  return null;
+}
+
+function saveState(state: LearningState) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch {}
+}
+
 export function AdaptiveProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<LearningState | null>(null);
   const stateRef = useRef<LearningState | null>(null);
 
-  // Load from sessionStorage on mount
+  // Load from localStorage on mount
   useEffect(() => {
-    try {
-      const stored = sessionStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        setState(parsed);
-        stateRef.current = parsed;
-      }
-    } catch {}
+    const stored = loadState();
+    if (stored) {
+      setState(stored);
+      stateRef.current = stored;
+    }
   }, []);
 
-  // Persist to sessionStorage on state change
+  // Persist to localStorage on state change
   useEffect(() => {
     if (state) {
-      try {
-        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      } catch {}
+      saveState(state);
       stateRef.current = state;
     }
   }, [state]);

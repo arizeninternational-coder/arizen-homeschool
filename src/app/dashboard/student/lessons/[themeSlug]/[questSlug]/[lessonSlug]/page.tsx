@@ -166,9 +166,37 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
   // Initialize adaptive state for Place Value lesson
   useEffect(() => {
     if (lesson && isPlaceValueLesson(lesson.title) && session?.user) {
+      if (completed) {
+        // Review mode — rely on localStorage load from useAdaptiveLesson
+        // If no stored state exists, review still works without adaptive state
+        return;
+      }
+      const existingState = adaptive.learningState;
+      if (existingState && existingState.lessonId === lesson.id) {
+        // Already initialized for this lesson
+        return;
+      }
       adaptive.initLearningState((session.user as any).id || 'unknown', lesson.id);
     }
-  }, [lesson, session, adaptive]);
+  }, [lesson, session, adaptive, completed]);
+
+  // Restore previous answers from persisted adaptive state
+  const restorePreviousAnswers = useCallback((state: any) => {
+    if (!state?.concepts) return;
+    const evidenceMap: Record<string, { answer: string; correct: boolean }> = {};
+    for (const [conceptId, conceptState] of Object.entries(state.concepts)) {
+      const cs = conceptState as any;
+      if (cs.lastEvidence) {
+        evidenceMap[conceptId] = {
+          answer: cs.lastEvidence.answer || '',
+          correct: cs.lastEvidence.correct,
+        };
+      }
+    }
+    if (Object.keys(evidenceMap).length > 0) {
+      (window as any).__restoredAnswers = evidenceMap;
+    }
+  }, []);
 
   // Derive adaptive journey (only depends on lesson, not on render-specific state)
   useEffect(() => {
@@ -179,6 +207,28 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
       setAdaptiveJourney(null);
     }
   }, [lesson, baseJourney]);
+
+  // Apply restored answers when a step renders (review mode)
+  useEffect(() => {
+    const restored = (window as any).__restoredAnswers;
+    if (!restored || !currentJourneyStep?.interactionSpec) return;
+    const choices = currentJourneyStep.interactionSpec.choices || currentJourneyStep.interactionSpec.options || [];
+    const options = choices.map((c: any) => typeof c === 'string' ? c : c.label);
+    const mapping = PLACE_VALUE_QUIZ_MAPPINGS.find(m => {
+      const conceptState = adaptive.learningState?.concepts?.[m.conceptId];
+      return conceptState?.lastEvidence && restored[m.conceptId];
+    });
+    if (!mapping) return;
+    const evidence = restored[mapping.conceptId];
+    const idx = options.indexOf(evidence.answer);
+    if (idx >= 0) {
+      setInteraction((p: any) => ({
+        ...p,
+        selectedChoice: idx,
+        choiceFeedback: evidence.correct ? 'correct' : 'incorrect',
+      }));
+    }
+  }, [currentStep, currentJourneyStep, adaptive.learningState]);
 
   // ── Debug logging in development ──────────────────────────────────────────
   if (process.env.NODE_ENV === "development") {
@@ -356,7 +406,18 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
   }, [lesson?.id, lesson?.questId, fireConfetti]);
 
   const handleNavigateHome = useCallback(() => {
-    router.push("/dashboard/student");
+    // Try router.push first, fall back to window.location for reliability
+    try {
+      router.push("/dashboard/student");
+      // Fallback: if router.push doesn't navigate within 500ms, use window.location
+      setTimeout(() => {
+        if (window.location.href.includes("/lessons/")) {
+          window.location.href = "/dashboard/student";
+        }
+      }, 500);
+    } catch {
+      window.location.href = "/dashboard/student";
+    }
   }, [router]);
 
   // useMediaQuery must be called before any conditional returns (hooks rule)
