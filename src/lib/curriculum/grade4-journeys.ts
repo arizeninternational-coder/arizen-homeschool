@@ -252,7 +252,7 @@ export function buildPlaceValueJourney(): JourneyStep[] {
         buttonLabel: "Start lesson",
         hint: "Each digit has a special place.",
       },
-      visualSpec: pvVisual(["1", "2", "3", "4", "5"]),
+      visualSpec: pvVisual(["1", "0", "0", "0", "0"]),
       feedbackSpec: {
         hint: "Each digit has a special place.",
       },

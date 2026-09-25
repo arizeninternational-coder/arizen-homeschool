@@ -14,10 +14,10 @@ import { GradientButton } from "@/components/ui/Pill";
 import OwlTeacher from "@/components/ui/OwlTeacher";
 import type { JourneyStep, JourneyStepType } from "@/lib/curriculum/lesson-journey";
 import { STEP_TYPE_ICONS } from "@/lib/curriculum/lesson-journey";
-import { InteractiveStepRenderer } from "@/components/interactive";
+import { InteractiveStepRenderer, RemediationTapChoice } from "@/components/interactive";
 import { isLessonStudentVisible } from "@/lib/curriculum/student-visibility";
 import { isGrade4MathContent, buildGrade4JourneyFromBlocks } from "@/lib/curriculum/grade4-journeys";
-import { isPlaceValueLesson, buildAdaptivePlaceValueJourney, PLACE_VALUE_QUIZ_MAPPINGS } from "@/lib/curriculum/adaptive-journey";
+import { isPlaceValueLesson, buildAdaptivePlaceValueJourney } from "@/lib/curriculum/adaptive-journey";
 import { getPerformanceBand } from "@/lib/curriculum/performance-bands";
 import { getScoredActivities, calculateLessonScore } from "@/lib/curriculum/scoring-config";
 import { getStepConceptMapping, getAllScoredStepIds } from "@/lib/curriculum/step-concept-mappings";
@@ -155,6 +155,8 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
   const adaptive = useAdaptiveLesson();
   const [adaptiveJourney, setAdaptiveJourney] = useState<any[]|null>(null);
   const [activeRemediation, setActiveRemediation] = useState<any>(null);
+  const [retryKey, setRetryKey] = useState(0);
+  const [remediationTargetActivity, setRemediationTargetActivity] = useState<string | null>(null);
 
   const baseJourney = useMemo(() => buildLessonJourney(lesson), [lesson]);
   // Use adaptive journey for Place Value
@@ -296,6 +298,22 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
     ? STEP_TYPE_ICONS[journeySteps[clampedStep + 1].stepType as JourneyStepType] + " " + (journeySteps[clampedStep + 1].title || "Next")
     : null;
 
+  // Gating: the learner cannot advance to the next step while:
+  // 1. A remediation overlay is active
+  // 2. A MultiActivity step has incomplete sub-activities
+  // 3. A tap_choice / multiple_choice step has no submitted answer
+  const canAdvance = useMemo(() => {
+    if (activeRemediation) return false;
+    const step = currentJourneyStep;
+    if (!step) return true;
+    const itype = step.interactionSpec?.type;
+    if (itype === "multi_activity") return interaction.multiActivityComplete === true;
+    if (itype === "tap_choice" || itype === "multiple_choice" || itype === "adaptive-evaluation") {
+      return interaction.choiceSubmitted === true;
+    }
+    return true;
+  }, [activeRemediation, currentJourneyStep, interaction]);
+
   // ── RENDER DIAGNOSTIC (temporary) ─────────────────────────────────────
   useEffect(() => {
     const step = currentJourneyStep;
@@ -360,7 +378,16 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
   }, []);
 
   // Persist interaction response to the database (server-side)
-  const persistResponse = useCallback(async (activityId: string, selectedAnswer: string, expectedAnswer: string, correct: boolean, conceptId?: string) => {
+  const persistResponse = useCallback(async (
+    activityId: string,
+    selectedAnswer: string,
+    expectedAnswer: string,
+    correct: boolean,
+    conceptId?: string,
+    misconceptionId?: string | null,
+    attemptNumber?: number,
+    remediationShown?: string | null,
+  ) => {
     if (!lesson?.id) return;
     try {
       await fetch("/api/learner/responses", {
@@ -374,6 +401,9 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
           selectedAnswer,
           expectedAnswer,
           correct,
+          misconceptionId: misconceptionId || null,
+          attemptNumber: attemptNumber || 1,
+          remediationShown: remediationShown || null,
         }),
       });
     } catch (e) {
@@ -385,84 +415,111 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
   const handleAdaptiveAnswer = useCallback((selectedIdx: number, correct: boolean, overrideActivityId?: string, overrideSelectedAnswer?: string, overrideExpectedAnswer?: string) => {
     const step = currentJourneyStep;
     if (!step) return;
-    
-    // Determine activity ID - use override if provided (for multi-activity steps)
+
+    // Determine the ACTUAL activity ID for this response.
+    // For MultiActivity sub-activities (p1, p2, p3) use the override ID.
+    // For single-activity steps use the step's own id.
     const activityId = overrideActivityId || step.id || `step-${clampedStep}`;
-    
-    // For multi-activity steps, find the sub-activity
-    if (step.stepType === 'practice' && step.interactionSpec?.activities && overrideActivityId) {
+
+    // Resolve selected/expected answer strings and options from the actual activity
+    let selectedAnswer: string;
+    let expectedAnswer: string;
+    let options: string[];
+    let remediationPrompt: string;
+
+    if (step.interactionSpec?.activities && overrideActivityId) {
+      // MultiActivity sub-activity (p1, p2, p3)
       const subActivity = step.interactionSpec.activities.find((a: any) => a.id === overrideActivityId);
-      if (subActivity) {
-        const choices = subActivity.choices || subActivity.options || [];
-        const options = choices.map((c: any) => typeof c === 'string' ? c : c.label);
-        const selectedAnswer = overrideSelectedAnswer || options[selectedIdx] || '';
-        
-        let expectedAnswer = overrideExpectedAnswer || '';
-        if (!expectedAnswer && subActivity.correctChoiceId) {
-          const correctChoice = subActivity.choices?.find((c: any) => {
-            const id = typeof c === 'object' ? c.id : String(subActivity.choices.indexOf(c));
-            return id === subActivity.correctChoiceId;
-          });
-          expectedAnswer = correctChoice ? (typeof correctChoice === 'string' ? correctChoice : correctChoice.label) : '';
-        } else if (!expectedAnswer && subActivity.correctIndex != null) {
-          expectedAnswer = subActivity.options?.[subActivity.correctIndex] || '';
-        }
-        
-        persistResponse(activityId, selectedAnswer, expectedAnswer, correct, step.stepType);
-        
-        // Call adaptive engine using step concept mapping
-        if (isPlaceValueLesson(lesson?.title)) {
-          const stepMapping = getStepConceptMapping(activityId);
-          if (stepMapping) {
-            const misconceptionId = stepMapping.misconceptionCheck(selectedAnswer, expectedAnswer);
-            if (!correct && misconceptionId && adaptive.learningState) {
-              const result = adaptive.submitAnswer(stepMapping.conceptId, selectedIdx, options.indexOf(expectedAnswer), options);
-              if (result.shouldRemediate && result.remediationStep) {
-                setActiveRemediation(result.remediationStep);
-              }
-            }
+      if (!subActivity) return;
+      const choices = subActivity.choices || subActivity.options || [];
+      options = choices.map((c: any) => typeof c === "string" ? c : c.label);
+      selectedAnswer = overrideSelectedAnswer || (selectedIdx >= 0 ? (options[selectedIdx] || "") : "");
+      if (overrideExpectedAnswer) {
+        expectedAnswer = overrideExpectedAnswer;
+      } else if (subActivity.correctChoiceId) {
+        const correctChoice = subActivity.choices?.find((c: any) => {
+          const id = typeof c === "object" ? c.id : String(subActivity.choices.indexOf(c));
+          return id === subActivity.correctChoiceId;
+        });
+        expectedAnswer = correctChoice ? (typeof correctChoice === "string" ? correctChoice : correctChoice.label) : "";
+      } else if (subActivity.correctIndex != null) {
+        expectedAnswer = subActivity.options?.[subActivity.correctIndex] || "";
+      } else {
+        expectedAnswer = "";
+      }
+      remediationPrompt = subActivity.prompt || subActivity.question || "";
+    } else {
+      // Standard single-activity step (think_first, connect, quick_check)
+      const choices = step.interactionSpec?.choices || step.interactionSpec?.options || [];
+      options = choices.map((c: any) => typeof c === "string" ? c : c.label);
+      selectedAnswer = overrideSelectedAnswer || (selectedIdx >= 0 ? (options[selectedIdx] || "") : "");
+      if (overrideExpectedAnswer) {
+        expectedAnswer = overrideExpectedAnswer;
+      } else if (step.interactionSpec?.correctChoiceId) {
+        const correctChoice = choices.find((c: any) =>
+          (typeof c === "object" && c.id === step.interactionSpec?.correctChoiceId)
+        );
+        expectedAnswer = correctChoice ? (correctChoice.label || "") : "";
+      } else if (step.interactionSpec?.correctIndex != null) {
+        expectedAnswer = options[step.interactionSpec.correctIndex] || "";
+      } else if (step.interactionSpec?.correctAnswer != null) {
+        expectedAnswer = typeof step.interactionSpec.correctAnswer === "string"
+          ? step.interactionSpec.correctAnswer
+          : options[step.interactionSpec.correctAnswer] || "";
+      } else {
+        expectedAnswer = "";
+      }
+      remediationPrompt = step.interactionSpec?.prompt || step.interactionSpec?.question || "";
+    }
+
+    // Persist ALL responses to DB (instrumentation for attempt history)
+    persistResponse(activityId, selectedAnswer, expectedAnswer, correct, step.interactionSpec?.conceptId || undefined);
+
+    // Instrumentation: log which activity entered the adaptive path
+    const stepMapping = getStepConceptMapping(activityId);
+    if (process.env.NODE_ENV === "development") {
+      console.log("[Adaptive] Answer evaluated — activity:", activityId,
+        "conceptId:", stepMapping?.conceptId || "unknown",
+        "correct:", correct, "selected:", selectedAnswer, "expected:", expectedAnswer);
+    }
+
+    // Adaptive evaluation — ONLY when the answer is wrong.
+    // submitAnswer itself determines the misconception and generates remediation.
+    if (isPlaceValueLesson(lesson?.title) && adaptive.learningState && !correct) {
+      if (stepMapping) {
+        const result = adaptive.submitAnswer(
+          stepMapping.conceptId,
+          selectedAnswer,
+          expectedAnswer,
+          options,
+          {
+            prompt: remediationPrompt,
+            options,
+            expectedAnswer,
+            selectedAnswer,
+            activityId,
           }
+        );
+        if (result.shouldRemediate && result.remediationStep) {
+          setActiveRemediation(result.remediationStep);
+          setRemediationTargetActivity(overrideActivityId || step.id || null);
+          // Reset interaction for retry
+          setInteraction({});
         }
-        return;
+        // Persist adaptive evidence to DB (with misconception + attempt tracking)
+        persistResponse(
+          activityId,
+          selectedAnswer,
+          expectedAnswer,
+          false,
+          stepMapping.conceptId,
+          result.misconceptionId,
+          result.attemptNumber,
+          result.remediationStep?.id || null,
+        );
       }
     }
-    
-    // Standard single-activity persistence
-    const choices = step.interactionSpec?.choices || step.interactionSpec?.options || [];
-    const options = choices.map((c: any) => typeof c === 'string' ? c : c.label);
-    
-    if (choices.length > 0) {
-      const selectedAnswer = options[selectedIdx] || '';
-      
-      let expectedAnswer = '';
-      if (step.interactionSpec?.correctChoiceId) {
-        const correctChoice = choices.find((c: any) => 
-          (typeof c === 'object' && c.id === step.interactionSpec.correctChoiceId)
-        );
-        expectedAnswer = correctChoice ? (correctChoice.label || correctChoice) : options[0];
-      } else if (step.interactionSpec?.correctIndex != null) {
-        expectedAnswer = options[step.interactionSpec.correctIndex] || options[0];
-      } else if (step.interactionSpec?.correctAnswer) {
-        expectedAnswer = step.interactionSpec.correctAnswer;
-      }
-      
-      persistResponse(activityId, selectedAnswer, expectedAnswer, correct, step.stepType);
-      
-        // Call adaptive engine using step concept mapping
-        if (isPlaceValueLesson(lesson?.title)) {
-          const stepMapping = getStepConceptMapping(step.id);
-          if (stepMapping) {
-            const misconceptionId = stepMapping.misconceptionCheck(selectedAnswer, expectedAnswer);
-            if (!correct && misconceptionId && adaptive.learningState) {
-              const result = adaptive.submitAnswer(stepMapping.conceptId, selectedIdx, options.indexOf(expectedAnswer), options);
-              if (result.shouldRemediate && result.remediationStep) {
-                setActiveRemediation(result.remediationStep);
-              }
-            }
-          }
-        }
-      }
-      }, [lesson?.title, currentJourneyStep, adaptive, clampedStep, persistResponse]);
+  }, [lesson?.title, currentJourneyStep, adaptive, clampedStep, persistResponse, setInteraction]);
 
   const handleComplete = useCallback(async () => {
     const lessonId = lesson?.id;
@@ -714,6 +771,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                 {/* Interactive renderer for steps with new spec fields */}
                 {hasInteractiveSpec(currentJourneyStep) ? (
                   <InteractiveStepRenderer
+                    key={retryKey}
                     step={currentJourneyStep as any}
                     stepNumber={clampedStep + 1}
                     totalSteps={totalSteps}
@@ -727,6 +785,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                       }
                     }}
                     onAnswer={handleAdaptiveAnswer}
+                    resetSubActivityId={remediationTargetActivity || undefined}
                   />
                 ) : (
                   <>
@@ -921,54 +980,44 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                   {activeRemediation.visualSpec && (
                     <div style={{ marginBottom: 12 }}>
                       <InteractiveStepRenderer
-                        step={activeRemediation}
-                        stepNumber={clampedStep + 1}
-                        totalSteps={totalSteps}
+                        key={`remediation-viz-${activeRemediation.id || "viz"}`}
+                        step={{ visualSpec: activeRemediation.visualSpec } as any}
+                        stepNumber={1}
+                        totalSteps={1}
                         interaction={{}}
                         setInteraction={() => {}}
                         onNext={() => {}}
                         onAnswer={() => {}}
-                        isRemediation={true}
                       />
                     </div>
                   )}
-                  {activeRemediation.interactionSpec?.type === 'tap_choice' && activeRemediation.interactionSpec.choices && (
-                            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
-                              {activeRemediation.interactionSpec.choices.map((choice: any, i: number) => (
-                                <button
-                                  key={i}
-                                  onClick={() => {
-                                    const isCorrect = choice.id === activeRemediation.interactionSpec.correctChoiceId;
-                                    if (isCorrect) {
-                                      adaptive.recordRecovery(activeRemediation.interactionSpec.conceptId || 'digit-value');
-                                      setActiveRemediation(null);
-                                    }
-                                  }}
-                                  style={{ padding: "12px 16px", borderRadius: 10, border: "2px solid #CBD5E1", background: "#fff", textAlign: "left", cursor: "pointer", fontSize: "0.9rem", fontWeight: 600, color: "#334155" }}
-                                >
-                                  {choice.label} {choice.description ? `— ${choice.description}` : ''}
-                                </button>
-                              ))}
-                            </div>
-                          )}
-                          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                            <button
-                              onClick={() => {
-                                // Retry: clear the current step's interaction and reload
-                                setInteraction({});
-                                setCurrentStep(clampedStep);
-                              }}
-                              style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#10B981", color: "#fff", fontWeight: 700, fontSize: "0.9rem", cursor: "pointer" }}
-                            >
-                              Try Again
-                            </button>
-                            <button
-                              onClick={() => setActiveRemediation(null)}
-                              style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#8B5CF6", color: "#fff", fontWeight: 700, fontSize: "0.9rem", cursor: "pointer" }}
-                            >
-                              Continue →
-                            </button>
-                          </div>
+                  {activeRemediation.interactionSpec?.type === "tap_choice" && activeRemediation.interactionSpec.choices && (
+                    <RemediationTapChoice
+                      choices={activeRemediation.interactionSpec.choices}
+                      correctChoiceId={activeRemediation.interactionSpec.correctChoiceId}
+                      feedbackSpec={activeRemediation.interactionSpec.feedbackSpec}
+                      conceptId={activeRemediation.interactionSpec.conceptId || "digit-value"}
+                    />
+                  )}
+                  <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 12 }}>
+                    <button
+                      onClick={() => {
+                        // Try Again: increment retryKey to force a full remount
+                        // of InteractiveStepRenderer. This clears all internal
+                        // component state (TapChoice.selectedId, MultipleChoice.selectedIndex,
+                        // MultiActivity currentActivity/allSubmitted) and re-renders
+                        // the question with NO pre-selected answer — the learner
+                        // must actively answer again.
+                        setRetryKey((k) => k + 1);
+                        setActiveRemediation(null);
+                        setRemediationTargetActivity(null);
+                        setInteraction({});
+                      }}
+                      style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#10B981", color: "#fff", fontWeight: 700, fontSize: "0.9rem", cursor: "pointer" }}
+                    >
+                      Try Again
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -978,7 +1027,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
           {totalSteps > 0 && (
             <div style={{ background: "#fff", borderTop: "1px solid #E2E8F0", padding: "12px 16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               {clampedStep > 0 ? (
-                <button onClick={() => setCurrentStep(clampedStep - 1)} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "10px 16px", borderRadius: 10, border: "1px solid #CBD5E1", background: "#fff", color: "#334155", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>
+                <button onClick={() => setCurrentStep(clampedStep - 1)} disabled={!!activeRemediation} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "10px 16px", borderRadius: 10, border: "1px solid #CBD5E1", background: "#fff", color: "#334155", fontWeight: 700, fontSize: 14, cursor: "pointer", opacity: activeRemediation ? 0.5 : 1 }}>
                   <ChevronLeft style={{ width: 16, height: 16 }} /> Back
                 </button>
               ) : <div />}
@@ -986,7 +1035,10 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                 <div />
               ) : (
                 nextStepLabel && (
-                  <button onClick={() => setCurrentStep(clampedStep + 1)} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "10px 20px", borderRadius: 10, border: "none", background: "linear-gradient(135deg, #6366F1, #8B5CF6)", color: "#fff", fontWeight: 700, fontSize: "14", cursor: "pointer" }}>
+                  <button
+                  onClick={() => setCurrentStep(clampedStep + 1)}
+                  disabled={!canAdvance}
+                  style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "10px 20px", borderRadius: 10, border: "none", background: canAdvance ? "linear-gradient(135deg, #6366F1, #8B5CF6)" : "#CBD5E1", color: "#fff", fontWeight: 700, fontSize: "14", cursor: canAdvance ? "pointer" : "not-allowed" }}>
                     {nextStepLabel} <ChevronRight style={{ width: 16, height: 16 }} />
                   </button>
                 )
@@ -1073,7 +1125,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
               }}>
                 Back to Dashboard
               </button>
-              <button onClick={() => { setShowCompleted(false); setCurrentStep(0); setViewing(true); }} style={{
+              <button onClick={() => { setShowCelebration(false); setCurrentStep(0); setViewing(true); }} style={{
                 marginTop: 12, padding: "12px 32px", borderRadius: 12, border: "2px solid #fff",
                 background: "transparent", color: "#fff",
                 fontWeight: 700, fontSize: 15, cursor: "pointer",

@@ -26,6 +26,20 @@ export interface Evidence {
   answer?: string;
   expectedAnswer?: string;
   misconceptionId?: string;
+  attemptNumber?: number;
+  remediationShown?: string | null;
+}
+
+export interface LearningAttempt {
+  activityId: string;
+  conceptId: string;
+  selectedAnswer: string;
+  expectedAnswer: string;
+  correct: boolean;
+  misconceptionId: string | null;
+  attemptNumber: number;
+  timestamp: number;
+  remediationShown: string | null;
 }
 
 export interface ConceptState {
@@ -45,6 +59,7 @@ export interface LearningState {
   remediationCount: number;
   difficultyLevel: number;
   startedAt: number;
+  attempts: LearningAttempt[];
 }
 
 export interface Misconception {
@@ -126,6 +141,13 @@ export const PLACE_VALUE_MISCONCEPTIONS: Misconception[] = [
     indicators: ['says equal when digits differ', 'ignores place differences'],
     remediationActivities: ['comparison-number-line', 'digit-by-digit-compare'],
   },
+  {
+    id: 'read-numbers',
+    label: 'Misreads a whole number',
+    description: 'Student swaps digit positions or assigns wrong place value when reading a number aloud',
+    indicators: ['reads digits in wrong order', 'misplaces a digit', 'ignores zero as placeholder'],
+    remediationActivities: ['read-numbers-scaffold', 'place-value-chart-explorer'],
+  },
 ];
 
 // -- Learning State Manager ---------------------------------------------------
@@ -154,6 +176,7 @@ export function createInitialLearningState(
     remediationCount: 0,
     difficultyLevel: 2,
     startedAt: Date.now(),
+    attempts: [],
   };
 }
 
@@ -186,6 +209,17 @@ export function recordEvidence(
         history: updatedHistory,
       },
     },
+    attempts: [...(state.attempts || []), {
+      activityId: evidence.activityId || '',
+      conceptId: evidence.conceptId,
+      selectedAnswer: evidence.answer || '',
+      expectedAnswer: evidence.expectedAnswer || '',
+      correct: evidence.correct,
+      misconceptionId: evidence.misconceptionId || null,
+      attemptNumber: evidence.attemptNumber || 1,
+      timestamp: evidence.timestamp,
+      remediationShown: evidence.remediationShown || null,
+    }],
   };
 }
 
@@ -223,33 +257,77 @@ export function detectMisconception(
 ): Misconception | null {
   const selected = selectedAnswer.toLowerCase();
   const expected = expectedAnswer.toLowerCase();
-  
-  // Place Value specific detection
-  if (conceptId === 'digit-value') {
-    // Check if student chose "ones" when the correct answer involves a higher place
-    // This indicates digit-vs-value confusion (they picked the digit face value)
+
+  // Normalize: strip commas/spaces for numeric comparison
+  const selNum = selectedAnswer.replace(/[,\s]/g, '');
+  const expNum = expectedAnswer.replace(/[,\s]/g, '');
+  const isNumeric = (s: string) => /^\d+$/.test(s);
+
+  // -- digit-value concept --------------------------------------------------
+  if (conceptId === 'digit-value' || conceptId === 'place-value') {
+    // Chose "ones"/"X ones" when correct is a higher place → digit-vs-value
+    const places = ['ones', 'tens', 'hundreds', 'thousands', 'ten thousands'];
     const selectedIsOnes = selected.includes('ones') || selected.includes('one');
     const expectedIsOnes = expected.includes('ones') || expected.includes('one');
-    
     if (selectedIsOnes && !expectedIsOnes) {
       return PLACE_VALUE_MISCONCEPTIONS.find(m => m.id === 'digit-not-value') || null;
     }
-    
-    // Check for position confusion (chose tens instead of hundreds, etc.)
-    const places = ['ones', 'tens', 'hundreds', 'thousands'];
-    const selectedPlace = places.find(p => selected.includes(p));
-    const expectedPlace = places.find(p => expected.includes(p));
-    
-    if (selectedPlace && expectedPlace && selectedPlace !== expectedPlace) {
+
+    // Different places → position confusion
+    const selPlace = places.find(p => selected.includes(p));
+    const expPlace = places.find(p => expected.includes(p));
+    if (selPlace && expPlace && selPlace !== expPlace) {
       return PLACE_VALUE_MISCONCEPTIONS.find(m => m.id === 'position-confusion') || null;
     }
   }
 
+  // -- read-numbers concept -------------------------------------------------
+  // Learner misreads a number: digits swapped or place mis-assigned.
+  // Any misreading is a 'read-numbers' misconception — the remediation
+  // generator key matches conceptId + misconceptionId.
+  if (conceptId === 'read-numbers') {
+    if (selected.trim() && expected.trim() && selected !== expected) {
+      return PLACE_VALUE_MISCONCEPTIONS.find(m => m.id === 'read-numbers') || null;
+    }
+  }
+
+  // -- compare-order concept ------------------------------------------------
+  if (conceptId === 'compare-order') {
+    // Said "equal" when numbers differ → comparison-equal
+    if (selected.includes('equal')) {
+      return PLACE_VALUE_MISCONCEPTIONS.find(m => m.id === 'comparison-equal') || null;
+    }
+    // Picked a smaller number when asked for larger → comparison-reverse
+    if (isNumeric(selNum) && isNumeric(expNum)) {
+      const selVal = parseInt(selNum, 10);
+      const expVal = parseInt(expNum, 10);
+      if (selVal < expVal) {
+        return PLACE_VALUE_MISCONCEPTIONS.find(m => m.id === 'comparison-reverse') || null;
+      }
+      if (selVal > expVal) {
+        return PLACE_VALUE_MISCONCEPTIONS.find(m => m.id === 'position-confusion') || null;
+      }
+    }
+  }
+
+  // -- expanded-form concept ------------------------------------------------
   if (conceptId === 'expanded-form') {
-    // Check for zero-skip pattern
-    const zeroPattern = /0/;
-    if (zeroPattern.test(expected) && !zeroPattern.test(selected)) {
-      return PLACE_VALUE_MISCONCEPTIONS.find(m => m.id === 'expanded-form-skip') || null;
+    // Zero-skip: expected has a zero place, selected doesn't represent it
+    if (expNum.includes('0') && !selNum.includes('0')) {
+      const expPlaces = expNum.split('');
+      const selPlaces = selNum.padStart(expPlaces.length, '0').split('');
+      if (expPlaces.some((d, i) => d !== selPlaces[i])) {
+        return PLACE_VALUE_MISCONCEPTIONS.find(m => m.id === 'expanded-form-skip') || null;
+      }
+    }
+    // Digit swap → left-right-reverse
+    if (selNum.length === expNum.length) {
+      const selDigits = selNum.split('');
+      const expDigits = expNum.split('');
+      const diffs = selDigits.filter((d, i) => d !== expDigits[i]);
+      if (diffs.length <= 2 && selNum !== expNum) {
+        return PLACE_VALUE_MISCONCEPTIONS.find(m => m.id === 'left-right-reverse') || null;
+      }
     }
   }
 

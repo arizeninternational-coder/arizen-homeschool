@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FractionCircle, FractionRectangle } from "./FractionVisuals";
 import { FeedbackDisplay, TapChoice, MultipleChoice } from "./InteractionRenderers";
 
@@ -220,6 +220,7 @@ interface MultiActivityProps {
   feedback?: { correct?: string; incorrect?: string; hint?: string };
   onComplete?: () => void;
   onAnswer?: (activityId: string, selectedAnswer: string, correctAnswer: string, correct: boolean) => void;
+  resetActivityId?: string;
 }
 
 export function MultiActivity({
@@ -227,6 +228,7 @@ export function MultiActivity({
   feedback,
   onComplete,
   onAnswer,
+  resetActivityId,
 }: MultiActivityProps) {
   const [currentActivity, setCurrentActivity] = useState(0);
   const [activityStates, setActivityStates] = useState<Record<string, any>>({});
@@ -236,6 +238,17 @@ export function MultiActivity({
   if (!activity) return null;
 
   const isLastActivity = currentActivity >= activities.length - 1;
+
+  // When a sub-activity gets a wrong answer and receives remediation,
+  // resetActivityId targets that specific sub-activity for retry
+  // without losing progress on the other sub-activities.
+  useEffect(() => {
+    if (!resetActivityId) return;
+    setActivityStates((prev) => ({
+      ...prev,
+      [resetActivityId]: {},
+    }));
+  }, [resetActivityId]);
 
   const handleActivityAnswer = (activityId: string, state: any) => {
     setActivityStates((prev) => ({ ...prev, [activityId]: state }));

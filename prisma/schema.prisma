@@ -716,6 +716,9 @@ model InteractionResponse {
   selectedAnswer  String
   expectedAnswer  String
   correct         Boolean
+  misconceptionId String?
+  attemptNumber   Int?
+  remediationShown String?
   timestamp       DateTime @default(now())
 
   learner         LearnerProfile @relation(fields: [learnerId], references: [id])
@@ -724,4 +727,6 @@ model InteractionResponse {
   @@index([learnerId])
   @@index([lessonId])
   @@index([learnerId, lessonId])
+  @@index([activityId])
+  @@index([conceptId])
 }

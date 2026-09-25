@@ -19,3 +19,4 @@ export {
 } from "./AdvancedRenderers";
 export { InteractiveStepRenderer } from "./InteractiveStepRenderer";
 export type { ExtendedJourneyStep } from "./InteractiveStepRenderer";
+export { RemediationTapChoice } from "./RemediationTapChoice";

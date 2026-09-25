@@ -149,10 +149,11 @@ interface InteractiveStepRendererProps {
   stepNumber: number;
   totalSteps: number;
   interaction: any;
-  setInteraction: (v: any) => void;
+  setInteraction: (updater: any) => void;
   onNext: () => void;
-  onAnswer?: (selectedIndex: number, correct: boolean) => void;
+  onAnswer: (selectedIdx: number, correct: boolean, overrideActivityId?: string, overrideSelectedAnswer?: string, overrideExpectedAnswer?: string) => void;
   className?: string;
+  resetSubActivityId?: string;
 }
 
 // -- Visual Spec Interpreter (renders data objects as React components) -------
@@ -354,6 +355,27 @@ export function InteractiveStepRenderer({
 
     if (vs.type === "checklist" || vs.type === "recap_checklist") {
       return <RecapChecklist items={vs.items || []} />;
+    }
+
+    if (vs.type === "digit_comparison") {
+      return (
+        <div className="mt-4 space-y-3">
+          <p className="text-sm font-semibold text-slate-700 text-center">Compare digit by digit:</p>
+          <div className="flex justify-center gap-4 font-mono text-xl">
+            {(vs.numberA || "").replace(/,/g, "").split("").map((d: string, i: number) => (
+              <span key={`a-${i}`} className={`px-2 py-1 ${vs.highlightDifferences && vs.numberB && vs.numberA.replace(/,/g, "").split("")[i] !== vs.numberB.replace(/,/g, "").split("")[i] ? "bg-rose-200 rounded" : ""}`}>
+                {d}
+              </span>
+            ))}
+            <span className="text-slate-400">=</span>
+            {(vs.numberB || "").replace(/,/g, "").split("").map((d: string, i: number) => (
+              <span key={`b-${i}`} className={`px-2 py-1 ${vs.highlightDifferences && vs.numberA && vs.numberA.replace(/,/g, "").split("")[i] !== vs.numberB.replace(/,/g, "").split("")[i] ? "bg-rose-200 rounded" : ""}`}>
+                {d}
+              </span>
+            ))}
+          </div>
+        </div>
+      );
     }
 
     if (vs.type === "mission_preview") {
@@ -586,6 +608,7 @@ export function InteractiveStepRenderer({
               onAnswer(-1, correct, activityId, selectedAnswer, correctAnswer);
             }
           }}
+          resetActivityId={resetSubActivityId}
         />
       );
     }

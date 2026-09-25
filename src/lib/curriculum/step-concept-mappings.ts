@@ -90,12 +90,7 @@ export const STEP_CONCEPT_MAPPINGS: StepConceptMapping[] = [
     conceptId: 'read-numbers',
     expectedAnswer: '3,042',
     misconceptionCheck: (selected, expected) => {
-      const sel = selected.toLowerCase();
-      const exp = expected.toLowerCase();
-      // Reversed digits (3,402 vs 3,042)
-      if (sel.includes('3,402')) return 'left-right-reverse';
-      // Wrong place value (3,240)
-      if (sel.includes('3,240')) return 'position-confusion';
+      if (selected.toLowerCase() !== expected.toLowerCase()) return 'read-numbers';
       return null;
     },
   },

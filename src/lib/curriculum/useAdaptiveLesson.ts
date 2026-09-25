@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import type { LearningState } from './adaptive-engine';
+import type { LearningState, Misconception } from './adaptive-engine';
 import type { JourneyStep } from './grade4-journeys';
 import {
   createInitialLearningState,
@@ -11,16 +11,21 @@ import {
   selectNextActivity,
   PLACE_VALUE_CONCEPTS,
 } from './adaptive-engine';
-import { generateRemediationStep, PLACE_VALUE_QUIZ_MAPPINGS } from './adaptive-journey';
+import { generateRemediationStep, type RemediationContext } from './adaptive-journey';
 
 const STORAGE_KEY = 'arizen-adaptive-state';
 
 export interface AdaptiveAnswerResult {
   correct: boolean;
+  selectedAnswer: string;
+  expectedAnswer: string;
   misconceptionId: string | null;
+  misconception: Misconception | null;
   feedbackMessage: string;
   remediationStep: JourneyStep | null;
   shouldRemediate: boolean;
+  attemptNumber: number;
+  remediationContext?: RemediationContext;
 }
 
 export interface UseAdaptiveLessonReturn {
@@ -28,9 +33,10 @@ export interface UseAdaptiveLessonReturn {
   initLearningState: (studentId: string, lessonId: string) => void;
   submitAnswer: (
     conceptId: string,
-    selectedIndex: number,
-    expectedIndex: number,
+    selectedAnswer: string,
+    expectedAnswer: string,
     options: string[],
+    remediationContext?: RemediationContext,
   ) => AdaptiveAnswerResult;
   recordRecovery: (conceptId: string) => void;
   clearState: () => void;
@@ -38,9 +44,14 @@ export interface UseAdaptiveLessonReturn {
 
 /**
  * useAdaptiveLesson — client-side hook for the Place Value adaptive pilot.
- * 
+ *
  * Survives React rerenders via useState + useRef.
  * Persists to localStorage for cross-session review (pilot scope).
+ *
+ * Key fix: submitAnswer now accepts `selectedAnswer` (string) and
+ * `expectedAnswer` (string) directly instead of relying on index math,
+ * which broke for MultiActivity sub-steps p1/p2/p3 where the selected
+ * index could be -1.
  */
 export function useAdaptiveLesson(): UseAdaptiveLessonReturn {
   const [learningState, setLearningState] = useState<LearningState | null>(null);
@@ -80,68 +91,143 @@ export function useAdaptiveLesson(): UseAdaptiveLessonReturn {
 
   const submitAnswer = useCallback((
     conceptId: string,
-    selectedIndex: number,
-    expectedIndex: number,
+    selectedAnswer: string,
+    expectedAnswer: string,
     options: string[],
+    remediationContext?: RemediationContext,
   ): AdaptiveAnswerResult => {
     let currentState = stateRef.current;
     if (!currentState) {
-      // Initialize on the fly if not already initialized
       const conceptIds = PLACE_VALUE_CONCEPTS.map(c => c.id);
       currentState = createInitialLearningState('unknown', 'unknown', conceptIds);
       stateRef.current = currentState;
     }
 
-    const result = evaluateAnswer(selectedIndex, expectedIndex, options);
-    const misconception = detectMisconception(conceptId, result.selectedAnswer, result.expectedAnswer, {});
+    // Determine correctness from the actual answer strings (not index math)
+    const selectedNorm = selectedAnswer.trim();
+    const expectedNorm = expectedAnswer.trim();
+    const correct = selectedNorm === expectedNorm;
 
+    // Detect misconception using conceptId + answer strings
+    const misconception = detectMisconception(conceptId, selectedAnswer, expectedAnswer, {
+      options,
+      prompt: remediationContext?.prompt,
+    });
+
+    // Compute attempt number for this activity
+    const prevAttempts = currentState.attempts?.filter(a => a.activityId === (remediationContext?.activityId || conceptId)) || [];
+    const attemptNumber = prevAttempts.length + 1;
+
+    // --- Wrong answer: detect misconception, generate remediation, then record once ---
+    if (!correct) {
+      const shouldRemediate = (currentState.remediationCount || 0) < 3;
+      let remediationStep: JourneyStep | null = null;
+
+      if (shouldRemediate) {
+        remediationStep = generateRemediationStep(
+          misconception ? misconception.id : "__default__",
+          conceptId,
+          {
+            ...(remediationContext || {}) as RemediationContext,
+            attemptNumber,
+            selectedAnswer,
+            expectedAnswer,
+            options,
+          },
+        );
+      }
+
+      const remediationId = remediationStep?.id || null;
+
+      // Build evidence ONCE with remediationShown, then record ONCE
+      const evidence = {
+        conceptId,
+        correct,
+        timestamp: Date.now(),
+        activityId: remediationContext?.activityId || `${conceptId}-live`,
+        answer: selectedAnswer,
+        expectedAnswer: expectedAnswer,
+        misconceptionId: misconception?.id || null,
+        attemptNumber,
+        remediationShown: remediationId,
+      };
+
+      // Increment remediationCount when a remediation step is actually generated
+      const stateAfterEvidence = recordEvidence(currentState, evidence);
+      const updatedState = remediationStep
+        ? { ...stateAfterEvidence, remediationCount: (currentState.remediationCount || 0) + 1 }
+        : stateAfterEvidence;
+      setLearningState(updatedState);
+      stateRef.current = updatedState;
+
+      return {
+        correct: false,
+        selectedAnswer,
+        expectedAnswer,
+        misconceptionId: misconception?.id || null,
+        misconception,
+        feedbackMessage: misconception
+          ? `I see a common idea here: ${misconception.label}. Let me help you with this.`
+          : "Not quite. Let me show you another way.",
+        remediationStep,
+        shouldRemediate,
+        attemptNumber,
+        remediationContext: {
+          ...(remediationContext || {}) as RemediationContext,
+          attemptNumber,
+        },
+      };
+    }
+
+    // --- Correct answer: record and return ---
     const evidence = {
       conceptId,
-      correct: result.correct,
+      correct,
       timestamp: Date.now(),
-      activityId: `${conceptId}-live`,
-      answer: result.selectedAnswer,
-      expectedAnswer: result.expectedAnswer,
-      misconceptionId: misconception?.id,
+      activityId: remediationContext?.activityId || `${conceptId}-live`,
+      answer: selectedAnswer,
+      expectedAnswer: expectedAnswer,
+      misconceptionId: null,
+      attemptNumber,
+      remediationShown: null,
     };
 
     const updatedState = recordEvidence(currentState, evidence);
     setLearningState(updatedState);
+    stateRef.current = updatedState;
 
-    if (result.correct) {
-      return {
-        correct: true,
-        misconceptionId: null,
-        feedbackMessage: 'Excellent! You got it right.',
-        remediationStep: null,
-        shouldRemediate: false,
-      };
-    }
-
-    // Wrong answer
-    const decision = selectNextActivity(updatedState, conceptId, false);
-    const shouldRemediate = updatedState.remediationCount < 3;
-
-    let remediationStep: JourneyStep | null = null;
-    if (shouldRemediate && misconception) {
-      remediationStep = generateRemediationStep(misconception.id, conceptId);
+    // Decrement remediationCount on successful recovery
+    if ((currentState.remediationCount || 0) > 0) {
+      setLearningState((prev) => ({
+        ...prev,
+        remediationCount: Math.max(0, (prev.remediationCount || 0) - 1),
+      }));
+      if (stateRef.current) {
+        stateRef.current = { ...stateRef.current, remediationCount: Math.max(0, (stateRef.current.remediationCount || 0) - 1) };
+      }
     }
 
     return {
-      correct: false,
-      misconceptionId: misconception?.id || null,
-      remediationStep,
-      shouldRemediate,
-      feedbackMessage: misconception
-        ? `Evidence consistent with: ${misconception.label}. Let me help you with this.`
-        : 'Not quite. Let me show you another way.',
+      correct: true,
+      selectedAnswer,
+      expectedAnswer,
+      misconceptionId: null,
+      misconception: null,
+      feedbackMessage: "Excellent! You got it right.",
+      remediationStep: null,
+      shouldRemediate: false,
+      attemptNumber,
+      remediationContext: {
+        ...(remediationContext || {}) as RemediationContext,
+        attemptNumber,
+      },
     };
   }, []);
 
   const recordRecovery = useCallback((conceptId: string) => {
     setLearningState(prev => {
       if (!prev) return prev;
-      return { ...prev, remediationCount: Math.max(0, prev.remediationCount - 1) };
+      return { ...prev, remediationCount: Math.max(0, (prev.remediationCount || 0) - 1) };
     });
   }, []);
 
