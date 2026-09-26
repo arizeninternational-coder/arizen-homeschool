@@ -235,6 +235,7 @@ export function InteractiveStepRenderer({
   onNext,
   onAnswer,
   className = "",
+  resetSubActivityId,
 }: InteractiveStepRendererProps) {
   const hasNewSpec = !!(step.visualSpec || step.interactionSpec || step.feedbackSpec || step.mediaSpec);
 
