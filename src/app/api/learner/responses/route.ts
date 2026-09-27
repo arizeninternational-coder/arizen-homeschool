@@ -95,6 +95,7 @@ export async function GET(req: NextRequest) {
       .from("InteractionResponse")
       .select("id, lessonId, activityId, conceptId, selectedAnswer, expectedAnswer, correct, misconceptionId, attemptNumber, remediationShown, timestamp")
       .eq("learnerId", user.learnerProfileId)
+      .neq("activityId", "__adaptive_snapshot__")
       .order("timestamp", { ascending: true });
 
     if (lessonId) query = query.eq("lessonId", lessonId);

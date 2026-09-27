@@ -22,6 +22,7 @@ import { getPerformanceBand } from "@/lib/curriculum/performance-bands";
 import { getScoredActivities, calculateLessonScore } from "@/lib/curriculum/scoring-config";
 import { getStepConceptMapping, getAllScoredStepIds } from "@/lib/curriculum/step-concept-mappings";
 import { useAdaptiveLesson } from "@/lib/curriculum/useAdaptiveLesson";
+import { useAdaptiveDecision, canComputeAdvance } from "@/lib/learning/useAdaptiveDecision";
 
 function getStepType(step: any): JourneyStepType {
   return (step?.stepType || "welcome") as JourneyStepType;
@@ -153,8 +154,14 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
 
   // Adaptive learning state (Place Value pilot)
   const adaptive = useAdaptiveLesson();
+  const adaptiveDecision = useAdaptiveDecision();
+  // Orchestrator-driven state (Place Value pilot)
+  const [adaptiveAction, setAdaptiveAction] = useState<any>(null);
+  const [adaptiveStep, setAdaptiveStep] = useState<any>(null);
+  const [adaptiveAttemptNumber, setAdaptiveAttemptNumber] = useState(1);
   const [adaptiveJourney, setAdaptiveJourney] = useState<any[]|null>(null);
   const [activeRemediation, setActiveRemediation] = useState<any>(null);
+  const [adaptivePending, setAdaptivePending] = useState(false);
   const [retryKey, setRetryKey] = useState(0);
   const [remediationTargetActivity, setRemediationTargetActivity] = useState<string | null>(null);
 
@@ -302,17 +309,13 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
   // 1. A remediation overlay is active
   // 2. A MultiActivity step has incomplete sub-activities
   // 3. A tap_choice / multiple_choice step has no submitted answer
-  const canAdvance = useMemo(() => {
-    if (activeRemediation) return false;
-    const step = currentJourneyStep;
-    if (!step) return true;
-    const itype = step.interactionSpec?.type;
-    if (itype === "multi_activity") return interaction.multiActivityComplete === true;
-    if (itype === "tap_choice" || itype === "multiple_choice" || itype === "adaptive-evaluation") {
-      return interaction.choiceSubmitted === true;
-    }
-    return true;
-  }, [activeRemediation, currentJourneyStep, interaction]);
+  // 4. An adaptive API decision is pending (prevents bypassing the orchestrator)
+  const canAdvance = useMemo(() => canComputeAdvance({
+    activeRemediation,
+    adaptivePending,
+    step: currentJourneyStep,
+    interaction,
+  }), [activeRemediation, adaptivePending, currentJourneyStep, interaction]);
 
   // ── RENDER DIAGNOSTIC (temporary) ─────────────────────────────────────
   useEffect(() => {
@@ -346,6 +349,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
       reflectionChip: null, reflectionSaved: false,
     });
     setActiveRemediation(null);
+    setAdaptivePending(false);
   }, [currentStep]);
 
   useEffect(() => {
@@ -412,9 +416,13 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
   }, [lesson?.id]);
 
   // Stable adaptive answer handler — avoids stale closures from inline JSX callbacks
-  const handleAdaptiveAnswer = useCallback((selectedIdx: number, correct: boolean, overrideActivityId?: string, overrideSelectedAnswer?: string, overrideExpectedAnswer?: string) => {
+  const handleAdaptiveAnswer = useCallback(async (selectedIdx: number, correct: boolean, overrideActivityId?: string, overrideSelectedAnswer?: string, overrideExpectedAnswer?: string) => {
     const step = currentJourneyStep;
     if (!step) return;
+
+    // Prevent duplicate submissions while an adaptive decision is pending.
+    // The learner must wait for the orchestrator's response before acting again.
+    if (isPlaceValueLesson(lesson?.title) && adaptivePending) return;
 
     // Determine the ACTUAL activity ID for this response.
     // For MultiActivity sub-activities (p1, p2, p3) use the override ID.
@@ -472,9 +480,6 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
       remediationPrompt = step.interactionSpec?.prompt || step.interactionSpec?.question || "";
     }
 
-    // Persist ALL responses to DB (instrumentation for attempt history)
-    persistResponse(activityId, selectedAnswer, expectedAnswer, correct, step.interactionSpec?.conceptId || undefined);
-
     // Instrumentation: log which activity entered the adaptive path
     const stepMapping = getStepConceptMapping(activityId);
     if (process.env.NODE_ENV === "development") {
@@ -483,43 +488,67 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
         "correct:", correct, "selected:", selectedAnswer, "expected:", expectedAnswer);
     }
 
-    // Adaptive evaluation — ONLY when the answer is wrong.
-    // submitAnswer itself determines the misconception and generates remediation.
-    if (isPlaceValueLesson(lesson?.title) && adaptive.learningState && !correct) {
-      if (stepMapping) {
-        const result = adaptive.submitAnswer(
-          stepMapping.conceptId,
+    // ── Adaptive evaluation for Place Value lessons ──
+    // Route through the orchestrator API instead of client-side adaptive.submitAnswer.
+    // The API loads state from the DB, runs the AdaptiveOrchestrator, and returns
+    // a validated PedagogicalAction + JourneyStep.
+    //
+    // The orchestrator, not the step index, determines the next activity.
+    if (isPlaceValueLesson(lesson?.title) && lesson?.id && session?.user?.id) {
+      setAdaptivePending(true);
+      try {
+        const result = await adaptiveDecision.submitAdaptiveAnswer({
+          lessonId: lesson.id,
+          lessonTitle: lesson.title,
+          activityId,
+          conceptId: stepMapping?.conceptId || step.interactionSpec?.conceptId,
           selectedAnswer,
           expectedAnswer,
           options,
-          {
-            prompt: remediationPrompt,
-            options,
-            expectedAnswer,
-            selectedAnswer,
-            activityId,
+          correct,
+          prompt: remediationPrompt,
+          attemptNumber: 1,
+          remediationContext: activeRemediation
+            ? { attemptNumber: adaptiveAttemptNumber, prompt: remediationPrompt }
+            : undefined,
+        });
+
+        if (result) {
+          setAdaptiveAction(result.finalAction);
+
+          if (result.finalAction.actionType === "move_forward") {
+            // The orchestrator deterministically decided mastery is achieved.
+            // Advance — the step index yields to the orchestrator's decision.
+            setCurrentStep((s: number) => Math.min(totalSteps - 1, s + 1));
+            setActiveRemediation(null);
+            setAdaptiveStep(null);
+            setAdaptiveAttemptNumber(1);
+          } else {
+            // Show the orchestrator's activity as an overlay.
+            // This covers: remediate, change_representation, targeted_practice,
+            // check_mastery, explain, ask, etc.
+            setActiveRemediation(result.step);
+            setRemediationTargetActivity(overrideActivityId || step.id || null);
+            setAdaptiveStep(result.step);
+            setAdaptiveAttemptNumber((v: number) => v + 1);
+            setInteraction({});
           }
-        );
-        if (result.shouldRemediate && result.remediationStep) {
-          setActiveRemediation(result.remediationStep);
-          setRemediationTargetActivity(overrideActivityId || step.id || null);
-          // Reset interaction for retry
-          setInteraction({});
         }
-        // Persist adaptive evidence to DB (with misconception + attempt tracking)
-        persistResponse(
-          activityId,
-          selectedAnswer,
-          expectedAnswer,
-          false,
-          stepMapping.conceptId,
-          result.misconceptionId,
-          result.attemptNumber,
-          result.remediationStep?.id || null,
-        );
+      } catch (err: any) {
+        console.error("[handleAdaptiveAnswer] Orchestrator API error:", err?.message || err);
+        // Fall back to basic persistence for non-place-value path
+        if (!isPlaceValueLesson(lesson?.title)) {
+          persistResponse(activityId, selectedAnswer, expectedAnswer, correct, step.interactionSpec?.conceptId || undefined);
+        }
+      } finally {
+        setAdaptivePending(false);
       }
+    } else if (!isPlaceValueLesson(lesson?.title)) {
+      // Non-Place-Value lessons: persist locally as before.
+      persistResponse(activityId, selectedAnswer, expectedAnswer, correct, step.interactionSpec?.conceptId || undefined);
     }
-  }, [lesson?.title, currentJourneyStep, adaptive, clampedStep, persistResponse, setInteraction]);
+  }, [lesson?.title, lesson?.id, currentJourneyStep, adaptive, adaptiveDecision,
+      adaptiveAttemptNumber, activeRemediation, totalSteps, setInteraction, adaptivePending]);
 
   const handleComplete = useCallback(async () => {
     const lessonId = lesson?.id;
@@ -997,6 +1026,68 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                       correctChoiceId={activeRemediation.interactionSpec.correctChoiceId}
                       feedbackSpec={activeRemediation.interactionSpec.feedbackSpec}
                       conceptId={activeRemediation.interactionSpec.conceptId || "digit-value"}
+                      onAnswer={async (selectedId, isCorrect) => {
+                        if (!lesson?.id || !session?.user?.id) return;
+                        const choices = activeRemediation.interactionSpec.choices;
+                        const selectedChoice = choices.find((c: any) => {
+                          const id = typeof c === "object" ? (c.id ?? String(choices.indexOf(c))) : String(c);
+                          return id === selectedId;
+                        });
+                        const selectedLabel = typeof selectedChoice === "string"
+                          ? selectedChoice
+                          : selectedChoice?.label || selectedId;
+                        const correctChoice = choices.find((c: any) => {
+                          const id = typeof c === "object" ? (c.id ?? String(choices.indexOf(c))) : String(c);
+                          return id === activeRemediation.interactionSpec.correctChoiceId;
+                        });
+                        const correctLabel = typeof correctChoice === "string"
+                          ? correctChoice
+                          : correctChoice?.label || activeRemediation.interactionSpec.correctChoiceId;
+                        const opts = choices.map((c: any) => typeof c === "string" ? c : c.label);
+
+                        // Call the orchestrator API with the remediation answer.
+                        // The student's remediation response now influences the next activity.
+                        setAdaptivePending(true);
+                        try {
+                        const result = await adaptiveDecision.submitAdaptiveAnswer({
+                          lessonId: lesson.id,
+                          lessonTitle: lesson.title,
+                          activityId: activeRemediation.id || "",
+                          conceptId: activeRemediation.interactionSpec.conceptId || currentJourneyStep?.interactionSpec?.conceptId || "digit-position",
+                          selectedAnswer: selectedLabel,
+                          expectedAnswer: correctLabel,
+                          options: opts,
+                          correct: isCorrect,
+                          prompt: activeRemediation.studentText || "",
+                          attemptNumber: adaptiveAttemptNumber,
+                          remediationContext: {
+                            attemptNumber: adaptiveAttemptNumber,
+                            prompt: activeRemediation.studentText || "",
+                            parentActivityId: activeRemediation.id,
+                            remediationStepId: activeRemediation.id,
+                          },
+                        });
+
+                        if (result) {
+                          setAdaptiveAction(result.finalAction);
+                          if (result.finalAction.actionType === "move_forward") {
+                            setCurrentStep((s: number) => Math.min(totalSteps - 1, s + 1));
+                            setActiveRemediation(null);
+                            setAdaptiveStep(null);
+                            setAdaptiveAttemptNumber(1);
+                          } else {
+                              // Escalate or advance — the orchestrator's decision
+                              // replaces the old "Try Again" which would repeat
+                              // the same remediation step.
+                              setActiveRemediation(result.step);
+                              setAdaptiveStep(result.step);
+                              setAdaptiveAttemptNumber((v: number) => v + 1);
+                            }
+                          }
+                          } finally {
+                            setAdaptivePending(false);
+                          }
+                          }}
                     />
                   )}
                   <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 12 }}>
@@ -1027,7 +1118,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
           {totalSteps > 0 && (
             <div style={{ background: "#fff", borderTop: "1px solid #E2E8F0", padding: "12px 16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               {clampedStep > 0 ? (
-                <button onClick={() => setCurrentStep(clampedStep - 1)} disabled={!!activeRemediation} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "10px 16px", borderRadius: 10, border: "1px solid #CBD5E1", background: "#fff", color: "#334155", fontWeight: 700, fontSize: 14, cursor: "pointer", opacity: activeRemediation ? 0.5 : 1 }}>
+                <button onClick={() => setCurrentStep(clampedStep - 1)} disabled={!!activeRemediation || !!adaptivePending} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "10px 16px", borderRadius: 10, border: "1px solid #CBD5E1", background: "#fff", color: "#334155", fontWeight: 700, fontSize: 14, cursor: "pointer", opacity: activeRemediation || adaptivePending ? 0.5 : 1 }}>
                   <ChevronLeft style={{ width: 16, height: 16 }} /> Back
                 </button>
               ) : <div />}

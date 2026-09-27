@@ -20,11 +20,13 @@ export function RemediationTapChoice({
   correctChoiceId,
   feedbackSpec,
   conceptId,
+  onAnswer,
 }: {
   choices: any[];
   correctChoiceId: string;
   feedbackSpec?: { correct?: string; incorrect?: string; hint?: string };
   conceptId?: string;
+  onAnswer?: (selectedId: string, isCorrect: boolean) => void;
 }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
@@ -69,6 +71,8 @@ export function RemediationTapChoice({
               if (submitted) return;
               setSelectedId(choice.id);
               setSubmitted(true);
+              const isCorrect = choice.id === correctChoiceId;
+              onAnswer?.(choice.id, isCorrect);
             }}
             style={{
               padding: "12px 16px",
@@ -93,12 +97,15 @@ export function RemediationTapChoice({
         return isCorrect ? (
           <FeedbackDisplay
             state="correct"
-            message={feedbackSpec?.correct || "Exactly right!"}
+            feedback={{ correct: feedbackSpec?.correct || "Exactly right!" }}
           />
         ) : (
           <FeedbackDisplay
             state="incorrect"
-            message={feedbackSpec?.incorrect || feedbackSpec?.hint || "Not quite \u2014 think about it and try the Try Again button below."}
+            feedback={{
+              incorrect: feedbackSpec?.incorrect || feedbackSpec?.hint || "Not quite — think about it and try the Try Again button below.",
+              hint: feedbackSpec?.hint,
+            }}
           />
         );
       })()}
