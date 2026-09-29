@@ -134,18 +134,22 @@ export function TapChoice({
         {options.map((opt) => {
           const isSelected = selectedId === opt.id;
           const isCorrect = opt.id === correctChoiceId;
+          // Correct styling is only ever earned by the option the learner
+          // actually selected. Keying on `isCorrect` alone would reveal the
+          // correct answer after a WRONG submission.
+          const showAsCorrect = submitted && isSelected && isCorrect;
+          const showAsIncorrect = submitted && isSelected && !isCorrect;
           let btnClass =
             "border-slate-200 bg-white hover:border-indigo-300 hover:shadow-md text-slate-700";
-          if (submitted) {
-            if (isSelected && isCorrect)
-              btnClass = "border-emerald-500 bg-emerald-50 text-emerald-800 shadow-lg shadow-emerald-100";
-            else if (isSelected && !isCorrect)
-              btnClass = "border-orange-500 bg-orange-50 text-orange-800 shadow-lg shadow-orange-100";
-            // DO NOT reveal the correct answer — learner must try again
-            else btnClass = "border-slate-200 bg-slate-50 text-slate-400 opacity-60";
-          } else if (isSelected) {
+          if (showAsCorrect)
+            btnClass = "border-emerald-500 bg-emerald-50 text-emerald-800 shadow-lg shadow-emerald-100";
+          else if (showAsIncorrect)
+            btnClass = "border-orange-500 bg-orange-50 text-orange-800 shadow-lg shadow-orange-100";
+          // DO NOT reveal the correct answer — learner must try again
+          else if (submitted)
+            btnClass = "border-slate-200 bg-slate-50 text-slate-400 opacity-60";
+          else if (isSelected)
             btnClass = "border-indigo-500 bg-indigo-50 text-indigo-800 shadow-lg shadow-indigo-100";
-          }
 
           return (
             <button
@@ -210,18 +214,22 @@ export function MultipleChoice({
         {options.map((opt, i) => {
           const isSelected = selectedIndex === i;
           const isCorrect = i === correctIndex;
+          // Correct styling is only ever earned by the option the learner
+          // actually selected. Keying on `isCorrect` alone would paint the
+          // correct answer after a WRONG submission, revealing it.
+          const showAsCorrect = submitted && isSelected && isCorrect;
+          const showAsIncorrect = submitted && isSelected && !isCorrect;
           let btnClass =
             "border-slate-200 bg-white hover:border-indigo-300 hover:shadow-md text-slate-700";
-          if (submitted) {
-            if (isSelected && isCorrect)
-              btnClass = "border-emerald-500 bg-emerald-50 text-emerald-800 shadow-lg shadow-emerald-100";
-            else if (isSelected && !isCorrect)
-              btnClass = "border-orange-500 bg-orange-50 text-orange-800 shadow-lg shadow-orange-100";
-            // DO NOT reveal the correct answer — learner must try again
-            else btnClass = "border-slate-200 bg-slate-50 text-slate-400 opacity-60";
-          } else if (isSelected) {
+          if (showAsCorrect)
+            btnClass = "border-emerald-500 bg-emerald-50 text-emerald-800 shadow-lg shadow-emerald-100";
+          else if (showAsIncorrect)
+            btnClass = "border-orange-500 bg-orange-50 text-orange-800 shadow-lg shadow-orange-100";
+          // DO NOT reveal the correct answer — learner must try again
+          else if (submitted)
+            btnClass = "border-slate-200 bg-slate-50 text-slate-400 opacity-60";
+          else if (isSelected)
             btnClass = "border-indigo-500 bg-indigo-50 text-indigo-800 shadow-lg shadow-indigo-100";
-          }
 
           return (
             <button
@@ -232,15 +240,15 @@ export function MultipleChoice({
             >
               <div className="flex items-center gap-3">
                 <span className={`w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs font-bold flex-shrink-0 ${
-                  submitted && isCorrect
+                  showAsCorrect
                     ? "border-emerald-500 bg-emerald-500 text-white"
-                    : submitted && isSelected && !isCorrect
+                    : showAsIncorrect
                     ? "border-orange-500 bg-orange-500 text-white"
                     : isSelected
                     ? "border-indigo-500 bg-indigo-500 text-white"
                     : "border-slate-300 text-slate-500"
                 }`}>
-                  {submitted && isCorrect ? "✓" : submitted && isSelected && !isCorrect ? "✗" : String.fromCharCode(65 + i)}
+                  {showAsCorrect ? "✓" : showAsIncorrect ? "✗" : String.fromCharCode(65 + i)}
                 </span>
                 <span>{opt}</span>
               </div>

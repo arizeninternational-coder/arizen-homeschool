@@ -35,11 +35,24 @@ export interface ActionAdapterContext {
  * decision — the learner must NOT advance while an adaptive API call is pending
  * or while a remediation overlay is active.
  *
+ * ADVANCE REQUIRES A CORRECT ANSWER, NOT MERELY A SUBMISSION.
+ *
+ * `choiceSubmitted` is set the instant the learner clicks any option, before
+ * correctness is known. Gating on submission alone allowed this sequence:
+ *
+ *   wrong answer -> choiceSubmitted: true -> canAdvance: true -> Next -> next step
+ *
+ * which let a learner bypass required remediation entirely. The renderers now
+ * also record `choiceCorrect`, and this boundary requires BOTH flags: a
+ * submitted-but-incorrect answer keeps Next blocked so the remediation loop can
+ * run to completion.
+ *
  * Returns false when:
  *  - activeRemediation is set (remediation overlay active)
  *  - adaptivePending is true (API call in-flight)
  *  - A multi_activity step has not been fully completed
- *  - A tap_choice / multiple_choice / adaptive-evaluation step has no submitted answer
+ *  - A tap_choice / multiple_choice / adaptive-evaluation step has no submitted
+ *    answer, or the submitted answer was incorrect
  */
 export function canComputeAdvance(params: {
   activeRemediation: unknown;
@@ -56,7 +69,9 @@ export function canComputeAdvance(params: {
     return params.interaction.multiActivityComplete === true;
   }
   if (itype === "tap_choice" || itype === "multiple_choice" || itype === "adaptive-evaluation") {
-    return params.interaction.choiceSubmitted === true;
+    // A submission alone is NOT enough — the learner must have been correct.
+    if (params.interaction.choiceSubmitted !== true) return false;
+    return params.interaction.choiceCorrect === true;
   }
   return true;
 }

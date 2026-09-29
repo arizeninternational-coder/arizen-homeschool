@@ -234,14 +234,12 @@ export function MultiActivity({
   const [activityStates, setActivityStates] = useState<Record<string, any>>({});
   const [allSubmitted, setAllSubmitted] = useState(false);
 
-  const activity = activities[currentActivity];
-  if (!activity) return null;
-
-  const isLastActivity = currentActivity >= activities.length - 1;
-
-  // When a sub-activity gets a wrong answer and receives remediation,
-  // resetActivityId targets that specific sub-activity for retry
-  // without losing progress on the other sub-activities.
+  // Hooks must be called unconditionally and in a stable order. The
+  // resetActivityId effect below used to sit AFTER an early `return null`,
+  // so the number of hooks changed between renders whenever `activities`
+  // was empty or currentActivity ran past the end — which React rejects and
+  // which unmounted the whole activity UI (the "Finish Activity" button
+  // included). The effect now runs before any early return.
   useEffect(() => {
     if (!resetActivityId) return;
     setActivityStates((prev) => ({
@@ -249,6 +247,9 @@ export function MultiActivity({
       [resetActivityId]: {},
     }));
   }, [resetActivityId]);
+
+  const activity = activities[currentActivity];
+  const isLastActivity = currentActivity >= activities.length - 1;
 
   const handleActivityAnswer = (activityId: string, state: any) => {
     setActivityStates((prev) => ({ ...prev, [activityId]: state }));
@@ -262,6 +263,9 @@ export function MultiActivity({
       setCurrentActivity((c) => c + 1);
     }
   };
+
+  // Safe to return early now that every hook has already run unconditionally.
+  if (!activity) return null;
 
   const getCorrectAnswer = (act: ActivityItem): string => {
     if (act.type === "tap_choice" && act.choices && act.correctChoiceId) {

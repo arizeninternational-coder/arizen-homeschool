@@ -20,7 +20,7 @@ import { isGrade4MathContent, buildGrade4JourneyFromBlocks } from "@/lib/curricu
 import { isPlaceValueLesson, buildAdaptivePlaceValueJourney } from "@/lib/curriculum/adaptive-journey";
 import { getPerformanceBand } from "@/lib/curriculum/performance-bands";
 import { getScoredActivities, calculateLessonScore } from "@/lib/curriculum/scoring-config";
-import { getStepConceptMapping, getAllScoredStepIds } from "@/lib/curriculum/step-concept-mappings";
+import { getStepConceptMapping, getAllScoredStepIds, resolveRemediationConceptId } from "@/lib/curriculum/step-concept-mappings";
 import { useAdaptiveLesson } from "@/lib/curriculum/useAdaptiveLesson";
 import { useAdaptiveDecision, canComputeAdvance } from "@/lib/learning/useAdaptiveDecision";
 
@@ -148,6 +148,11 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
   const [interaction, setInteraction] = useState<any>({
     predictionText: "", practiceEntries: ["", "", ""],
     selectedChoice: null, choiceFeedback: null,
+    // choiceSubmitted/choiceCorrect gate canComputeAdvance. They are written
+    // together by the renderers and cleared on every step change, so a stale
+    // "correct" from a previous step can never unlock the next one.
+    choiceSubmitted: false, choiceCorrect: false,
+    multiActivityComplete: false,
     selfChecked: null, reflectionText: "",
     reflectionChip: null, reflectionSaved: false,
   });
@@ -309,6 +314,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
   // 1. A remediation overlay is active
   // 2. A MultiActivity step has incomplete sub-activities
   // 3. A tap_choice / multiple_choice step has no submitted answer
+  //    — or the submitted answer was incorrect (remediation must run first)
   // 4. An adaptive API decision is pending (prevents bypassing the orchestrator)
   const canAdvance = useMemo(() => canComputeAdvance({
     activeRemediation,
@@ -316,6 +322,15 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
     step: currentJourneyStep,
     interaction,
   }), [activeRemediation, adaptivePending, currentJourneyStep, interaction]);
+
+  // Concept for the active remediation overlay. Resolved from the canonical
+  // mapping table — never a hardcoded concept id, so evidence is labelled with
+  // the concept actually being remediated regardless of which step it came from.
+  const remediationConceptId = useMemo(() => resolveRemediationConceptId({
+    stepConceptId: (activeRemediation as any)?.interactionSpec?.conceptId,
+    targetActivityId: remediationTargetActivity,
+    stepId: (activeRemediation as any)?.id,
+  }), [activeRemediation, remediationTargetActivity]);
 
   // ── RENDER DIAGNOSTIC (temporary) ─────────────────────────────────────
   useEffect(() => {
@@ -345,6 +360,11 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
     setInteraction({
       predictionText: "", practiceEntries: ["", "", ""],
       selectedChoice: null, choiceFeedback: null,
+      // Clear the advance gate on every step change. Without this, a
+      // "correct" flag from the previous step would leak into the next one
+      // and unlock Next before the learner had answered anything.
+      choiceSubmitted: false, choiceCorrect: false,
+      multiActivityComplete: false,
       selfChecked: null, reflectionText: "",
       reflectionChip: null, reflectionSaved: false,
     });
@@ -893,24 +913,29 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                             const showFeedback = interaction.choiceFeedback !== null;
                             const correctIdx = typeof currentJourneyStep.interaction?.correctAnswer === "number" ? currentJourneyStep.interaction.correctAnswer : null;
                             const isCorrect = i === correctIdx;
+                            // Correct styling only for the option the learner
+                            // actually picked. Highlighting on `isCorrect`
+                            // alone would reveal the answer after a wrong pick.
+                            const showAsCorrect = showFeedback && isSelected && isCorrect;
+                            const showAsIncorrect = showFeedback && isSelected && !isCorrect;
                             let bg = "#fff", border = "#CBD5E1";
-                            if (showFeedback && isSelected && isCorrect) { bg = "#D1FAE5"; border = "#10B981"; }
-                            else if (showFeedback && isSelected && !isCorrect) { bg = "#FEE2E2"; border = "#DC2626"; }
-                            else if (showFeedback && isCorrect) { bg = "#D1FAE5"; border = "#10B981"; }
+                            if (showAsCorrect) { bg = "#D1FAE5"; border = "#10B981"; }
+                            else if (showAsIncorrect) { bg = "#FEE2E2"; border = "#DC2626"; }
+                            else if (showFeedback) { bg = "#F8FAFC"; border = "#E2E8F0"; }
                             else if (isSelected) { bg = "#EEF2FF"; border = "#6366F1"; }
                             return (
                               <button key={i} onClick={() => {
                                 if (interaction.choiceFeedback !== null) return;
                                 const correct = correctIdx !== null ? i === correctIdx : true;
-                                setInteraction((p: any) => ({ ...p, selectedChoice: i, choiceFeedback: correct ? "correct" : "incorrect" }));
+                                setInteraction((p: any) => ({ ...p, selectedChoice: i, choiceFeedback: correct ? "correct" : "incorrect", choiceSubmitted: true, choiceCorrect: correct }));
                               }} disabled={interaction.choiceFeedback !== null}
                                 style={{ padding: "12px 16px", borderRadius: 10, border: `2px solid ${border}`, background: bg, display: "flex", alignItems: "center", gap: 10, cursor: interaction.choiceFeedback !== null ? "default" : "pointer", textAlign: "left", width: "100%" }}>
                                 <span style={{ width: 24, height: 24, borderRadius: "50%", border: `2px solid ${border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.75rem", fontWeight: 700, color: border, flexShrink: 0 }}>
                                   {String.fromCharCode(65 + i)}
                                 </span>
                                 <span style={{ fontSize: "0.875rem", color: "#334155", flex: 1 }}>{opt}</span>
-                                {showFeedback && isCorrect && <CheckCircle2 style={{ width: 18, height: 18, color: "#059669" }} />}
-                                {showFeedback && isSelected && !isCorrect && <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#DC2626" }}>Try again</span>}
+                                {showAsCorrect && <CheckCircle2 style={{ width: 18, height: 18, color: "#059669" }} />}
+                                {showAsIncorrect && <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#DC2626" }}>Try again</span>}
                               </button>
                             );
                           })}
@@ -1025,7 +1050,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                       choices={activeRemediation.interactionSpec.choices}
                       correctChoiceId={activeRemediation.interactionSpec.correctChoiceId}
                       feedbackSpec={activeRemediation.interactionSpec.feedbackSpec}
-                      conceptId={activeRemediation.interactionSpec.conceptId || "digit-value"}
+                      conceptId={remediationConceptId}
                       onAnswer={async (selectedId, isCorrect) => {
                         if (!lesson?.id || !session?.user?.id) return;
                         const choices = activeRemediation.interactionSpec.choices;
@@ -1053,7 +1078,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                           lessonId: lesson.id,
                           lessonTitle: lesson.title,
                           activityId: activeRemediation.id || "",
-                          conceptId: activeRemediation.interactionSpec.conceptId || currentJourneyStep?.interactionSpec?.conceptId || "digit-position",
+                          conceptId: remediationConceptId,
                           selectedAnswer: selectedLabel,
                           expectedAnswer: correctLabel,
                           options: opts,

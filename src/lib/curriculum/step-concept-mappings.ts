@@ -97,9 +97,40 @@ export const STEP_CONCEPT_MAPPINGS: StepConceptMapping[] = [
 ];
 
 export function getStepConceptMapping(stepId: string): StepConceptMapping | undefined {
+  if (!stepId) return undefined;
   return STEP_CONCEPT_MAPPINGS.find(m => m.stepId === stepId);
 }
 
 export function getAllScoredStepIds(): string[] {
   return STEP_CONCEPT_MAPPINGS.map(m => m.stepId);
+}
+
+/**
+ * Resolve the concept for a remediation step.
+ *
+ * Single source of truth for concept resolution. Callers must NOT hardcode
+ * concept ids as a fallback — the taxonomy belongs to STEP_CONCEPT_MAPPINGS
+ * and to the conceptId the orchestrator already stamped on the step.
+ *
+ * Resolution order:
+ *  1. The conceptId carried by the step itself (set by the action adapter
+ *     from the validated PedagogicalAction).
+ *  2. The canonical mapping for the activity being remediated.
+ *  3. undefined — deliberately NOT a hardcoded concept. Returning undefined
+ *     lets the caller omit the field rather than mislabel the evidence.
+ */
+export function resolveRemediationConceptId(params: {
+  stepConceptId?: string | null;
+  targetActivityId?: string | null;
+  stepId?: string | null;
+}): string | undefined {
+  const explicit = params.stepConceptId?.trim();
+  if (explicit) return explicit;
+
+  for (const candidate of [params.targetActivityId, params.stepId]) {
+    const mapped = candidate ? getStepConceptMapping(candidate)?.conceptId : undefined;
+    if (mapped) return mapped;
+  }
+
+  return undefined;
 }

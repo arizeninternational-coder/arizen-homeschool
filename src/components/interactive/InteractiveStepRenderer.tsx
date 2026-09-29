@@ -467,22 +467,27 @@ export function InteractiveStepRenderer({
           }))}
           correctChoiceId={spec.correctChoiceId}
           onSelect={(choiceId) => {
+            // Resolve which option was picked and whether it is the correct one
+            // BEFORE updating state, so `choiceCorrect` is recorded
+            // atomically with the submission. canComputeAdvance requires both.
+            const correctChoiceIdx = choices.findIndex((c: any) =>
+              (typeof c === "object" && c.id === spec.correctChoiceId) ||
+              (typeof c === "string" && String(choices.indexOf(c)) === spec.correctChoiceId)
+            );
+            const selectedIdx = choices.findIndex((c: any) =>
+              (typeof c === "object" && c.id === choiceId) ||
+              (typeof c === "string" && String(choices.indexOf(c)) === choiceId)
+            );
+            const isCorrect = selectedIdx === correctChoiceIdx;
             setInteraction((p: any) => ({
               ...p,
               selectedChoiceId: choiceId,
               choiceSubmitted: true,
+              choiceCorrect: isCorrect,
             }));
             // Report answer to parent for adaptive evaluation
             if (onAnswer) {
-              const correctChoiceIdx = choices.findIndex((c: any) =>
-                (typeof c === "object" && c.id === spec.correctChoiceId) ||
-                (typeof c === "string" && String(choices.indexOf(c)) === spec.correctChoiceId)
-              );
-              const selectedIdx = choices.findIndex((c: any) =>
-                (typeof c === "object" && c.id === choiceId) ||
-                (typeof c === "string" && String(choices.indexOf(c)) === choiceId)
-              );
-              onAnswer(selectedIdx >= 0 ? selectedIdx : parseInt(choiceId), selectedIdx === correctChoiceIdx);
+              onAnswer(selectedIdx >= 0 ? selectedIdx : parseInt(choiceId), isCorrect);
             }
           }}
           feedback={feedback}
@@ -501,10 +506,15 @@ export function InteractiveStepRenderer({
           correctIndex={correctIdx}
           feedback={feedback}
           onAnswer={(correct, selectedIdx) => {
+            // Record the submission AND its correctness together.
+            // canComputeAdvance requires choiceCorrect === true, so a wrong
+            // answer keeps Next blocked while remediation runs.
             setInteraction((p: any) => ({
               ...p,
               selectedChoice: selectedIdx,
               choiceFeedback: correct ? "correct" : "incorrect",
+              choiceSubmitted: true,
+              choiceCorrect: correct,
             }));
             // Report answer to parent for adaptive evaluation
             if (onAnswer) {
@@ -531,6 +541,8 @@ export function InteractiveStepRenderer({
               ...p,
               selectedChoice: selectedIdx,
               choiceFeedback: correct ? "correct" : "incorrect",
+              choiceSubmitted: true,
+              choiceCorrect: correct,
             }));
             // Report answer to parent for adaptive evaluation
             if (onAnswer) {
