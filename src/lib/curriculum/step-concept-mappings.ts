@@ -1,3 +1,5 @@
+import type { AdaptiveLessonConfig } from './adaptive/types';
+
 /**
  * Step-to-concept mappings for adaptive learning.
  * 
@@ -96,8 +98,37 @@ export const STEP_CONCEPT_MAPPINGS: StepConceptMapping[] = [
   },
 ];
 
-export function getStepConceptMapping(stepId: string): StepConceptMapping | undefined {
+/**
+ * Resolve the concept for an activity.
+ *
+ * When the lesson supplies its registered AdaptiveLessonConfig, the config is
+ * authoritative (it declares every activity of that lesson). The legacy table
+ * below remains only as the fallback for unregistered lessons, and it is the
+ * Place Value mapping that predates the config layer.
+ */
+export function getStepConceptMapping(
+  stepId: string,
+  config?: AdaptiveLessonConfig | null,
+): StepConceptMapping | undefined {
   if (!stepId) return undefined;
+
+  if (config) {
+    const activity = config.activities.find((a) => a.activityId === stepId);
+    if (!activity) return undefined;
+    return {
+      stepId,
+      conceptId: activity.conceptId,
+      expectedAnswer: activity.correctAnswer || '',
+      misconceptionCheck: (selected, expected) =>
+        activity.detectMisconception?.(selected, expected, {
+          prompt: activity.prompt || '',
+          choices: activity.choices || [],
+          activityId: stepId,
+          attemptNumber: 1,
+        }) || null,
+    };
+  }
+
   return STEP_CONCEPT_MAPPINGS.find(m => m.stepId === stepId);
 }
 
@@ -123,12 +154,15 @@ export function resolveRemediationConceptId(params: {
   stepConceptId?: string | null;
   targetActivityId?: string | null;
   stepId?: string | null;
+  lessonConfig?: AdaptiveLessonConfig | null;
 }): string | undefined {
   const explicit = params.stepConceptId?.trim();
   if (explicit) return explicit;
 
   for (const candidate of [params.targetActivityId, params.stepId]) {
-    const mapped = candidate ? getStepConceptMapping(candidate)?.conceptId : undefined;
+    const mapped = candidate
+      ? getStepConceptMapping(candidate, params.lessonConfig)?.conceptId
+      : undefined;
     if (mapped) return mapped;
   }
 

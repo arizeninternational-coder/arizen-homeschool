@@ -20,8 +20,7 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { buildPlaceValueJourney } from '../src/lib/curriculum/grade4-journeys';
-import { buildAdaptivePlaceValueJourney } from '../src/lib/curriculum/adaptive-journey';
-import { isPlaceValueLesson, PLACE_VALUE_QUIZ_MAPPINGS, generateRemediationStep } from '../src/lib/curriculum/adaptive-journey';
+import { buildAdaptiveLessonJourney, isAdaptiveLessonRef, PLACE_VALUE_QUIZ_MAPPINGS, generateRemediationStep } from '../src/lib/curriculum/adaptive-journey';
 import { useAdaptiveLesson } from '../src/lib/curriculum/useAdaptiveLesson';
 import { evaluateAnswer, detectMisconception, recordEvidence, createInitialLearningState } from '../src/lib/curriculum/adaptive-engine';
 
@@ -108,9 +107,9 @@ if (incorrectResult.misconception.id !== 'digit-not-value') {
 }
 console.log('✅ Incorrect answer detected, misconception: digit-not-value');
 
-// Test 8: buildAdaptivePlaceValueJourney returns steps with interactionSpec intact
-console.log('\n--- Test: buildAdaptivePlaceValueJourney preserves interactionSpec ---');
-const adaptiveResult = buildAdaptivePlaceValueJourney('Place Value and Number Reading', 'test-student');
+// Test 8: buildAdaptiveLessonJourney returns steps with interactionSpec intact
+console.log('\n--- Test: buildAdaptiveLessonJourney preserves interactionSpec ---');
+const adaptiveResult = buildAdaptiveLessonJourney({ title: 'Place Value and Number Reading' });
 const adaptiveStep3 = adaptiveResult.steps.find((s: any) => s.id === 'think_first');
 if (!adaptiveStep3) throw new Error('Step 3 not found in adaptive journey');
 if (adaptiveStep3.interactionSpec?.type !== 'tap_choice') {
@@ -118,12 +117,13 @@ if (adaptiveStep3.interactionSpec?.type !== 'tap_choice') {
 }
 console.log('✅ Adaptive journey preserves interactionSpec');
 
-// Test 9: isPlaceValueLesson detects Place Value lesson
-console.log('\n--- Test: isPlaceValueLesson detection ---');
-if (!isPlaceValueLesson('Place Value and Number Reading')) throw new Error('Failed to detect Place Value lesson');
-if (!isPlaceValueLesson('Place Value')) throw new Error('Failed to detect Place Value');
-if (isPlaceValueLesson('Addition and Subtraction')) throw new Error('False positive for non-Place-Value lesson');
-console.log('✅ isPlaceValueLesson works correctly');
+// Test 9: adaptive registry resolves lessons by slug (no title-string gate)
+console.log('\n--- Test: adaptive registry resolution ---');
+if (!isAdaptiveLessonRef({ slug: 'place-value' })) throw new Error('Failed to resolve place-value by DB slug');
+if (!isAdaptiveLessonRef({ slug: 'place-value-number-reading' })) throw new Error('Failed to resolve by source slug');
+if (!isAdaptiveLessonRef({ slug: 'roman-numerals' })) throw new Error('Failed to resolve roman-numerals');
+if (isAdaptiveLessonRef({ slug: 'addition-and-subtraction', title: 'Addition and Subtraction' })) throw new Error('False positive for unregistered lesson');
+console.log('✅ adaptive registry resolves lessons correctly');
 
 // Test 10: Journey has exactly 10 steps (no extra adaptive-eval steps)
 console.log('\n--- Test: Journey has exactly 10 steps ---');

@@ -17,7 +17,8 @@ import { STEP_TYPE_ICONS } from "@/lib/curriculum/lesson-journey";
 import { InteractiveStepRenderer, RemediationTapChoice } from "@/components/interactive";
 import { isLessonStudentVisible } from "@/lib/curriculum/student-visibility";
 import { isGrade4MathContent, buildGrade4JourneyFromBlocks } from "@/lib/curriculum/grade4-journeys";
-import { isPlaceValueLesson, buildAdaptivePlaceValueJourney } from "@/lib/curriculum/adaptive-journey";
+import { resolveAdaptiveLessonConfig } from "@/lib/curriculum/adaptive/registry";
+import { evaluateMastery, type LearnerResponseSummary } from "@/lib/curriculum/adaptive/engine";
 import { getPerformanceBand } from "@/lib/curriculum/performance-bands";
 import { getScoredActivities, calculateLessonScore } from "@/lib/curriculum/scoring-config";
 import { getStepConceptMapping, getAllScoredStepIds, resolveRemediationConceptId } from "@/lib/curriculum/step-concept-mappings";
@@ -170,6 +171,10 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
   const [retryKey, setRetryKey] = useState(0);
   const [remediationTargetActivity, setRemediationTargetActivity] = useState<string | null>(null);
 
+  // The lesson's adaptive configuration (null when the lesson is not registered).
+  // Everything adaptive below keys off this, never off the lesson's title.
+  const adaptiveConfig = useMemo(() => resolveAdaptiveLessonConfig(lesson), [lesson]);
+
   const baseJourney = useMemo(() => buildLessonJourney(lesson), [lesson]);
   // Use adaptive journey for Place Value
   const journeySteps = adaptiveJourney || baseJourney?.steps || [];
@@ -183,7 +188,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
 
   // Initialize adaptive state for Place Value lesson
   useEffect(() => {
-    if (lesson && isPlaceValueLesson(lesson.title) && session?.user) {
+    if (lesson && adaptiveConfig && session?.user) {
       if (completed) {
         // Review mode — rely on localStorage load from useAdaptiveLesson
         // If no stored state exists, review still works without adaptive state
@@ -196,7 +201,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
       }
       adaptive.initLearningState((session.user as any).id || 'unknown', lesson.id);
     }
-  }, [lesson, session, adaptive, completed]);
+  }, [lesson, session, adaptive, completed, adaptiveConfig]);
 
   // Load persisted interaction responses when entering review mode
   useEffect(() => {
@@ -218,15 +223,12 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
       .catch(() => {});
   }, [completed, lesson?.id]);
 
-  // Derive adaptive journey (only depends on lesson, not on render-specific state)
+  // Derive adaptive journey (only depends on lesson, not on render-specific state).
+  // Routing comes from the lesson's registered AdaptiveLessonConfig — there is
+  // no title-string gate anywhere in this component.
   useEffect(() => {
-    if (isPlaceValueLesson(lesson?.title) && baseJourney?.steps) {
-      const result = buildAdaptivePlaceValueJourney(lesson?.title || '', '');
-      setAdaptiveJourney(result.steps);
-    } else {
-      setAdaptiveJourney(null);
-    }
-  }, [lesson, baseJourney]);
+    setAdaptiveJourney(adaptiveConfig && baseJourney?.steps ? baseJourney.steps : null);
+  }, [lesson, baseJourney, adaptiveConfig]);
 
   // Apply restored answers when a step renders (review mode)
   // Uses stable activity ID (step.id or step-{index}) for mapping
@@ -261,7 +263,8 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
       themeSlug: lesson?.quest?.theme?.slug,
       journeySource: baseJourney?.source,
       journeySteps: journeySteps.length,
-      adaptive: isPlaceValueLesson(lesson?.title),
+      adaptive: !!adaptiveConfig,
+      adaptiveLesson: adaptiveConfig?.lessonSlug,
     });
   }
 
@@ -306,6 +309,57 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
   const visibility = lesson ? isLessonStudentVisible(lesson) : { visible: false, reasons: ["No lesson loaded"] };
   const isHiddenFromStudent = !visibility.visible;
 
+  // ── Lesson-derived content (no hardcoded per-lesson strings) ───────────
+  // Objectives come from the lesson's registered adaptive config when it has
+  // one; otherwise from the lesson's own description/SLOs.
+  const lessonObjectives = useMemo<string[]>(() => {
+    if (adaptiveConfig?.objectives?.length) return adaptiveConfig.objectives;
+    const slos = lesson?.cbcMapping?.specificLearningOutcomes;
+    if (Array.isArray(slos) && slos.length) {
+      return slos.map((s: string) => String(s).replace(/^[^:]+:\s*/, '')).filter(Boolean);
+    }
+    if (lesson?.description) return [String(lesson.description)];
+    return [];
+  }, [adaptiveConfig, lesson]);
+
+  // Celebration headline/praise are derived from the lesson, so no lesson ever
+  // sees another lesson's badge name.
+  const celebrationHeadline = useMemo<string>(() => {
+    if (adaptiveConfig?.celebration?.headline) return adaptiveConfig.celebration.headline;
+    const completeStep: any = [...journeySteps].reverse().find((s: any) => s.stepType === 'complete');
+    return completeStep?.owlText || '';
+  }, [adaptiveConfig, journeySteps]);
+
+  // ── Mastery gate ───────────────────────────────────────────────────────
+  // Completion requires the lesson's evidence-based mastery criteria, not
+  // merely reaching the last step. Recomputed from persisted responses.
+  const [masteryStatus, setMasteryStatus] = useState<{ mastered: boolean; reason: string } | null>(null);
+  const [reviewResponses, setReviewResponses] = useState<LearnerResponseSummary[]>([]);
+
+  const evaluateLessonMastery = useCallback(async (lessonId: string): Promise<{ mastered: boolean; reason: string }> => {
+    if (!adaptiveConfig) return { mastered: true, reason: 'not-adaptive' };
+    try {
+      const res = await fetch(`/api/learner/responses?lessonId=${lessonId}`, { credentials: 'include' });
+      const data = await res.json();
+      const summaries: LearnerResponseSummary[] = (data.responses || []).map((r: any) => ({
+        activityId: r.activityId,
+        correct: !!r.correct,
+        misconceptionId: r.misconceptionId,
+      }));
+      setReviewResponses(summaries);
+      const result = evaluateMastery(adaptiveConfig, summaries);
+      if (result.mastered) return { mastered: true, reason: 'mastery-met' };
+      const names = result.unmetConcepts.map((c) => c.label).join(', ');
+      return {
+        mastered: false,
+        reason: `Keep practising: ${names || 'your evidence for this lesson is not complete yet'}.`,
+      };
+    } catch {
+      // Evidence unavailable — never block the learner on a transient fetch error.
+      return { mastered: true, reason: 'unavailable' };
+    }
+  }, [adaptiveConfig]);
+
   const nextStepLabel = !isLastStep && journeySteps[clampedStep + 1]
     ? STEP_TYPE_ICONS[journeySteps[clampedStep + 1].stepType as JourneyStepType] + " " + (journeySteps[clampedStep + 1].title || "Next")
     : null;
@@ -330,7 +384,8 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
     stepConceptId: (activeRemediation as any)?.interactionSpec?.conceptId,
     targetActivityId: remediationTargetActivity,
     stepId: (activeRemediation as any)?.id,
-  }), [activeRemediation, remediationTargetActivity]);
+    lessonConfig: adaptiveConfig,
+  }), [activeRemediation, remediationTargetActivity, adaptiveConfig]);
 
   // ── RENDER DIAGNOSTIC (temporary) ─────────────────────────────────────
   useEffect(() => {
@@ -442,7 +497,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
 
     // Prevent duplicate submissions while an adaptive decision is pending.
     // The learner must wait for the orchestrator's response before acting again.
-    if (isPlaceValueLesson(lesson?.title) && adaptivePending) return;
+    if (adaptiveConfig && adaptivePending) return;
 
     // Determine the ACTUAL activity ID for this response.
     // For MultiActivity sub-activities (p1, p2, p3) use the override ID.
@@ -501,7 +556,8 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
     }
 
     // Instrumentation: log which activity entered the adaptive path
-    const stepMapping = getStepConceptMapping(activityId);
+    // Concept comes from the lesson's config when it declares this activity.
+    const stepMapping = getStepConceptMapping(activityId, adaptiveConfig);
     if (process.env.NODE_ENV === "development") {
       console.log("[Adaptive] Answer evaluated — activity:", activityId,
         "conceptId:", stepMapping?.conceptId || "unknown",
@@ -514,12 +570,13 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
     // a validated PedagogicalAction + JourneyStep.
     //
     // The orchestrator, not the step index, determines the next activity.
-    if (isPlaceValueLesson(lesson?.title) && lesson?.id && session?.user?.id) {
+    if (adaptiveConfig && lesson?.id && session?.user?.id) {
       setAdaptivePending(true);
       try {
         const result = await adaptiveDecision.submitAdaptiveAnswer({
           lessonId: lesson.id,
           lessonTitle: lesson.title,
+          lessonSlug: lesson.slug,
           activityId,
           conceptId: stepMapping?.conceptId || step.interactionSpec?.conceptId,
           selectedAnswer,
@@ -557,22 +614,29 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
       } catch (err: any) {
         console.error("[handleAdaptiveAnswer] Orchestrator API error:", err?.message || err);
         // Fall back to basic persistence for non-place-value path
-        if (!isPlaceValueLesson(lesson?.title)) {
-          persistResponse(activityId, selectedAnswer, expectedAnswer, correct, step.interactionSpec?.conceptId || undefined);
-        }
+        persistResponse(activityId, selectedAnswer, expectedAnswer, correct, stepMapping?.conceptId || step.interactionSpec?.conceptId || undefined);
       } finally {
         setAdaptivePending(false);
       }
-    } else if (!isPlaceValueLesson(lesson?.title)) {
+    } else if (!adaptiveConfig) {
       // Non-Place-Value lessons: persist locally as before.
       persistResponse(activityId, selectedAnswer, expectedAnswer, correct, step.interactionSpec?.conceptId || undefined);
     }
-  }, [lesson?.title, lesson?.id, currentJourneyStep, adaptive, adaptiveDecision,
-      adaptiveAttemptNumber, activeRemediation, totalSteps, setInteraction, adaptivePending]);
+  }, [lesson?.title, lesson?.slug, lesson?.id, currentJourneyStep, adaptive, adaptiveDecision,
+      adaptiveAttemptNumber, activeRemediation, totalSteps, setInteraction, adaptivePending,
+      adaptiveConfig]);
 
   const handleComplete = useCallback(async () => {
     const lessonId = lesson?.id;
     if (!lessonId || hasCompletedRef.current) return;
+
+    // Mastery gate: completion is allowed only when the lesson's evidence-based
+    // mastery criteria are satisfied. Page completion alone never completes a
+    // lesson that still has unmet concepts.
+    const mastery = await evaluateLessonMastery(lessonId);
+    setMasteryStatus(mastery);
+    if (!mastery.mastered) return;
+
     hasCompletedRef.current = true;
 
     // Immediate visual acknowledgement — do not wait for the API
@@ -626,7 +690,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
       // Network failed — show error but don't remove the celebration
       setCompleteError("Progress saved locally. Will sync later.");
     }
-  }, [lesson?.id, lesson?.questId, fireConfetti, journeySteps]);
+  }, [lesson?.id, lesson?.questId, fireConfetti, journeySteps, evaluateLessonMastery]);
 
   const handleNavigateHome = useCallback(() => {
     // Try router.push first, fall back to window.location for reliability
@@ -1006,6 +1070,34 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                             <span style={{ fontSize: "1.25rem", fontWeight: 800, color: "#92400E" }}>+{xp} XP earned!</span>
                           </div>
                         )}
+                        {masteryStatus && !masteryStatus.mastered && (
+                          <div style={{ maxWidth: 460, margin: "0 auto 20px", padding: "16px", borderRadius: 14, background: "#FFFBEB", border: "2px solid #F59E0B", textAlign: "left" }}>
+                            <p style={{ fontSize: "0.95rem", fontWeight: 800, color: "#92400E", margin: "0 0 8px" }}>
+                              🔒 One more step before you finish
+                            </p>
+                            <p style={{ fontSize: "0.875rem", color: "#92400E", margin: "0 0 12px", lineHeight: 1.5 }}>
+                              {masteryStatus.reason} Your answers are saved — go back and practise the
+                              activities for these, then try again.
+                            </p>
+                            <button
+                              onClick={() => {
+                                // Jump back to the first scored activity the learner
+                                // has not yet answered correctly.
+                                const target = reviewResponses.length
+                                  ? journeySteps.findIndex((s: any) => {
+                                      const ids = s?.interactionSpec?.activities?.map((a: any) => a.id) || [s?.id];
+                                      return ids.some((id: string) => !reviewResponses.some((r) => r.activityId === id && r.correct));
+                                    })
+                                  : 0;
+                                setMasteryStatus(null);
+                                setCurrentStep(Math.max(0, target < 0 ? 0 : target));
+                              }}
+                              style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#F59E0B", color: "#fff", fontWeight: 700, fontSize: "0.9rem", cursor: "pointer" }}
+                            >
+                              Practise the parts I still need
+                            </button>
+                          </div>
+                        )}
                         <button onClick={handleComplete} style={{ padding: "14px 32px", borderRadius: 12, border: "none", background: "linear-gradient(135deg, #059669, #10B981)", color: "#fff", fontWeight: 800, fontSize: 16, cursor: "pointer", boxShadow: "0 4px 16px rgba(5,150,105,0.3)" }}>
                           Complete Lesson
                         </button>
@@ -1077,6 +1169,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                         const result = await adaptiveDecision.submitAdaptiveAnswer({
                           lessonId: lesson.id,
                           lessonTitle: lesson.title,
+                          lessonSlug: lesson.slug,
                           activityId: activeRemediation.id || "",
                           conceptId: remediationConceptId,
                           selectedAnswer: selectedLabel,
@@ -1178,7 +1271,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                 Amazing work, {learnerName}!
               </p>
               <p style={{ fontSize: "1rem", color: "rgba(255,255,255,0.85)", marginBottom: 24 }}>
-                You've completed this lesson. You're a Place Value Pro!
+                You've completed this lesson. {celebrationHeadline}
               </p>
               
               {/* Score Display */}
@@ -1312,7 +1405,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
           <div style={{ background: "#fff", borderRadius: 20, padding: "24px", boxShadow: "0 2px 12px rgba(0,0,0,0.04)", marginBottom: 20 }}>
             <h3 style={{ fontSize: "1rem", fontWeight: 800, color: "#1e293b", margin: "0 0 12px" }}>By the end of this lesson, you'll be able to:</h3>
             <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
-              {['Read numbers up to tens of thousands', 'Identify the place value of any digit', 'Write numbers in expanded form', 'Compare and order big numbers'].map((obj, i) => (
+              {lessonObjectives.map((obj, i) => (
                               <li key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 0", color: "#475569", fontSize: "0.95rem" }}>
                                 <span style={{ color: "#10B981", fontSize: "1.1rem", fontWeight: 700 }}>✓</span>
                                 {obj}
@@ -1354,13 +1447,10 @@ function buildLessonJourney(lesson: any) {
 
     // Grade 4 flat contentBlocks — transform into journey at render time
     if (Array.isArray(cb) && isGrade4MathContent(cb)) {
-      // Place Value lesson uses the adaptive journey
-      if (isPlaceValueLesson(lesson?.title)) {
-        const result = buildAdaptivePlaceValueJourney(lesson?.title || '', '');
-        return { steps: result.steps, source: "adaptive" };
-      }
-      const steps = buildGrade4JourneyFromBlocks(cb, lesson?.title);
-      return { steps, source: "grade4" };
+      // Adaptive lessons are identified by their registered config, not by title.
+      const config = resolveAdaptiveLessonConfig(lesson);
+      const steps = buildGrade4JourneyFromBlocks(cb, lesson?.title, lesson?.slug);
+      return { steps, source: config ? "adaptive" : "grade4" };
     }
 
     const steps = Array.isArray(cb.studentJourney) && cb.studentJourney.length > 0

@@ -20,9 +20,9 @@ import {
 
 import {
   PLACE_VALUE_QUIZ_MAPPINGS,
-  buildAdaptivePlaceValueJourney,
+  buildAdaptiveLessonJourney,
   generateRemediationStep,
-  isPlaceValueLesson,
+  isAdaptiveLessonRef,
 } from '../src/lib/curriculum/adaptive-journey';
 
 import { pvVisual } from '../src/lib/curriculum/grade4-journeys';
@@ -46,7 +46,7 @@ function assertNotUndefined(value: any, message: string) {
 function testStep1_HasOneStartCTA() {
   console.log('\n--- testStep1_HasOneStartCTA ---');
   
-  const journey = buildAdaptivePlaceValueJourney('Place Value and Number Reading', 'test');
+  const journey = buildAdaptiveLessonJourney({ title: 'Place Value and Number Reading' });
   const step1 = journey.steps.find(s => s.id === 'welcome');
   assertNotUndefined(step1, 'Step 1 exists');
   
@@ -71,7 +71,7 @@ function testStep1_HasOneStartCTA() {
 function testStep2_MissionPreview() {
   console.log('\n--- testStep2_MissionPreview ---');
   
-  const journey = buildAdaptivePlaceValueJourney('Place Value and Number Reading', 'test');
+  const journey = buildAdaptiveLessonJourney({ title: 'Place Value and Number Reading' });
   const step2 = journey.steps.find(s => s.id === 'mission');
   assertNotUndefined(step2, 'Step 2 exists');
   
@@ -94,7 +94,7 @@ function testStep2_MissionPreview() {
 function testStep10_Completion() {
   console.log('\n--- testStep10_Completion ---');
   
-  const journey = buildAdaptivePlaceValueJourney('Place Value and Number Reading', 'test');
+  const journey = buildAdaptiveLessonJourney({ title: 'Place Value and Number Reading' });
   const step10 = journey.steps.find(s => s.id === 'complete');
   assertNotUndefined(step10, 'Step 10 exists');
   
@@ -233,24 +233,27 @@ function testAdaptivePathDifference() {
 }
 
 function testIsPlaceValueLesson() {
-  console.log('\n--- testIsPlaceValueLesson ---');
-  
-  assert(isPlaceValueLesson('Place Value and Number Reading') === true, 'Detects Place Value');
-  assert(isPlaceValueLesson('Ordering and Rounding') === false, 'Does not match other lessons');
-  assert(isPlaceValueLesson(undefined) === false, 'Handles undefined');
-  
-  console.log('  ✓ Lesson detection works');
+  console.log('\n--- testAdaptiveLessonResolution ---');
+
+  assert(isAdaptiveLessonRef({ slug: 'place-value' }) === true, 'Resolves Place Value by DB slug');
+  assert(isAdaptiveLessonRef({ slug: 'ordering-rounding' }) === true, 'Resolves Ordering and Rounding');
+  assert(isAdaptiveLessonRef({ slug: 'not-a-lesson' }) === false, 'Rejects unregistered lessons');
+  assert(isAdaptiveLessonRef(undefined) === false, 'Handles undefined');
+
+  console.log('  ✓ Lesson resolution works');
 }
 
 function testRegressionGrade2Unaffected() {
   console.log('\n--- testRegressionGrade2Unaffected ---');
   
-  // Verify that the generic builder doesn't break for other lessons
-  const journey = buildAdaptivePlaceValueJourney('Roman Numerals', 'test');
+  // Verify that the shared builder doesn't break for other lessons
+  const journey = buildAdaptiveLessonJourney({ slug: 'roman-numerals' });
   const step1 = journey.steps[0];
-  
+
   // Should still build correctly
   assertNotUndefined(step1, 'Step 1 exists for other lessons');
+  assert(journey.steps.length > 0, 'Non-Place-Value lessons build a real journey');
+  assert(journey.adaptiveInserted === true, 'Roman Numerals is registered as adaptive');
   
   console.log('  ✓ Other lessons still build correctly');
 }

@@ -19,7 +19,7 @@ import {
   simulateAnswer,
   createTestLearningState,
   generateRemediationStep,
-  buildAdaptivePlaceValueJourney,
+  buildAdaptiveLessonJourney,
 } from '../src/lib/curriculum/adaptive-journey';
 
 // ============================================================
@@ -292,19 +292,19 @@ function testSelectNextActivity() {
 }
 
 function testAdaptiveJourneyBuilding() {
-  console.log('\n📝 Test: buildAdaptivePlaceValueJourney');
-  
-  const result = buildAdaptivePlaceValueJourney('Place Value', 'test-student');
-  
+  console.log('\n📝 Test: buildAdaptiveLessonJourney');
+
+  const result = buildAdaptiveLessonJourney({ slug: 'place-value' });
+
   assert(result.steps.length === 10, 'Journey has exactly 10 steps');
-  assert(!result.adaptiveInserted, 'No extra adaptive steps inserted (adaptive eval happens via onAnswer)');
+  assert(result.adaptiveInserted, 'Lesson resolved via the adaptive config registry');
   assert(result.remediationStepIds.length === 0, 'No remediation step IDs at journey build time');
   
   // Verify NO adaptive-eval step was inserted
   const adaptiveStep = result.steps.find(s => s.stepType === 'adaptive-eval');
   assert(adaptiveStep === undefined, 'No empty adaptive-eval step in journey');
   
-  console.log('  ✅ buildAdaptivePlaceValueJourney tests passed');
+  console.log('  ✅ buildAdaptiveLessonJourney tests passed');
 }
 
 function testRemediationGeneration() {

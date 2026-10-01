@@ -10,6 +10,12 @@
 
 import type { JourneyStep } from "./grade4-journeys";
 import {
+  resolveAdaptiveLessonConfig,
+  resolveAdaptiveLesson,
+} from './adaptive/registry';
+import { buildAdaptiveJourneyFromConfig } from './adaptive/build-journey';
+import { generateGrade4Math } from '../../data/grade4-math';
+import {
   type LearningState,
   type AdaptiveStep,
   type AnswerResult,
@@ -63,44 +69,10 @@ export const PLACE_VALUE_QUIZ_MAPPINGS: QuizConceptMapping[] = [
   },
 ];
 
-/**
- * Check if a lesson is the Place Value lesson that should use adaptive path.
- */
-export function isPlaceValueLesson(lessonTitle?: string): boolean {
-  if (!lessonTitle) return false;
-  const title = lessonTitle.toLowerCase();
-  return title.includes('place value') || title.includes('place-value');
-}
-
 export interface AdaptiveJourneyResult {
   steps: JourneyStep[];
   adaptiveInserted: boolean;
   remediationStepIds: string[];
-}
-
-/**
- * Build an adaptive journey for Place Value.
- *
- * Takes the standard journey and augments quiz steps with answer
- * evaluation + misconception detection + remediation insertion.
- *
- * @param lessonTitle - title of the lesson (used for routing)
- * @param studentId - current student ID
- * @param learningState - current adaptive learning state
- */
-export function buildAdaptivePlaceValueJourney(
-  lessonTitle: string,
-  studentId: string,
-  learningState?: LearningState,
-): AdaptiveJourneyResult {
-  const { buildPlaceValueJourney } = require('./grade4-journeys');
-  const baseSteps = buildPlaceValueJourney();
-
-  return {
-    steps: baseSteps,
-    adaptiveInserted: false,
-    remediationStepIds: [],
-  };
 }
 
 // -- Remediation context ----------------------------------------------------
@@ -846,4 +818,64 @@ export function simulateAnswer(
   const updatedState = recordEvidence(state, evidence);
 
   return { state: updatedState, result, misconceptionId: misconception?.id || null };
+}
+
+// -- Backwards-compatible adapters ---------------------------------------------
+//
+// The lesson-title gate (isPlaceValueLesson / buildAdaptivePlaceValueJourney)
+// was replaced by the data-driven AdaptiveLessonConfig layer. These adapters
+// keep legacy call sites and regression suites working while delegating
+// entirely to the new registry — no title matching remains here.
+
+/**
+ * True when the lesson identified by slug or title is registered as adaptive.
+ * The lesson title is matched against the REGISTRY, not by string inspection.
+ */
+export function isAdaptiveLessonRef(lesson: { slug?: string | null; title?: string | null }): boolean {
+  return resolveAdaptiveLessonConfig(lesson) !== null;
+}
+
+/**
+ * Build the adaptive journey for a lesson identified by slug or title.
+ *
+ * Behaviour-preserving replacement for the removed
+ * buildAdaptivePlaceValueJourney: it returns exactly the steps the student
+ * player renders for that lesson, drawn from the lesson's real curriculum
+ * content.
+ */
+export function buildAdaptiveLessonJourney(
+  lesson: { slug?: string | null; title?: string | null },
+  contentBlocks?: any[],
+): AdaptiveJourneyResult {
+  const config = resolveAdaptiveLessonConfig(lesson);
+  if (!config) {
+    return { steps: [], adaptiveInserted: false, remediationStepIds: [] };
+  }
+
+  let blocks = contentBlocks;
+  if (!blocks) {
+    const quests = generateGrade4Math();
+    for (const quest of quests) {
+      for (const lessonData of quest.lessons as any[]) {
+        if (lessonData.slug === config.lessonSlug || lessonData.title === config.lessonTitle) {
+          blocks = lessonData.contentBlocks;
+        }
+      }
+    }
+  }
+
+  if (config.journeyBuilder === 'bespoke') {
+    const { buildPlaceValueJourney } = require('./grade4-journeys');
+    return {
+      steps: buildPlaceValueJourney(),
+      adaptiveInserted: true,
+      remediationStepIds: [],
+    };
+  }
+
+  return {
+    steps: buildAdaptiveJourneyFromConfig(config, blocks || []),
+    adaptiveInserted: true,
+    remediationStepIds: [],
+  };
 }

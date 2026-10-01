@@ -10,7 +10,7 @@
  */
 
 import { buildPlaceValueJourney } from '../src/lib/curriculum/grade4-journeys';
-import { buildAdaptivePlaceValueJourney } from '../src/lib/curriculum/adaptive-journey';
+import { buildAdaptiveLessonJourney } from '../src/lib/curriculum/adaptive-journey';
 import { pvVisual } from '../src/lib/curriculum/grade4-journeys';
 
 // ── 1. tap_choice adaptive evaluation ──────────────────────────────────────
@@ -172,22 +172,29 @@ function step7_no_premature_success() {
   console.log('✅ Step 7 feedback present (shown after correct completion)');
 }
 
-// ── 7. buildAdaptivePlaceValueJourney returns 10 steps ────────────────────
+// ── 7. buildAdaptiveLessonJourney returns 10 steps ──────────────────────
 
 adaptive_journey_10_steps();
 function adaptive_journey_10_steps() {
   console.log('\n--- Adaptive journey 10 steps ---');
-  
-  const result = buildAdaptivePlaceValueJourney('Place Value', 'test-student');
-  
+
+  const result = buildAdaptiveLessonJourney({ slug: 'place-value' });
+
   if (result.steps.length !== 10) {
     console.log(`❌ Adaptive journey has ${result.steps.length} steps (expected 10)`);
     return;
   }
   console.log(`✅ Adaptive journey has ${result.steps.length} steps`);
 
-  if (result.adaptiveInserted) {
-    console.log('❌ adaptiveInserted should be false (no extra adaptive steps)');
+  if (!result.adaptiveInserted) {
+    console.log('❌ lesson should be registered as adaptive');
+    return;
+  }
+  console.log('✅ Lesson resolved through the adaptive config registry');
+
+  // No injected adaptive-eval step: evaluation happens via onAnswer.
+  if (result.steps.some((s: any) => s.stepType === 'adaptive-eval')) {
+    console.log('❌ an empty adaptive-eval step was injected');
     return;
   }
   console.log('✅ No extra adaptive-eval steps injected');

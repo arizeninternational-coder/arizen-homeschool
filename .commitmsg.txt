@@ -1,0 +1,36 @@
+Replace Place Value title gate with data-driven adaptive lesson configs
+
+Adds 4 Grade 4 Math lessons (SLOs 1.1-d/e, 1.1-f/g/h, 1.1-i, 1.1-j) and the
+smallest shared architecture needed to run them through the existing adaptive
+loop.
+
+Architecture (new: src/lib/curriculum/adaptive/)
+- types.ts          per-lesson config contract (concepts, activities,
+                    misconceptions, remediation, mastery, celebration)
+- registry.ts       slug-keyed opt-in; replaces title.includes("place value")
+- engine.ts         deterministic validation, misconception detection,
+                    remediation steps, evidence-based mastery, progression
+- resolve-activity.ts  binds the rendered question to the lesson's rules
+- build-journey.ts  generates a journey from config + real content blocks
+- *.config.ts       Place Value + 4 new lessons
+
+Place Value behaviour is preserved: same concepts, same 7 misconception ids,
+same 6 activity->concept bindings, same bespoke journey, and
+remediationStrategy 'lesson-generators' keeps its existing generator registry.
+
+Also fixes the shared-UI leakage: completion copy and objectives are derived
+from the lesson (no more "You're a Place Value Pro!" on any lesson), and the
+generic builder derives practice activities from real quiz content instead of
+experiment placeholders ("Try the activity." / "I did it!").
+
+The server now decides correctness deterministically from the lesson config
+rather than trusting the client's `correct` flag, and lesson completion requires
+the lesson's evidence-based mastery criteria.
+
+DB slugs differ from curriculum-source slugs (place-value, factors-multiples),
+so each config declares slugAliases.
+
+Verified: 18/18 test files pass (2 new suites, 304 assertions); build compiles;
+tsc errors 182 -> 119 (none in changed files); all 5 lessons browser-verified
+through the real renderer (wrong answer -> evidence -> misconception ->
+misconception-specific remediation).

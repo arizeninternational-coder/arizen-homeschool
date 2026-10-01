@@ -13,6 +13,12 @@ import type { ExtendedJourneyStep } from "@/components/interactive";
 import type { PedagogicalAction } from "@/lib/ai/AIProvider";
 import { generateRemediationStep } from "@/lib/curriculum/adaptive-journey";
 import type { Evidence } from "@/lib/curriculum/adaptive-engine";
+import type { AdaptiveLessonConfig } from "@/lib/curriculum/adaptive/types";
+import {
+  buildRemediationStep as buildConfigRemediationStep,
+  detectActivityMisconception,
+} from "@/lib/curriculum/adaptive/engine";
+import { resolveActivityFromJourney } from "@/lib/curriculum/adaptive/resolve-activity";
 
 export interface ActionAdapterContext {
   evidence: Evidence;
@@ -25,6 +31,12 @@ export interface ActionAdapterContext {
     attemptNumber?: number;
   };
   conceptChain: string[];
+  /**
+   * The lesson's adaptive config, when the lesson is registered. Enables
+   * config-driven remediation. Absent for legacy/unregistered lessons, which
+   * fall back to the lesson generator registry.
+   */
+  lessonConfig?: AdaptiveLessonConfig | null;
 }
 
 /**
@@ -97,6 +109,34 @@ export function pedagogicalActionToJourneyStep(
   switch (action.actionType) {
 
     case "remediate": {
+      // Config-driven lessons build remediation from their own misconception
+      // data. Lessons that declare `lesson-generators` (the Place Value pilot)
+      // keep their existing, working generator registry untouched.
+      if (ctx.lessonConfig?.remediationStrategy === "config-driven") {
+        const config = ctx.lessonConfig;
+        const resolved = resolveActivityFromJourney(config, {
+          activityId: evidence.activityId,
+          options: safeOptions(ctx),
+          prompt: aiContext.prompt,
+          expectedAnswer: aiContext.expectedAnswer,
+        });
+        if (resolved.declared && resolved.activity) {
+          const misconception = detectActivityMisconception(
+            config,
+            resolved.activity,
+            aiContext.selectedAnswer || "",
+            { attemptNumber: action.escalated ? 2 : 1 },
+          );
+          return buildConfigRemediationStep(
+            config,
+            misconception,
+            resolved.activity,
+            action.escalated ? 2 : 1,
+            aiContext.selectedAnswer || "",
+          ) as unknown as ExtendedJourneyStep;
+        }
+      }
+
       const remediation = generateRemediationStep(
         action.misconceptionId,
         conceptId,

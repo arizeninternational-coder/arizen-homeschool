@@ -19,9 +19,29 @@
  */
 
 import type { LessonTemplate, GeneratedContentBlock as ContentBlock } from "../../data/content-types";
+import { resolveAdaptiveLessonConfig } from "./adaptive/registry";
+import { buildAdaptiveJourneyFromConfig } from "./adaptive/build-journey";
 export type { GeneratedContentBlock as ContentBlock } from "../../data/content-types";
 
 // -- Journey step type (mirrors the Grade 2 studentJourney step shape) --------
+
+/**
+ * A choice as the renderer receives it: either a plain string label or an
+ * object carrying an id, label and optional description.
+ */
+export type JourneyChoice = string | { id?: string; label: string; description?: string; visual?: Record<string, unknown> };
+
+export interface JourneySubActivity {
+  id: string;
+  type: string;
+  prompt?: string;
+  question?: string;
+  choices?: JourneyChoice[];
+  options?: string[];
+  correctChoiceId?: string;
+  correctIndex?: number;
+  hint?: string;
+}
 
 export interface JourneyStep {
   id: string;
@@ -42,14 +62,10 @@ export interface JourneyStep {
     object?: string;
     highlightPart?: number;
     label?: string;
-    items?: string[];
+    items?: unknown[];
     steps?: Array<{ title: string; description?: string; visual?: Record<string, unknown> }>;
-    choices?: Array<{
-      id: string;
-      label: string;
-      description?: string;
-      visual?: Record<string, unknown>;
-    }>;
+    choices?: JourneyChoice[];
+    [key: string]: unknown;
     icon?: string;
     sentenceStarter?: string;
     digits?: string[];
@@ -68,25 +84,19 @@ export interface JourneyStep {
     prompt?: string;
     question?: string;
     buttonLabel?: string;
-    choices?: string[];
+    choices?: JourneyChoice[];
     correctChoiceId?: string;
     correctIndex?: number;
     correctAnswer?: number | string;
+    conceptId?: string;
     hint?: string;
     chips?: string[];
     sentenceStarter?: string;
-    activities?: Array<{
-      id: string;
-      type: string;
-      prompt?: string;
-      question?: string;
-      choices?: string[];
-      options?: string[];
-      correctChoiceId?: string;
-      correctIndex?: number;
-      hint?: string;
-    }>;
+    activities?: JourneySubActivity[];
+    [key: string]: unknown;
   };
+  /** Reward animation shown at the end of a journey. */
+  mediaSpec?: Record<string, unknown>;
   feedbackSpec?: {
     correct?: string;
     incorrect?: string;
@@ -97,6 +107,15 @@ export interface JourneyStep {
 }
 
 // -- Helpers ------------------------------------------------------------------
+
+/**
+ * Narrow a content block's `data` payload to a concrete record.
+ * The generated block data is loosely typed at the storage boundary; every
+ * consumer below reads the fields it actually declares.
+ */
+function blockData<T extends Record<string, any>>(block: ContentBlock): T {
+  return ((block as any)?.data || {}) as T;
+}
 
 /** Extract text blocks from contentBlocks */
 function textBlocks(blocks: ContentBlock[]): ContentBlock[] {
@@ -121,13 +140,13 @@ function journalBlocks(blocks: ContentBlock[]): ContentBlock[] {
 /** Get the first text block's content, or a fallback */
 function firstText(blocks: ContentBlock[]): string {
   const t = textBlocks(blocks)[0];
-  return t?.data.content || "";
+  return (t ? blockData<{ content?: string }>(t).content : "") || "";
 }
 
 /** Get the second text block's content, or empty */
 function secondText(blocks: ContentBlock[]): string {
   const t = textBlocks(blocks)[1];
-  return t?.data.content || "";
+  return (t ? blockData<{ content?: string }>(t).content : "") || "";
 }
 
 /**
@@ -693,14 +712,15 @@ export function buildGrade4Journey(blocks: ContentBlock[]): JourneyStep[] {
   // ── Think First (prediction from first quiz) ──
   if (quizzes.length > 0) {
     const q = quizzes[0];
-    const choices = (q.data.options || []).map((opt, i) => ({
+    const qData = blockData<{ question?: string; options?: string[]; correctIndex?: number; explanation?: string }>(q);
+    const choices = (qData.options || []).map((opt, i) => ({
       id: String.fromCharCode(65 + i),
       label: opt,
       description: opt,
     }));
     const correctId =
-      choices.length > (q.data.correctIndex ?? 0)
-        ? choices[q.data.correctIndex].id
+      choices.length > (qData.correctIndex ?? 0)
+        ? choices[qData.correctIndex!].id
         : "A";
 
     steps.push({
@@ -713,15 +733,15 @@ export function buildGrade4Journey(blocks: ContentBlock[]): JourneyStep[] {
       studentInstruction: "Choose the answer you think is right.",
       interactionSpec: {
         type: "tap_choice",
-        prompt: q.data.question || "What do you think?",
+        prompt: qData.question || "What do you think?",
         choices,
         correctChoiceId: correctId,
-        hint: q.data.explanation || "Think carefully about the question.",
+        hint: qData.explanation || "Think carefully about the question.",
       },
       feedbackSpec: {
         correct: "Great prediction! Let us see if you are right.",
         incorrect: "Not quite — but that is why we are learning!",
-        hint: q.data.explanation || "Think carefully.",
+        hint: qData.explanation || "Think carefully.",
       },
       successCriteria: "Makes a prediction.",
     });
@@ -744,66 +764,134 @@ export function buildGrade4Journey(blocks: ContentBlock[]): JourneyStep[] {
     successCriteria: "Understands the main idea.",
   });
 
-  // ── Practice (from experiment blocks) ──
-  if (experiments.length > 0) {
-    const exp = experiments[0];
-    const activitySteps = (exp.data.steps || []).map((step, i) => ({
-      id: `exp-${i}`,
-      type: "tap_choice" as const,
-      prompt: step,
-      choices: ["I did it!", "I need help"],
-      correctChoiceId: "I did it!",
-      hint: "",
-    }));
+  // ── Practice ──
+    // Derived from the lesson's ACTUAL mathematics content: remaining quiz
+    // blocks become scored practice activities. An experiment block is only
+    // used to frame the activity — never as a placeholder with fake choices
+    // ("I did it!" / "I need help"), which scored nothing and taught nothing.
+    {
+      const usedQuiz = new Set<number>(quizzes.length > 0 ? [0] : []);
+      const practiceQuizzes = quizzes.filter((_, i) => !usedQuiz.has(i)).slice(0, 3);
+      const exp = experiments[0];
+      const expData = exp
+        ? blockData<{ title?: string; materials?: string[]; steps?: string[] }>(exp)
+        : null;
 
-    steps.push({
-      id: "practice",
-      stepType: "practice",
-      title: "Your Turn",
-      studentText: exp.data.title || "Try the activity.",
-      owlText: "Now you try it. Follow the steps.",
-      studentInstruction: "Follow each step.",
-      interactionSpec: {
-        type: "multi_activity",
-        prompt: "Complete each step",
-        activities: activitySteps,
-      },
-      visualSpec: {
-        type: "practice_set",
-        items: exp.data.steps?.map((s, i) => ({ id: `step-${i}`, type: "tap_continue", prompt: s })) || [],
-      },
-      feedbackSpec: {
-        correct: "Well done! You completed the activity.",
-        incorrect: "Try again.",
-        hint: "",
-      },
-      successCriteria: "Completes the hands-on activity.",
-    });
-  }
+      if (practiceQuizzes.length > 0) {
+        const activitySteps: JourneySubActivity[] = practiceQuizzes.map((q, i) => {
+          const qData = blockData<{ question?: string; options?: string[]; correctIndex?: number; explanation?: string }>(q);
+          const options = qData.options || [];
+          const correctIdx = qData.correctIndex ?? 0;
+          return {
+            id: `p${i + 1}`,
+            type: "tap_choice" as const,
+            prompt: qData.question || `Question ${i + 1}`,
+            choices: options.map((opt, j) => ({
+              id: String.fromCharCode(65 + j),
+              label: opt,
+            })),
+            correctChoiceId: options.length
+              ? String.fromCharCode(65 + correctIdx)
+              : undefined,
+            hint: qData.explanation || "",
+          };
+        });
+
+        steps.push({
+          id: "practice",
+          stepType: "practice",
+          title: expData?.title || "Your Turn",
+          studentText:
+            expData?.title
+              ? `${expData.title}: answer these questions from this lesson, then try the activity with the materials listed.`
+              : "Now it is your turn. Answer each question from this lesson.",
+          owlText: expData?.title
+            ? `Now you try it. Answer the questions first, then follow the steps of ${expData.title}.`
+            : "Now you try it. Take your time and think carefully about each question.",
+          studentInstruction: "Answer each question, then complete the activity.",
+          interactionSpec: {
+            type: "multi_activity",
+            prompt: "Answer each question",
+            activities: activitySteps,
+          },
+          visualSpec: {
+            type: "practice_set",
+            items: activitySteps.map((a, i) => ({
+              id: a.id,
+              type: "tap_choice",
+              prompt: a.prompt,
+            })),
+          },
+          feedbackSpec: {
+            correct: "Well done! You answered every question correctly.",
+            incorrect: "Let us look at the one you found tricky again.",
+            hint: "",
+          },
+          successCriteria: "Responds to every practice activity.",
+        });
+      } else if (expData) {
+        // No quiz content to practise with — keep the activity, but make it
+        // explicitly self-checked rather than presenting fake choices.
+        const expSteps = expData.steps || [];
+        const activitySteps: JourneySubActivity[] = expSteps.map((step, i) => ({
+          id: `exp-${i}`,
+          type: "tap_continue" as const,
+          prompt: step,
+        }));
+        steps.push({
+          id: "practice",
+          stepType: "practice",
+          title: expData.title || "Your Turn",
+          studentText: `Work through ${expData.title || "the activity"} using these materials: ${(expData.materials || []).join(", ") || "paper and pencil"}.`,
+          owlText: "Now you try it. Follow each step of the activity on your own.",
+          studentInstruction: "Work through each step of the activity.",
+          interactionSpec: {
+            type: "multi_activity",
+            prompt: "Complete each step",
+            activities: activitySteps,
+          },
+          visualSpec: {
+            type: "practice_set",
+            items: expSteps.map((s, i) => ({
+              id: `step-${i}`,
+              type: "tap_continue",
+              prompt: s,
+            })),
+          },
+          feedbackSpec: {
+            correct: "Well done! You completed the activity.",
+            incorrect: "Have another go at the step you found tricky.",
+            hint: "",
+          },
+          successCriteria: "Completes the hands-on activity.",
+        });
+      }
+    }
 
   // ── Quick Check (from second quiz or first quiz if only one) ──
   const checkQuiz = quizzes.length > 1 ? quizzes[1] : quizzes[0];
   if (checkQuiz) {
-    const opts = checkQuiz.data.options || [];
-    const correctIdx = checkQuiz.data.correctIndex ?? 0;
+    const checkData = blockData<{ question?: string; options?: string[]; correctIndex?: number; explanation?: string }>(checkQuiz);
+    const opts = checkData.options || [];
+    const correctIdx = checkData.correctIndex ?? 0;
     steps.push({
       id: "quick_check",
       stepType: "quick_check",
       title: "Quick Check",
-      studentText: checkQuiz.data.question || "Quick check!",
+      studentText: checkData.question || "Quick check!",
       owlText: "Let us check what you learned.",
       studentInstruction: "Choose the best answer.",
       interactionSpec: {
         type: "multiple_choice",
-        question: checkQuiz.data.question || "Quick check!",
+        question: checkData.question || "Quick check!",
         options: opts,
         correctIndex: correctIdx,
-        hint: checkQuiz.data.explanation || "Think about what you learned.",
+        hint: checkData.explanation || "Think about what you learned.",
       },
       feedbackSpec: {
         correct: "Correct! You know this.",
         incorrect: "Not quite — review the lesson and try again.",
-        hint: checkQuiz.data.explanation || "Think about the lesson.",
+        hint: checkData.explanation || "Think about the lesson.",
       },
       successCriteria: "Shows understanding.",
     });
@@ -812,16 +900,17 @@ export function buildGrade4Journey(blocks: ContentBlock[]): JourneyStep[] {
   // ── Reflect (from journal block) ──
   if (journals.length > 0) {
     const j = journals[0];
+    const jData = blockData<{ prompt?: string; placeholder?: string }>(j);
     steps.push({
       id: "reflect",
       stepType: "reflect",
       title: "Think About It",
-      studentText: j.data.prompt || "Reflect on what you learned.",
+      studentText: jData.prompt || "Reflect on what you learned.",
       owlText: "Take a moment to reflect on what you learned.",
       studentInstruction: "Write your reflection.",
       interactionSpec: {
         type: "reflection_chips",
-        prompt: j.data.prompt || "What did you learn?",
+        prompt: jData.prompt || "What did you learn?",
         chips: ["I learned something new", "I can explain it", "I want to learn more"],
         sentenceStarter: "I learned that...",
         hint: "Use your own words.",
@@ -905,17 +994,22 @@ export function isGrade4MathContent(blocks: ContentBlock[]): boolean {
 
 /**
  * Build a Grade 4 journey from legacy contentBlocks.
- * Routes to the dedicated builder for the Place Value lesson when
- * the lesson title matches; otherwise uses the generic builder.
+ *
+ * Routing is DATA-DRIVEN: a lesson with a registered AdaptiveLessonConfig uses
+ * the shared adaptive builder (its own journey for `bespoke` lessons, the
+ * generated builder for `generated` lessons). No title-string branches.
+ *
+ * Lessons with no adaptive config fall back to the generic builder.
  */
 export function buildGrade4JourneyFromBlocks(
   blocks: ContentBlock[],
   lessonTitle?: string,
+  lessonSlug?: string,
 ): JourneyStep[] {
-  // Route to the dedicated Place Value builder when we can identify it
-  if (lessonTitle === "Place Value and Number Reading") {
-    return buildPlaceValueJourney();
+  const config = resolveAdaptiveLessonConfig({ slug: lessonSlug, title: lessonTitle });
+  if (config) {
+    if (config.journeyBuilder === "bespoke") return buildPlaceValueJourney();
+    return buildAdaptiveJourneyFromConfig(config, blocks);
   }
-  // Generic builder for all other Grade 4 Math lessons
   return buildGrade4Journey(blocks);
 }

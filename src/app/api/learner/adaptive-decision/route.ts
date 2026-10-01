@@ -25,14 +25,23 @@ import { createAIProvider } from "@/lib/ai/providers";
 import { AdaptiveOrchestrator } from "@/lib/learning/orchestrator";
 import { loadLearningState, saveLearningStateSnapshot } from "@/lib/learning/state-persistence";
 import { pedagogicalActionToJourneyStep } from "@/lib/learning/action-adapter";
-import { PLACE_VALUE_CONCEPTS, type Evidence, type LearningState } from "@/lib/curriculum/adaptive-engine";
+import { type Evidence, type LearningState } from "@/lib/curriculum/adaptive-engine";
+import { resolveAdaptiveLessonConfig } from "@/lib/curriculum/adaptive/registry";
+import {
+  buildRemediationStep,
+  detectActivityMisconception,
+  validateActivity,
+  type ResolvedActivity,
+} from "@/lib/curriculum/adaptive/engine";
+import { resolveActivityFromJourney } from "@/lib/curriculum/adaptive/resolve-activity";
 import type { AIContext, PedagogicalAction } from "@/lib/ai/AIProvider";
-import { getStepConceptMapping } from "@/lib/curriculum/step-concept-mappings";
 import { supabase } from "@/lib/supabase";
 
 interface AdaptiveDecisionRequest {
   lessonId: string;
   lessonTitle: string;
+  /** Curriculum slug — the authoritative key for adaptive lesson lookup. */
+  lessonSlug?: string;
   activityId: string;
   conceptId?: string;
   selectedAnswer: string;
@@ -51,7 +60,8 @@ interface AdaptiveDecisionResponse {
   usedFallback: boolean;
   updatedState: LearningState;
   conceptMastery: Record<string, unknown>;
-  isPlaceValue: boolean;
+  /** True when the lesson is registered with the adaptive architecture. */
+  isAdaptive: boolean;
 }
 
 export const dynamic = "force-dynamic";
@@ -68,25 +78,23 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     const body = await req.json() as AdaptiveDecisionRequest;
     const {
-      lessonId, lessonTitle, activityId, conceptId,
+      lessonId, lessonTitle, lessonSlug, activityId, conceptId,
       selectedAnswer, expectedAnswer, options, correct, prompt,
       attemptNumber, remediationContext,
     } = body;
 
-    // Only Place Value lessons route through the orchestrator.
-    const isPlaceValue = lessonTitle
-      ? lessonTitle.toLowerCase().includes("place value") ||
-        lessonTitle.toLowerCase().includes("place-value")
-      : true;
+    // Routing is data-driven: the lesson's registered AdaptiveLessonConfig
+    // decides whether (and how) the adaptive loop applies. No title matching.
+    const config = resolveAdaptiveLessonConfig({ slug: lessonSlug, title: lessonTitle });
 
-    if (!isPlaceValue) {
+    if (!config) {
       return NextResponse.json(
-        { error: "Adaptive decision API is only for Place Value lessons." },
+        { error: "This lesson is not registered with the adaptive architecture." },
         { status: 400 }
       );
     }
 
-    const conceptIds = PLACE_VALUE_CONCEPTS.map((c) => c.id);
+    const conceptIds = config.concepts.map((c) => c.id);
 
     // ── 1. Load learner state from persisted InteractionResponse rows ──
     // The state is reconstructed by replaying every prior response through
@@ -107,15 +115,52 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     ).length;
     const attemptNumberToUse = existingAttemptsForActivity + 1;
 
-    // ── 2. Resolve concept + step mapping ──
-    const stepMapping = getStepConceptMapping(activityId);
-    const effectiveConceptId = conceptId || stepMapping?.conceptId || "digit-position";
+    // ── 2. Resolve the activity from the lesson config ──
+    // The config owns concept, validator and misconception detectors. Runtime
+    // options/prompt come from the journey step the learner actually saw.
+    const resolved = resolveActivityFromJourney(config, {
+      activityId,
+      options: options || [],
+      prompt,
+      expectedAnswer,
+    });
+    const stepMapping = resolved.declared
+      ? {
+          conceptId: resolved.activity!.conceptId,
+          expectedAnswer: resolved.activity!.correctAnswer,
+          misconceptionCheck: (sel: string, exp: string) =>
+            resolved.activity!.spec.detectMisconception?.(sel, exp, {
+              prompt: resolved.activity!.prompt,
+              choices: resolved.activity!.choices,
+              activityId,
+              attemptNumber: 1,
+            }) || null,
+        }
+      : undefined;
+
+    const effectiveConceptId = conceptId || stepMapping?.conceptId;
+    if (!effectiveConceptId) {
+      return NextResponse.json(
+        { error: `Activity "${activityId}" is not declared by this lesson's adaptive configuration.` },
+        { status: 400 },
+      );
+    }
     const effectiveExpected = expectedAnswer || stepMapping?.expectedAnswer || "";
     const effectivePrompt = (remediationContext?.prompt as string) || prompt || "";
 
-    // Determine misconception via existing rule-based detection (for evidence).
+    // Deterministic validation is authoritative: the server decides correctness
+    // from the lesson's own rules rather than trusting the client's `correct`.
+    const serverCorrect = resolved.declared
+      ? validateActivity(resolved.activity!, selectedAnswer)
+      : correct;
+    const wasCorrect = serverCorrect;
+
+    // Determine misconception via the lesson's deterministic detectors.
     let misconceptionId: string | null = null;
-    if (!correct && stepMapping) {
+    if (!wasCorrect && resolved.declared) {
+      const mc = detectActivityMisconception(config, resolved.activity!, selectedAnswer);
+      misconceptionId = mc?.id || null;
+    } else if (!wasCorrect && stepMapping) {
       const mc = stepMapping.misconceptionCheck(selectedAnswer, effectiveExpected);
       misconceptionId = mc || null;
     }
@@ -123,7 +168,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     // ── 3. Build Evidence from the student response ──
     const evidence: Evidence = {
       conceptId: effectiveConceptId,
-      correct,
+      correct: wasCorrect,
       timestamp: Date.now(),
       activityId,
       answer: selectedAnswer,
@@ -159,7 +204,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       learnerState: learningState,
       evidence,
       context: aiContext,
-      curriculumKey: "g4-math-place-value",
+      curriculumKey: config.curriculumKey,
     });
 
     // ── 7. Persist the response (so the next call reconstructs correct state) ──
@@ -172,7 +217,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         conceptId: effectiveConceptId || null,
         selectedAnswer: String(selectedAnswer),
         expectedAnswer: String(effectiveExpected),
-        correct,
+        correct: wasCorrect,
         misconceptionId: misconceptionId || null,
         attemptNumber: attemptNumberToUse,
         remediationShown: remediationContext?.attemptNumber
@@ -208,6 +253,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         attemptNumber: attemptNumberToUse,
       },
       conceptChain: conceptIds,
+      lessonConfig: config,
     });
 
     // ── 10. Extract mastery snapshot for the client ──
@@ -227,7 +273,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       usedFallback: decision.usedFallback,
       updatedState: decision.updatedState,
       conceptMastery,
-      isPlaceValue,
+      isAdaptive: true,
     };
 
     return NextResponse.json(response);

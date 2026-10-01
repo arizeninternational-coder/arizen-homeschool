@@ -25,6 +25,8 @@ import {
 } from '../curriculum/adaptive-engine';
 import type { MasteryLevel } from '../curriculum/adaptive-engine';
 import type { PedagogicalActionKind } from '../ai/AIProvider';
+import type { AdaptiveLessonConfig } from '../curriculum/adaptive/types';
+import { getAllAdaptiveLessonConfigs } from '../curriculum/adaptive/registry';
 
 // ── Allowed pedagogical action types ─────────────────────────────────────────
 
@@ -161,6 +163,37 @@ export interface CurriculumConstraints {
 // Maps a curriculum key (e.g. "g4-math-place-value") to its constraints.
 // The orchestrator looks up the constraint set for the current lesson.
 
+/**
+ * Constraint sets are derived from the lesson's registered AdaptiveLessonConfig
+ * so a new adaptive lesson gets its own concept scope, prerequisite graph and
+ * mastery thresholds without touching the orchestrator or validator.
+ */
+function buildConstraintsFromConfig(config: AdaptiveLessonConfig): CurriculumConstraints {
+  const concepts = config.concepts.map((c) => ({
+    id: c.id,
+    label: c.label,
+    prerequisites: [...c.prerequisites],
+    allowedRepresentations: c.allowedRepresentations
+      ? [...c.allowedRepresentations]
+      : Array.from(ALLOWED_REPRESENTATIONS),
+    masteryThreshold: c.masteryThreshold,
+  }));
+
+  return {
+    conceptScope: new Set(concepts.map((c) => c.id)),
+    concepts,
+    prerequisites: new Map(concepts.map((c) => [c.id, new Set(c.prerequisites)])),
+    allowedActionTypes: ALLOWED_ACTION_TYPES,
+    allowedRepresentations: ALLOWED_REPRESENTATIONS,
+    minDifficulty: MIN_DIFFICULTY,
+    maxDifficulty: MAX_DIFFICULTY,
+    objective: config.objectives.join(' '),
+    strand: config.strand,
+    subStrand: config.subStrand,
+    grade: config.grade,
+  };
+}
+
 const CONSTRAINT_REGISTRY: Map<string, CurriculumConstraints> = new Map();
 
 const pvConstraints: CurriculumConstraints = {
@@ -182,6 +215,11 @@ const pvConstraints: CurriculumConstraints = {
 };
 
 CONSTRAINT_REGISTRY.set('g4-math-place-value', pvConstraints);
+
+// Every registered adaptive lesson gets its own constraint set from its config.
+for (const config of getAllAdaptiveLessonConfigs()) {
+  CONSTRAINT_REGISTRY.set(config.curriculumKey, buildConstraintsFromConfig(config));
+}
 
 // ── Public API ───────────────────────────────────────────────────────────────
 

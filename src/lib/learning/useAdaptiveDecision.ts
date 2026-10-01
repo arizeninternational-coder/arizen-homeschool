@@ -30,12 +30,15 @@ export interface AdaptiveDecisionResult {
   usedFallback: boolean;
   updatedState: LearningState;
   conceptMastery: Record<string, unknown>;
-  isPlaceValue: boolean;
+  /** True when the lesson is registered with the adaptive architecture. */
+  isAdaptive: boolean;
 }
 
 export interface SubmitAdaptiveAnswerParams {
   lessonId: string;
   lessonTitle: string;
+  /** Curriculum slug — the authoritative key for adaptive lesson lookup. */
+  lessonSlug?: string;
   activityId: string;
   conceptId?: string;
   selectedAnswer: string;
@@ -79,7 +82,7 @@ export function useAdaptiveDecision() {
         usedFallback: data.usedFallback || false,
         updatedState: data.updatedState,
         conceptMastery: data.conceptMastery || {},
-        isPlaceValue: data.isPlaceValue || false,
+        isAdaptive: data.isAdaptive ?? false,
       };
 
       setDecision(result);

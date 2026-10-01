@@ -14,9 +14,9 @@ import {
 
 import {
   PLACE_VALUE_QUIZ_MAPPINGS,
-  buildAdaptivePlaceValueJourney,
+  buildAdaptiveLessonJourney,
   generateRemediationStep,
-  isPlaceValueLesson,
+  isAdaptiveLessonRef,
 } from '../src/lib/curriculum/adaptive-journey';
 
 function assert(condition: boolean, message: string) {
@@ -190,17 +190,18 @@ function testSessionPersistence() {
 }
 
 // ============================================================
-// Test 6: isPlaceValueLesson Detection
+// Test 6: adaptive registry resolution (data-driven, not title matching)
 // ============================================================
 function testPlaceValueDetection() {
-  console.log('\n--- Test 6: Place Value lesson detection ---');
+  console.log('\n--- Test 6: adaptive lesson resolution ---');
 
-  assert(isPlaceValueLesson('Place Value and Number Reading') === true, 'Detects "Place Value"');
-  assert(isPlaceValueLesson('Place-Value Lesson') === true, 'Detects "Place-Value"');
-  assert(isPlaceValueLesson('Ordering and Rounding') === false, 'Does not match other lessons');
-  assert(isPlaceValueLesson('') === false, 'Handles empty string');
-  assert(isPlaceValueLesson(undefined) === false, 'Handles undefined');
-  console.log('  ✓ Place Value detection works correctly');
+  assert(isAdaptiveLessonRef({ slug: 'place-value' }) === true, 'Resolves the DB slug "place-value"');
+  assert(isAdaptiveLessonRef({ slug: 'place-value-number-reading' }) === true, 'Resolves the source slug');
+  assert(isAdaptiveLessonRef({ slug: 'ordering-rounding' }) === true, 'Resolves the next adaptive lesson');
+  assert(isAdaptiveLessonRef({ slug: 'nope', title: 'Not Registered' }) === false, 'Rejects unregistered lessons');
+  assert(isAdaptiveLessonRef({}) === false, 'Handles empty input');
+  assert(isAdaptiveLessonRef(null as any) === false, 'Handles undefined');
+  console.log('  ✓ adaptive lesson resolution works correctly');
 }
 
 // ============================================================
@@ -209,10 +210,10 @@ function testPlaceValueDetection() {
 function testAdaptiveJourneyBuilding() {
   console.log('\n--- Test 7: Adaptive journey building ---');
 
-  const result = buildAdaptivePlaceValueJourney('Place Value and Number Reading', 'test-student');
+  const result = buildAdaptiveLessonJourney({ title: 'Place Value and Number Reading' });
 
   assert(result.steps.length === 10, 'Journey has exactly 10 steps');
-  assert(!result.adaptiveInserted, 'No extra adaptive steps inserted (evaluation happens via onAnswer)');
+  assert(result.adaptiveInserted, 'Lesson is registered as adaptive');
   assert(result.remediationStepIds.length === 0, 'No remediation IDs at build time');
 
   const adaptiveStep = result.steps.find(s => s.stepType === 'adaptive-eval');
