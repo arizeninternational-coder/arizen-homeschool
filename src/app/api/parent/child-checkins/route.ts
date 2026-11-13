@@ -1,10 +1,11 @@
 // GET /api/parent/child-checkins - Get today's emotional check-ins for all linked children
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { withAuth } from "@/lib/api-guard";
 export const dynamic = "force-dynamic";
 
 export const GET = withAuth(async (req: NextRequest, user: any) => {
+  const supabase = getSupabaseAdmin();
   try {
     const parentId = user.id;
 

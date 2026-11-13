@@ -1,11 +1,12 @@
 // POST /api/xp/award — Award XP to learner
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { withAuthPost } from "@/lib/api-guard";
 import { updateStreak, awardXp } from "@/lib/auth/utils";
 export const dynamic = "force-dynamic";
 
 export const POST = withAuthPost(async (req, user, body: any) => {
+  const supabase = getSupabaseAdmin();
   try {
     if (!user.learnerProfileId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -54,6 +55,7 @@ export const POST = withAuthPost(async (req, user, body: any) => {
 });
 
 async function checkAndAwardBadges(learnerId: string): Promise<any[]> {
+  const supabase = getSupabaseAdmin();
   const { data: profile } = await supabase
     .from("LearnerProfile")
     .select("totalXp, currentStreak")

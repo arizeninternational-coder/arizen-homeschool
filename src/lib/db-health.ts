@@ -2,13 +2,14 @@
  * Database table health check utility.
  * Use in API routes to detect missing tables and return helpful errors.
  */
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 
 /**
  * Check if a table exists and is queryable.
  * Returns { exists: true } or { exists: false, error: string }.
  */
 export async function checkTableExists(tableName: string): Promise<{ exists: boolean; error?: string }> {
+  const supabase = getSupabaseAdmin();
   try {
     const { error } = await supabase.from(tableName).select("id").limit(1);
     if (error) {
@@ -31,6 +32,7 @@ export async function checkTableExists(tableName: string): Promise<{ exists: boo
  * Returns the first missing table error, or null if all exist.
  */
 export async function checkRequiredTables(tables: string[]): Promise<string | null> {
+  const supabase = getSupabaseAdmin();
   for (const table of tables) {
     const result = await checkTableExists(table);
     if (!result.exists) {

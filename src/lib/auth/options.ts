@@ -1,7 +1,8 @@
 // NextAuth config — uses Supabase REST API for auth (bypasses Prisma TCP issues on Vercel)
 import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
+import { USER_AUTH_COLUMNS } from "@/lib/db/user-columns";
 import bcrypt from "bcryptjs";
 
 export const authOptions: NextAuthOptions = {
@@ -13,6 +14,7 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
+        const supabase = getSupabaseAdmin();
         const logs: string[] = [];
         try {
           logs.push("authorize() called");
@@ -30,7 +32,7 @@ export const authOptions: NextAuthOptions = {
           console.log("[AUTH] Querying Supabase for:", email);
           const { data: users, error: dbError } = await supabase
             .from("User")
-            .select("id, name, email, image, role, passwordHash, guildId")
+            .select(USER_AUTH_COLUMNS)
             .eq("email", email)
             .limit(1);
 

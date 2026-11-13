@@ -35,7 +35,7 @@ import {
 } from "@/lib/curriculum/adaptive/engine";
 import { resolveActivityFromJourney } from "@/lib/curriculum/adaptive/resolve-activity";
 import type { AIContext, PedagogicalAction } from "@/lib/ai/AIProvider";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 
 interface AdaptiveDecisionRequest {
   lessonId: string;
@@ -85,6 +85,7 @@ interface AdaptiveDecisionResponse {
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
+  const supabase = getSupabaseAdmin();
   try {
     const user = await getAuthUser(req);
     if (!user) {

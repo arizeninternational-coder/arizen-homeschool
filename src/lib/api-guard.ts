@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 
 export interface AuthUser {
   id: string;
@@ -74,6 +74,7 @@ function getSessionFromCookie(req: NextRequest): Record<string, any> | null {
  * Look up user in Supabase by ID.
  */
 async function lookupUserById(userId: string): Promise<AuthUser | null> {
+  const supabase = getSupabaseAdmin();
   try {
     const { data: user, error } = await supabase
       .from("User")
@@ -114,6 +115,7 @@ async function lookupUserById(userId: string): Promise<AuthUser | null> {
  * Look up user in Supabase by email.
  */
 async function lookupUserByEmail(email: string): Promise<AuthUser | null> {
+  const supabase = getSupabaseAdmin();
   try {
     const { data: user, error } = await supabase
       .from("User")
@@ -154,6 +156,7 @@ async function lookupUserByEmail(email: string): Promise<AuthUser | null> {
  * Get authenticated user from request.
  */
 export async function getAuthUser(req: NextRequest): Promise<AuthUser | null> {
+  const supabase = getSupabaseAdmin();
   try {
     const jwt = getSessionFromCookie(req);
     if (!jwt) {
@@ -201,6 +204,7 @@ function hasRole(userRole: string, allowedRoles: string[]): boolean {
 }
 
 export async function requireAdmin(req: NextRequest): Promise<{ user: AuthUser } | NextResponse> {
+  const supabase = getSupabaseAdmin();
   const user = await getAuthUser(req);
   if (!user) {
     return NextResponse.json({ error: "Unauthorized — please log in" }, { status: 401 });
@@ -215,6 +219,7 @@ export function withAuth(
   handler: (req: NextRequest, user: AuthUser, url: URL) => Promise<NextResponse | Response>,
   options?: { roles?: string[] }
 ) {
+  const supabase = getSupabaseAdmin();
   return async (req: NextRequest): Promise<NextResponse | Response> => {
     const user = await getAuthUser(req);
     if (!user) return NextResponse.json({ error: "Unauthorized — please log in" }, { status: 401 });
@@ -229,6 +234,7 @@ export function withAuthPost(
   handler: (req: NextRequest, user: AuthUser, body: unknown) => Promise<NextResponse | Response>,
   options?: { roles?: string[] }
 ) {
+  const supabase = getSupabaseAdmin();
   return async (req: NextRequest): Promise<NextResponse | Response> => {
     const user = await getAuthUser(req);
     if (!user) return NextResponse.json({ error: "Unauthorized — please log in" }, { status: 401 });

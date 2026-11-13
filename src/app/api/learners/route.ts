@@ -1,11 +1,12 @@
 // GET /api/learners — List learners for leaderboard (authenticated users only)
 // Returns ONLY safe display fields — no emails, no internal IDs, no private data
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { getAuthUser } from "@/lib/api-guard";
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
+  const supabase = getSupabaseAdmin();
   try {
     // Require authentication — any logged-in user can view the leaderboard
     const user = await getAuthUser(req);

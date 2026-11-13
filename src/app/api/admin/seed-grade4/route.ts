@@ -2,7 +2,7 @@
 // Creates themes, quests, and lessons with PUBLISHED status and flat
 // contentBlocks arrays that the student journey renderer can transform.
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { requireAdmin } from "@/lib/api-guard";
 export const dynamic = "force-dynamic";
 
@@ -80,6 +80,7 @@ const GRADE_4_MATH = {
 };
 
 export async function POST(req: NextRequest) {
+  const supabase = getSupabaseAdmin();
   const auth = await requireAdmin(req);
   if (auth instanceof NextResponse) return auth;
 
@@ -264,6 +265,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
+  const supabase = getSupabaseAdmin();
   // Allow GET to trigger the seed via query param (one-time setup)
   const { searchParams } = new URL(req.url);
   if (searchParams.get("setup") === "grade4") {

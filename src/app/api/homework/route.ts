@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { jwtVerify } from "jose";
 
 export const dynamic = "force-dynamic";
@@ -28,6 +28,7 @@ async function getUserIdFromCookie(request: Request): Promise<{ id: string; role
 
 // GET — list homework for a learner
 export async function GET(request: Request) {
+  const supabase = getSupabaseAdmin();
   try {
     const user = await getUserIdFromCookie(request);
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -113,6 +114,7 @@ export async function GET(request: Request) {
 
 // POST — parent creates homework
 export async function POST(request: Request) {
+  const supabase = getSupabaseAdmin();
   try {
     const user = await getUserIdFromCookie(request);
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -181,6 +183,7 @@ export async function POST(request: Request) {
 
 // PATCH — mark homework as complete
 export async function PATCH(request: Request) {
+  const supabase = getSupabaseAdmin();
   try {
     const user = await getUserIdFromCookie(request);
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import bcrypt from "bcryptjs";
 
 export async function createUser(data: {
@@ -10,6 +10,7 @@ export async function createUser(data: {
   grade?: number;
   displayName?: string;
 }) {
+  const supabase = getSupabaseAdmin();
   const passwordHash = await bcrypt.hash(data.password, 12);
   const userRole = data.role || "LEARNER";
 
@@ -41,6 +42,7 @@ export async function createUser(data: {
 }
 
 export async function updateStreak(learnerId: string) {
+  const supabase = getSupabaseAdmin();
   const { data: profile } = await supabase
     .from("LearnerProfile")
     .select("currentStreak, bestStreak, lastActivityDate")
@@ -88,6 +90,7 @@ export async function awardXp(
   sourceId: string,
   description?: string
 ) {
+  const supabase = getSupabaseAdmin();
   await supabase.from("XpRecord").insert({
     learnerId,
     sourceType,

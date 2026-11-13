@@ -1,10 +1,11 @@
 // GET /api/guilds — List published themes for the user's guild
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { withAuth } from "@/lib/api-guard";
 export const dynamic = "force-dynamic";
 
 export const GET = withAuth(async (req, user) => {
+  const supabase = getSupabaseAdmin();
   try {
     const guildId = user.guildId || user.guildSlug;
     if (!guildId) return NextResponse.json({ error: "No guild assigned" }, { status: 400 });

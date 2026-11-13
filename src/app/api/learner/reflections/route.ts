@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { jwtVerify } from "jose";
 
 export const dynamic = "force-dynamic";
 
 async function getAuth(request: Request): Promise<{ userId: string; learnerId: string } | null> {
+  const supabase = getSupabaseAdmin();
   try {
     const cookieHeader = request.headers.get("cookie") || "";
     const cookies = Object.fromEntries(cookieHeader.split(";").map(c => { const [k,...r] = c.trim().split("="); return [k.trim(), r.join("=")]; }));
@@ -23,6 +24,7 @@ async function getAuth(request: Request): Promise<{ userId: string; learnerId: s
 
 // GET reflections for this learner
 export async function GET(request: Request) {
+  const supabase = getSupabaseAdmin();
   try {
     const auth = await getAuth(request);
     if (!auth?.learnerId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -46,6 +48,7 @@ export async function GET(request: Request) {
   }
 }
 export async function POST(request: Request) {
+  const supabase = getSupabaseAdmin();
   try {
     const auth = await getAuth(request);
     if (!auth?.learnerId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

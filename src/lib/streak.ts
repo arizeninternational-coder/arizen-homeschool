@@ -1,11 +1,12 @@
 // Shared streak computation helper
 // Used by lesson completion and check-in APIs to keep streak logic consistent
 
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 
 const NAIROBI_TZ = "Africa/Nairobi";
 
 export function getNairobiDateKey(d: Date = new Date()): string {
+  const supabase = getSupabaseAdmin();
   return new Intl.DateTimeFormat("en-CA", {
     timeZone: NAIROBI_TZ,
     year: "numeric",
@@ -15,6 +16,7 @@ export function getNairobiDateKey(d: Date = new Date()): string {
 }
 
 export function nairobiDaysBetween(earlier: Date, later: Date): number {
+  const supabase = getSupabaseAdmin();
   const fmt = new Intl.DateTimeFormat("en-CA", {
     timeZone: NAIROBI_TZ,
     year: "numeric",
@@ -34,6 +36,7 @@ export function nairobiDaysBetween(earlier: Date, later: Date): number {
  * Idempotent: calling multiple times on the same Nairobi day returns the same count.
  */
 export async function updateStreak(learnerId: string): Promise<number> {
+  const supabase = getSupabaseAdmin();
   const nowDate = new Date();
   const todayKey = getNairobiDateKey(nowDate);
 

@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { getAuthUser } from "@/lib/api-guard";
 
 export const dynamic = "force-dynamic";
 
 // GET /api/avatar — get current student's avatar config
 export async function GET(req: NextRequest) {
+  const supabase = getSupabaseAdmin();
   try {
     const user = await getAuthUser(req);
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -40,6 +41,7 @@ export async function GET(req: NextRequest) {
 //   equippedTopId, equippedBottomId, equippedShoesId,
 //   equippedAccessoryId, equippedPetId, equippedBackgroundId
 export async function POST(req: NextRequest) {
+  const supabase = getSupabaseAdmin();
   try {
     const user = await getAuthUser(req);
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

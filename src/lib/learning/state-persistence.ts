@@ -6,7 +6,7 @@
  * migration is required — every student response is already stored.
  */
 
-import { supabase } from '@/lib/supabase';
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import {
   createInitialLearningState,
   recordEvidence,
@@ -37,6 +37,7 @@ export async function loadLearningState(
   lessonId: string,
   conceptIds: string[],
 ): Promise<LearningState> {
+  const supabase = getSupabaseAdmin();
   let state = createInitialLearningState(studentId, lessonId, conceptIds);
 
   const { data: rows, error } = await supabase
@@ -86,6 +87,7 @@ export async function saveLearningStateSnapshot(
   lessonId: string,
   state: LearningState,
 ): Promise<void> {
+  const supabase = getSupabaseAdmin();
   const snapshot = {
     studentId,
     lessonId,

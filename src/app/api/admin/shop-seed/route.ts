@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { requireAdmin } from "@/lib/api-guard";
 export const dynamic = "force-dynamic";
 
@@ -37,6 +37,7 @@ const ITEMS = [
 ];
 
 export async function POST(req: NextRequest) {
+  const supabase = getSupabaseAdmin();
   const auth = await requireAdmin(req);
   if (auth instanceof NextResponse) return auth;
   const res = { rulesCreated: 0, rulesSkipped: 0, itemsCreated: 0, itemsSkipped: 0 };

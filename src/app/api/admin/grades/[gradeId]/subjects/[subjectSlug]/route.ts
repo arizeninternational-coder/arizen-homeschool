@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { requireAdmin } from "@/lib/api-guard";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: Request, { params }: { params: { gradeId: string; subjectSlug: string } }) {
+  const supabase = getSupabaseAdmin();
   try {
     const auth = await requireAdmin(request);
     if (auth instanceof NextResponse) return auth;

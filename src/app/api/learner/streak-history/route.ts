@@ -1,12 +1,13 @@
 // GET /api/learner/streak-history — Returns which days in the past week had learning activity
 // Used by the student sidebar streak calendar
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { getAuthUser } from "@/lib/api-guard";
 import { getNairobiDateKey } from "@/lib/streak";
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
+  const supabase = getSupabaseAdmin();
   try {
     const user = await getAuthUser(req);
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

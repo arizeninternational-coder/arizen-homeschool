@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { jwtVerify } from "jose";
 
 export const dynamic = "force-dynamic";
@@ -27,6 +27,7 @@ async function getUserFromCookie(request: Request): Promise<{ id: string; role: 
 }
 
 export async function GET(request: Request) {
+  const supabase = getSupabaseAdmin();
   try {
     const user = await getUserFromCookie(request);
     if (!user) return NextResponse.json({ notifications: [], unread: 0 });

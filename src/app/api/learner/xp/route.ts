@@ -1,10 +1,11 @@
 // GET /api/learner/xp — Get XP history
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { withAuth } from "@/lib/api-guard";
 export const dynamic = "force-dynamic";
 
 export const GET = withAuth(async (req, user) => {
+  const supabase = getSupabaseAdmin();
   try {
     if (!user.learnerProfileId) {
       return NextResponse.json({ xpRecords: [] });

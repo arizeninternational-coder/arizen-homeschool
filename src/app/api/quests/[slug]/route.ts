@@ -1,6 +1,6 @@
 // GET /api/quests/[slug] — Get quest with lessons and progress
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { withAuth } from "@/lib/api-guard";
 export const dynamic = "force-dynamic";
 
@@ -9,6 +9,7 @@ function respondError(message: string, status = 400) {
 }
 
 export const GET = withAuth(async (req, user, url) => {
+  const supabase = getSupabaseAdmin();
   try {
 
     const slug = url.searchParams.get("slug");

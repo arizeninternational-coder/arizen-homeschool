@@ -2,12 +2,13 @@
 // This endpoint is used by the frontend to verify auth state and role
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 export const dynamic = "force-dynamic";
 
 const secret = process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-production";
 
 export async function GET(request: NextRequest) {
+  const supabase = getSupabaseAdmin();
   try {
     console.log("[AUTH_ME] Request URL:", request.url);
     console.log("[AUTH_ME] Cookie header:", request.headers.get("cookie") ? "PRESENT" : "MISSING");

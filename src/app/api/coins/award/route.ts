@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "@/lib/api-guard";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 export const dynamic = "force-dynamic";
 
 function genId(): string {
@@ -8,6 +8,7 @@ function genId(): string {
 }
 
 export const POST = withAuth(async (req: NextRequest, user: any, body: any) => {
+  const supabase = getSupabaseAdmin();
   try {
     const { learnerId, amount, source, sourceId, description } = body || {};
     if (!learnerId || !amount || amount <= 0) {

@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "@/lib/api-guard";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 export const dynamic = "force-dynamic";
 
 export const GET = withAuth(async (req: NextRequest, user: any, url: URL) => {
+  const supabase = getSupabaseAdmin();
   try {
     const learnerId = user.learnerProfileId;
     if (!learnerId) return NextResponse.json({ transactions: [] });

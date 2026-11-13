@@ -1,6 +1,6 @@
 // GET /api/admin/curriculum/lessons — List imported lessons for a grade+subject
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { requireAdmin } from "@/lib/api-guard";
 export const dynamic = "force-dynamic";
 
@@ -32,6 +32,7 @@ function slugify(text: string): string {
 }
 
 export async function GET(req: NextRequest) {
+  const supabase = getSupabaseAdmin();
   const auth = await requireAdmin(req);
   if (auth instanceof NextResponse) return auth;
 

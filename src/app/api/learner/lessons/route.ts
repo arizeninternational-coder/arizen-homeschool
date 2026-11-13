@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { getAuthUser } from "@/lib/api-guard";
 
 // ── Student visibility check ────────────────────────────────────────────────
@@ -61,6 +61,7 @@ function normalizeReward(reward: any): number {
 }
 
 export async function GET(req: NextRequest) {
+  const supabase = getSupabaseAdmin();
   try {
     const user = await getAuthUser(req);
     if (!user) {

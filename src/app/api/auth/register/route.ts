@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import bcrypt from "bcryptjs";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
+  const supabase = getSupabaseAdmin();
   try {
     const body = await req.json();
     const { email, password, name, guildSlug, role, grade, displayName } = body;

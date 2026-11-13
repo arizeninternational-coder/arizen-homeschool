@@ -1,6 +1,6 @@
 // GET /api/learner/badges — Get learner badges (earned + available with progress)
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { getAuthUser } from "@/lib/api-guard";
 export const dynamic = "force-dynamic";
 
@@ -47,6 +47,7 @@ const BADGE_DEFINITIONS = [
 ];
 
 export async function GET(req: NextRequest) {
+  const supabase = getSupabaseAdmin();
   try {
     const user = await getAuthUser(req);
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

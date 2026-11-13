@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { getAuthUser, requireAdmin } from "@/lib/api-guard";
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
+  const supabase = getSupabaseAdmin();
   const authUser = await getAuthUser(req);
   if (!authUser) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const { data, error } = await supabase.from("RewardRule").select("*").eq("isActive", true).order("action");
@@ -12,6 +13,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const supabase = getSupabaseAdmin();
   const auth = await requireAdmin(req);
   if (auth instanceof NextResponse) return auth;
   const body = await req.json();

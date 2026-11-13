@@ -1,7 +1,7 @@
 // POST /api/admin/lessons/[id]/illustrations/upload
 // Admin-only: Upload an image for a specific journey step
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { requireAdmin } from "@/lib/api-guard";
 export const dynamic = "force-dynamic";
 
@@ -9,6 +9,7 @@ export async function POST(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const supabase = getSupabaseAdmin();
   const auth = await requireAdmin(req);
   if (auth instanceof NextResponse) return auth;
 

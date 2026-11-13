@@ -2,7 +2,7 @@
 // This endpoint finds lessons even when the quest itself isn't PUBLISHED,
 // so the student can still access lesson content.
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { withAuth } from "@/lib/api-guard";
 export const dynamic = "force-dynamic";
 
@@ -11,6 +11,7 @@ function respondError(message: string, status = 400) {
 }
 
 export const GET = withAuth(async (req, user, url) => {
+  const supabase = getSupabaseAdmin();
   try {
     const slug = url.searchParams.get("slug");
     if (!slug) return respondError("Slug required", 400);

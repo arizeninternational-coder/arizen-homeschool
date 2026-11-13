@@ -1,12 +1,13 @@
 // GET /api/admin/quests — List all quests with theme info (ADMIN only)
 // POST /api/admin/quests — Create a new quest (ADMIN only)
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { requireAdmin } from "@/lib/api-guard";
 export const dynamic = "force-dynamic";
 
 // GET — list all quests
 export async function GET(req: NextRequest) {
+  const supabase = getSupabaseAdmin();
   const auth = await requireAdmin(req);
   if (auth instanceof NextResponse) return auth;
   const { user } = auth;
@@ -72,6 +73,7 @@ export async function GET(req: NextRequest) {
 
 // POST — create a new quest
 export async function POST(req: NextRequest) {
+  const supabase = getSupabaseAdmin();
   const auth = await requireAdmin(req);
   if (auth instanceof NextResponse) return auth;
   const { user } = auth;
@@ -142,6 +144,7 @@ export async function POST(req: NextRequest) {
 
 // DELETE — delete a quest by ID
 export async function DELETE(req: NextRequest) {
+  const supabase = getSupabaseAdmin();
   const auth = await requireAdmin(req);
   if (auth instanceof NextResponse) return auth;
 

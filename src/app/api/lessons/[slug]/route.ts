@@ -1,7 +1,7 @@
 // GET /api/lessons/[slug] — Get lesson content
 // POST /api/lessons/[slug] — Mark lesson complete
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { withAuth, withAuthPost } from "@/lib/api-guard";
 import { updateStreak, awardXp } from "@/lib/auth/utils";
 export const dynamic = "force-dynamic";
@@ -11,6 +11,7 @@ function respondError(message: string, status = 400) {
 }
 
 export const GET = withAuth(async (req, user, url) => {
+  const supabase = getSupabaseAdmin();
   try {
     const slug = url.searchParams.get("slug");
     if (!slug) return respondError("Slug required", 400);
@@ -57,6 +58,7 @@ export const GET = withAuth(async (req, user, url) => {
 });
 
 export const POST = withAuthPost(async (req, user, body: any) => {
+  const supabase = getSupabaseAdmin();
   try {
     if (!user.learnerProfileId) return respondError("Unauthorized", 401);
 

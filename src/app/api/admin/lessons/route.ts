@@ -1,10 +1,11 @@
 // GET /api/admin/lessons — List all lessons (ADMIN only)
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { requireAdmin } from "@/lib/api-guard";
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
+  const supabase = getSupabaseAdmin();
   const auth = await requireAdmin(req);
   if (auth instanceof NextResponse) return auth;
 
@@ -46,6 +47,7 @@ export async function GET(req: NextRequest) {
 
 // POST /api/admin/lessons — Create a new lesson
 export async function POST(req: NextRequest) {
+  const supabase = getSupabaseAdmin();
   const auth = await requireAdmin(req);
   if (auth instanceof NextResponse) return auth;
 

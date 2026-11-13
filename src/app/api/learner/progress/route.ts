@@ -2,7 +2,7 @@
 // Body: { lessonId, action: "start" | "complete", questId? }
 // Handles: progress creation/update, rewards on first completion, streak logic
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { getAuthUser } from "@/lib/api-guard";
 import { updateStreak } from "@/lib/streak";
 export const dynamic = "force-dynamic";
@@ -20,6 +20,7 @@ function safeRewardValue(reward: any): number {
 
 
 export async function POST(req: NextRequest) {
+  const supabase = getSupabaseAdmin();
   try {
     const user = await getAuthUser(req);
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -312,6 +313,7 @@ export async function POST(req: NextRequest) {
 
 // GET /api/learner/progress — Get progress for a specific lesson or all lessons
 export async function GET(req: NextRequest) {
+  const supabase = getSupabaseAdmin();
   try {
     const user = await getAuthUser(req);
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

@@ -1,10 +1,11 @@
 // POST /api/parent/create-child — Create a new child learner profile linked to the current parent (PARENT only)
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { withAuth, withAuthPost } from "@/lib/api-guard";
 export const dynamic = "force-dynamic";
 
 export const POST = withAuthPost(async (req, user, body: any) => {
+  const supabase = getSupabaseAdmin();
   try {
     const parentId = user.id;
     const { name, grade } = body;

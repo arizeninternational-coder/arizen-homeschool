@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { withAuth } from "@/lib/api-guard";
 export const dynamic = "force-dynamic";
 
@@ -9,6 +9,7 @@ export const dynamic = "force-dynamic";
 // Parent → linked children + admin/teacher users
 // Admin/Teacher → parent users only
 export const GET = withAuth(async (req: NextRequest, user: any) => {
+  const supabase = getSupabaseAdmin();
   try {
     const role = user.role;
     const userId = user.id;

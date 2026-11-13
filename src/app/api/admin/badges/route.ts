@@ -1,12 +1,13 @@
 // GET /api/admin/badges — List all badges (ADMIN only)
 // POST /api/admin/badges — Create a badge (ADMIN only)
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { requireAdmin } from "@/lib/api-guard";
 export const dynamic = "force-dynamic";
 
 // GET — list all badges with learner info
 export async function GET(req: NextRequest) {
+  const supabase = getSupabaseAdmin();
   const auth = await requireAdmin(req);
   if (auth instanceof NextResponse) return auth;
 
@@ -57,6 +58,7 @@ export async function GET(req: NextRequest) {
 
 // POST — create a badge definition (global badge template)
 export async function POST(req: NextRequest) {
+  const supabase = getSupabaseAdmin();
   const auth = await requireAdmin(req);
   if (auth instanceof NextResponse) return auth;
 

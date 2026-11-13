@@ -2,7 +2,8 @@
 // Bypasses NextAuth CSRF issues by handling credentials directly
 // Sets the NextAuth session cookie manually
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
+import { USER_AUTH_COLUMNS } from "@/lib/db/user-columns";
 import bcrypt from "bcryptjs";
 import { SignJWT } from "jose";
 export const dynamic = "force-dynamic";
@@ -33,6 +34,7 @@ async function createSessionToken(user: any) {
 }
 
 export async function POST(req: NextRequest) {
+  const supabase = getSupabaseAdmin();
   try {
     const body = await req.json();
     const { email, password } = body || {};
@@ -50,7 +52,7 @@ export async function POST(req: NextRequest) {
     console.log("[LOGIN_API] Querying Supabase for:", normalizedEmail);
     const { data: users, error: dbError } = await supabase
       .from("User")
-      .select("id, name, email, image, role, passwordHash, guildId")
+      .select(USER_AUTH_COLUMNS)
       .eq("email", normalizedEmail)
       .limit(1);
     
@@ -183,5 +185,6 @@ export async function POST(req: NextRequest) {
 
 // GET — return 405 (use POST)
 export function GET() {
+  const supabase = getSupabaseAdmin();
   return NextResponse.json({ error: "Use POST" }, { status: 405 });
 }

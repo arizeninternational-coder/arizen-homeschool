@@ -1,6 +1,6 @@
 // POST /api/learner/checkin - Save or update today's emotional check-in
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { getAuthUser } from "@/lib/api-guard";
 import { updateStreak } from "@/lib/streak";
 export const dynamic = "force-dynamic";
@@ -19,6 +19,7 @@ const EMOTION_LABELS: Record<string, string> = {
 };
 
 export async function POST(req: NextRequest) {
+  const supabase = getSupabaseAdmin();
   const authUser = await getAuthUser(req);
   if (!authUser) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   if (!authUser.learnerProfileId) return NextResponse.json({ error: "Learner profile required" }, { status: 403 });
@@ -85,6 +86,7 @@ export async function POST(req: NextRequest) {
 
 // GET /api/learner/checkin - Get today's check-in for current learner
 export async function GET(req: NextRequest) {
+  const supabase = getSupabaseAdmin();
   const authUser = await getAuthUser(req);
   if (!authUser) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   if (!authUser.learnerProfileId) return NextResponse.json({ checkin: null });

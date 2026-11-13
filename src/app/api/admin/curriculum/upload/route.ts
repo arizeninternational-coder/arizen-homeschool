@@ -1,7 +1,7 @@
 // POST /api/admin/curriculum/upload — Parse CSV, preview, and confirm import
 // Actions: "preview" = parse & validate only, "confirm" = save to DB
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { requireAdmin } from "@/lib/api-guard";
 export const dynamic = "force-dynamic";
 
@@ -259,6 +259,7 @@ function buildThemeSlug(gradeNum: number, subjectName: string): string {
 }
 
 async function getOrCreateGuild(): Promise<string | null> {
+  const supabase = getSupabaseAdmin();
   const { data: existing } = await supabase.from("Guild").select("id").eq("slug", "arizen-international").single();
   if (existing) return existing.id;
   const { data: created } = await supabase.from("Guild").insert({
@@ -268,6 +269,7 @@ async function getOrCreateGuild(): Promise<string | null> {
 }
 
 async function getOrCreateTheme(guildId: string, gradeNum: number, subjectName: string): Promise<string | null> {
+  const supabase = getSupabaseAdmin();
   const themeSlug = buildThemeSlug(gradeNum, subjectName);
   // Fix: scope lookup by guildId + slug (exact match, no loose ilike)
   const { data: existing } = await supabase
@@ -287,6 +289,7 @@ async function getOrCreateTheme(guildId: string, gradeNum: number, subjectName: 
 }
 
 async function getOrCreateQuest(themeId: string, questTitle: string, index: number): Promise<string | null> {
+  const supabase = getSupabaseAdmin();
   const slug = `${slugify(questTitle)}-q${index}`;
   // Fix: scope lookup by themeId + slug (not global slug)
   const { data: existing } = await supabase
@@ -306,6 +309,7 @@ async function getOrCreateQuest(themeId: string, questTitle: string, index: numb
 
 // ── Main handler ────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
+  const supabase = getSupabaseAdmin();
   const auth = await requireAdmin(req);
   if (auth instanceof NextResponse) return auth;
 

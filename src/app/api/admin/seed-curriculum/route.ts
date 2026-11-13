@@ -1,7 +1,7 @@
 // POST /api/admin/seed-curriculum — Seed curriculum data (ADMIN only)
 // GET — returns usage instructions
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { requireAdmin } from "@/lib/api-guard";
 export const dynamic = "force-dynamic";
 
@@ -144,6 +144,7 @@ const CURRICULUM: Array<[number, string, string, string, string[]]> = [
 
 // GET — usage instructions (public, no auth needed)
 export function GET() {
+  const supabase = getSupabaseAdmin();
   return NextResponse.json({
     message: "Use POST from the admin dashboard to run this seed.",
     usage: "Click the 'Seed Draft Curriculum' button in the admin dashboard, or send a POST request to this endpoint while authenticated as admin.",
@@ -153,6 +154,7 @@ export function GET() {
 
 // POST — run the seed (admin only, using requireAdmin for consistency)
 export async function POST(req: NextRequest) {
+  const supabase = getSupabaseAdmin();
   const auth = await requireAdmin(req);
   if (auth instanceof NextResponse) return auth;
   const { user } = auth;

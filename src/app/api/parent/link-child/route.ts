@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
+  const supabase = getSupabaseAdmin();
   try {
     // Read parent session from cookie
     const cookieHeader = request.headers.get("cookie") || "";
@@ -143,6 +144,7 @@ export async function POST(request: Request) {
 
 // GET — list children linked to this parent
 export async function GET(request: Request) {
+  const supabase = getSupabaseAdmin();
   try {
     const cookieHeader = request.headers.get("cookie") || "";
     const cookies = Object.fromEntries(
