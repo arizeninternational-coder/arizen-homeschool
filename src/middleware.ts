@@ -10,7 +10,6 @@ const publicPaths = [
   "/auth/login",
   "/auth/register",
   "/preview",
-  "/api/debug",
 ];
 
 // Role-based path prefixes
@@ -93,8 +92,8 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // Allow health check and diagnostic endpoints
-  if (pathname.startsWith("/api/health") || pathname.startsWith("/api/diagnostic")) {
+  // Allow health check only — all diagnostic endpoints were removed in Phase 0.
+  if (pathname.startsWith("/api/health")) {
     return NextResponse.next();
   }
 
