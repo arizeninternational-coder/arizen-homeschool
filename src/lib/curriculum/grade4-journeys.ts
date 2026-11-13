@@ -97,6 +97,14 @@ export interface JourneyStep {
   };
   /** Reward animation shown at the end of a journey. */
   mediaSpec?: Record<string, unknown>;
+  /** The AI-authored tutoring turn, when this step is a tutor response. */
+  tutorTurn?: Record<string, unknown>;
+  /** The question the learner must answer on this tutor turn. */
+  tutorQuestion?: Record<string, unknown>;
+  /** Present when the turn came from a deterministic fallback, not the model. */
+  tutorDegradedReason?: string;
+  /** Provenance of the tutor turn, for the client badge. */
+  tutorEvidence?: Record<string, unknown>;
   feedbackSpec?: {
     correct?: string;
     incorrect?: string;

@@ -3,7 +3,7 @@
  *
  * Communicates with Ollama via the HTTP REST API using fetch (no SDK).
  * Configuration is environment-driven:
- *   AI_MODEL     — the model name (e.g., qwen2.5:7b-instruct-q4_K_M)
+ *   AI_MODEL     — the model tag (e.g., qwen3:7b-q4_K_M)
  *   AI_BASE_URL  — base URL of the Ollama API (default: http://localhost:11434)
  *   AI_TEMPERATURE — sampling temperature (default: 0.2)
  *   AI_TIMEOUT_MS  — request timeout in ms (default: 30000)
@@ -23,22 +23,20 @@ import type {
   MisconceptionAnalysis,
   PedagogicalAction,
   PedagogicalActionKind,
+  TutoringRequest,
+  TutoringTurn,
 } from '../AIProvider';
 import type { Evidence } from '../../curriculum/adaptive-engine';
-import {
-  PLACE_VALUE_CONCEPTS,
-  PLACE_VALUE_MISCONCEPTIONS,
-} from '../../curriculum/adaptive-engine';
 
-/** Check whether a concept ID is one of the known Place Value concepts. */
-function isConceptKnown(conceptId: string): boolean {
-  return PLACE_VALUE_CONCEPTS.some((c) => c.id === conceptId);
-}
-
-/** Check whether a misconception ID is one of the known Place Value misconceptions. */
-function isMisconceptionKnown(misconceptionId: string): boolean {
-  return PLACE_VALUE_MISCONCEPTIONS.some((m) => m.id === misconceptionId);
-}
+/**
+ * The provider is LESSON-AGNOSTIC.
+ *
+ * Concept and misconception ids come from the active lesson's request
+ * (`request.allowedConceptIds` / `allowedMisconceptionIds`), never from a
+ * hardcoded Place Value list. This is what lets every adaptive lesson — Roman
+ * Numerals, Ordering/Rounding, Factors/Multiples, Number Patterns — use the same
+ * model without a lesson-specific branch here.
+ */
 
 // ── Configuration ────────────────────────────────────────────────────────────
 
@@ -52,25 +50,13 @@ interface OllamaConfig {
 function loadConfig(): OllamaConfig {
   return {
     baseUrl: process.env.AI_BASE_URL?.replace(/\/$/, '') ?? 'http://localhost:11434',
-    model: process.env.AI_MODEL ?? 'qwen2.5:7b-instruct-q4_K_M',
+    model: process.env.AI_MODEL ?? 'qwen3:7b-q4_K_M',
     temperature: parseFloat(process.env.AI_TEMPERATURE ?? '0.2'),
     timeoutMs: parseInt(process.env.AI_TIMEOUT_MS ?? '30000', 10),
   };
 }
 
 // ── Prompt templates ─────────────────────────────────────────────────────────
-
-/**
- * The list of concepts is sourced dynamically from the existing curriculum
- * (PLACE_VALUE_CONCEPTS), ensuring the AI only references known concepts.
- */
-function conceptIdsList(): string {
-  return PLACE_VALUE_CONCEPTS.map((c) => c.id).join(', ');
-}
-
-function misconceptionIdsList(): string {
-  return PLACE_VALUE_MISCONCEPTIONS.map((m) => m.id).join(', ');
-}
 
 /** Fallback action types — used when context doesn't supply them. */
 const FALLBACK_ACTION_TYPES: PedagogicalActionKind[] = [
@@ -95,23 +81,25 @@ const FALLBACK_REPRESENTATIONS = [
 function buildSystemPrompt(context: AIContext): string {
   const actionTypes = context.allowedActionTypes ?? FALLBACK_ACTION_TYPES;
   const representations = context.allowedRepresentations ?? FALLBACK_REPRESENTATIONS;
+  const conceptIds = context.conceptChain ?? [];
 
   return `You are the AI tutoring engine for Arizen School, a gamified CBC-aligned
-Kenyan homeschool platform. Your role is to INTERPRET learner evidence and PROPOSE
-pedagogical actions — but you do NOT own curriculum progression. The application
-validates every proposal against deterministic curriculum constraints.
+Kenyan homeschool platform. You are talking to a Kenyan Grade 4 learner.
+
+Your role is to INTERPRET learner evidence and PROPOSE pedagogical actions —
+but you do NOT own curriculum progression. The application validates every
+proposal against deterministic curriculum constraints, and the application
+decides whether an answer is correct.
 
 Constraints:
-- Only use these concept IDs: ${conceptIdsList()}
+- Only use these concept IDs: ${conceptIds.length ? conceptIds.join(', ') : '(none supplied)'}
 - Only use these action types: ${actionTypes.join(', ')}
 - Only use these representations: ${representations.join(', ')}
-- Only use these misconception IDs: ${misconceptionIdsList()}
 - NEVER invent new concepts, actions, or representations.
-- You can propose 'move_forward' to a concept only if it is the next in the
-  prerequisite chain: read-numbers → digit-position → digit-value →
-  expanded-form → compare-order.
-- You can propose 'revisit_prerequisite' only to a concept that precedes
-  the current one in the chain.
+- You may propose 'move_forward' only to a concept that follows the current one
+  in the supplied concept chain.
+- You may propose 'revisit_prerequisite' only to a concept that precedes the
+  current one in that chain.
 
 Always respond with valid JSON matching the requested schema.
 Do not include any explanatory text outside the JSON object.`;
@@ -208,8 +196,9 @@ Return JSON with exactly these fields:
   "evidenceStrength": "strong" | "weak"
 }
 
-If the evidence suggests a misconception, set misconceptionId to one of: ${misconceptionIdsList()}
-If no misconception is detected, set misconceptionId to null.`;
+If the evidence suggests a misconception, set misconceptionId to one of the
+concept ids the application detected, or null. The application validates this
+against the lesson's own misconception list.`;
 
     try {
       const result = (await this.chat([
@@ -218,16 +207,20 @@ If no misconception is detected, set misconceptionId to null.`;
       ])) as Partial<MisconceptionAnalysis>;
 
       // Validate response
+      // The lesson's own misconception list is authoritative. The provider only
+      // knows what the application told it is in scope for this lesson.
+      const allowedMisconceptions = context.allowedMisconceptionIds ?? [];
       if (
         result.misconceptionId !== null &&
         typeof result.misconceptionId === 'string' &&
-        !isMisconceptionKnown(result.misconceptionId)
+        allowedMisconceptions.length > 0 &&
+        !allowedMisconceptions.includes(result.misconceptionId)
       ) {
-        // AI returned an unknown misconception — reject, use null
+        // AI returned a misconception this lesson does not declare — reject it.
         return {
           misconceptionId: null,
           confidence: 0,
-          explanation: `AI returned unknown misconception "${result.misconceptionId}" — rejected and reset to null.`,
+          explanation: `AI returned misconception "${result.misconceptionId}", which this lesson does not declare — rejected.`,
           evidenceStrength: 'weak',
         };
       }
@@ -340,8 +333,9 @@ lead to different actions for the same evidence.`;
         return this.safeFallback(context, `Invalid action type: ${actionType}`);
       }
 
-      // Validate conceptId
-      if (!isConceptKnown(result.conceptId as string)) {
+      // Validate conceptId against the concept chain the application supplied
+      const knownConcepts = context.conceptChain ?? [];
+      if (knownConcepts.length && !knownConcepts.includes(result.conceptId as string)) {
         return this.safeFallback(context, `Unknown concept: ${result.conceptId}`);
       }
 
@@ -420,6 +414,197 @@ Return JSON: {"question": string, "options": [string, string, string, string], "
       options: data.options,
       correctIndex: Math.min(Math.max(data.correctIndex, 0), data.options.length - 1),
     };
+  }
+
+  /**
+   * Generate the tutoring turn — the AI's core teaching responsibility.
+   *
+   * The application has already decided the escalation stage, validated the
+   * learner's answer, and chosen the transfer question. The model writes ONLY
+   * the language a learner reads, at the stage the application asked for.
+   *
+   * The prompt is a guardrail, not the enforcement mechanism: ActionValidator
+   * independently rejects any turn that reveals the learner's answer or breaks
+   * the stage contract.
+   */
+  async generateTutoringTurn(request: TutoringRequest): Promise<TutoringTurn> {
+    const systemPrompt = `You are an encouraging maths tutor speaking to a Kenyan
+Grade 4 learner (age 9-10) in Arizen School. You are warm, patient and clear.
+
+You are given a question the learner answered INCORRECTLY, a diagnosed
+misconception, and the tutoring stage the application has decided.
+
+HARD RULES:
+- NEVER state the correct answer to the learner's question. Not in any wording.
+  The learner must work it out themselves.
+- Do not simply write more text than last time. Escalate the SCAFFOLD.
+- Speak simply: short sentences, everyday words, no jargon.
+- Be encouraging. The learner is trying, not failing.
+
+The application decides which stage you are at. Write that stage:
+
+"scaffold" (first wrong answer)
+  acknowledgement: one warm sentence.
+  misconceptionExplanation: show the learner, in simple words, the idea that is
+    behind their mistake.
+  scaffold.kind: "hint" or "thinking_question".
+  scaffold.content: a nudge, not the method spelled out.
+  thinkingQuestion: one focused question that makes them reason.
+
+"deeper_scaffold" (same mistake again)
+  Change your approach. Use a different scaffold.kind ("representation").
+  Give a concrete way to picture or organise the problem.
+  thinkingQuestion: ask them to reason about the new representation.
+
+"explain_then_transfer" (threshold reached)
+  Now you MAY teach the method properly.
+  scaffold.kind: "worked_example".
+  workedExample: a FULL worked explanation. You may show the method and the
+    answer to a SIMILAR example, but never the answer to the learner's own
+    question.
+  thinkingQuestion: point them at the transfer question.
+  You MUST echo the transfer question exactly as given.`;
+
+    const history = request.previousTurns.length
+      ? request.previousTurns
+          .map(
+            (t) =>
+              `- [${t.stage}] learner answered "${t.learnerAnswer}" (${t.correct ? 'correct' : 'wrong'})${t.summary ? `; ${t.summary}` : ''}`,
+          )
+          .join('\n')
+      : '(no previous turns — this is the first)';
+
+    const userPrompt = `CURRICULUM
+Lesson: ${request.lessonTitle || 'unknown'}
+Learning outcome: ${request.slo || 'not supplied'}
+Concept: ${request.conceptId}
+
+THE QUESTION THE LEARNER WAS ASKED
+${request.prompt}
+Options: ${request.options.join(' | ')}
+
+WHAT THE LEARNER DID
+Their answer: "${request.learnerAnswer}"
+Correct: ${request.correct}
+Diagnosed misconception: ${request.misconceptionId || 'none'}${
+      request.misconceptionLabel ? ` (${request.misconceptionLabel})` : ''
+    }
+
+CONVERSATION SO FAR (${request.previousTurns.length} turns)
+${history}
+Scaffolds already used: ${request.previousScaffolds.join(', ') || 'none'}
+
+TUTORING STAGE TO WRITE: "${request.stage}"${
+      request.stage === 'explain_then_transfer'
+        ? `\n(attempt ${request.attemptNumber} has reached the explanation threshold of ${request.explanationThreshold})`
+        : ''
+    }
+
+${
+  request.transfer
+    ? `TRANSFER QUESTION (you must ask EXACTLY this, and must NOT reveal its answer):
+${request.transfer.prompt}
+Options: ${request.transfer.options.join(' | ')}`
+    : 'TRANSFER QUESTION: none for this stage — ask the learner to retry the original question.'
+}
+
+Return JSON with exactly these fields:
+{
+  "acknowledgement": string,
+  "misconceptionExplanation": string,
+  "scaffold": { "kind": "hint" | "thinking_question" | "representation" | "worked_example", "content": string },
+  "thinkingQuestion": string,
+  "inviteRetry": string,
+  "stage": "${request.stage}",${
+    request.stage === 'explain_then_transfer'
+      ? '\n  "workedExample": string,'
+      : ''
+  }
+  "transfer": ${request.transfer ? '{ "prompt": string, "options": string[], "correctAnswer": string }' : 'null'}
+}
+
+Return ONLY this JSON object.`;
+
+    const raw = await this.chat([
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt },
+    ]);
+
+    return this.normalizeTutoringTurn(raw as Record<string, unknown>, request);
+  }
+
+  /**
+   * Coerce a raw model response into a well-formed TutoringTurn.
+   * Structural repair only — the pedagogical contract is enforced by the
+   * ActionValidator, which will reject a turn that breaks it.
+   */
+  private normalizeTutoringTurn(
+    raw: Record<string, unknown>,
+    request: TutoringRequest,
+  ): TutoringTurn {
+    const str = (v: unknown): string => (typeof v === 'string' ? v.trim() : '');
+    const scaffoldRaw = (raw.scaffold || {}) as Record<string, unknown>;
+    const kindRaw = str(scaffoldRaw.kind);
+    const kind = (['hint', 'thinking_question', 'representation', 'worked_example'] as const)
+      .find((k) => k === kindRaw);
+
+    const turn: TutoringTurn = {
+      acknowledgement: str(raw.acknowledgement),
+      misconceptionExplanation: str(raw.misconceptionExplanation),
+      scaffold: {
+        kind: kind || 'hint',
+        content: str(scaffoldRaw.content),
+      },
+      thinkingQuestion: str(raw.thinkingQuestion),
+      inviteRetry: str(raw.inviteRetry),
+      stage: (str(raw.stage) as TutoringTurn['stage']) || request.stage,
+      workedExample: str(raw.workedExample) || undefined,
+      // The transfer question is curriculum data: echoed from the request, never
+      // taken from the model, so the app can validate the learner's answer.
+      transfer: request.transfer,
+    };
+
+    return turn;
+  }
+
+  /**
+   * Report real availability. Production must never silently appear to have a
+   * tutor when the model is not reachable.
+   */
+  async isAvailable(): Promise<{ available: boolean; reason?: string; model?: string }> {
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 5000);
+      const res = await fetch(`${this.config.baseUrl}/api/tags`, { signal: controller.signal });
+      clearTimeout(timer);
+      if (!res.ok) {
+        return {
+          available: false,
+          model: this.config.model,
+          reason: `Ollama responded ${res.status} ${res.statusText}`,
+        };
+      }
+      const data = (await res.json()) as { models?: Array<{ name?: string }> };
+      const installed = (data.models || []).map((m) => m.name || '');
+      const wanted = this.config.model;
+      const present = installed.some((n) => n === wanted || n.startsWith(`${wanted}:`));
+      if (installed.length && !present) {
+        return {
+          available: false,
+          model: wanted,
+          reason: `Ollama is running but model "${wanted}" is not installed. Installed: ${installed.join(', ')}`,
+        };
+      }
+      return { available: true, model: wanted };
+    } catch (e) {
+      return {
+        available: false,
+        model: this.config.model,
+        reason: `Cannot reach Ollama at ${this.config.baseUrl}: ${
+          e instanceof Error ? e.message : String(e)
+        }`,
+      };
+    }
   }
 
   // ─── Private helpers ────────────────────────────────────────────────────

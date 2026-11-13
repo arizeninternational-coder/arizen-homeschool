@@ -158,6 +158,14 @@ export const ROMAN_NUMERALS_CONFIG: AdaptiveLessonConfig = {
     {
       activityId: 'think_first',
       conceptId: 'roman-write',
+      transfer: {
+        activityId: 'think_first-transfer',
+        prompt: "What is the Roman numeral for 8?",
+        choices: ["IIIII", "VIII", "IV", "VIIII"],
+        correctAnswer: "VIII",
+        explanation: "8 is 5 + 3, written V followed by three I letters: VIII.",
+        slo: 'ARIZEN-INT-1.1-j',
+      },
       slo: 'ARIZEN-INT-1.1-j',
       prompt: 'What is the Roman numeral for 4?',
       choices: ['IIII', 'IV', 'VI', 'IX'],
@@ -177,6 +185,14 @@ export const ROMAN_NUMERALS_CONFIG: AdaptiveLessonConfig = {
     {
       activityId: 'connect',
       conceptId: 'roman-read',
+      transfer: {
+        activityId: 'connect-transfer',
+        prompt: "A page is numbered X. Which page is it?",
+        choices: ["9", "10", "5", "4"],
+        correctAnswer: "10",
+        explanation: "X is the Roman letter worth 10.",
+        slo: 'ARIZEN-INT-1.1-j',
+      },
       slo: 'ARIZEN-INT-1.1-j',
       prompt: 'A chapter in your book is numbered VII. Which chapter is it?',
       choices: ['7', '5', '12', '9'],
@@ -196,6 +212,14 @@ export const ROMAN_NUMERALS_CONFIG: AdaptiveLessonConfig = {
     {
       activityId: 'p1',
       conceptId: 'roman-read',
+      transfer: {
+        activityId: 'p1-transfer',
+        prompt: "What number is IV?",
+        choices: ["6", "4", "9", "14"],
+        correctAnswer: "4",
+        explanation: "The I comes before the V, so it is subtracted: 5 - 1 = 4.",
+        slo: 'ARIZEN-INT-1.1-j',
+      },
       slo: 'ARIZEN-INT-1.1-j',
       prompt: 'What number is IX?',
       choices: ['4', '5', '8', '9'],
@@ -214,6 +238,14 @@ export const ROMAN_NUMERALS_CONFIG: AdaptiveLessonConfig = {
     {
       activityId: 'p2',
       conceptId: 'roman-write',
+      transfer: {
+        activityId: 'p2-transfer',
+        prompt: "Write 5 in Roman numerals.",
+        choices: ["IIII", "IIIIV", "V", "IV"],
+        correctAnswer: "V",
+        explanation: "5 is written with the single letter V.",
+        slo: 'ARIZEN-INT-1.1-j',
+      },
       slo: 'ARIZEN-INT-1.1-j',
       prompt: 'Write 7 in Roman numerals.',
       choices: ['VII', 'IV', 'IIIIII', 'X'],
@@ -239,6 +271,14 @@ export const ROMAN_NUMERALS_CONFIG: AdaptiveLessonConfig = {
     {
       activityId: 'p3',
       conceptId: 'roman-subtraction-rule',
+      transfer: {
+        activityId: 'p3-transfer',
+        prompt: "What is the Roman numeral for 4?",
+        choices: ["IV", "IIII", "VI", "VIV"],
+        correctAnswer: "IV",
+        explanation: "4 is one less than 5, so it is written IV by subtraction.",
+        slo: 'ARIZEN-INT-1.1-j',
+      },
       slo: 'ARIZEN-INT-1.1-j',
       prompt: 'What is the Roman numeral for 9?',
       choices: ['IX', 'VIIII', 'VIV', 'X'],
@@ -258,6 +298,14 @@ export const ROMAN_NUMERALS_CONFIG: AdaptiveLessonConfig = {
     {
       activityId: 'quick_check',
       conceptId: 'roman-symbol-values',
+      transfer: {
+        activityId: 'quick_check-transfer',
+        prompt: "Which Roman numeral equals 3?",
+        choices: ["II", "III", "IV", "V"],
+        correctAnswer: "III",
+        explanation: "3 is one, one, one: III.",
+        slo: 'ARIZEN-INT-1.1-j',
+      },
       slo: 'ARIZEN-INT-1.1-j',
       prompt: 'Which Roman numeral equals 6?',
       choices: ['VI', 'IV', 'IX', 'IIII'],
@@ -274,6 +322,11 @@ export const ROMAN_NUMERALS_CONFIG: AdaptiveLessonConfig = {
       },
     },
   ],
+  remediation: {
+    explanationThreshold: 3,
+    maxTurns: 4,
+    preferredRepresentations: ["step_reveal", "recap_checklist"],
+  },
   mastery: {
     requiredConcepts: ['roman-symbol-values', 'roman-write', 'roman-read'],
     minCorrectPerConcept: 1,

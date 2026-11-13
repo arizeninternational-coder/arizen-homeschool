@@ -41,6 +41,11 @@ import {
   getCurriculumConstraints,
 } from './curriculum-constraints';
 import {
+  buildTutoringRequest,
+  buildFallbackTurn,
+  resolveTransferActivity,
+} from './tutor';
+import {
   ActionValidator,
   type ValidationResult,
   extractConceptMastery,
@@ -57,9 +62,36 @@ export interface OrchestratorInput {
   context: AIContext;
   /** Which curriculum unit this decision is for. Defaults to Grade 4 Place Value. */
   curriculumKey?: string;
+  /**
+   * The active lesson's adaptive configuration. Required for AI tutoring: it
+   * supplies the SLO, concept/misconception scope, transfer questions and
+   * remediation policy. The orchestrator is lesson-agnostic — it never names a
+   * lesson itself.
+   */
+  lessonConfig?: import('../curriculum/adaptive/types').AdaptiveLessonConfig | null;
+  /** Prior tutoring turns in this remediation conversation. */
+  previousTutorTurns?: import('../ai/AIProvider').TutoringTurnRecord[];
+  /**
+   * True when this response answered a transfer question correctly, i.e. the
+   * learner has recovered understanding through remediation.
+   */
+  recovered?: boolean;
+  /** Activity id the learner was answering (original or transfer). */
+  tutorActivityId?: string;
+  /**
+   * The misconception id the APPLICATION's deterministic detector produced.
+   * Authoritative for tutoring; the AI's own diagnosis is advisory.
+   */
+  diagnosedMisconceptionId?: string | null;
+  /** Human-readable misconception label, for the tutor's explanation. */
+  diagnosedMisconceptionLabel?: string;
 }
 
 export interface OrchestratorDecision {
+  /** The AI-authored tutoring turn, when remediation occurred. */
+  tutoringTurn?: import('../ai/AIProvider').TutoringTurn | null;
+  /** The request that produced the turn — carries the question the app asks. */
+  tutoringRequest?: import('../ai/AIProvider').TutoringRequest | null;
   /** The final, validated action to render. */
   finalAction: PedagogicalAction;
   /** The AI's original proposal (before validation), or null if AI was bypassed. */
@@ -163,6 +195,11 @@ export class AdaptiveOrchestrator {
       allowedRepresentations: Array.from(constraints.allowedRepresentations),
       allowedActionTypes: Array.from(constraints.allowedActionTypes),
       conceptChain: constraints.concepts.map((c) => c.id),
+      // Misconception scope comes from the ACTIVE LESSON's config, so no
+      // provider ever validates against a hardcoded lesson's list.
+      allowedMisconceptionIds: input.lessonConfig
+        ? input.lessonConfig.misconceptions.map((m) => m.id)
+        : [],
     };
 
     const misconceptionAnalysis = await this.aiProvider.analyzeLearnerEvidence(
@@ -181,16 +218,41 @@ export class AdaptiveOrchestrator {
     // ── Step 4: Validate the AI proposal against curriculum constraints ────
     const validationResult = validator.validate(aiProposal, updatedState);
 
-    // ── Step 5: Assemble the final decision ────────────────────────────────
+    // ── Step 5: AI tutoring turn for a remediation action ────────────────────
+    // Deterministic code has already decided the escalation stage and which
+    // transfer question (if any) applies. The AI writes only the teaching
+    // language; its turn is validated before it can reach the learner.
+    const effectiveAction: PedagogicalAction = validationResult.valid
+      ? validationResult.action
+      : validationResult.fallback;
+
+    // The tutor engages whenever the learner is WRONG on a mapped activity —
+    // regardless of which action the AI proposed. Whether to teach is
+    // deterministic (an incorrect answer on a scored activity); the AI's chosen
+    // action only influences the scaffold, it must not gate the tutor.
+    let tutoringTurn: import('../ai/AIProvider').TutoringTurn | null = null;
+    let tutoringRequest: import('../ai/AIProvider').TutoringRequest | null = null;
+    if (input.lessonConfig && !evidence.correct) {
+      const tutoring = await this.buildTutoringTurn(input, effectiveAction, updatedState, evidence);
+      tutoringTurn = tutoring.turn;
+      tutoringRequest = tutoring.request;
+    }
+
+    // ── Step 5b: Assemble the final decision ────────────────────────────────
     if (validationResult.valid) {
       return {
         finalAction: validationResult.action,
+        tutoringTurn,
+        tutoringRequest,
         aiProposal,
         validationResult,
         usedFallback: false,
         reasoning: `AI proposed "${aiProposal.actionType}" for concept "${aiProposal.conceptId}" ` +
           `and the ActionValidator accepted it. Misconception: ${misconceptionAnalysis.misconceptionId || 'none'} ` +
-          `(${misconceptionAnalysis.confidence.toFixed(2)} confidence).`,
+          `(${misconceptionAnalysis.confidence.toFixed(2)} confidence).` +
+          (tutoringTurn
+            ? ` Tutor stage: ${tutoringTurn.stage}${tutoringTurn.degradedReason ? ' (degraded)' : ''}.`
+            : ''),
         updatedState,
       };
     }
@@ -198,6 +260,8 @@ export class AdaptiveOrchestrator {
     // ── Step 6: AI proposal was rejected — use deterministic fallback ────────
     return {
       finalAction: validationResult.fallback,
+      tutoringTurn,
+      tutoringRequest,
       aiProposal,
       validationResult,
       usedFallback: true,
@@ -207,6 +271,128 @@ export class AdaptiveOrchestrator {
         `Using deterministic fallback: "${validationResult.fallback.actionType}".`,
       updatedState,
     };
+  }
+
+  // ── AI tutoring ───────────────────────────────────────────────────────────
+
+  /**
+   * Ask the AI tutor for the next turn, then validate it.
+   *
+   * If the provider is unavailable, fails, or produces a turn that would reveal
+   * the answer / break the stage contract, we fall back to a deterministic
+   * scaffold that is explicitly marked `degradedReason` — the client surfaces
+   * that, so a fallback is never presented as AI tutoring.
+   */
+  private async buildTutoringTurn(
+    input: OrchestratorInput,
+    action: PedagogicalAction,
+    state: LearningState,
+    evidence: Evidence,
+  ): Promise<{
+    turn: import('../ai/AIProvider').TutoringTurn;
+    request: import('../ai/AIProvider').TutoringRequest;
+  }> {
+    const config = input.lessonConfig!;
+    const constraints = getCurriculumConstraints(input.curriculumKey || config.curriculumKey);
+    const validator = new ActionValidator(constraints);
+
+    // Declared first so every return path below can attach the request.
+    const request = buildTutoringRequest({
+      config,
+      activityId: input.tutorActivityId || action.conceptId,
+      options: input.context.options,
+      prompt: input.context.prompt,
+      learnerAnswer: input.context.selectedAnswer || '',
+      correct: false,
+      // The APPLICATION's deterministic detector is authoritative for the
+      // misconception; the AI's own diagnosis is advisory and may differ.
+      // Priority: the app's deterministic diagnosis → the action the AI
+      // proposed → the misconception already attached to this evidence. The
+      // application always wins; the AI's own guess is only a fallback.
+      misconceptionId:
+        input.diagnosedMisconceptionId ||
+        (action.actionType === 'remediate' ? action.misconceptionId : null) ||
+        evidence.misconceptionId ||
+        null,
+      misconceptionLabel:
+        input.diagnosedMisconceptionLabel ||
+        (config.misconceptions.find(
+          (m) =>
+            m.id ===
+            (input.diagnosedMisconceptionId ||
+              (action.actionType === 'remediate' ? action.misconceptionId : null) ||
+              evidence.misconceptionId),
+        )?.label),
+      previousTurns: input.previousTutorTurns || [],
+      attemptNumber: input.context.attemptNumber ?? 1,
+      recovered: input.recovered,
+    });
+
+    if (request.activityId === request.conceptId) {
+      // No matching activity: fall back to the first activity of the concept so
+      // the tutor still has a real question to re-ask.
+      const first = config.activities.find((a) => a.conceptId === action.conceptId);
+      if (first) {
+        request.activityId = first.activityId;
+        request.prompt = first.prompt || request.prompt;
+        request.options = first.choices || request.options;
+      }
+    }
+    if (!request.correctAnswer) {
+      const spec = config.activities.find((a) => a.activityId === request.activityId);
+      request.correctAnswer = spec?.correctAnswer || '';
+    }
+    if (request.transfer && !request.transfer.correctAnswer) {
+      const transferSpec = resolveTransferActivity(config, request.activityId);
+      if (transferSpec) {
+        request.transfer = {
+          prompt: transferSpec.prompt,
+          options: transferSpec.choices,
+          correctAnswer: transferSpec.correctAnswer,
+        };
+      }
+    }
+
+    const buildFallback = (reason: string) => ({
+      request,
+      turn: buildFallbackTurn({
+        config,
+        stage: request.stage,
+        prompt: request.prompt,
+        learnerAnswer: request.learnerAnswer,
+        misconceptionLabel: request.misconceptionLabel,
+        transfer: request.transfer,
+        reason,
+      }),
+    });
+
+    // Is the provider actually able to serve this?
+    if (typeof this.aiProvider.isAvailable === 'function') {
+      const availability = await this.aiProvider.isAvailable();
+      if (!availability.available) {
+        return buildFallback(
+          `AI provider unavailable: ${availability.reason || 'not configured'}`,
+        );
+      }
+    }
+
+    let turn: import('../ai/AIProvider').TutoringTurn | null = null;
+    try {
+      turn = await this.aiProvider.generateTutoringTurn(request);
+    } catch (error) {
+      return buildFallback(
+        `AI tutor call failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
+
+    const rejection = validator.validateTutoringTurn(turn, request, {
+      misconceptionIds: config.misconceptions.map((m) => m.id),
+    });
+    if (rejection) {
+      return buildFallback(`AI tutor turn rejected: ${rejection}`);
+    }
+
+    return { turn: turn!, request };
   }
 
   // ── Helpers ───────────────────────────────────────────────────────────────

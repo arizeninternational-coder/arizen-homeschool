@@ -23,7 +23,11 @@ import type { Evidence } from '../curriculum/adaptive-engine';
 
 export type { ConceptId } from '../curriculum/adaptive-engine';
 
-/** Concept IDs available in the Grade 4 Place Value curriculum. */
+/**
+ * Concept IDs available in the Grade 4 Place Value curriculum.
+ * @deprecated Lesson-agnostic: the AI now receives the active lesson's concept
+ * ids in the request. This type is retained only for existing type references.
+ */
 export type PlaceValueConceptId =
   | 'read-numbers'
   | 'digit-position'
@@ -180,6 +184,117 @@ export type PedagogicalAction =
   | CheckMasteryAction
   | MoveForwardAction;
 
+// ── AI Tutoring Model ────────────────────────────────────────────────────────
+
+/**
+ * The pedagogical stage of a remediation conversation.
+ *
+ * Escalation is decided by DETERMINISTIC application code from attempt count
+ * and remediation history — never by the AI, and never by the length of text.
+ */
+export type RemediationStage =
+  /** First failure: expose the misconception, hint, invite another attempt. */
+  | 'scaffold'
+  /** Same misconception again: deeper scaffold, concrete representation. */
+  | 'deeper_scaffold'
+  /** Threshold reached: clear worked explanation, then a transfer question. */
+  | 'explain_then_transfer'
+  /** Transfer question answered correctly: understanding recovered. */
+  | 'recovered';
+
+/** One previously delivered tutoring turn, replayed to the AI for continuity. */
+export interface TutoringTurnRecord {
+  stage: RemediationStage;
+  /** What the learner answered on that turn. */
+  learnerAnswer: string;
+  correct: boolean;
+  /** Short note on what the tutor did (scaffold type, example used, etc). */
+  summary?: string;
+}
+
+/**
+ * Everything the AI tutor needs to produce the next turn.
+ *
+ * The application owns correctness, validation, attempt counting and mastery.
+ * The AI receives this context and decides HOW to teach.
+ */
+export interface TutoringRequest {
+  // ── Curriculum (WHAT) ──
+  /** The SLO / curriculum objective this activity serves. */
+  slo?: string;
+  lessonTitle?: string;
+  /** Concept ids valid for the active lesson (never a hardcoded list). */
+  allowedConceptIds: string[];
+  /** Misconception ids valid for the active lesson. */
+  allowedMisconceptionIds: string[];
+  /** Representations the lesson permits. */
+  allowedRepresentations: string[];
+
+  // ── The activity (deterministic; already validated) ──
+  activityId: string;
+  conceptId: string;
+  prompt: string;
+  options: string[];
+  correctAnswer: string;
+
+  // ── The learner's response (deterministic) ──
+  learnerAnswer: string;
+  correct: boolean;
+  misconceptionId: string | null;
+  misconceptionLabel?: string;
+
+  // ── History and state ──
+  attemptNumber: number;
+  previousTurns: TutoringTurnRecord[];
+  /** Scaffolds already used, so the tutor does not repeat itself. */
+  previousScaffolds: string[];
+  stage: RemediationStage;
+  /** Attempt number at which a worked explanation is due. */
+  explanationThreshold: number;
+
+  // ── Transfer question (curriculum data, not AI-generated) ──
+  /** Present only when stage === 'explain_then_transfer'. */
+  transfer?: {
+    prompt: string;
+    options: string[];
+    correctAnswer: string;
+  };
+}
+
+/**
+ * A single AI-authored tutoring turn — the language the learner actually reads.
+ *
+ * `transfer` is echoed back from the request (it is curriculum data). The AI
+ * authors the teaching around it, never the answer.
+ */
+export interface TutoringTurn {
+  /** Short acknowledgement of what the learner did. */
+  acknowledgement: string;
+  /** Age-appropriate exposure of the misconception. Must not state the answer. */
+  misconceptionExplanation: string;
+  /** The scaffold used: a hint, a representation, a worked example, etc. */
+  scaffold: {
+    kind: 'hint' | 'thinking_question' | 'representation' | 'worked_example';
+    /** The scaffold's teaching content. */
+    content: string;
+  };
+  /** A focused question that makes the learner reason, not guess. */
+  thinkingQuestion: string;
+  /** Explicit invitation to try again. */
+  inviteRetry: string;
+  stage: RemediationStage;
+  /**
+   * Worked example. Required when stage === 'explain_then_transfer'.
+   * This IS allowed to show the method, including the answer to a SIMILAR
+   * example — never the answer to the learner's own question.
+   */
+  workedExample?: string;
+  /** Echoed from the request so the client knows which question to ask. */
+  transfer?: { prompt: string; options: string[]; correctAnswer: string };
+  /** Non-empty when the turn came from a deterministic fallback, not the AI. */
+  degradedReason?: string;
+}
+
 // ── Analysis / Diagnosis Result ──────────────────────────────────────────────
 
 export interface MisconceptionAnalysis {
@@ -210,6 +325,11 @@ export interface AIContext {
   allowedActionTypes?: PedagogicalActionKind[];
   /** The concept prerequisite chain (for AI planning). */
   conceptChain?: string[];
+  /**
+   * Misconception ids the active lesson declares. Providers MUST scope any
+   * misconception validation to this list — never to a hardcoded lesson.
+   */
+  allowedMisconceptionIds?: string[];
 }
 
 // ── The Interface ─────────────────────────────────────────────────────────────
@@ -265,4 +385,25 @@ export interface AIProvider {
     difficulty: number,
     context: AIContext
   ): Promise<{ question: string; options: string[]; correctIndex: number }>;
+
+  /**
+   * Generate the next tutoring turn for a learner who has answered incorrectly.
+   *
+   * This is the AI's core teaching responsibility. The application has already
+   * decided the escalation stage and validated correctness; the AI decides HOW
+   * to respond at that stage.
+   */
+  generateTutoringTurn(request: TutoringRequest): Promise<TutoringTurn>;
+
+  /**
+   * Whether this provider can actually serve a request right now.
+   * An unavailable provider must report false rather than throwing, so the
+   * application can degrade deterministically instead of 500-ing.
+   */
+  isAvailable?(): Promise<{ available: boolean; reason?: string; model?: string }>;
 }
+
+/** Fields the AI must never be shown. Guarded by the validator, not the prompt. */
+export const NEVER_SHOW_TO_LEARNER = [
+  'the expected answer for the learner\'s own question',
+] as const;

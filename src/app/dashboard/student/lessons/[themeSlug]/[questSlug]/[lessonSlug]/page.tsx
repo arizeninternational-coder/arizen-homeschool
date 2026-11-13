@@ -14,7 +14,8 @@ import { GradientButton } from "@/components/ui/Pill";
 import OwlTeacher from "@/components/ui/OwlTeacher";
 import type { JourneyStep, JourneyStepType } from "@/lib/curriculum/lesson-journey";
 import { STEP_TYPE_ICONS } from "@/lib/curriculum/lesson-journey";
-import { InteractiveStepRenderer, RemediationTapChoice } from "@/components/interactive";
+import { InteractiveStepRenderer } from "@/components/interactive";
+import { RemediationTutor } from "@/components/interactive/RemediationTutor";
 import { isLessonStudentVisible } from "@/lib/curriculum/student-visibility";
 import { isGrade4MathContent, buildGrade4JourneyFromBlocks } from "@/lib/curriculum/grade4-journeys";
 import { resolveAdaptiveLessonConfig } from "@/lib/curriculum/adaptive/registry";
@@ -170,6 +171,15 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
   const [adaptivePending, setAdaptivePending] = useState(false);
   const [retryKey, setRetryKey] = useState(0);
   const [remediationTargetActivity, setRemediationTargetActivity] = useState<string | null>(null);
+  // ── AI tutoring state ────────────────────────────────────────────────────
+  // The transcript is the conversation the AI reads on the next turn, so it can
+  // escalate instead of repeating. Deterministic code owns the stage.
+  const [tutorTurns, setTutorTurns] = useState<any[]>([]);
+  const [tutorTurn, setTutorTurn] = useState<any | null>(null);
+  const [tutorQuestion, setTutorQuestion] = useState<any | null>(null);
+  const [tutorProvider, setTutorProvider] = useState<any | null>(null);
+  /** The lesson activity the remediation conversation belongs to. */
+  const tutorActivityId = useRef<string | null>(null);
 
   // The lesson's adaptive configuration (null when the lesson is not registered).
   // Everything adaptive below keys off this, never off the lesson's title.
@@ -427,6 +437,16 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
     setAdaptivePending(false);
   }, [currentStep]);
 
+  // Reset the tutoring conversation when the learner moves to a different
+  // activity, so the next conversation starts with a clean transcript and
+  // escalation restarts at the scaffold stage.
+  useEffect(() => {
+    setTutorTurns([]);
+    setTutorTurn(null);
+    setTutorQuestion(null);
+    tutorActivityId.current = null;
+  }, [currentStep]);
+
   useEffect(() => {
     params.then(p => {
       setSlugs(p);
@@ -585,6 +605,9 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
           correct,
           prompt: remediationPrompt,
           attemptNumber: 1,
+          // The transcript lets the tutor escalate rather than repeat itself.
+          previousTutorTurns: tutorTurns,
+          tutorActivityId: tutorActivityId.current,
           remediationContext: activeRemediation
             ? { attemptNumber: adaptiveAttemptNumber, prompt: remediationPrompt }
             : undefined,
@@ -592,6 +615,30 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
 
         if (result) {
           setAdaptiveAction(result.finalAction);
+          setTutorProvider(result.tutorProvider || null);
+
+          // A wrong answer on a mapped activity begins (or continues) a
+          // tutoring conversation. The conversation is anchored to ONE
+          // activity so attempts and evidence stay coherent.
+          if (!correct) {
+            if (!tutorActivityId.current) tutorActivityId.current = activityId;
+            setTutorTurns((prev: any[]) => [
+              ...prev,
+              {
+                stage: result.tutoringTurn?.stage || 'scaffold',
+                learnerAnswer: selectedAnswer,
+                correct: false,
+                summary: result.tutoringTurn?.scaffold?.kind,
+              },
+            ]);
+            if (result.tutoringTurn) {
+              setTutorTurn(result.tutoringTurn);
+              setTutorQuestion(result.tutoringRequest ? (result.step as any)?.tutorQuestion : null);
+            }
+          } else {
+            setTutorTurn(null);
+            setTutorQuestion(null);
+          }
 
           if (result.finalAction.actionType === "move_forward") {
             // The orchestrator deterministically decided mastery is achieved.
@@ -1138,10 +1185,34 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                     </div>
                   )}
                   {activeRemediation.interactionSpec?.type === "tap_choice" && activeRemediation.interactionSpec.choices && (
-                    <RemediationTapChoice
-                      choices={activeRemediation.interactionSpec.choices}
-                      correctChoiceId={activeRemediation.interactionSpec.correctChoiceId}
-                      feedbackSpec={activeRemediation.interactionSpec.feedbackSpec}
+                    <RemediationTutor
+                      turn={activeRemediation.tutorTurn || {
+                        acknowledgement: "Let us look at this together.",
+                        misconceptionExplanation: activeRemediation.studentText || "",
+                        scaffold: { kind: "hint", content: activeRemediation.interactionSpec?.hint || "" },
+                        thinkingQuestion: "",
+                        inviteRetry: activeRemediation.owlText || "Have another go.",
+                        stage: "scaffold",
+                      }}
+                      question={activeRemediation.tutorQuestion || {
+                        prompt: activeRemediation.interactionSpec?.prompt || activeRemediation.studentText || "",
+                        options: (activeRemediation.interactionSpec?.choices || []).map((c: any) =>
+                          typeof c === "string" ? c : c.label,
+                        ),
+                        correctAnswer:
+                          (activeRemediation.interactionSpec?.choices || []).find(
+                            (c: any) =>
+                              (typeof c === "object" ? c.id : String(c)) ===
+                              activeRemediation.interactionSpec.correctChoiceId,
+                          )?.label || "",
+                        isTransfer: false,
+                      }}
+                      degraded={!!activeRemediation.tutorDegradedReason}
+                      providerLabel={
+                        tutorProvider?.available
+                          ? `${tutorProvider.type}${tutorProvider.model ? " · " + tutorProvider.model : ""}`
+                          : undefined
+                      }
                       conceptId={remediationConceptId}
                       onAnswer={async (selectedId, isCorrect) => {
                         if (!lesson?.id || !session?.user?.id) return;
@@ -1170,7 +1241,11 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                           lessonId: lesson.id,
                           lessonTitle: lesson.title,
                           lessonSlug: lesson.slug,
-                          activityId: activeRemediation.id || "",
+                          // Always answer against the ORIGINAL activity so the
+                          // transcript, attempts and evidence stay on one
+                          // activity, even when the tutor is asking the
+                          // transfer question.
+                          activityId: remediationTargetActivity || tutorActivityId.current || activeRemediation.id || "",
                           conceptId: remediationConceptId,
                           selectedAnswer: selectedLabel,
                           expectedAnswer: correctLabel,
@@ -1178,6 +1253,12 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                           correct: isCorrect,
                           prompt: activeRemediation.studentText || "",
                           attemptNumber: adaptiveAttemptNumber,
+                          // The conversation so far, so the tutor escalates.
+                          previousTutorTurns: tutorTurns,
+                          // A correct answer on a TRANSFER question is recovered
+                          // understanding, not a repeat of the original success.
+                          recovered: isCorrect && !!activeRemediation.tutorQuestion?.isTransfer,
+                          tutorActivityId: remediationTargetActivity || tutorActivityId.current || undefined,
                           remediationContext: {
                             attemptNumber: adaptiveAttemptNumber,
                             prompt: activeRemediation.studentText || "",
@@ -1188,15 +1269,43 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
 
                         if (result) {
                           setAdaptiveAction(result.finalAction);
+                          setTutorProvider(result.tutorProvider || null);
+
+                          // Record the learner's turn in the transcript.
+                          setTutorTurns((prev: any[]) => [
+                            ...prev,
+                            {
+                              stage: activeRemediation.tutorTurn?.stage || "scaffold",
+                              learnerAnswer: selectedLabel,
+                              correct: isCorrect,
+                              summary: activeRemediation.tutorQuestion?.isTransfer ? "transfer" : undefined,
+                            },
+                          ]);
+
+                          const wasTransfer = !!activeRemediation.tutorQuestion?.isTransfer;
+                          if (isCorrect && wasTransfer) {
+                            // Understanding recovered through remediation.
+                            setTutorTurns((prev: any[] & { recovered?: boolean }) => prev);
+                            setAdaptiveAction({
+                              ...result.finalAction,
+                              recoveredUnderstanding: true,
+                            });
+                            setCurrentStep((s: number) => Math.min(totalSteps - 1, s + 1));
+                            setActiveRemediation(null);
+                            setTutorTurn(null);
+                            setTutorQuestion(null);
+                            setAdaptiveStep(null);
+                            setAdaptiveAttemptNumber(1);
+                            return;
+                          }
+
                           if (result.finalAction.actionType === "move_forward") {
                             setCurrentStep((s: number) => Math.min(totalSteps - 1, s + 1));
                             setActiveRemediation(null);
                             setAdaptiveStep(null);
                             setAdaptiveAttemptNumber(1);
                           } else {
-                              // Escalate or advance — the orchestrator's decision
-                              // replaces the old "Try Again" which would repeat
-                              // the same remediation step.
+                              // Escalate — the next tutor turn, from the model.
                               setActiveRemediation(result.step);
                               setAdaptiveStep(result.step);
                               setAdaptiveAttemptNumber((v: number) => v + 1);

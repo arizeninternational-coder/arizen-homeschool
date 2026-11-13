@@ -18,6 +18,7 @@ import {
   buildRemediationStep as buildConfigRemediationStep,
   detectActivityMisconception,
 } from "@/lib/curriculum/adaptive/engine";
+import { turnQuestion } from "@/lib/learning/tutor";
 import { resolveActivityFromJourney } from "@/lib/curriculum/adaptive/resolve-activity";
 
 export interface ActionAdapterContext {
@@ -37,6 +38,13 @@ export interface ActionAdapterContext {
    * fall back to the lesson generator registry.
    */
   lessonConfig?: AdaptiveLessonConfig | null;
+  /**
+   * The AI-authored tutoring turn. When present its LANGUAGE is what the learner
+   * reads — the application no longer substitutes a static template.
+   */
+  tutoringTurn?: import('@/lib/ai/AIProvider').TutoringTurn | null;
+  /** The tutoring request that produced the turn (supplies the question). */
+  tutoringRequest?: import('@/lib/ai/AIProvider').TutoringRequest | null;
 }
 
 /**
@@ -88,6 +96,81 @@ export function canComputeAdvance(params: {
   return true;
 }
 
+/**
+ * Convert an AI-authored tutoring turn into a renderable step.
+ *
+ * The learner's question is supplied by the application (curriculum data); the
+ * explanation, scaffold, thinking prompt and retry invitation are the AI's.
+ */
+export function tutoringTurnToStep(
+  turn: import('@/lib/ai/AIProvider').TutoringTurn,
+  request: import('@/lib/ai/AIProvider').TutoringRequest,
+  evidence: Evidence,
+  conceptId: string,
+): ExtendedJourneyStep {
+  const question = turnQuestion(turn, request);
+  const isTransfer = question.isTransfer;
+
+  // The tutor's explanation is shown in full; the scaffold is the visual/owl half.
+  const body = [
+    turn.acknowledgement,
+    turn.misconceptionExplanation,
+    turn.workedExample ? `\n\nHow it works:\n${turn.workedExample}` : '',
+    turn.scaffold.content ? `\n\n${turn.scaffold.content}` : '',
+    turn.thinkingQuestion ? `\n\nBefore you answer: ${turn.thinkingQuestion}` : '',
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  const choices = question.options.map((label, i) => ({ id: String(i), label }));
+  const correctIndex = question.options.findIndex(
+    (c) => String(c).trim().toLowerCase() === String(question.correctAnswer).trim().toLowerCase(),
+  );
+
+  return {
+    id: `tutor-${request.activityId}-${turn.stage}-${request.previousTurns.length + 1}`,
+    stepType: 'learn',
+    title: isTransfer
+      ? 'Now try a similar one'
+      : turn.stage === 'explain_then_transfer'
+        ? 'Let us work through it'
+        : turn.stage === 'deeper_scaffold'
+          ? 'Let us look at it differently'
+          : 'Let us think about this together',
+    studentText: body,
+    // Surfaced so a degraded (non-AI) turn is never presented as AI tutoring.
+    owlText: turn.inviteRetry,
+    visualSpec: turn.scaffold.kind === 'worked_example'
+      ? ({ type: 'step_reveal' } as any)
+      : undefined,
+    interactionSpec: {
+      type: 'tap_choice',
+      prompt: question.prompt,
+      choices,
+      correctChoiceId: correctIndex >= 0 ? String(correctIndex) : undefined,
+      conceptId,
+      hint: turn.scaffold.content,
+    } as any,
+    feedbackSpec: {
+      correct: 'That is it — you have got it now.',
+      incorrect: 'Not quite yet. Have another careful look.',
+      hint: turn.scaffold.content,
+    },
+    successCriteria: 'Answers the tutor question, correct or with another turn.',
+    // Machine-readable tutor state for the client renderer.
+    tutorTurn: turn,
+    tutorQuestion: question,
+    tutorEvidence: {
+      activityId: evidence.activityId,
+      attemptNumber: request.attemptNumber,
+      stage: turn.stage,
+    },
+    ...(turn.degradedReason
+      ? { tutorDegradedReason: turn.degradedReason }
+      : {}),
+  } as unknown as ExtendedJourneyStep;
+}
+
 function safeOptions(ctx: ActionAdapterContext): string[] {
   return (ctx.aiContext.options && ctx.aiContext.options.length > 0)
     ? ctx.aiContext.options : [];
@@ -106,13 +189,24 @@ export function pedagogicalActionToJourneyStep(
   const conceptId = action.conceptId || evidence.conceptId;
   const now = Date.now();
 
+  // ── AI tutoring path ────────────────────────────────────────────────────
+  // The AI wrote the language; the application owns the question it asks.
+  // This applies to EVERY action type, because the pedagogical action label
+  // (remediate / change_representation / provide_hint / ...) describes the
+  // intent, whereas what the learner needs to SEE is the tutor's turn. Gating
+  // this on `remediate` meant a tutor response was silently discarded whenever
+  // the model proposed a different action.
+  if (ctx.tutoringTurn && ctx.tutoringRequest) {
+    return tutoringTurnToStep(ctx.tutoringTurn, ctx.tutoringRequest, evidence, conceptId);
+  }
+
   switch (action.actionType) {
 
     case "remediate": {
       // Config-driven lessons build remediation from their own misconception
       // data. Lessons that declare `lesson-generators` (the Place Value pilot)
       // keep their existing, working generator registry untouched.
-      if (ctx.lessonConfig?.remediationStrategy === "config-driven") {
+      if (ctx.lessonConfig?.remediationStrategy === 'config-driven') {
         const config = ctx.lessonConfig;
         const resolved = resolveActivityFromJourney(config, {
           activityId: evidence.activityId,

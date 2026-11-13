@@ -184,7 +184,16 @@ export const PLACE_VALUE_ADAPTIVE_CONFIG: AdaptiveLessonConfig = {
     {
       activityId: 'think_first',
       conceptId: 'digit-value',
-      expectedAnswer: '7 hundreds',
+      transfer: {
+        activityId: 'think_first-transfer',
+        prompt: "In 6,482, what is the value of the digit 4?",
+        choices: ["4 ones", "4 tens", "4 hundreds", "4 thousands"],
+        correctAnswer: "4 hundreds",
+        explanation: "The 4 sits in the hundreds column, so it is worth 4 hundreds = 400.",
+        slo: 'ARIZEN-INT-1.1-a',
+      },
+      slo: 'ARIZEN-INT-1.1-a',
+      correctAnswer: '7 hundreds',
       detectMisconception: (selected, expected) => {
         const sel = selected.toLowerCase();
         const exp = expected.toLowerCase();
@@ -202,7 +211,16 @@ export const PLACE_VALUE_ADAPTIVE_CONFIG: AdaptiveLessonConfig = {
     {
       activityId: 'connect',
       conceptId: 'digit-value',
-      expectedAnswer: '3,000 people',
+      transfer: {
+        activityId: 'connect-transfer',
+        prompt: "A library has 5,930 books. What does the 5 represent?",
+        choices: ["5 books", "50 books", "500 books", "5,000 books"],
+        correctAnswer: "5,000 books",
+        explanation: "The 5 is in the thousands place, so it represents 5,000 books.",
+        slo: 'ARIZEN-INT-1.1-a',
+      },
+      slo: 'ARIZEN-INT-1.1-a',
+      correctAnswer: '3,000 people',
       detectMisconception: (selected, expected) => {
         const sel = selected.toLowerCase();
         const exp = expected.toLowerCase();
@@ -219,7 +237,15 @@ export const PLACE_VALUE_ADAPTIVE_CONFIG: AdaptiveLessonConfig = {
     {
       activityId: 'p1',
       conceptId: 'expanded-form',
-      expectedAnswer: '2,538',
+      transfer: {
+        activityId: 'p1-transfer',
+        prompt: "Write the expanded form of 3,705.",
+        choices: ["3,000 + 700 + 5", "3,000 + 700 + 0 + 5", "3,700 + 5", "700 + 5"],
+        correctAnswer: "3,000 + 700 + 0 + 5",
+        explanation: "Every place counts, including the zero tens, so 3,705 = 3,000 + 700 + 0 + 5.",
+        slo: 'ARIZEN-INT-1.1-a',
+      },
+      correctAnswer: '2,538',
       detectMisconception: (selected) => {
         const sel = selected.toLowerCase();
         if (sel.includes('5,238')) return 'position-confusion';
@@ -230,7 +256,15 @@ export const PLACE_VALUE_ADAPTIVE_CONFIG: AdaptiveLessonConfig = {
     {
       activityId: 'p2',
       conceptId: 'expanded-form',
-      expectedAnswer: '1,547',
+      transfer: {
+        activityId: 'p2-transfer',
+        prompt: "What is 2,400 + 80 + 6?",
+        choices: ["2,486", "2,406", "2,486", "2,860"],
+        correctAnswer: "2,486",
+        explanation: "Add the parts: 2,400 + 80 = 2,480, then + 6 = 2,486.",
+        slo: 'ARIZEN-INT-1.1-a',
+      },
+      correctAnswer: '1,547',
       detectMisconception: (selected) => {
         const sel = selected.toLowerCase();
         if (sel.includes('1,247')) return 'expanded-form-skip';
@@ -241,7 +275,15 @@ export const PLACE_VALUE_ADAPTIVE_CONFIG: AdaptiveLessonConfig = {
     {
       activityId: 'p3',
       conceptId: 'compare-order',
-      expectedAnswer: '5,621',
+      transfer: {
+        activityId: 'p3-transfer',
+        prompt: "Which number is larger: 7,318 or 7,138?",
+        choices: ["7,318", "7,138", "They are equal"],
+        correctAnswer: "7,318",
+        explanation: "Both start with 7 thousands and 3 hundreds, so compare the tens: 1 tens vs 3 tens. 7,318 is larger.",
+        slo: 'ARIZEN-INT-1.1-d',
+      },
+      correctAnswer: '5,621',
       detectMisconception: (selected) => {
         const sel = selected.toLowerCase();
         if (sel.includes('5,261')) return 'comparison-reverse';
@@ -252,11 +294,33 @@ export const PLACE_VALUE_ADAPTIVE_CONFIG: AdaptiveLessonConfig = {
     {
       activityId: 'quick_check',
       conceptId: 'read-numbers',
-      expectedAnswer: '3,042',
+      transfer: {
+        activityId: 'quick_check-transfer',
+        prompt: "Which number is read as 'two thousand, ninety-six'?",
+        choices: ["2,096", "2,906", "2,960", "2,006"],
+        correctAnswer: "2,096",
+        explanation: "'Two thousand' = 2,000 and 'ninety-six' = 96, so the number is 2,096.",
+        slo: 'ARIZEN-INT-1.1-c',
+      },
+      slo: 'ARIZEN-INT-1.1-c',
+      correctAnswer: '3,042',
       detectMisconception: (selected, expected) =>
         selected.toLowerCase() !== expected.toLowerCase() ? 'read-numbers' : null,
     },
   ],
+  remediation: {
+    // Third wrong answer delivers a full worked explanation, then a transfer
+    // question that checks the idea actually transferred.
+    explanationThreshold: 3,
+    maxTurns: 4,
+    preferredRepresentations: [
+      'place_value_chart',
+      'number_line',
+      'counters',
+      'digit_comparison',
+      'step_reveal',
+    ],
+  },
   mastery: {
     requiredConcepts: ['digit-value', 'expanded-form', 'compare-order', 'read-numbers'],
     minCorrectPerConcept: 1,

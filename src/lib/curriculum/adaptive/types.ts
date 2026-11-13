@@ -70,6 +70,46 @@ export interface RemediationTemplate {
   visual?: Record<string, unknown>;
 }
 
+/**
+ * A closely related question used to check whether understanding was actually
+ * recovered, rather than merely re-guessed.
+ *
+ * Transfer questions are CURRICULUM DATA, never AI-generated: the application
+ * must be able to validate the learner's answer deterministically. The AI tutor
+ * writes the teaching language around this question, never the question itself.
+ */
+export interface TransferActivitySpec {
+  activityId: string;
+  prompt: string;
+  choices: string[];
+  correctAnswer: string;
+  explanation: string;
+  slo?: string;
+  /** Deterministic override, same contract as AdaptiveActivitySpec.validate. */
+  validate?: (selected: string, expected: string) => boolean;
+}
+
+/**
+ * How remediation escalates for a lesson. Deterministic application data.
+ */
+export interface RemediationPolicy {
+  /**
+   * Attempt number at which a full worked explanation is delivered before the
+   * transfer question. Default 3.
+   */
+  explanationThreshold: number;
+  /**
+   * Maximum remediation turns before the learner is moved on. The learner is
+   * never trapped in an infinite loop. Default 4.
+   */
+  maxTurns: number;
+  /**
+   * Representations this lesson's concepts permit, used by the tutor when it
+   * chooses a concrete representation scaffold.
+   */
+  preferredRepresentations?: string[];
+}
+
 export interface AdaptiveActivitySpec {
   /** Stable, globally unique activity id (journey step id or sub-activity id). */
   activityId: string;
@@ -78,8 +118,6 @@ export interface AdaptiveActivitySpec {
   sourceQuizIndex?: number;
   /** Direct specification for activities not sourced from a quiz block. */
   prompt?: string;
-  /** Lesson-declared correct answer, used when no runtime options are given. */
-  expectedAnswer?: string;
   choices?: string[];
   correctAnswer?: string;
   /** Student-facing explanation used for correct feedback. */
@@ -101,6 +139,12 @@ export interface AdaptiveActivitySpec {
   ) => string | null;
   /** SLO this activity provides evidence for. */
   slo?: string;
+  /**
+   * Transfer question used to verify recovery after remediation.
+   * Optional: without one, a correct retry records recovery on the original
+   * activity instead.
+   */
+  transfer?: TransferActivitySpec;
 }
 
 export interface AdaptiveMasteryCriteria {
@@ -155,6 +199,8 @@ export interface AdaptiveLessonConfig {
   misconceptions: LessonMisconception[];
   activities: AdaptiveActivitySpec[];
   mastery: AdaptiveMasteryCriteria;
+  /** Remediation escalation policy. Defaults apply when omitted. */
+  remediation?: RemediationPolicy;
   celebration: AdaptiveCelebration;
   journeyBuilder: JourneyBuilderKind;
   /**

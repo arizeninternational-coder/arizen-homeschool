@@ -19,7 +19,12 @@
 
 import { useState, useCallback } from "react";
 import type { JourneyStep } from "@/lib/curriculum/lesson-journey";
-import type { PedagogicalAction } from "@/lib/ai/AIProvider";
+import type {
+  PedagogicalAction,
+  TutoringTurn,
+  TutoringRequest,
+  TutoringTurnRecord,
+} from "@/lib/ai/AIProvider";
 import type { LearningState } from "@/lib/curriculum/adaptive-engine";
 import { canComputeAdvance } from "@/lib/learning/action-adapter";
 
@@ -32,6 +37,12 @@ export interface AdaptiveDecisionResult {
   conceptMastery: Record<string, unknown>;
   /** True when the lesson is registered with the adaptive architecture. */
   isAdaptive: boolean;
+  /** The AI-authored tutoring turn, when remediation occurred. */
+  tutoringTurn?: TutoringTurn | null;
+  /** The request that produced the turn. */
+  tutoringRequest?: TutoringRequest | null;
+  /** Provider identity/availability, surfaced so a fallback is never called AI. */
+  tutorProvider?: { type: string; available: boolean; reason?: string; model?: string };
 }
 
 export interface SubmitAdaptiveAnswerParams {
@@ -48,6 +59,12 @@ export interface SubmitAdaptiveAnswerParams {
   prompt: string;
   attemptNumber?: number;
   remediationContext?: Record<string, unknown>;
+  /** Prior tutoring turns, so the tutor escalates instead of repeating. */
+  previousTutorTurns?: TutoringTurnRecord[];
+  /** True when this answer resolved a transfer question. */
+  recovered?: boolean;
+  /** The activity the tutoring conversation is anchored to. */
+  tutorActivityId?: string | null;
 }
 
 export function useAdaptiveDecision() {
@@ -83,6 +100,9 @@ export function useAdaptiveDecision() {
         updatedState: data.updatedState,
         conceptMastery: data.conceptMastery || {},
         isAdaptive: data.isAdaptive ?? false,
+        tutoringTurn: data.tutoringTurn || null,
+        tutoringRequest: data.tutoringRequest || null,
+        tutorProvider: data.tutorProvider || null,
       };
 
       setDecision(result);

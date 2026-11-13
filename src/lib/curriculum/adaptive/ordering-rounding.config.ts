@@ -132,6 +132,14 @@ export const ORDERING_ROUNDING_CONFIG: AdaptiveLessonConfig = {
     {
       activityId: 'think_first',
       conceptId: 'order-numbers',
+      transfer: {
+        activityId: 'think_first-transfer',
+        prompt: "Order these numbers from smallest to largest: 512, 176, 649, 308",
+        choices: ["176, 308, 512, 649", "308, 176, 512, 649", "176, 512, 308, 649", "512, 176, 649, 308"],
+        correctAnswer: "176, 308, 512, 649",
+        explanation: "Compare the hundreds: 176 (1), 308 (3), 512 (5), 649 (6). So 176, 308, 512, 649.",
+        slo: 'ARIZEN-INT-1.1-d',
+      },
       slo: 'ARIZEN-INT-1.1-d',
       prompt: 'Order these numbers from SMALLEST to LARGEST: 345, 521, 298, 476',
       choices: [
@@ -162,6 +170,14 @@ export const ORDERING_ROUNDING_CONFIG: AdaptiveLessonConfig = {
     {
       activityId: 'connect',
       conceptId: 'round-to-ten',
+      transfer: {
+        activityId: 'connect-transfer',
+        prompt: "A tank holds 728 litres. About how much is that, to the nearest ten?",
+        choices: ["720", "730", "728", "700"],
+        correctAnswer: "730",
+        explanation: "The ones digit is 8, which is 5 or more, so we round up: 728 becomes 730.",
+        slo: 'ARIZEN-INT-1.1-e',
+      },
       slo: 'ARIZEN-INT-1.1-e',
       prompt: 'A shop has 462 oranges. About how many oranges is that, rounded to the nearest ten?',
       choices: ['460', '470', '462', '400'],
@@ -180,6 +196,14 @@ export const ORDERING_ROUNDING_CONFIG: AdaptiveLessonConfig = {
     {
       activityId: 'p1',
       conceptId: 'round-to-ten',
+      transfer: {
+        activityId: 'p1-transfer',
+        prompt: "Round 461 to the nearest ten.",
+        choices: ["460", "470", "461", "450"],
+        correctAnswer: "460",
+        explanation: "The ones digit is 1, which is less than 5, so we round down: 461 becomes 460.",
+        slo: 'ARIZEN-INT-1.1-e',
+      },
       slo: 'ARIZEN-INT-1.1-e',
       prompt: 'Round 384 to the nearest ten.',
       choices: ['380', '390', '384', '385'],
@@ -196,6 +220,14 @@ export const ORDERING_ROUNDING_CONFIG: AdaptiveLessonConfig = {
     {
       activityId: 'p2',
       conceptId: 'order-direction',
+      transfer: {
+        activityId: 'p2-transfer',
+        prompt: "Order these from LARGEST to smallest: 243, 517, 396, 128",
+        choices: ["517, 396, 243, 128", "128, 243, 396, 517", "517, 243, 396, 128", "396, 517, 243, 128"],
+        correctAnswer: "517, 396, 243, 128",
+        explanation: "Largest first: hundreds 5, 3, 2, 1, so 517, 396, 243, 128.",
+        slo: 'ARIZEN-INT-1.1-d',
+      },
       slo: 'ARIZEN-INT-1.1-d',
       prompt: 'Order these numbers from LARGEST to SMALLEST: 528, 316, 804, 199',
       choices: ['804, 528, 316, 199', '199, 316, 528, 804', '804, 316, 528, 199', '528, 804, 316, 199'],
@@ -212,6 +244,14 @@ export const ORDERING_ROUNDING_CONFIG: AdaptiveLessonConfig = {
     {
       activityId: 'p3',
       conceptId: 'round-to-ten',
+      transfer: {
+        activityId: 'p3-transfer',
+        prompt: "Round 934 to the nearest ten.",
+        choices: ["930", "940", "934", "900"],
+        correctAnswer: "940",
+        explanation: "The ones digit is 4, which is less than 5, so we round down: 934 becomes 930.",
+        slo: 'ARIZEN-INT-1.1-e',
+      },
       slo: 'ARIZEN-INT-1.1-e',
       prompt: 'Round 855 to the nearest ten.',
       choices: ['860', '850', '855', '865'],
@@ -228,6 +268,14 @@ export const ORDERING_ROUNDING_CONFIG: AdaptiveLessonConfig = {
     {
       activityId: 'quick_check',
       conceptId: 'round-to-ten',
+      transfer: {
+        activityId: 'quick_check-transfer',
+        prompt: "A market had 2,847 visitors. About how many, to the nearest ten?",
+        choices: ["2,850", "2,840", "2,847", "2,800"],
+        correctAnswer: "2,850",
+        explanation: "The ones digit is 7, which is 5 or more, so we round up: 2,840 becomes 2,850.",
+        slo: 'ARIZEN-INT-1.1-e',
+      },
       slo: 'ARIZEN-INT-1.1-e',
       prompt: 'A school has 4,237 learners. About how many learners is that, to the nearest ten?',
       choices: ['4,240', '4,230', '4,237', '4,200'],
@@ -243,6 +291,11 @@ export const ORDERING_ROUNDING_CONFIG: AdaptiveLessonConfig = {
       },
     },
   ],
+  remediation: {
+    explanationThreshold: 3,
+    maxTurns: 4,
+    preferredRepresentations: ["number_line", "place_value_chart", "digit_comparison"],
+  },
   mastery: {
     requiredConcepts: ['order-numbers', 'round-to-ten'],
     minCorrectPerConcept: 1,
