@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
+import { getAuthSecret } from "@/lib/auth/secret";
 
-const secret = process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-production";
+const secret = getAuthSecret();
 
 // Public paths that don't require authentication
 const publicPaths = [

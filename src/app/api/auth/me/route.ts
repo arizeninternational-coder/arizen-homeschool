@@ -3,9 +3,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
+import { getAuthSecret } from "@/lib/auth/secret";
 export const dynamic = "force-dynamic";
 
-const secret = process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-production";
+const secret = getAuthSecret();
 
 export async function GET(request: NextRequest) {
   const supabase = getSupabaseAdmin();

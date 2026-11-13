@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { jwtVerify } from "jose";
+import { getAuthSecret } from "@/lib/auth/secret";
 
 export const dynamic = "force-dynamic";
 
@@ -9,7 +10,7 @@ async function getAuth(request: Request): Promise<{ userId: string; learnerId: s
   try {
     const cookieHeader = request.headers.get("cookie") || "";
     const cookies = Object.fromEntries(cookieHeader.split(";").map(c => { const [k,...r] = c.trim().split("="); return [k.trim(), r.join("=")]; }));
-    const secret = process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-production";
+    const secret = getAuthSecret();
     const isProd = process.env.NODE_ENV === "production";
     const cookieName = isProd ? "__Secure-next-auth.session-token" : "next-auth.session-token";
     const token = cookies[cookieName] || cookies["next-auth.session-token"] || cookies["__Secure-next-auth.session-token"];

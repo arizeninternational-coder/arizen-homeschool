@@ -6,9 +6,10 @@ import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { USER_AUTH_COLUMNS } from "@/lib/db/user-columns";
 import bcrypt from "bcryptjs";
 import { SignJWT } from "jose";
+import { getAuthSecret } from "@/lib/auth/secret";
 export const dynamic = "force-dynamic";
 
-const NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-production";
+const NEXTAUTH_SECRET = getAuthSecret();
 
 async function createSessionToken(user: any) {
   const secret = new TextEncoder().encode(NEXTAUTH_SECRET);

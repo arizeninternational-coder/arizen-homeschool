@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
+import { getAuthSecret } from "@/lib/auth/secret";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +17,7 @@ export async function POST(request: Request) {
     );
 
     const { jwtVerify } = await import("jose");
-    const secret = process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-production";
+    const secret = getAuthSecret();
     const isProduction = process.env.NODE_ENV === "production";
     const cookieName = isProduction ? "__Secure-next-auth.session-token" : "next-auth.session-token";
     const token = cookies[cookieName] || cookies["next-auth.session-token"] || cookies["__Secure-next-auth.session-token"];
@@ -155,7 +156,7 @@ export async function GET(request: Request) {
     );
 
     const { jwtVerify } = await import("jose");
-    const secret = process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-production";
+    const secret = getAuthSecret();
     const isProduction = process.env.NODE_ENV === "production";
     const cookieName = isProduction ? "__Secure-next-auth.session-token" : "next-auth.session-token";
     const token = cookies[cookieName] || cookies["next-auth.session-token"] || cookies["__Secure-next-auth.session-token"];

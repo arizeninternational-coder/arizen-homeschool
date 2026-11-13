@@ -4,6 +4,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { USER_AUTH_COLUMNS } from "@/lib/db/user-columns";
 import bcrypt from "bcryptjs";
+import { getAuthSecret } from "@/lib/auth/secret";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -170,7 +171,7 @@ export const authOptions: NextAuthOptions = {
   },
   pages: { signIn: "/auth/login", error: "/auth/login" },
   session: { strategy: "jwt", maxAge: 30 * 24 * 60 * 60 },
-  secret: process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-production",
+  secret: getAuthSecret(),
   cookies: {
     sessionToken: {
       name: `__Secure-next-auth.session-token`,

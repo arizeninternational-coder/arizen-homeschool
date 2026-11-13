@@ -6,6 +6,7 @@ import {
   Star, Swords, Zap, Gift, Flame, Eye, SmilePlus,
   Award, Clock, TrendingUp
 } from "lucide-react";
+import { getAuthSecret } from "@/lib/auth/secret";
 
 /* ═══════════════════════════════════════════════════════════════════
    ARIZEN SCHOOL — Landing Page v7.0
@@ -22,7 +23,7 @@ export default async function HomePage() {
   try {
     const { cookies } = await import("next/headers");
     const { jwtVerify } = await import("jose");
-    const secret = process.env.NEXTAUTH_SECRET || "arizen-dev-secret-change-in-production";
+    const secret = getAuthSecret();
     const cookieStore = await cookies();
     const isProd = process.env.NODE_ENV === "production";
     const cookieName = isProd ? "__Secure-next-auth.session-token" : "next-auth.session-token";
