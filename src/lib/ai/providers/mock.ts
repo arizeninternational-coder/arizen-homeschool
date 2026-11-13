@@ -23,6 +23,8 @@ import type {
   MisconceptionAnalysis,
   PedagogicalAction,
   PedagogicalActionKind,
+  TutoringRequest,
+  TutoringTurn,
 } from '../AIProvider';
 import type { Evidence } from '../../curriculum/adaptive-engine';
 
@@ -163,7 +165,7 @@ export class MockAIProvider implements AIProvider {
   async analyzeLearnerEvidence(
     conceptId: string,
     evidence: Evidence[],
-    _context: AIContext
+    context: AIContext
   ): Promise<MisconceptionAnalysis> {
     this.callCount.analyze++;
 
@@ -187,7 +189,10 @@ export class MockAIProvider implements AIProvider {
         // Diagnosis: a specific place-value confusion pattern.
         // selectNextAction will propose targeted remediation.
         return {
-          misconceptionId: this.misconceptionId ?? 'position-confusion',
+          misconceptionId:
+            this.misconceptionId ??
+            context.allowedMisconceptionIds?.[0] ??
+            'position-confusion',
           confidence: 0.9,
           explanation:
             `Learner consistently selects digit value instead of digit position. ` +
@@ -258,7 +263,15 @@ export class MockAIProvider implements AIProvider {
     this.callCount.select++;
 
     const summary = summarizeEvidence(evidence);
-    const nextConcept = this.nextConceptId ?? nextInChain(conceptId) ?? conceptId;
+    // The chain comes from the application (the active lesson), not from a
+    // hardcoded Place Value list — this keeps the mock lesson-agnostic.
+    const chain = context.conceptChain && context.conceptChain.length
+      ? context.conceptChain
+      : CONCEPT_CHAIN;
+    const chainIdx = chain.indexOf(conceptId);
+    const nextInLessonChain =
+      chainIdx >= 0 && chainIdx < chain.length - 1 ? chain[chainIdx + 1] : null;
+    const nextConcept = this.nextConceptId ?? nextInLessonChain ?? nextInChain(conceptId) ?? conceptId;
 
     // ── Out-of-scope test fixture ────────────────────────────────────────
     // This scenario deliberately bypasses diagnosis to return an action
@@ -342,7 +355,9 @@ export class MockAIProvider implements AIProvider {
       // A specific, narrow misconception (e.g. position-confusion,
       // digit-not-value, comparison-reverse) benefits from targeted
       // remediation with the appropriate visual representation.
-      const representation = REPRESENTATION_FOR_MISCONCEPTION[mc] ?? 'place_value_chart';
+      const representation =
+        REPRESENTATION_FOR_MISCONCEPTION[mc] ||
+        (context.allowedRepresentations?.[0] ?? 'place_value_chart');
       return {
         actionType: 'remediate',
         conceptId: context.conceptId,
@@ -415,6 +430,66 @@ export class MockAIProvider implements AIProvider {
       question: `Mock practice question for ${conceptId} at difficulty ${difficulty}.`,
       options: ['Option A', 'Option B', 'Option C', 'Option D'],
       correctIndex: 0,
+    };
+  }
+
+  // ── AI tutoring (DETERMINISTIC TEST DOUBLE) ───────────────────────────────
+  //
+  // THIS IS NOT AI TUTORING. These are fixed strings selected by stage, written
+  // to exercise the remediation STATE MACHINE deterministically in automated
+  // tests. They are never evidence that the real tutor works — only a real
+  // provider (Ollama + Qwen) can demonstrate that.
+
+  async generateTutoringTurn(request: TutoringRequest): Promise<TutoringTurn> {
+    const mc = request.misconceptionId || 'unknown-misconception';
+
+    if (request.stage === 'explain_then_transfer') {
+      return {
+        acknowledgement: `[mock:${mc}] You have had more than one go at this.`,
+        misconceptionExplanation: `[mock:${mc}] Here is the idea behind the mistake, stated plainly.`,
+        scaffold: {
+          kind: 'worked_example',
+          content: `[mock:${mc}] Work through it one place at a time, naming each part.`,
+        },
+        thinkingQuestion: `[mock:${mc}] Now use that same method on the new question.`,
+        inviteRetry: '[mock] Go on and answer the transfer question.',
+        workedExample: `[mock:${mc}] A full worked method: break the number into its parts, name each part, then recombine to check.`,
+        stage: 'explain_then_transfer',
+        transfer: request.transfer,
+      };
+    }
+
+    if (request.stage === 'deeper_scaffold') {
+      return {
+        acknowledgement: `[mock:${mc}] Still thinking — good, you are persisting.`,
+        misconceptionExplanation: `[mock:${mc}] Let us picture it a different way.`,
+        scaffold: {
+          kind: 'representation',
+          content: `[mock:${mc}] Lay the number out in columns before you decide anything.`,
+        },
+        thinkingQuestion: `[mock:${mc}] Which column should you look at first?`,
+        inviteRetry: '[mock] Try again using that column.',
+        stage: 'deeper_scaffold',
+      };
+    }
+
+    return {
+      acknowledgement: `[mock:${mc}] Thank you for trying.`,
+      misconceptionExplanation: `[mock:${mc}] Let us see the idea behind that answer.`,
+      scaffold: {
+        kind: 'hint',
+        content: `[mock:${mc}] Start from the largest place and work down.`,
+      },
+      thinkingQuestion: `[mock:${mc}] What is the question asking you to work out?`,
+      inviteRetry: '[mock] Have another go.',
+      stage: 'scaffold',
+    };
+  }
+
+  async isAvailable() {
+    return {
+      available: true,
+      reason: 'MockAIProvider is a deterministic test double, not a real tutor.',
     };
   }
 }

@@ -51,6 +51,18 @@ interface AdaptiveDecisionRequest {
   prompt: string;
   attemptNumber?: number;
   remediationContext?: Record<string, unknown>;
+  /**
+   * Prior tutoring turns in this remediation conversation, replayed to the AI
+   * so it can escalate rather than repeat itself.
+   */
+  previousTutorTurns?: import("@/lib/ai/AIProvider").TutoringTurnRecord[];
+  /**
+   * True when this response answered a transfer question correctly, i.e. the
+   * learner recovered understanding through remediation.
+   */
+  recovered?: boolean;
+  /** Activity id actually being answered (original or transfer question). */
+  tutorActivityId?: string;
 }
 
 interface AdaptiveDecisionResponse {
@@ -62,6 +74,12 @@ interface AdaptiveDecisionResponse {
   conceptMastery: Record<string, unknown>;
   /** True when the lesson is registered with the adaptive architecture. */
   isAdaptive: boolean;
+  /** The AI-authored tutoring turn, when remediation occurred. */
+  tutoringTurn?: import("@/lib/ai/AIProvider").TutoringTurn | null;
+  /** The request the turn was produced from (supplies the question to ask). */
+  tutoringRequest?: import("@/lib/ai/AIProvider").TutoringRequest | null;
+  /** Provider identity, so the client can show whether a real tutor answered. */
+  tutorProvider?: { type: string; available: boolean; reason?: string; model?: string };
 }
 
 export const dynamic = "force-dynamic";
@@ -80,7 +98,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     const {
       lessonId, lessonTitle, lessonSlug, activityId, conceptId,
       selectedAnswer, expectedAnswer, options, correct, prompt,
-      attemptNumber, remediationContext,
+      attemptNumber, remediationContext, previousTutorTurns, recovered, tutorActivityId,
     } = body;
 
     // Routing is data-driven: the lesson's registered AdaptiveLessonConfig
@@ -197,6 +215,20 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     // Provider selection is behind createAIProvider() — no branching in page.
     // Default: MockAIProvider (AI_PROVIDER=mock). Swappable to OllamaProvider.
     const aiProvider = createAIProvider();
+
+    // Report real provider status. An unconfigured or unreachable provider must
+    // degrade visibly rather than break the lesson.
+    const availability = (await aiProvider.isAvailable?.()) ?? { available: false, reason: 'provider does not report availability' };
+    const tutorProvider = {
+      type: aiProvider.constructor.name,
+      available: availability.available,
+      reason: availability.reason,
+      model: availability.model,
+    };
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[adaptive-decision] tutor provider:', tutorProvider);
+    }
+
     const orchestrator = new AdaptiveOrchestrator(aiProvider);
 
     // ── 6. Decide: evidence → diagnosis → action proposal → validation ──
@@ -205,6 +237,14 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       evidence,
       context: aiContext,
       curriculumKey: config.curriculumKey,
+      lessonConfig: config,
+      previousTutorTurns: previousTutorTurns || [],
+      recovered: recovered || false,
+      tutorActivityId: tutorActivityId || activityId,
+      diagnosedMisconceptionId: misconceptionId,
+      diagnosedMisconceptionLabel: resolved.declared
+        ? config.misconceptions.find((m) => m.id === misconceptionId)?.label
+        : undefined,
     });
 
     // ── 7. Persist the response (so the next call reconstructs correct state) ──
@@ -254,6 +294,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       },
       conceptChain: conceptIds,
       lessonConfig: config,
+      tutoringTurn: decision.tutoringTurn,
+      tutoringRequest: decision.tutoringRequest,
     });
 
     // ── 10. Extract mastery snapshot for the client ──
@@ -274,6 +316,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       updatedState: decision.updatedState,
       conceptMastery,
       isAdaptive: true,
+      tutoringTurn: decision.tutoringTurn || null,
+      tutoringRequest: decision.tutoringRequest || null,
+      tutorProvider,
     };
 
     return NextResponse.json(response);

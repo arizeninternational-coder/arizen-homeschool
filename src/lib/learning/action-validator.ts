@@ -18,7 +18,13 @@
 import type {
   PedagogicalAction,
   PedagogicalActionKind,
+  TutoringRequest,
+  TutoringTurn,
 } from '../ai/AIProvider';
+import {
+  tutoringTurnLeaksAnswer,
+  stageRequiresExplanation,
+} from './tutor';
 import type {
   LearningState,
   ConceptState,
@@ -188,6 +194,83 @@ export class ActionValidator {
         }
         return null;
     }
+  }
+
+  /**
+   * Validate an AI-authored tutoring turn before it reaches the learner.
+   *
+   * The AI owns teaching LANGUAGE; the application still enforces the rules that
+   * protect the learner. A turn is rejected when it is empty, of the wrong
+   * shape, missing a required worked explanation, or — critically — when it
+   * states the answer to the learner's own question.
+   *
+   * Returns null when the turn is safe to deliver.
+   */
+  validateTutoringTurn(
+    turn: TutoringTurn | null | undefined,
+    request: TutoringRequest,
+    config: { misconceptionIds: string[] }
+  ): string | null {
+    if (!turn) return 'Tutor produced no turn.';
+
+    // Required non-empty teaching language.
+    const required: Array<[string, string | undefined]> = [
+      ['acknowledgement', turn.acknowledgement],
+      ['misconceptionExplanation', turn.misconceptionExplanation],
+      ['thinkingQuestion', turn.thinkingQuestion],
+      ['inviteRetry', turn.inviteRetry],
+      ['scaffold.content', turn.scaffold?.content],
+    ];
+    for (const [name, value] of required) {
+      if (!value || typeof value !== 'string' || value.trim().length < 8) {
+        return `Tutoring field "${name}" is missing or too short to be useful.`;
+      }
+    }
+
+    if (!turn.scaffold || !['hint', 'thinking_question', 'representation', 'worked_example'].includes(turn.scaffold.kind)) {
+      return `Tutoring scaffold kind "${turn.scaffold?.kind}" is not permitted.`;
+    }
+
+    if (turn.stage !== request.stage) {
+      return `Tutor returned stage "${turn.stage}" but the application decided "${request.stage}".`;
+    }
+
+    // Escalation threshold: the explanation stage must carry a worked example.
+    if (stageRequiresExplanation(request.stage)) {
+      if (!turn.workedExample || turn.workedExample.trim().length < 20) {
+        return 'Explanation stage requires a worked example.';
+      }
+      if (!turn.transfer) {
+        return 'Explanation stage requires a transfer question.';
+      }
+    }
+
+    // The transfer question is curriculum data and must be echoed unchanged.
+    if (stageRequiresExplanation(request.stage) && request.transfer && turn.transfer) {
+      if (
+        turn.transfer.prompt !== request.transfer.prompt ||
+        turn.transfer.correctAnswer !== request.transfer.correctAnswer
+      ) {
+        return 'Tutor altered the transfer question; only its teaching language may be generated.';
+      }
+    }
+
+    // Misconception must be one the lesson actually declares.
+    if (
+      request.misconceptionId &&
+      config.misconceptionIds.length &&
+      !config.misconceptionIds.includes(request.misconceptionId)
+    ) {
+      return `Misconception "${request.misconceptionId}" is not declared by this lesson.`;
+    }
+
+    // The safety rule: never reveal the answer to the learner's own question.
+    // The worked example may show the METHOD (and the answer to a similar
+    // example), so it is checked separately against the transfer question only.
+    const leak = tutoringTurnLeaksAnswer(turn, request.correctAnswer);
+    if (leak) return `Tutor turn rejected: ${leak}.`;
+
+    return null;
   }
 
   /** Validate 'remediate' actions: misconception must be known. */

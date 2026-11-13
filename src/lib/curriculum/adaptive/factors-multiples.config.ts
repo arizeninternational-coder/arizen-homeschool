@@ -151,6 +151,14 @@ export const FACTORS_MULTIPLES_CONFIG: AdaptiveLessonConfig = {
     {
       activityId: 'think_first',
       conceptId: 'identify-factors',
+      transfer: {
+        activityId: 'think_first-transfer',
+        prompt: "Which of these is a FACTOR of 30?",
+        choices: ["7", "6", "11", "13"],
+        correctAnswer: "6",
+        explanation: "30 divided by 6 is exactly 5, so 6 is a factor of 30.",
+        slo: 'ARIZEN-INT-1.1-f',
+      },
       slo: 'ARIZEN-INT-1.1-f',
       prompt: 'Which of these is a FACTOR of 24?',
       choices: ['7', '9', '8', '13'],
@@ -165,6 +173,14 @@ export const FACTORS_MULTIPLES_CONFIG: AdaptiveLessonConfig = {
     {
       activityId: 'connect',
       conceptId: 'even-and-odd',
+      transfer: {
+        activityId: 'connect-transfer',
+        prompt: "A class has 45 children. Is 45 an even or an odd number?",
+        choices: ["Even", "Odd", "Neither", "Both"],
+        correctAnswer: "Odd",
+        explanation: "45 ends in 5, and digits 1, 3, 5, 7, 9 at the end make a number odd.",
+        slo: 'ARIZEN-INT-1.1-h',
+      },
       slo: 'ARIZEN-INT-1.1-h',
       prompt:
         'A farmer has 18 chairs and wants to put them in equal rows with none left over. Which number of rows works?',
@@ -187,6 +203,14 @@ export const FACTORS_MULTIPLES_CONFIG: AdaptiveLessonConfig = {
     {
       activityId: 'p1',
       conceptId: 'even-and-odd',
+      transfer: {
+        activityId: 'p1-transfer',
+        prompt: "Which number is EVEN?",
+        choices: ["53", "74", "81", "39"],
+        correctAnswer: "74",
+        explanation: "74 ends in 4, and numbers ending in 0, 2, 4, 6 or 8 are even.",
+        slo: 'ARIZEN-INT-1.1-h',
+      },
       slo: 'ARIZEN-INT-1.1-h',
       prompt: 'Which number is ODD?',
       choices: ['42', '68', '97', '24'],
@@ -203,6 +227,14 @@ export const FACTORS_MULTIPLES_CONFIG: AdaptiveLessonConfig = {
     {
       activityId: 'p2',
       conceptId: 'identify-factors',
+      transfer: {
+        activityId: 'p2-transfer',
+        prompt: "What are the factors of 20?",
+        choices: ["1, 2, 4, 5, 10, 20", "1, 2, 4, 10", "2, 4, 5, 10", "1, 5, 20"],
+        correctAnswer: "1, 2, 4, 5, 10, 20",
+        explanation: "20 divides by 1, 2, 4, 5, 10 and 20 with nothing left over.",
+        slo: 'ARIZEN-INT-1.1-f',
+      },
       slo: 'ARIZEN-INT-1.1-f',
       prompt: 'What are the factors of 18?',
       choices: [
@@ -231,6 +263,14 @@ export const FACTORS_MULTIPLES_CONFIG: AdaptiveLessonConfig = {
     {
       activityId: 'p3',
       conceptId: 'identify-multiples',
+      transfer: {
+        activityId: 'p3-transfer',
+        prompt: "What are the first 4 multiples of 4?",
+        choices: ["4, 8, 12, 16", "4, 8, 16, 12", "8, 12, 16, 20", "4, 12, 16, 20"],
+        correctAnswer: "4, 8, 12, 16",
+        explanation: "Counting in fours from the start: 4, 8, 12, 16.",
+        slo: 'ARIZEN-INT-1.1-g',
+      },
       slo: 'ARIZEN-INT-1.1-g',
       prompt: 'What are the first 5 multiples of 6?',
       choices: [
@@ -255,6 +295,14 @@ export const FACTORS_MULTIPLES_CONFIG: AdaptiveLessonConfig = {
     {
       activityId: 'quick_check',
       conceptId: 'identify-multiples',
+      transfer: {
+        activityId: 'quick_check-transfer',
+        prompt: "A train leaves every 20 minutes. Will one leave at 70 minutes past the hour?",
+        choices: ["Yes", "No"],
+        correctAnswer: "No",
+        explanation: "70 divided by 20 is 3 with 10 minutes left over, so no train at exactly 70 minutes.",
+        slo: 'ARIZEN-INT-1.1-g',
+      },
       slo: 'ARIZEN-INT-1.1-g',
       prompt: 'A bus arrives every 15 minutes. Will a bus arrive exactly 50 minutes past the hour?',
       choices: ['Yes', 'No'],
@@ -266,6 +314,11 @@ export const FACTORS_MULTIPLES_CONFIG: AdaptiveLessonConfig = {
         selected.toLowerCase().includes('yes') ? 'remainder-ignored' : null,
     },
   ],
+  remediation: {
+    explanationThreshold: 3,
+    maxTurns: 4,
+    preferredRepresentations: ["grouped_objects", "counters", "number_line"],
+  },
   mastery: {
     requiredConcepts: ['identify-factors', 'identify-multiples', 'even-and-odd'],
     minCorrectPerConcept: 1,

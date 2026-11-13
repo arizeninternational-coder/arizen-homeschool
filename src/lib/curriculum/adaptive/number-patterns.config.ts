@@ -125,6 +125,14 @@ export const NUMBER_PATTERNS_CONFIG: AdaptiveLessonConfig = {
     {
       activityId: 'think_first',
       conceptId: 'identify-pattern-rule',
+      transfer: {
+        activityId: 'think_first-transfer',
+        prompt: "What comes next in this pattern: 4, 8, 12, 16, __?",
+        choices: ["20", "18", "24", "22"],
+        correctAnswer: "20",
+        explanation: "The step is +4, so after 16 the next number is 20.",
+        slo: 'ARIZEN-INT-1.1-i',
+      },
       slo: 'ARIZEN-INT-1.1-i',
       prompt: 'What number comes next in this pattern: 6, 12, 18, 24, __?',
       choices: ['28', '30', '32', '26'],
@@ -143,6 +151,14 @@ export const NUMBER_PATTERNS_CONFIG: AdaptiveLessonConfig = {
     {
       activityId: 'connect',
       conceptId: 'even-odd-patterns',
+      transfer: {
+        activityId: 'connect-transfer',
+        prompt: "A bell rings at 7:00, 7:15, 7:30, 7:45 \u2026 What is the next time?",
+        choices: ["7:50", "8:00", "7:55", "7:60"],
+        correctAnswer: "8:00",
+        explanation: "The step is 15 minutes, so after 7:45 the next is 8:00.",
+        slo: 'ARIZEN-INT-1.1-i',
+      },
       slo: 'ARIZEN-INT-1.1-i',
       prompt:
         'A bus leaves the stage at 6:00, 6:10, 6:20, 6:30 … What is the next departure time?',
@@ -161,6 +177,14 @@ export const NUMBER_PATTERNS_CONFIG: AdaptiveLessonConfig = {
     {
       activityId: 'p1',
       conceptId: 'extend-number-pattern',
+      transfer: {
+        activityId: 'p1-transfer',
+        prompt: "What comes next in this pattern: 3, 6, 9, 12, __?",
+        choices: ["15", "14", "16", "13"],
+        correctAnswer: "15",
+        explanation: "The step is +3, so after 12 the next number is 15.",
+        slo: 'ARIZEN-INT-1.1-i',
+      },
       slo: 'ARIZEN-INT-1.1-i',
       prompt: 'What comes next in this pattern: 1, 3, 5, 7, __?',
       choices: ['8', '9', '10', '11'],
@@ -179,6 +203,14 @@ export const NUMBER_PATTERNS_CONFIG: AdaptiveLessonConfig = {
     {
       activityId: 'p2',
       conceptId: 'identify-pattern-rule',
+      transfer: {
+        activityId: 'p2-transfer',
+        prompt: "What comes next in this pattern: 1, 2, 4, 8, __?",
+        choices: ["12", "16", "10", "9"],
+        correctAnswer: "16",
+        explanation: "Each number is double the one before, so 8 doubles to 16.",
+        slo: 'ARIZEN-INT-1.1-i',
+      },
       slo: 'ARIZEN-INT-1.1-i',
       prompt: 'What comes next in this pattern: 2, 4, 8, 16, __?',
       choices: ['32', '18', '64', '20'],
@@ -196,6 +228,14 @@ export const NUMBER_PATTERNS_CONFIG: AdaptiveLessonConfig = {
     {
       activityId: 'p3',
       conceptId: 'extend-number-pattern',
+      transfer: {
+        activityId: 'p3-transfer',
+        prompt: "What comes next in this pattern: 20, 18, 16, 14, __?",
+        choices: ["12", "13", "15", "10"],
+        correctAnswer: "12",
+        explanation: "The step is -2, so after 14 the next number is 12.",
+        slo: 'ARIZEN-INT-1.1-i',
+      },
       slo: 'ARIZEN-INT-1.1-i',
       prompt: 'What comes next in this pattern: 4, 8, 12, 16, __?',
       choices: ['20', '18', '24', '32'],
@@ -214,6 +254,14 @@ export const NUMBER_PATTERNS_CONFIG: AdaptiveLessonConfig = {
     {
       activityId: 'quick_check',
       conceptId: 'identify-pattern-rule',
+      transfer: {
+        activityId: 'quick_check-transfer',
+        prompt: "Which rule describes this pattern: 3, 6, 9, 12, \u2026 ?",
+        choices: ["Add 3 each time", "Add 6 each time", "Double each time", "Add 2 each time"],
+        correctAnswer: "Add 3 each time",
+        explanation: "From 3 to 6 is +3, 6 to 9 is +3, so the rule is add 3 each time.",
+        slo: 'ARIZEN-INT-1.1-i',
+      },
       slo: 'ARIZEN-INT-1.1-i',
       prompt: 'Which rule describes this pattern: 5, 10, 15, 20, … ?',
       choices: [
@@ -234,6 +282,11 @@ export const NUMBER_PATTERNS_CONFIG: AdaptiveLessonConfig = {
       },
     },
   ],
+  remediation: {
+    explanationThreshold: 3,
+    maxTurns: 4,
+    preferredRepresentations: ["number_line", "step_reveal", "counters"],
+  },
   mastery: {
     requiredConcepts: ['identify-pattern-rule', 'extend-number-pattern'],
     minCorrectPerConcept: 1,
