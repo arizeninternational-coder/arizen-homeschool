@@ -35,7 +35,23 @@ async function createSessionToken(user: any) {
 }
 
 export async function POST(req: NextRequest) {
-  const supabase = getSupabaseAdmin();
+  // The service-role client is required for the credential lookup. If it cannot
+  // be constructed (missing/wrong SUPABASE_SERVICE_ROLE_KEY) that is a
+  // deployment problem, not a credential problem — return JSON so the client can
+  // show a real message. Previously this threw outside the try block, and Next
+  // answered with an empty 500 body, which surfaced in the UI as
+  // "Unexpected end of JSON input".
+  let supabase: ReturnType<typeof getSupabaseAdmin>;
+  try {
+    supabase = getSupabaseAdmin();
+  } catch (configErr: any) {
+    console.error("[LOGIN_API] Service client unavailable:", configErr?.message);
+    return NextResponse.json(
+      { error: "Sign-in is temporarily unavailable. Please try again shortly." },
+      { status: 503 }
+    );
+  }
+
   try {
     const body = await req.json();
     const { email, password } = body || {};
