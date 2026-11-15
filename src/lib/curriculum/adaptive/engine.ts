@@ -36,7 +36,16 @@ export interface ResolvedActivity {
 
 function normalise(value: string | number | null | undefined): string {
   if (value === null || value === undefined) return '';
-  return String(value).trim().toLowerCase().replace(/[, ]/g, '');
+  // Trailing sentence punctuation is presentation, not answer content: the UI
+  // renders options as "298, 345, 476, 521." while the config stores
+  // "298, 345, 476, 521". Without this, a correct ordering compared unequal,
+  // the server recorded it as wrong, and the learner was sent to remediation
+  // for a mistake they had not made.
+  return String(value)
+    .trim()
+    .toLowerCase()
+    .replace(/[\s.?!,;:]+$/, '')
+    .replace(/[, ]/g, '');
 }
 
 /**

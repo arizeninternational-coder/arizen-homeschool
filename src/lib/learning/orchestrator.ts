@@ -118,6 +118,40 @@ export class AdaptiveOrchestrator {
     );
     const masteryThreshold = conceptSpec?.masteryThreshold ?? 0.75;
 
+    // ── Step 1b: A correct answer is never grounds for remediation ──────────
+    // The mastery short-circuit above only fires when mastery is already high,
+    // so a *first* correct answer used to fall through to the AI — which, asked
+    // to diagnose, would invent a misconception. Observed in production:
+    // "298, 345, 476, 521" (correct) was answered with
+    // actionType "remediate", misconceptionId "position-confusion",
+    // confidence 0.90. A child who answers correctly was then gated behind a
+    // remediation lesson about a mistake they had not made.
+    //
+    // Correctness here is deterministic evidence, not a judgement call: the
+    // answer was checked against the curriculum's expected value upstream. The
+    // model is only consulted when the learner is actually wrong.
+    if (evidence.correct) {
+      const nextConcept = this.findNextConcept(constraints, evidence.conceptId);
+      // MoveForwardAction requires a nextConceptId; when this is the last
+      // concept, advance the activity while staying on the current concept.
+      const action: PedagogicalAction = {
+        actionType: 'move_forward',
+        conceptId: evidence.conceptId,
+        nextConceptId: nextConcept || evidence.conceptId,
+        reason: nextConcept
+          ? `Answer was correct. Mastery not yet at threshold (${mastery ? mastery.confidence.toFixed(2) : 'no evidence yet'}), so advancing to the next concept.`
+          : 'Answer was correct. Advancing to the next activity.',
+        confidence: 1.0,
+      };
+
+      return {
+        finalAction: action,
+        aiProposal: null, // AI is not consulted on a correct answer
+        validationResult: { valid: true, action },
+        usedFallback: false,
+      } as any;
+    }
+
     // ── Step 2: Short-circuit — if mastered with strong evidence, move forward ─
     // The AI is never asked to "declare mastery." That is always a
     // deterministic application-side decision.
