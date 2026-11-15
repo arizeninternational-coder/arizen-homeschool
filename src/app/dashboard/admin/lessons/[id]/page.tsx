@@ -10,6 +10,8 @@ import {
 } from "lucide-react";
 import { ds, colors } from "@/lib/design-system";
 import { STEP_TYPE_ICONS, STEP_TYPE_LABELS, JOURNEY_STEP_TYPES, type JourneyStepType } from "@/lib/curriculum/lesson-journey";
+import { NumberOrderingCards } from "@/components/interactive/NumberOrderingCards";
+import { parseOrderingQuestion } from "@/lib/curriculum/order-question";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -901,21 +903,42 @@ export default function AdminLessonEditPage({ params }: { params: { id: string }
                           <p style={{ fontSize: "0.8125rem", fontWeight: 700, color: "#92400E" }}>
                             ✋ {step.interaction.question}
                           </p>
-                          {step.interaction.options && (
-                            <div style={{ marginTop: "0.5rem", display: "flex", flexDirection: "column", gap: "0.25rem" }}>
-                              {step.interaction.options.map((opt, oi) => (
-                                <div key={oi} style={{
-                                  padding: "6px 10px", borderRadius: 6,
-                                  background: oi === step.interaction?.correctAnswer ? "#D1FAE5" : "#fff",
-                                  border: `1px solid ${oi === step.interaction?.correctAnswer ? "#10B981" : colors.border}`,
-                                  fontSize: "0.75rem", color: colors.text,
-                                }}>
-                                  {String.fromCharCode(65 + oi)}. {opt}
-                                  {oi === step.interaction?.correctAnswer && " ✓"}
+                          {step.interaction.options && (() => {
+                            const ordering = parseOrderingQuestion(step.interaction.question);
+                            if (ordering) {
+                              // Show the editor what the learner will actually get:
+                              // number cards to arrange, not four pre-sorted strings.
+                              return (
+                                <div style={{ marginTop: "0.5rem" }}>
+                                  <NumberOrderingCards
+                                    numbers={ordering.numbers}
+                                    direction={ordering.direction}
+                                    expectedAnswer={
+                                      typeof step.interaction.correctAnswer === "string"
+                                        ? step.interaction.correctAnswer
+                                        : ordering.answer
+                                    }
+                                    compact
+                                  />
                                 </div>
-                              ))}
-                            </div>
-                          )}
+                              );
+                            }
+                            return (
+                              <div style={{ marginTop: "0.5rem", display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+                                {step.interaction.options.map((opt, oi) => (
+                                  <div key={oi} style={{
+                                    padding: "6px 10px", borderRadius: 6,
+                                    background: oi === step.interaction?.correctAnswer ? "#D1FAE5" : "#fff",
+                                    border: `1px solid ${oi === step.interaction?.correctAnswer ? "#10B981" : colors.border}`,
+                                    fontSize: "0.75rem", color: colors.text,
+                                  }}>
+                                    {String.fromCharCode(65 + oi)}. {opt}
+                                    {oi === step.interaction?.correctAnswer && " ✓"}
+                                  </div>
+                                ))}
+                              </div>
+                            );
+                          })()}
                         </div>
                       )}
 

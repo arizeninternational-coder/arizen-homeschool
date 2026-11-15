@@ -11,6 +11,8 @@ import {
   ReflectionChips,
 } from "./InteractionRenderers";
 import { MediaSpecVideo } from "./MediaSpecVideo";
+import { NumberOrderingCards } from "./NumberOrderingCards";
+import { parseOrderingQuestion } from "@/lib/curriculum/order-question";
 import {
   TapRegion,
   ShadeShape,
@@ -21,6 +23,14 @@ import {
 } from "./AdvancedRenderers";
 import { PlaceValueChart } from "./PlaceValueChart";
 import { NumberLine } from "./NumberLine";
+
+/** Compare answer strings ignoring case, spacing and trailing punctuation. */
+function normaliseLabel(value: string): string {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[\s.?!,;:]+$/, "")
+    .replace(/[, ]/g, "");
+}
 
 // -- Extended Journey Step Type -----------------------------------------------
 
@@ -456,6 +466,49 @@ export function InteractiveStepRenderer({
 
     if (spec.type === "tap_choice") {
       const choices = spec.choices || spec.options || [];
+
+      // Ordering questions ("Order these…: 345, 521, 298, 476") are a sorting
+      // task, not a recognition task. Offer the numbers as cards to arrange
+      // instead of four pre-sorted lists to pick between. The answer string the
+      // cards produce maps back onto the existing choice ids, so scoring,
+      // misconception detection and the tutor loop are unchanged.
+      const ordering = parseOrderingQuestion(spec.prompt || spec.question);
+      if (ordering) {
+        const labelOf = (c: any) => (typeof c === "string" ? c : c.label || "");
+        const expectedLabel =
+          labelOf(choices.find((c: any) => typeof c === "object" && c.id === spec.correctChoiceId)) ||
+          ordering.answer;
+        return (
+          <NumberOrderingCards
+            numbers={ordering.numbers}
+            direction={ordering.direction}
+            expectedAnswer={expectedLabel}
+            disabled={interaction.choiceSubmitted === true}
+            onChecked={(answer, correct) => {
+              const matchIdx = choices.findIndex(
+                (c: any) => normaliseLabel(labelOf(c)) === normaliseLabel(answer)
+              );
+              setInteraction((p: any) => ({
+                ...p,
+                selectedChoiceId: matchIdx >= 0 ? String(matchIdx) : null,
+                selectedChoice: matchIdx,
+                choiceSubmitted: true,
+                choiceCorrect: correct,
+              }));
+              if (onAnswer) {
+                onAnswer(
+                  matchIdx,
+                  correct,
+                  undefined,
+                  answer,        // exact arrangement, not a choice index
+                  expectedLabel
+                );
+              }
+            }}
+          />
+        );
+      }
+
       return (
         <TapChoice
           prompt={spec.prompt || spec.question}
