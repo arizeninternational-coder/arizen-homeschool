@@ -806,9 +806,11 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
           {/* Desktop progression panel */}
           {isDesktop && (
             <div style={{
-              position: "fixed", right: 0, top: 70, bottom: 0, width: 260,
+              position: "fixed", right: 0, top: 0, bottom: 0, width: 260,
               background: "#fff", borderLeft: "1px solid #E2E8F0",
-              padding: "24px 20px", overflow: "auto", zIndex: 5,
+              // Clears the sticky top bar + progress bar; without this the
+              // "Journey Progress" heading is clipped by them.
+              padding: "104px 20px 24px", overflow: "auto", zIndex: 5,
             }}>
               <h4 style={{ fontSize: "0.875rem", fontWeight: 800, color: "#6366f1", textTransform: "uppercase", letterSpacing: "0.05em", margin: "0 0 16px" }}>Journey Progress</h4>
               <div style={{ height: 8, background: "#F1F5F9", borderRadius: 4, overflow: "hidden", marginBottom: 16 }}>
@@ -844,7 +846,9 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
           )}
 
           {/* Step content */}
-          <div style={{ flex: 1, overflow: "auto", padding: "16px" }}>
+          {/* The progression rail is fixed at 260px on desktop, so the content
+              column must reserve that space or it renders underneath it. */}
+          <div style={{ flex: 1, overflow: "auto", padding: "16px", paddingRight: isDesktop ? 292 : 16 }}>
             <div style={{ maxWidth: isDesktop ? 720 : 720, margin: "0 auto" }}>
               {/* Step header */}
               <div style={{ background: "#fff", borderRadius: 16, padding: "24px", boxShadow: "0 2px 12px rgba(0,0,0,0.04)", marginBottom: 16 }}>
@@ -1234,7 +1238,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
 
           {/* Bottom navigation */}
           {totalSteps > 0 && (
-            <div style={{ background: "#fff", borderTop: "1px solid #E2E8F0", padding: "12px 16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div style={{ background: "#fff", borderTop: "1px solid #E2E8F0", padding: "12px 16px", paddingRight: isDesktop ? 292 : 16, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               {clampedStep > 0 ? (
                 <button onClick={() => setCurrentStep(clampedStep - 1)} disabled={!!activeRemediation || !!adaptivePending} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "10px 16px", borderRadius: 10, border: "1px solid #CBD5E1", background: "#fff", color: "#334155", fontWeight: 700, fontSize: 14, cursor: "pointer", opacity: activeRemediation || adaptivePending ? 0.5 : 1 }}>
                   <ChevronLeft style={{ width: 16, height: 16 }} /> Back
