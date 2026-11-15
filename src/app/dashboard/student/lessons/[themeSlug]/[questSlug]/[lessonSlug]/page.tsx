@@ -16,6 +16,8 @@ import type { JourneyStep, JourneyStepType } from "@/lib/curriculum/lesson-journ
 import { STEP_TYPE_ICONS } from "@/lib/curriculum/lesson-journey";
 import { InteractiveStepRenderer } from "@/components/interactive";
 import { RemediationTutor } from "@/components/interactive/RemediationTutor";
+import { NumberOrderingCards } from "@/components/interactive/NumberOrderingCards";
+import { parseOrderingQuestion } from "@/lib/curriculum/order-question";
 import { isLessonStudentVisible } from "@/lib/curriculum/student-visibility";
 import { isGrade4MathContent, buildGrade4JourneyFromBlocks } from "@/lib/curriculum/grade4-journeys";
 import { resolveAdaptiveLessonConfig } from "@/lib/curriculum/adaptive/registry";
@@ -192,6 +194,13 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
   const isLastStep = currentStep >= totalSteps - 1;
   const clampedStep = Math.min(currentStep, Math.max(totalSteps - 1, 0));
   const currentJourneyStep = totalSteps > 0 ? journeySteps[clampedStep] : null;
+
+  // Ordering questions ("Order these…: 345, 521, 298, 476") get number cards
+  // instead of four pre-sorted strings. Plain const, not useMemo — this sits
+  // after conditional work and must never disturb hook order.
+  const orderingQuestion = parseOrderingQuestion(
+    currentJourneyStep?.interaction?.question || currentJourneyStep?.interaction?.prompt
+  );
   const xp = getRewardValue(lesson?.xpReward);
   const subject = lesson?.quest?.theme?.themeSubjects?.[0]?.subject || "";
   const grade = lesson?.quest?.theme?.grade || 0;
@@ -536,7 +545,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
       if (!subActivity) return;
       const choices = subActivity.choices || subActivity.options || [];
       options = choices.map((c: any) => typeof c === "string" ? c : c.label);
-      selectedAnswer = overrideSelectedAnswer || (selectedIdx >= 0 ? (options[selectedIdx] || "") : "");
+      selectedAnswer = overrideSelectedAnswer || interaction?.orderedAnswer || (selectedIdx >= 0 ? (options[selectedIdx] || "") : "");
       if (overrideExpectedAnswer) {
         expectedAnswer = overrideExpectedAnswer;
       } else if (subActivity.correctChoiceId) {
@@ -555,7 +564,7 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
       // Standard single-activity step (think_first, connect, quick_check)
       const choices = step.interactionSpec?.choices || step.interactionSpec?.options || [];
       options = choices.map((c: any) => typeof c === "string" ? c : c.label);
-      selectedAnswer = overrideSelectedAnswer || (selectedIdx >= 0 ? (options[selectedIdx] || "") : "");
+      selectedAnswer = overrideSelectedAnswer || interaction?.orderedAnswer || (selectedIdx >= 0 ? (options[selectedIdx] || "") : "");
       if (overrideExpectedAnswer) {
         expectedAnswer = overrideExpectedAnswer;
       } else if (step.interactionSpec?.correctChoiceId) {
@@ -1012,8 +1021,47 @@ export default function StudentLessonPlayer({ params }: { params: Promise<{ them
                       </div>
                     )}
 
+                    {/* Ordering question → number cards (drag, tap-swap, arrow keys) */}
+                    {orderingQuestion && currentJourneyStep.interaction?.options && currentJourneyStep.interaction.options.length > 0 && (
+                      <div style={{ marginBottom: 16 }}>
+                        <p style={{ fontSize: "1rem", fontWeight: 700, color: "#1e293b", marginBottom: 12 }}>
+                          {currentJourneyStep.interaction.question || currentJourneyStep.interaction.prompt || ""}
+                        </p>
+                        <NumberOrderingCards
+                          numbers={orderingQuestion.numbers}
+                          direction={orderingQuestion.direction}
+                          expectedAnswer={
+                            typeof currentJourneyStep.interaction.correctAnswer === "string"
+                              ? currentJourneyStep.interaction.correctAnswer
+                              : typeof currentJourneyStep.interaction.correctAnswer === "number"
+                                ? currentJourneyStep.interaction.options[currentJourneyStep.interaction.correctAnswer]
+                                : orderingQuestion.answer
+                          }
+                          disabled={interaction.choiceFeedback === "correct"}
+                          onChecked={(arranged, correct) => {
+                            const idx = currentJourneyStep.interaction.options.indexOf(arranged);
+                            setInteraction((p: any) => ({
+                              ...p,
+                              selectedChoice: idx,
+                              orderedAnswer: arranged,
+                              choiceFeedback: correct ? "correct" : "incorrect",
+                              choiceSubmitted: true,
+                              choiceCorrect: correct,
+                            }));
+                          }}
+                        />
+                        {interaction.choiceFeedback === "incorrect" && (
+                          <div style={{ marginTop: 8, padding: "10px 14px", borderRadius: 8, background: "#FEF3C7", border: "1px solid #FDE68A" }}>
+                            <p style={{ fontSize: "0.875rem", fontWeight: 700, color: "#92400E", margin: 0 }}>
+                              Not quite. Compare the hundreds digit of each number first.
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
                     {/* Multiple choice */}
-                    {currentJourneyStep.interaction?.options && currentJourneyStep.interaction.options.length > 0 && (
+                    {!orderingQuestion && currentJourneyStep.interaction?.options && currentJourneyStep.interaction.options.length > 0 && (
                       <div style={{ marginBottom: 16 }}>
                         <p style={{ fontSize: "1rem", fontWeight: 700, color: "#1e293b", marginBottom: 12 }}>
                           {currentJourneyStep.interaction.question || currentJourneyStep.interaction.prompt || ""}
